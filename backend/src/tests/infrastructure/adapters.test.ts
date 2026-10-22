@@ -59,6 +59,15 @@ describe('config', () => {
     expect(config.demoSeed.enabled).toBe(false);
   });
 
+  it('uses the real crypto market source in production, even when told otherwise', () => {
+    const prod = { NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48), RESEND_API_KEY: 're_test' };
+    expect(loadConfig({ ...prod, CRYPTO_MARKET: 'demo' }).cryptoMarket).toBe('binance');
+    expect(loadConfig({ NODE_ENV: 'development', CRYPTO_MARKET: 'demo' }).cryptoMarket).toBe(
+      'demo'
+    );
+    expect(loadConfig({ NODE_ENV: 'development' }).cryptoMarket).toBe('binance');
+  });
+
   it('encrypts the 2FA secrets with their own key, or one derived from the JWT secret', () => {
     const base = { NODE_ENV: 'development', JWT_SECRET: 'j'.repeat(40) };
     expect(loadConfig(base).twoFactor.encryptionKey).toBe('j'.repeat(40));

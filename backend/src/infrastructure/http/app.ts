@@ -8,6 +8,7 @@ import { businessDataRoutes } from './routes/business-data.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
 import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
+import { cryptoRoutes } from './routes/crypto.routes';
 import { financeRoutes } from './routes/finance.routes';
 import { funnelRoutes } from './routes/funnel.routes';
 import { householdRoutes } from './routes/household.routes';
@@ -68,6 +69,7 @@ export function createApp(c: Container): Express {
   api.use(businessDataRoutes(c, limiter));
   api.use(videoRoutes(c, limiter));
   api.use(learnRoutes(c, limiter));
+  api.use(cryptoRoutes(c, limiter));
   api.use(notFoundHandler);
 
   app.use('/api', api);

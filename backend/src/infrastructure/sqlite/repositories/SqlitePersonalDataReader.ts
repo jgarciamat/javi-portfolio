@@ -107,6 +107,50 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       ),
       security: this.security(userId),
       autonomoData: this.autonomoData(userId),
+      cryptoSimulator: this.cryptoSimulator(userId),
+    };
+  }
+
+  /** The play-money simulator of the crypto console: balance, purchases and pending orders. */
+  private cryptoSimulator(userId: string): Row | null {
+    const account = this.one(
+      `SELECT initial_cents, cash_cents, fee_bps AS feeBps, started_at AS startedAt
+       FROM crypto_sim_accounts WHERE user_id = ?`,
+      userId
+    );
+    if (!account) return null;
+    const { initial_cents, cash_cents, ...rest } = account;
+    return {
+      ...rest,
+      initial: money(initial_cents),
+      cash: money(cash_cents),
+      operations: this.all(
+        `SELECT id, symbol, quantity, entry_price AS entryPrice, amount_cents, entry_fee_cents,
+                open_type AS openType, opened_at AS openedAt, exit_price AS exitPrice,
+                exit_fee_cents, proceeds_cents, pnl_cents, close_type AS closeType,
+                closed_at AS closedAt
+         FROM crypto_sim_positions WHERE user_id = ? ORDER BY opened_at`,
+        userId
+      ).map(
+        ({ amount_cents, entry_fee_cents, exit_fee_cents, proceeds_cents, pnl_cents, ...p }) => ({
+          ...p,
+          invested: money(amount_cents),
+          entryFee: money(entry_fee_cents),
+          exitFee: money(exit_fee_cents),
+          proceeds: money(proceeds_cents),
+          result: money(pnl_cents),
+        })
+      ),
+      pendingOrders: this.all(
+        `SELECT id, symbol, side, type, price, amount_cents, reserved_cents,
+                position_id AS positionId, created_at AS createdAt
+         FROM crypto_sim_orders WHERE user_id = ? ORDER BY created_at`,
+        userId
+      ).map(({ amount_cents, reserved_cents, ...o }) => ({
+        ...o,
+        amount: money(amount_cents),
+        reserved: money(reserved_cents),
+      })),
     };
   }
 

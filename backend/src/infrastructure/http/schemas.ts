@@ -6,6 +6,8 @@ import {
   PURCHASE_OPS,
   SALE_OPS,
 } from '@domain/services/autonomo-vat-data';
+import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
+import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
@@ -1055,3 +1057,62 @@ export const referralSummaryResponse = z
       .nullable(),
   })
   .strict();
+
+// ─── Crypto console (simulator with play money) ─────────────────────────────
+
+const cryptoSymbol = z.enum(CRYPTO_SYMBOLS);
+const cryptoOrderType = z.enum(['market', 'limit', 'stop']);
+const cryptoPrice = z.number().finite().positive().max(1_000_000_000);
+const oneOf = <T extends readonly number[]>(values: T, what: string) =>
+  z
+    .number()
+    .refine((v) => (values as readonly number[]).includes(v), `${what}: ${values.join(', ')}`);
+
+export const cryptoCandlesQuery = z
+  .object({ symbol: cryptoSymbol, interval: z.enum(CRYPTO_INTERVALS) })
+  .strict();
+
+/** A purchase (euros to invest) or the sale of an open purchase; market orders take no price. */
+export const cryptoOrderBody = z
+  .discriminatedUnion('action', [
+    z
+      .object({
+        action: z.literal('buy'),
+        symbol: cryptoSymbol,
+        type: cryptoOrderType,
+        amount: z.number().finite().min(1).max(10_000_000).transform(toCents),
+        price: cryptoPrice.optional(),
+      })
+      .strict(),
+    z
+      .object({
+        action: z.literal('sell'),
+        positionId: z.string().uuid(),
+        type: cryptoOrderType,
+        price: cryptoPrice.optional(),
+      })
+      .strict(),
+  ])
+  .superRefine((order, ctx) => {
+    if ((order.type === 'market') !== (order.price === undefined)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['price'],
+        message:
+          order.type === 'market'
+            ? 'Una orden a mercado no lleva precio'
+            : 'Indica el precio de la orden',
+      });
+    }
+  });
+
+export const cryptoOrderParams = z.object({ id: z.string().uuid() }).strict();
+
+export const cryptoResetBody = z
+  .object({
+    initial: oneOf(INITIAL_BALANCES_EUR, 'Saldo inicial').transform(toCents),
+    feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión'),
+  })
+  .strict();
+
+export const cryptoSettingsBody = z.object({ feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión') }).strict();

@@ -6,6 +6,7 @@ import {
   CategorySuggester,
   CheckoutRequest,
   Clock,
+  CryptoMarketData,
   FinancialAdvisor,
   GoogleIdentity,
   GoogleIdentityVerifier,
@@ -15,7 +16,14 @@ import {
   OfferCatalog,
   PaymentGateway,
 } from '@domain/ports/services';
-import { UnauthorizedError, ValidationError } from '@domain/errors';
+import { UnauthorizedError, UnavailableError, ValidationError } from '@domain/errors';
+import {
+  CryptoInterval,
+  CryptoSymbol,
+  MarketCandle,
+  MarketFeed,
+  MarketTicker,
+} from '@domain/services/crypto-market';
 import { BcryptPasswordHasher } from '@infrastructure/auth/JwtTokenService';
 import { buildContainer, Container } from '@infrastructure/container';
 import { createApp } from '@infrastructure/http/app';
@@ -86,6 +94,7 @@ export interface TestContext {
   google: FakeGoogleVerifier;
   payments: FakePaymentGateway;
   push: FakePushSender;
+  market: FakeCryptoMarket;
 }
 
 /** Push sender that records what it is asked to send; `gone` endpoints answer as removed. */
@@ -107,6 +116,60 @@ export class FakePushSender implements PushSender {
   }
 }
 
+/**
+ * Crypto market double (no Internet): prices and candles set by the test, made-up numbers.
+ * `down` makes every call fail like a source that does not answer.
+ */
+export class FakeCryptoMarket implements CryptoMarketData {
+  readonly source = 'binance' as const;
+  prices = new Map<CryptoSymbol, number>([
+    ['BTC', 50_000],
+    ['ETH', 2_000],
+  ]);
+  series = new Map<string, MarketCandle[]>();
+  stale = false;
+  down = false;
+  candleCalls: string[] = [];
+
+  constructor(private readonly clock: Clock) {}
+
+  /** Candles of a coin for every size the simulator may ask for. */
+  setCandles(symbol: CryptoSymbol, candles: MarketCandle[]): void {
+    this.series.set(symbol, candles);
+  }
+
+  async candles(
+    symbol: CryptoSymbol,
+    interval: CryptoInterval
+  ): Promise<MarketFeed<MarketCandle[]>> {
+    this.candleCalls.push(`${symbol}:${interval}`);
+    if (this.down) throw new UnavailableError('down', 'MARKET_UNAVAILABLE');
+    return this.feed(this.series.get(symbol) ?? []);
+  }
+
+  async tickers(): Promise<MarketFeed<MarketTicker[]>> {
+    if (this.down) throw new UnavailableError('down', 'MARKET_UNAVAILABLE');
+    return this.feed(
+      [...this.prices].map(([symbol, price]) => ({
+        symbol,
+        price,
+        changePercent24h: 1.5,
+        high24h: price * 1.02,
+        low24h: price * 0.97,
+      }))
+    );
+  }
+
+  private feed<T>(data: T): MarketFeed<T> {
+    return {
+      data,
+      source: 'binance',
+      updatedAt: this.clock.now().toISOString(),
+      stale: this.stale,
+    };
+  }
+}
+
 export const STRONG_PASSWORD = 'Sup3r-secret!';
 
 export function createTestApp(
@@ -116,6 +179,7 @@ export function createTestApp(
     categorySuggester?: CategorySuggester | null;
     offers?: OfferCatalog;
     rates?: ExchangeRates;
+    market?: FakeCryptoMarket;
     pushEnabled?: boolean;
     env?: Record<string, string>;
   } = {}
@@ -129,6 +193,7 @@ export function createTestApp(
   const payments = new FakePaymentGateway();
   const push = new FakePushSender();
   push.enabled = options.pushEnabled ?? true;
+  const market = options.market ?? new FakeCryptoMarket(clock);
   const container = buildContainer(db, config, {
     // Cheap rounds even when a test runs with NODE_ENV=development (live rate limits).
     hasher: new BcryptPasswordHasher(4),
@@ -143,8 +208,9 @@ export function createTestApp(
     rates: options.rates ?? {
       rate: async (from, to) => (from === 'USD' && to === 'EUR' ? 0.9 : 2),
     },
+    market,
   });
-  return { app: createApp(container), container, clock, email, google, payments, push };
+  return { app: createApp(container), container, clock, email, google, payments, push, market };
 }
 
 export interface TestUser {

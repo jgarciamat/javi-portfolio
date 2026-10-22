@@ -83,6 +83,8 @@ const envSchema = z.object({
   BACKUP_INTERVAL_HOURS: z.coerce.number().positive().default(24),
   BACKUP_RETENTION_DAYS: z.coerce.number().int().positive().default(14),
   RATE_LIMIT_DISABLED: booleanish,
+  /** Market data of the crypto console: the public source, or invented data (never in production). */
+  CRYPTO_MARKET: z.enum(['binance', 'demo']).default('binance'),
   SEED_DEMO_USER: booleanish,
   SEED_DEMO_EMAIL: z.string().email().default('demo@moneymanager.local'),
   SEED_DEMO_PASSWORD: z.string().optional(),
@@ -141,6 +143,8 @@ export interface AppConfig {
   email: { resendApiKey: string | null; fromEmail: string; fromName: string };
   backup: { dir: string | null; intervalHours: number; retentionDays: number };
   rateLimitDisabled: boolean;
+  /** Where the crypto console gets its prices: always the real source in production. */
+  cryptoMarket: 'binance' | 'demo';
   demoSeed: { enabled: boolean; email: string; password: string | null };
 }
 
@@ -300,6 +304,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       retentionDays: raw.BACKUP_RETENTION_DAYS,
     },
     rateLimitDisabled: raw.RATE_LIMIT_DISABLED,
+    cryptoMarket: raw.NODE_ENV === 'production' ? 'binance' : raw.CRYPTO_MARKET,
     demoSeed: {
       enabled: raw.SEED_DEMO_USER && raw.NODE_ENV !== 'production',
       email: raw.SEED_DEMO_EMAIL,

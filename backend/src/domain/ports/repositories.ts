@@ -612,3 +612,71 @@ export interface HouseholdRepository {
 export interface PersonalDataReader {
   sectionsFor(userId: string): Record<string, unknown>;
 }
+
+// ─── Crypto simulator (play money) ───────────────────────────────────────────
+
+export interface CryptoSimAccount {
+  userId: string;
+  initialCents: Cents;
+  cashCents: Cents;
+  feeBps: number;
+  startedAt: string;
+}
+
+/** One purchase of the simulator: open while `closedAt` is null. */
+export interface CryptoSimPosition {
+  id: string;
+  userId: string;
+  symbol: string;
+  quantity: number;
+  entryPrice: number;
+  amountCents: Cents;
+  entryFeeCents: Cents;
+  openType: 'market' | 'limit' | 'stop';
+  openedAt: string;
+  exitPrice: number | null;
+  exitFeeCents: Cents | null;
+  proceedsCents: Cents | null;
+  pnlCents: Cents | null;
+  closeType: 'market' | 'limit' | 'stop' | null;
+  closedAt: string | null;
+}
+
+/** An order waiting for a price: a purchase (`amountCents`) or the sale of `positionId`. */
+export interface CryptoSimOrder {
+  id: string;
+  userId: string;
+  symbol: string;
+  side: 'buy' | 'sell';
+  type: 'limit' | 'stop';
+  price: number;
+  amountCents: Cents | null;
+  reservedCents: Cents;
+  positionId: string | null;
+  createdAt: string;
+}
+
+export interface CryptoSimRepository {
+  account(userId: string): CryptoSimAccount | null;
+  saveAccount(account: CryptoSimAccount): void;
+  positions(userId: string): CryptoSimPosition[];
+  position(userId: string, id: string): CryptoSimPosition | null;
+  countPositions(userId: string): { open: number; total: number };
+  insertPosition(position: CryptoSimPosition): void;
+  /** Closes an open position; false when it was already closed (or is not the user's). */
+  closePosition(
+    userId: string,
+    id: string,
+    close: Pick<
+      CryptoSimPosition,
+      'exitPrice' | 'exitFeeCents' | 'proceedsCents' | 'pnlCents' | 'closeType' | 'closedAt'
+    >
+  ): boolean;
+  orders(userId: string): CryptoSimOrder[];
+  insertOrder(order: CryptoSimOrder): void;
+  /** Removes a pending order; false when it is no longer there. */
+  deleteOrder(userId: string, id: string): boolean;
+  deleteOrdersOfPosition(userId: string, positionId: string): number;
+  /** «Start again»: every position and order of the user goes. */
+  clear(userId: string): void;
+}

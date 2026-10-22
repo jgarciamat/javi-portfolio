@@ -2,6 +2,7 @@ import { AppConfig } from '@config/env';
 import {
   CategorySuggester,
   Clock,
+  CryptoMarketData,
   ExchangeRates,
   PushSender,
   EmailSender,
@@ -51,6 +52,11 @@ import { GeminiAdvisor } from './ai/GeminiAdvisor';
 import { DisabledPaymentGateway, StripeGateway } from './billing/StripeGateway';
 import { DisabledPushSender, WebPushSender } from './push/WebPushSender';
 import { FrankfurterRates } from './rates/FrankfurterRates';
+import { BinanceMarketData } from './market/BinanceMarketData';
+import { DemoMarketData } from './market/DemoMarketData';
+import { SqliteCryptoSimRepository } from './sqlite/repositories/SqliteCryptoSimRepository';
+import { CryptoMarketService } from '@application/crypto/CryptoMarketService';
+import { CryptoSimService } from '@application/crypto/CryptoSimService';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
@@ -119,6 +125,7 @@ export interface ContainerOverrides {
   payments?: PaymentGateway;
   offers?: OfferCatalog;
   rates?: ExchangeRates;
+  market?: CryptoMarketData;
   pushSender?: PushSender;
   hasher?: PasswordHasher;
 }
@@ -162,6 +169,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     trialNotices: new SqliteTrialNoticeRepository(db),
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
+    cryptoSim: new SqliteCryptoSimRepository(db),
     push: new SqlitePushRepository(db),
     inbox: new SqliteInboxRepository(db),
     renta: new SqliteRentaUsageRepository(db),
@@ -340,6 +348,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     }
   };
 
+  const market =
+    overrides.market ??
+    (config.cryptoMarket === 'demo'
+      ? new DemoMarketData(() => clock.now().getTime())
+      : new BinanceMarketData());
+
   return {
     db,
     config,
@@ -347,6 +361,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     repos,
     email,
     rates: overrides.rates ?? new FrankfurterRates(),
+    cryptoMarket: new CryptoMarketService(market),
+    cryptoSim: new CryptoSimService(repos.cryptoSim, market, uow, clock),
     auth,
     twoFactor,
     transactions,
