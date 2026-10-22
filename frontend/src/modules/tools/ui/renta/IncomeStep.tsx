@@ -9,6 +9,7 @@ import {
 import type { RentaWorkExtras } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
 import { GeneralCapitalSection } from './GeneralCapital';
+import { DisabilityPlans, ExcessByYear } from './PlanExtras';
 
 /** Step 2: pay, withholdings, expenses of the job and contributions that lower the base. */
 export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWorkExtras }) {
@@ -129,19 +130,6 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             onChange={(v) => set({ dependencyPremiums: v })}
           />
           <Field
-            id="renta-pension-excess"
-            label={t('tools.renta.pensionExcess')}
-            hint={t('tools.renta.pensionExcessHint')}
-            value={form.pensionExcess ?? ''}
-            onChange={(v) => set({ pensionExcess: v })}
-          />
-          <Field
-            id="renta-dependency-excess"
-            label={t('tools.renta.dependencyExcess')}
-            value={form.dependencyExcess ?? ''}
-            onChange={(v) => set({ dependencyExcess: v })}
-          />
-          <Field
             id="renta-spouse-plan"
             label={t('tools.renta.spousePlan')}
             value={form.spousePlan}
@@ -168,6 +156,8 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             onChange={(v) => set({ pensionCapital2006: v })}
           />
         </div>
+        <ExcessByYear form={form} set={set} />
+        <DisabilityPlans form={form} set={set} />
         <ul className="renta-notes">
           {extras.baseReductions.map((r) => (
             <li key={r.id}>

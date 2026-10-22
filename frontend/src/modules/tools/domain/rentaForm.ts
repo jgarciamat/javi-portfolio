@@ -411,8 +411,8 @@ const tablesOf = (data: RentaData) =>
     : (data.activityTables ?? { modules: [], farm: [] });
 
 /** The excess of the pension plans typed by year, those with an amount. */
-const excessYearsOf = (form: RentaForm): ExcessYear[] =>
-  Object.entries(form.pensionExcessYears ?? {})
+const excessYearsOf = (typed: NonNullable<RentaForm['pensionExcessYears']>): ExcessYear[] =>
+  Object.entries(typed)
     .map(([year, x]) => ({
       year: Number(year),
       plans: number(x.plans),
@@ -449,7 +449,7 @@ export function disabilitySupportOf(form: RentaForm): DisabilitySupport | undefi
 const excessOf = (form: RentaForm): NonNullable<RentaInput['pensionExcess']> => ({
   plans: number(form.pensionExcess),
   dependency: number(form.dependencyExcess),
-  ...(form.pensionExcessYears ? { byYear: excessYearsOf(form) } : {}),
+  ...(form.pensionExcessYears ? { byYear: excessYearsOf(form.pensionExcessYears) } : {}),
 });
 
 /** The calculation input for what is in the form. */

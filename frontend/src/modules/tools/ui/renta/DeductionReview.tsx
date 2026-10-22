@@ -5,6 +5,7 @@ import { number, type Choice } from '../../domain/rentaForm';
 import { needsAmount, queueOf, type Decision, type ReviewState } from '../../domain/rentaReview';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, reveal, useMoney } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 export interface ReviewProps {
   n: number;
@@ -74,6 +75,8 @@ function OutOfReach({ list }: { list: Deduction[] }) {
 function Saving({ saving }: { saving: DeductionSaving }) {
   const { t } = useI18n();
   const money = useMoney();
+  // The year misses figures for this return: no figure, only what is missing.
+  if (useHeld()) return <HeldNote />;
   if (saving.saving <= 0) {
     return <p className="renta-saving">{t('tools.renta.saving.none')}</p>;
   }
@@ -259,6 +262,7 @@ function ReviewDone({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  const held = useHeld();
   const { choices, dismissed, candidates, review } = props;
   const marked = queue.filter((id) => choices[id]?.on);
   const out = queue.filter((id) => !choices[id]?.on && dismissed.includes(id));
@@ -281,9 +285,13 @@ function ReviewDone({
           ))}
         </ul>
       )}
-      <p className="renta-saving-total" role="status">
-        {t('tools.renta.review.saves')} <strong>{money(props.markedSaving)}</strong>
-      </p>
+      {held ? (
+        <HeldNote />
+      ) : (
+        <p className="renta-saving-total" role="status">
+          {t('tools.renta.review.saves')} <strong>{money(props.markedSaving)}</strong>
+        </p>
+      )}
       <div className="button-row renta-review-nav">
         {props.resultLink !== false && (
           <button type="button" className="btn-primary" onClick={() => reveal(null)}>

@@ -5,6 +5,7 @@ import type { JointComparison } from '../../domain/rentaJoint';
 import { JointTable } from './JointResult';
 import { InvestInResult } from './invest/InvestSummary';
 import { useRentaRules } from './RentaRulesContext';
+import { ExcessExpiry } from './PlanExtras';
 import type { ImportedSavings } from '../../domain/rentaGains';
 import { Icon } from '@shared/components/Icon';
 import { scrollBehavior } from '@shared/utils/motion';
@@ -219,6 +220,7 @@ export function ResultCard({
         </p>
       )}
       <ResultLines result={result} money={money} />
+      <ExcessExpiry result={result} />
       {result.savingsDetail && (
         <InvestInResult
           breakdown={result.savingsDetail}

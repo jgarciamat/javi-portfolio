@@ -30,6 +30,10 @@ export const DISABILITY_LIMITS: DisabilityLimits = {
   patrimonyYears: 4,
 };
 
+/** The limits of a year's rules, or those of the law since 2008 when the rules have none. */
+export const disabilityLimitsOf = (r: { disability?: DisabilityLimits }): DisabilityLimits =>
+  r.disability ?? DISABILITY_LIMITS;
+
 /** What was not reduced of one year before, still to use. */
 export interface YearAmount {
   year: number;

@@ -428,7 +428,8 @@ export function useRentaPlanner({
     input,
     live,
     savings,
-    saved,
+    // A year missing figures for this return gives no saving (rentaRules.ts, blockersOf).
+    saved: blockers.length > 0 ? 0 : saved,
     comparison,
     all,
     found,

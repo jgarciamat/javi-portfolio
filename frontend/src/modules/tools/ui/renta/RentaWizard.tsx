@@ -6,7 +6,7 @@ import { useAssistantMode, useWizardProgress } from '@modules/wizard/application
 import type { WizardStep } from '@modules/wizard/domain/wizard';
 import type { RentaMode } from '../../application/useRentaAccess';
 import { DEFAULT_RENTA_YEAR } from '../../data/renta/ejercicios';
-import { RentaRulesProvider, YearNotice } from './RentaRulesContext';
+import { HeldNote, RentaHeldProvider, RentaRulesProvider, YearNotice } from './RentaRulesContext';
 import { COMPARED_BOXES, ourBoxes } from '../../domain/rentaCompare';
 import { answerOf, choose, noPay, OPTIONS, type QuestionId } from '../../domain/rentaGuide';
 import { number, propertiesOf } from '../../domain/rentaForm';
@@ -407,6 +407,8 @@ function BoxesToCopy({ p }: { p: RentaPlannerState }) {
   const [copied, setCopied] = useState<string | null>(null);
   // Filed elsewhere (not resident, foral...): no boxes of the State's return to copy.
   if (scopeOf(p.form).kind === 'out') return <p className="section-hint">{t(w('boxesOut'))}</p>;
+  // The year keeps the result back: say what is missing, not «work it out first».
+  if (p.blockers.length > 0) return <HeldNote />;
   if (!p.shown) return <p className="section-hint">{t(w('boxesFirst'))}</p>;
   const boxes = ourBoxes(p.shown.result, p.input);
   const copy = (box: string, value: number) => {
@@ -612,25 +614,27 @@ export function RentaWizard({
   };
   return (
     <RentaRulesProvider value={p.rules}>
-      <YearNotice blockers={p.blockers} ccaaName={p.ccaaName} />
-      <Wizard
-        flow="renta"
-        defs={RENTA_STEPS}
-        steps={rentaSteps(ctx)}
-        controls={controls}
-        onExpert={onExpert}
-        screenAction={
-          <NewReturn
-            year={year}
-            hasActivity={(p.form.activities?.length ?? 0) > 0}
-            onConfirm={(alsoActivity) => {
-              p.startNew(alsoActivity);
-              controls.restart();
-            }}
-          />
-        }
-        finale={<Finale p={p} money={money} />}
-      />
+      <RentaHeldProvider value={{ blockers: p.blockers, ccaaName: p.ccaaName }}>
+        <YearNotice blockers={p.blockers} ccaaName={p.ccaaName} />
+        <Wizard
+          flow="renta"
+          defs={RENTA_STEPS}
+          steps={rentaSteps(ctx)}
+          controls={controls}
+          onExpert={onExpert}
+          screenAction={
+            <NewReturn
+              year={year}
+              hasActivity={(p.form.activities?.length ?? 0) > 0}
+              onConfirm={(alsoActivity) => {
+                p.startNew(alsoActivity);
+                controls.restart();
+              }}
+            />
+          }
+          finale={<Finale p={p} money={money} />}
+        />
+      </RentaHeldProvider>
     </RentaRulesProvider>
   );
 }

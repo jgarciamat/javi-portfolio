@@ -15,6 +15,7 @@ import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 import { DONATION_IDS } from '../../domain/rentaDonations';
 import { Requirements } from './Requirements';
 import { checkDeduction } from '../../domain/rentaRequirements';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
@@ -42,6 +43,8 @@ function SavingLine({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  // The year misses figures for this return: no saving is given (the step says why, once).
+  if (useHeld()) return null;
   if (saving.blocked && !deduction.incomeLimit) {
     // Without an income limit, what leaves it out is a requirement (age, children, disability).
     return (
@@ -514,12 +517,15 @@ export function DeductionsStep({
   const money = useMoney();
   const foral = ccaa?.regime === 'foral';
   const marked = Object.values(choices).some((c) => c.on);
+  const held = useHeld();
+  // Without the community's figures of the year there is no list to pick: the note says why.
+  const noRegion = useHeld(['regions']);
   return (
     <Step n={n} titleKey="tools.renta.step3">
       {lead}
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
-      <p className="section-hint">{t('tools.renta.saving.hint')}</p>
-      {marked && (
+      {held ? <HeldNote /> : <p className="section-hint">{t('tools.renta.saving.hint')}</p>}
+      {marked && !held && (
         <p className="renta-saving-total" role="status">
           {t('tools.renta.saving.total')} <strong>{money(markedSaving)}</strong>
         </p>
@@ -551,7 +557,9 @@ export function DeductionsStep({
           onChange={onChange}
         />
       )}
-      {!ccaa && !loadError && <p className="section-hint">{t('tools.renta.pickCcaa')}</p>}
+      {!ccaa && !loadError && !noRegion && (
+        <p className="section-hint">{t('tools.renta.pickCcaa')}</p>
+      )}
     </Step>
   );
 }

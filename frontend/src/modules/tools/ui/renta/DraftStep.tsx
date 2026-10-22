@@ -16,6 +16,7 @@ import { applyReading } from '../../domain/rentaDraftApply';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
 import { DraftComparison } from './DraftComparison';
+import { HeldNote, useHeld } from './RentaRulesContext';
 import type { DraftGap } from '../../domain/rentaDraftGaps';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
@@ -454,6 +455,8 @@ export function DraftStep({
 }) {
   const { t } = useI18n();
   const { reading } = draft;
+  // Our figures next to the draft's would be partial while the year misses some of them.
+  const held = useHeld();
 
   return (
     <Step n={0} titleKey="tools.renta.draft.title" className="renta-draft">
@@ -473,7 +476,8 @@ export function DraftStep({
           {reading && (
             <section className="renta-block" aria-live="polite">
               <DraftFound reading={reading} />
-              {!draft.scenario && (
+              {!draft.scenario && held && <HeldNote />}
+              {!draft.scenario && !held && (
                 <DraftComparison
                   reading={reading}
                   rows={comparison.rows}

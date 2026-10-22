@@ -1,5 +1,6 @@
 import {
   DISABILITY_LIMITS,
+  disabilityLimitsOf,
   disabilityReductions,
   patrimonyShare,
   relativePlanShare,
@@ -84,6 +85,9 @@ describe('plans and protected patrimony of a person with a disability (arts. 53 
   });
 
   it('keeps the limits of the law in one place', () => {
+    expect(disabilityLimitsOf({})).toBe(DISABILITY_LIMITS);
+    const own = { ...DISABILITY_LIMITS, patrimonyYears: 3 };
+    expect(disabilityLimitsOf({ disability: own })).toBe(own);
     expect(DISABILITY_LIMITS).toEqual({
       perContributor: 10000,
       joint: 24250,

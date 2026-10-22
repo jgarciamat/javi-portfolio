@@ -45,9 +45,21 @@ describe('Renta planner: work, contributions and savings', () => {
     expect(screen.queryByText(tr('tools.renta.line.pensionExcessNext'))).toBeNull();
     fill('tools.renta.pensionEmploymentOwn', '300');
     fill('tools.renta.dependencyPremiums', '200');
-    fill('tools.renta.dependencyExcess', '100');
-    fill('tools.renta.pensionExcess', '20000');
+    // The excess is asked year by year (2020 to 2024 for the return of 2025).
+    fireEvent.change(
+      screen.getByLabelText(tr('tools.renta.plans.excessDependency', { year: 2021 })),
+      {
+        target: { value: '100' },
+      }
+    );
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.plans.excessPlans', { year: 2024 })), {
+      target: { value: '20000' },
+    });
     expect(screen.getByText(tr('tools.renta.line.pensionExcessNext'))).toBeInTheDocument();
+    // What is left of 2024 can be used until the return of 2029.
+    expect(
+      screen.getByText(new RegExp('de 2024, que puedes reducir hasta la declaración de 2029'))
+    ).toBeInTheDocument();
   });
 
   it('takes pensions out of the low-pay deduction and drops the disability expenses of a pensioner', async () => {

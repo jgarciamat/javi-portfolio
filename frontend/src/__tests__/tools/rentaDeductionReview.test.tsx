@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import type { Deduction } from '@modules/tools/domain/rentaData';
 import { NO_REVIEW } from '@modules/tools/domain/rentaReview';
 import { DeductionReview, type ReviewProps } from '@modules/tools/ui/renta/DeductionReview';
+import { RentaHeldProvider } from '@modules/tools/ui/renta/RentaRulesContext';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 const ded = (id: string, over: Partial<Deduction> = {}): Deduction => ({
@@ -79,5 +80,27 @@ describe('the review, on its own', () => {
     rerender(<DeductionReview {...props({ candidates: [], outOfReach: [], startSignal: 1 })} />);
     expect(screen.getByText(tr('tools.renta.review.doneTitle'))).toHaveFocus();
     expect(screen.getByText(tr('tools.renta.review.pending', { count: 0 }))).toBeInTheDocument();
+  });
+});
+
+describe('the review in a year missing figures', () => {
+  it('says what is missing instead of what a deduction and the marked ones save', () => {
+    const held = (p: ReviewProps) => (
+      <RentaHeldProvider value={{ blockers: ['regions'], ccaaName: 'Galicia' }}>
+        <DeductionReview {...p} />
+      </RentaHeldProvider>
+    );
+    const marked = props({
+      choices: { 'estado-a': { on: true, amount: '', units: '' } },
+      savings: { 'estado-a': { saving: 9, blocked: false, example: null } },
+    });
+    const { rerender } = renderWithProviders(held(marked), { authenticated: false });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.review.start') }));
+    const note = tr('tools.renta.year.held', { name: 'Galicia', year: 2025 });
+    expect(screen.getByText(note)).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.renta.review.saving'), { exact: false })).toBeNull();
+    rerender(held({ ...marked, candidates: [], outOfReach: [], startSignal: 1 }));
+    expect(screen.getByText(note)).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.renta.review.saves'), { exact: false })).toBeNull();
   });
 });

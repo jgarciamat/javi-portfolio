@@ -5,6 +5,7 @@ import { AUTONOMO_ACTIVITY, withoutAutonomoActivity } from '../../domain/rentaFr
 import { ActivityBoxes } from './ActivityBoxes';
 import { RemoveActivity } from './AutonomoBring';
 import { Field, useMoney, type StepProps } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 /**
  * An activity in direct estimation that may be artistic (LIRPF DA 60.ª.2, from 2025): the tick and
@@ -72,6 +73,8 @@ export function ActivitiesList({
 }: StepProps & { result: ActivitiesResult | null }) {
   const { t } = useI18n();
   const money = useMoney();
+  // Without the módulos of the year the figures of an activity by módulos would be partial.
+  const held = useHeld(['modules']);
   const list = form.activities ?? [];
   if (list.length === 0 || !result) return null;
   return (
@@ -81,7 +84,12 @@ export function ActivitiesList({
         {list.map((a, i) => (
           <li key={`${a.name}-${i}`}>
             <span>
-              {t('tools.renta.activities.line', { name: a.name, net: money(result.each[i].net) })}
+              {held
+                ? a.name
+                : t('tools.renta.activities.line', {
+                    name: a.name,
+                    net: money(result.each[i].net),
+                  })}
             </span>
             {a.name === AUTONOMO_ACTIVITY ? (
               <RemoveActivity onRemove={() => set(withoutAutonomoActivity(form))} />
@@ -102,21 +110,27 @@ export function ActivitiesList({
           </li>
         ))}
       </ul>
-      {(result.artisticReduction ?? 0) > 0 && (
-        <p className="section-hint" role="status">
-          {t('tools.renta.activities.artisticReduction', {
-            amount: money(result.artisticReduction as number),
-          })}
-        </p>
+      {held ? (
+        <HeldNote parts={['modules']} />
+      ) : (
+        <>
+          {(result.artisticReduction ?? 0) > 0 && (
+            <p className="section-hint" role="status">
+              {t('tools.renta.activities.artisticReduction', {
+                amount: money(result.artisticReduction as number),
+              })}
+            </p>
+          )}
+          <p className="section-hint">
+            {t('tools.renta.activities.total', {
+              total: money(result.total),
+              withheld: money(result.withheld),
+              payments: money(result.payments),
+            })}
+          </p>
+          <ActivityBoxes list={list} result={result} />
+        </>
       )}
-      <p className="section-hint">
-        {t('tools.renta.activities.total', {
-          total: money(result.total),
-          withheld: money(result.withheld),
-          payments: money(result.payments),
-        })}
-      </p>
-      <ActivityBoxes list={list} result={result} />
     </section>
   );
 }

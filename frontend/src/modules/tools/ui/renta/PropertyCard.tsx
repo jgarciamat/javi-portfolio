@@ -18,6 +18,7 @@ import {
   type RepairWhen,
 } from '../../domain/rentaRentals';
 import { Field, RadioOptions, useMoney, type StepProps } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 const USES: PropertyUse[] = ['home', 'season', 'tourist', 'business', 'other'];
 /** Information cards of the catalogue, not amounts. */
@@ -185,7 +186,7 @@ function RepairTiming({
 }
 
 /** What the property gives, in one line: net, reduction, the reduced net and the imputed rent. */
-function PropertySummary({
+export function PropertySummary({
   p,
   property,
   year,
@@ -201,13 +202,17 @@ function PropertySummary({
     revised: property.imputation.revisedRate,
   });
   const rate = p.revised ? property.imputation.revisedRate : property.imputation.standardRate;
+  // The year misses the reductions of the rent or the imputation rate: those figures are not given.
+  const rentals = useHeld(['rentals']);
+  const imputation = useHeld(['imputation']);
   return (
     <ul className="renta-property-summary" aria-label={t('tools.renta.property.summary')}>
       <li>
         {t('tools.renta.property.net')} <strong>{money(r.net)}</strong>
       </li>
       <li>
-        {t('tools.renta.property.reducedNet')} <strong>{money(r.reducedNet)}</strong>
+        {t('tools.renta.property.reducedNet')}{' '}
+        {rentals ? <HeldNote parts={['rentals']} /> : <strong>{money(r.reducedNet)}</strong>}
       </li>
       {r.excessCarry > 0 && (
         <li>
@@ -217,7 +222,11 @@ function PropertySummary({
       {r.disposalDays > 0 && (
         <li>
           {t('tools.renta.property.imputed', { days: r.disposalDays })}{' '}
-          <strong>{money(Math.round(r.imputedValue * rate) / 100)}</strong>
+          {imputation ? (
+            <HeldNote parts={['imputation']} />
+          ) : (
+            <strong>{money(Math.round(r.imputedValue * rate) / 100)}</strong>
+          )}
         </li>
       )}
     </ul>

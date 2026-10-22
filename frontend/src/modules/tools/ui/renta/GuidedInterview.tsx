@@ -25,6 +25,7 @@ import { AscendantsSection, ChildrenSection } from './FamilyStep';
 import { PartnerFields, SingleParentFields } from './JointStep';
 import { RentalSection, UnrentedSection } from './PropertyStep';
 import { ResidenceQuestions } from './Residence';
+import { DisabilityPlans, ExcessByYear } from './PlanExtras';
 import { Field, RadioOptions, Step, useMoney, type StepProps } from './shared';
 
 export interface GuideProps extends StepProps {
@@ -284,6 +285,11 @@ function PlanBody({ form, set, answer }: BodyProps) {
         value={form.pensionEmployer}
         onChange={(v) => set({ pensionEmployer: v })}
       />
+      <details className="renta-group">
+        <summary>{t('tools.renta.plans.more')}</summary>
+        <ExcessByYear form={form} set={set} />
+        <DisabilityPlans form={form} set={set} />
+      </details>
     </div>
   );
 }
