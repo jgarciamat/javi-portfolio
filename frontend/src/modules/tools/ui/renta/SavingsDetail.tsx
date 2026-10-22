@@ -18,7 +18,7 @@ import { InvestLink } from './InvestCard';
 import { InvestImport } from './invest/InvestImport';
 
 const KINDS: AssetKind[] = ['listed', 'fund', 'crypto', 'unlisted', 'other'];
-const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvested'];
+const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvested', 'annuity'];
 const CAPITAL: (keyof CapitalIncome)[] = [
   'interest',
   'dividends',
@@ -285,6 +285,20 @@ function PropertyEditor({
             ))}
           </select>
         </label>
+        {sale.exemption === 'annuity' && (
+          <>
+            <Amount
+              label={t(`${k}.annuityReinvested`)}
+              value={sale.reinvested ?? 0}
+              onChange={(reinvested) => onChange({ ...sale, reinvested })}
+            />
+            <Amount
+              label={t(`${k}.annuityPrior`)}
+              value={sale.annuityPrior ?? 0}
+              onChange={(annuityPrior) => onChange({ ...sale, annuityPrior })}
+            />
+          </>
+        )}
         {sale.exemption === 'reinvested' && (
           <>
             <Amount
@@ -300,6 +314,7 @@ function PropertyEditor({
           </>
         )}
       </div>
+      {sale.exemption === 'annuity' && <p className="section-hint">{t(`${k}.annuityHint`)}</p>}
       {pre1995(sale.acquired ?? '') && <p className="section-hint">{t(`${k}.abatementHint`)}</p>}
       <button className="btn-secondary" onClick={onRemove}>
         {t(`${k}.removeProperty`)}

@@ -123,6 +123,22 @@ describe('Renta: the savings in detail', () => {
     type(sale.getByLabelText(tr(`${k}.pendingLoan`)), '50000');
     // Half of the 100,000 € gain is exempt.
     expect(statusText()).toContain(money(50000));
+    // Put in a life annuity instead: 150,000 of the 200,000 €, after 140,000 € of earlier ones,
+    // counts 100,000 € (240,000 in all): half of the gain.
+    fireEvent.change(sale.getByLabelText(tr(`${k}.exemption`)), { target: { value: 'annuity' } });
+    expect(sale.getByText(tr(`${k}.annuityHint`))).toBeInTheDocument();
+    type(sale.getByLabelText(tr(`${k}.annuityReinvested`)), '150000');
+    type(sale.getByLabelText(tr(`${k}.annuityPrior`)), '140000');
+    expect(last.savingsDetail?.properties[0]).toMatchObject({
+      exemption: 'annuity',
+      reinvested: 150000,
+      annuityPrior: 140000,
+    });
+    expect(statusText()).toContain(money(50000));
+    fireEvent.change(sale.getByLabelText(tr(`${k}.exemption`)), {
+      target: { value: 'reinvested' },
+    });
+    type(sale.getByLabelText(tr(`${k}.reinvested`)), '75000');
     type(screen.getByLabelText(tr(`${k}.other`)), '-1000');
     type(screen.getByLabelText(tr(`${k}.general`)), '300');
     expect(screen.getByText(tr(`${k}.generalLine`))).toBeInTheDocument();

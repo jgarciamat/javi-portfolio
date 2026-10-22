@@ -91,10 +91,15 @@ export interface PropertySale {
   cost: number;
   /** Depreciation deducted while it was rented: it lowers the acquisition value (art. 35.1). */
   amortization: number;
-  /** homeOver65: main home sold at 65 or more (art. 33.4.b); reinvested: main home reinvested (art. 38.1). */
-  exemption: 'none' | 'homeOver65' | 'reinvested';
-  /** reinvested: what was put in the new main home. */
+  /**
+   * homeOver65: main home sold at 65 or more (art. 33.4.b); reinvested: main home reinvested (art.
+   * 38.1); annuity: sold at 65 or more and put in a life annuity within six months (art. 38.3).
+   */
+  exemption: 'none' | 'homeOver65' | 'reinvested' | 'annuity';
+  /** reinvested: what was put in the new main home; annuity: what was put in the life annuity. */
   reinvested?: number;
+  /** annuity: what earlier sales already put in life annuities, which uses up the 240,000 €. */
+  annuityPrior?: number;
   /** reinvested: the loan on the old home paid off with the sale (RIRPF art. 41.2). */
   pendingLoan?: number;
   /**
@@ -386,6 +391,30 @@ export interface PropertyResult {
   taxable: number;
 }
 
+/** Art. 38.3 LIRPF: the most that can be put in life annuities with the exemption, in all. */
+export const ANNUITY_LIMIT = 240000;
+
+/**
+ * The exempt part of a gain put in a life annuity by a taxpayer of 65 or more (LIRPF art. 38.3 and
+ * RIRPF art. 42.4, BOE-A-2006-20764 and BOE-A-2007-6820, checked 22-10-2026): «únicamente se
+ * considerará reinvertido el importe de la diferencia entre 240.000 euros y el importe de las
+ * reinversiones anteriores», and with less than what was obtained only «la parte proporcional».
+ * Manual práctico de Renta 2025, c11, «Ejemplo: reinversión en rentas vitalicias»: 190,000 ×
+ * 140,000 / 250,000 = 106,400. `prior`: what earlier sales already put in annuities.
+ */
+export function annuityExempt(
+  gain: number,
+  proceeds: number,
+  reinvested: number,
+  prior = 0,
+  limit = ANNUITY_LIMIT
+): number {
+  const obtained = positive(proceeds);
+  if (gain <= 0 || obtained <= 0) return 0;
+  const counted = Math.min(positive(reinvested), obtained, Math.max(0, limit - positive(prior)));
+  return round2((gain * counted) / obtained);
+}
+
 /** The gain of a property sold and its exempt part, before the abatement. */
 function propertyBase(p: PropertySale): { gain: number; exempt: number; item: AbatementItem } {
   const cost = Math.max(0, positive(p.cost) - positive(p.amortization));
@@ -399,6 +428,8 @@ function propertyBase(p: PropertySale): { gain: number; exempt: number; item: Ab
     const share = obtained > 0 ? Math.min(1, positive(p.reinvested ?? 0) / obtained) : 1;
     exempt = round2(gain * share);
   }
+  if (gain > 0 && p.exemption === 'annuity')
+    exempt = annuityExempt(gain, p.proceeds, p.reinvested ?? 0, p.annuityPrior ?? 0);
   // The exempt part neither has the reduction nor counts towards the 400,000 € (Manual 2025, c11,
   // «Cálculo del valor de transmisión», checked 22-10-2026: the reinvested value is left out).
   const free = gain > 0 ? (gain - exempt) / gain : 1;

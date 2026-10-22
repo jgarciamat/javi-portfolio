@@ -29,6 +29,7 @@ import { agrarianModules } from '@modules/finances/domain/agrarianModules';
 import { artisticReduction } from '@modules/tools/domain/rentaActivity';
 import { emptyForm, rentalOf, toInput } from '@modules/tools/domain/rentaForm';
 import {
+  annuityExempt,
   emptySavingsDetail,
   fifo,
   generalBaseOf,
@@ -568,6 +569,25 @@ const CHECKS: Record<string, () => void> = {
     expect(p.exempt).toBe(figure('renta-c11-07', 'Ganancia exenta'));
     expect(p.taxable).toBe(figure('renta-c11-07', 'Ganancia sujeta'));
   },
+  'renta-c11-08': () => {
+    // Shares bought for 20,000 € and sold for 50,000 €, all of it put in a life annuity in August.
+    expect(annuityExempt(50000 - 20000, 50000, 50000)).toBe(
+      figure('renta-c11-08', 'Ganancia acciones exenta')
+    );
+    // Then a property, 110,000 → 250,000 €, also into the annuity: only 240,000 − 50,000 counts.
+    const p = propertyGain({
+      name: 'Inmueble',
+      proceeds: 250000,
+      cost: 110000,
+      amortization: 0,
+      exemption: 'annuity',
+      reinvested: 250000,
+      annuityPrior: 50000,
+    });
+    expect(p.gain).toBe(figure('renta-c11-08', 'Ganancia inmueble'));
+    expect(p.exempt).toBe(figure('renta-c11-08', 'Ganancia inmueble exenta'));
+    expect(p.taxable).toBe(140000 - 106400);
+  },
   'renta-c12-01': () => {
     const s = savingsOf(
       {
@@ -837,8 +857,6 @@ const PENDING: Record<string, string> = {
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',
-  'renta-c11-08':
-    'Exención por reinversión en renta vitalicia de mayores de 65 (art. 38.3): solo hay una ficha informativa.',
   'renta-c16-02':
     'Comprobación del aumento de patrimonio en la deducción por vivienda (régimen transitorio): la base la escribe la persona.',
 };
