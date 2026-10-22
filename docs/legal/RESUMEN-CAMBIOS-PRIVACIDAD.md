@@ -248,8 +248,11 @@ dinero real, no hay cuentas de exchange, claves, enlaces de afiliado, señales n
     (se borra al momento) o elimines la cuenta. Las órdenes pendientes caducan a los 30 días.»
 35. **s7**: la exportación JSON ya incluye la sección `cryptoSimulator` (saldo, comisión,
     operaciones y órdenes pendientes). Al eliminar la cuenta se borra todo (borrado en cascada).
-36. **s8** (almacenamiento local, añadir): «`mm_crypto_view`: la moneda y el tamaño de vela que
-    viste por última vez en la Consola crypto (solo una preferencia de este dispositivo).»
+36. **s8** (almacenamiento local, añadir): «En la Consola crypto guardamos en este dispositivo,
+    solo como preferencias: la moneda y el tamaño de vela que viste por última vez
+    (`mm_crypto_view`), las capas de la gráfica que tienes encendidas (`mm_crypto_layers`), si ves
+    los importes en euros o en dólares (`mm_crypto_currency`) y si ya viste el aviso de girar el
+    móvil (`mm_crypto_rotate_hint`).»
 37. **Avisos legales y de licencias (página de licencias de terceros o «Acerca de», si existe)**:
     la gráfica usa **TradingView Lightweight Charts™** (licencia Apache 2.0, «Copyright (c) 2025
     TradingView, Inc.»), que exige atribución y un enlace a https://www.tradingview.com/. Ya se cumple
@@ -270,3 +273,34 @@ dinero real, no hay cuentas de exchange, claves, enlaces de afiliado, señales n
       licencia de datos ni atribución adicional para un uso no comercial en la app; revisar sus
       condiciones de uso de la API pública antes de publicar.
     - Si en el futuro se añaden ventas en corto o apalancamiento simulados, revisar los avisos.
+
+# Cambios del 22/10/2026 (segunda tanda): cortos, take profit y stop loss, euros/dólares
+
+El dueño autoriza adaptar los textos de la consola por ser contenido didáctico. Lo marcado como
+«propuesta» sigue pendiente de revisión legal. **No se ha editado ningún texto legal de la app.**
+
+40. **Aviso fijo de la consola** (ya en la app, `app.crypto.risk.body`): se amplía con «Operar en
+    corto o con apalancamiento en el mercado real puede hacer perder más de lo invertido; esto es
+    solo un simulador».
+41. **s2** (propuesta, completar el punto 31): «…cada operación (dirección long o short, moneda,
+    cantidad, precio y fecha de entrada y de salida, importe, comisiones, resultado y si se cerró
+    a mercado, por take profit, por stop loss o por garantía agotada) y cada orden pendiente (tipo,
+    dirección, precio, importe, y el take profit y el stop loss que dejará al ejecutarse).»
+42. **s4** (propuesta, completar el punto 33): «Para ver los importes en dólares usamos el tipo de
+    cambio del BCE que ya consulta nuestro servidor (Frankfurter); no se envía ningún dato tuyo.»
+43. **Condiciones** (propuesta, completar el punto 38): «La Consola crypto permite simular
+    posiciones largas y cortas siempre a 1x, sin préstamos ni apalancamiento: en un corto el
+    importe queda como garantía y la posición se cierra sola si el precio llega al doble. La guía
+    explica el apalancamiento solo con fines didácticos; Finanverso no lo ofrece.»
+44. **Dudas para el abogado**: confirmar que explicar cortos y apalancamiento con ejemplos
+    inventados, sin recomendar operar ni enlazar a plataformas, sigue siendo contenido educativo
+    y no publicidad de productos apalancados (CNMV); revisar la redacción del aviso fijo.
+
+## Pendiente para la próxima entrega (no implementado todavía)
+
+45. **Temporadas, ranking mensual y cartera de prácticas** (ver `docs/consola-crypto.md`,
+    «Pendiente»). Antes de publicarlos hacen falta: tratamiento del **alias** del ranking
+    (participación voluntaria, base 6.1.a, conservación del histórico de temporadas), **bases del
+    ranking** (concurso de habilidad sin coste, premio de 1 mes de Premium no canjeable por dinero,
+    sin dinero real, descalificación por abuso, fechas en hora de Madrid) y revisión del **premio
+    promocional** por un abogado.
