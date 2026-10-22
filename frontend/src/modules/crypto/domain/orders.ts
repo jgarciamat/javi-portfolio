@@ -148,6 +148,23 @@ export function exitResult(
   return saleEstimate(trade.quantity, price, trade.invested + trade.entryFee, bps, short);
 }
 
+/**
+ * Where an open position's result comes from: what the price alone gives (a long gains when it
+ * rises, a short when it falls), the commissions (the one paid on opening plus the estimated one
+ * of closing now) and the net result, which is what the card headlines. Null without a price.
+ */
+export function openBreakdown(
+  trade: Pick<OpenTrade, 'pnl' | 'entryFee' | 'exitFee'>
+): { price: number; fees: number; net: number } | null {
+  if (trade.pnl === null || trade.exitFee === null) return null;
+  const fees = cents(trade.entryFee + trade.exitFee);
+  return { price: cents(trade.pnl + fees), fees, net: trade.pnl };
+}
+
+/** Whether the price must rise (true) or fall (false) for a take profit or stop loss to be reached. */
+export const needsRise = (direction: Direction, kind: ExitKind): boolean =>
+  (kind === 'takeProfit') === (direction === 'long');
+
 export type ExitKind = 'takeProfit' | 'stopLoss';
 export type ExitProblem = 'price' | 'side';
 

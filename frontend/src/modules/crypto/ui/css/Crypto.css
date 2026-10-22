@@ -1249,8 +1249,27 @@
   color: var(--cc-strong);
 }
 
-.cc-trade-head > :last-child {
+.cc-trade-head > .cc-trade-result {
   margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.5rem;
+  align-items: baseline;
+  justify-content: flex-end;
+}
+
+.cc-price-result {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.cc-exit-way {
+  color: var(--cc-text-2);
+  font-size: 0.75rem;
+}
+
+.cc-breakdown {
+  margin-bottom: 0.5rem;
 }
 
 .cc-facts {

@@ -50,6 +50,14 @@ test('opens a long with take profit and stop loss, changes them and closes it at
   await expect(takeProfit).toContainText('100.000,00 €');
   await expect(takeProfit).toContainText(/\+\d+,\d\d\s*% del precio actual/);
   await expect(takeProfit.locator('.pnl-pos')).toBeVisible();
+  await expect(takeProfit).toContainText('(el precio debe subir)');
+  await expect(stopLoss).toContainText('(el precio debe bajar)');
+  // The result is explained: price, commissions (entry + estimated exit) and net.
+  const breakdown = open.locator('.cc-breakdown');
+  await expect(breakdown).toContainText('Resultado del precio');
+  await expect(breakdown).toContainText('Comisiones (entrada + salida estimada)');
+  await expect(breakdown).toContainText('Resultado neto');
+  await expect(open.locator('.cc-price-result')).toContainText(/^Precio: [+−]?\d/);
   await expect(stopLoss).toContainText('30.000,00 €');
   await expect(stopLoss.locator('.pnl-neg')).toBeVisible();
   const colour = (part: typeof takeProfit) =>

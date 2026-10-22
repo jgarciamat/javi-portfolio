@@ -615,6 +615,9 @@ describe('Crypto console: opening positions', () => {
     expect(nb((await screen.findByText(/menos que al empezar/)).textContent)).toMatch(
       /50,00 € menos/
     );
+    expect(
+      screen.getByText(/ya descuenta las comisiones de entrada y la de salida estimada/)
+    ).toBeVisible();
     unmount();
     setup(
       withPortfolio({
@@ -779,10 +782,10 @@ describe('Crypto console: open, pending and closed', () => {
     );
     const long = card(/^Cerrar operación \(Long de BTC\)/);
     expect(text(long.querySelector('.cc-exit--takeProfit'))).toBe(
-      'Take profit60.000,00 €+9,09 % del precio actualSi llega: +197,80 € (+19,76 %)'
+      'Take profit60.000,00 €+9,09 % del precio actual (el precio debe subir)Si llega: +197,80 € (+19,76 %)'
     );
     expect(text(long.querySelector('.cc-exit--stopLoss'))).toBe(
-      'Stop loss45.000,00 €−18,18 % del precio actualSi llega: −101,90 € (−10,18 %)'
+      'Stop loss45.000,00 €−18,18 % del precio actual (el precio debe bajar)Si llega: −101,90 € (−10,18 %)'
     );
     expect(long.querySelector('.cc-exit--takeProfit .pnl-pos')).not.toBeNull();
     expect(long.querySelector('.cc-exit--stopLoss .pnl-neg')).not.toBeNull();
@@ -795,6 +798,56 @@ describe('Crypto console: open, pending and closed', () => {
     expect(screen.getByText(/lo ves en verde en su tarjeta/)).toBeVisible();
   });
 
+  it('explains a red short whose price already goes its way: price, commissions and net', async () => {
+    // Invented short: price result +7,26, commissions 5,00 + 4,99, net -2,73 (-0,05 %).
+    const winning: OpenTrade = {
+      ...short,
+      invested: 5_000,
+      entryFee: 5,
+      currentPrice: 103.16,
+      entryPrice: 103.31,
+      value: 5_002.27,
+      exitFee: 4.99,
+      pnl: -2.73,
+      pnlPercent: -0.05,
+    };
+    setup(withPortfolio({ open: [winning] }));
+    await screen.findByText('Abiertas (1)');
+    const li = card(/^Cerrar operación \(Short de BTC\)/);
+    // Headline: the net, red, with the price result small and green beside it.
+    expect(text(li.querySelector('.cc-trade-head'))).toContain('−2,73 € (−0,05 %)Precio: +7,26 €');
+    expect(li.querySelector('.cc-trade-head .pnl-neg')).not.toBeNull();
+    expect(li.querySelector('.cc-price-result.pnl-pos')).not.toBeNull();
+    const rows = li.querySelector('.cc-breakdown')!;
+    expect(text(rows)).toBe(
+      'Resultado del precio+7,26 €Comisiones (entrada + salida estimada)−9,99 €' +
+        'Resultado neto−2,73 € (−0,05 %)El precio ya juega a tu favor, pero las comisiones aún no están cubiertas.'
+    );
+    expect(rows.querySelector('.pnl-pos')).not.toBeNull();
+    expect(rows.querySelector('.pnl-neg')).not.toBeNull();
+  });
+
+  it('does not add the sentence when the net is green or the price goes against', async () => {
+    setup(withPortfolio({ open: [fx.portfolio().open[0], { ...short, id: 's2' }] }));
+    await screen.findByText('Abiertas (2)');
+    expect(screen.queryByText(/comisiones aún no están cubiertas/)).toBeNull();
+    expect(document.querySelectorAll('.cc-breakdown')).toHaveLength(2);
+    expect(document.querySelectorAll('.cc-breakdown .pnl-pos')).toHaveLength(2);
+  });
+
+  it('shows no breakdown without a price', async () => {
+    setup(
+      withPortfolio({
+        open: [
+          { ...short, currentPrice: null, value: null, exitFee: null, pnl: null, pnlPercent: null },
+        ],
+      })
+    );
+    await screen.findByText('Abiertas (1)');
+    expect(document.querySelector('.cc-breakdown')).toBeNull();
+    expect(document.querySelector('.cc-price-result')).toBeNull();
+  });
+
   it("shows the distance as «—» without a price, and a short's result if reached", async () => {
     const pending = [
       exit({ id: 'tp', positionId: 's1', direction: 'short', side: 'buy', price: 40_000 }),
@@ -803,7 +856,7 @@ describe('Crypto console: open, pending and closed', () => {
     await screen.findByText('Abiertas (1)');
     // Guarantee 1.000 € + (50.000 − 40.000) × 0,02 = 1.200 €, minus 0,80 € of commission.
     expect(text(document.querySelector('.cc-exit--takeProfit'))).toBe(
-      'Take profit40.000,00 €—Si llega: +198,20 € (+19,80 %)'
+      'Take profit40.000,00 €— (el precio debe bajar)Si llega: +198,20 € (+19,80 %)'
     );
   });
 

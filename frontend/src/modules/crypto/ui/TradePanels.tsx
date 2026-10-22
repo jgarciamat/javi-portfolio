@@ -2,7 +2,7 @@ import { useEffect, useId, useState, type FormEvent } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatDateTime, formatQuantity, pnl } from '../domain/format';
-import { exitProblem, exitResult, type ExitKind } from '../domain/orders';
+import { exitProblem, exitResult, needsRise, openBreakdown, type ExitKind } from '../domain/orders';
 import type {
   ClosedTrade,
   Direction,
@@ -121,6 +121,7 @@ function ExitFacts({
       {EXITS.map(({ kind }) => {
         const price = exits[kind];
         const result = price === undefined ? null : exitResult(trade, price, bps);
+        const rise = needsRise(trade.direction, kind);
         return (
           <div key={kind} className={`cc-exit cc-exit--${kind}`}>
             <dt>{t(`app.crypto.trades.facts.${kind}`)}</dt>
@@ -137,7 +138,13 @@ function ExitFacts({
                           ((price! - trade.currentPrice) / trade.currentPrice) * 100,
                           locale
                         ),
-                      })}
+                      })}{' '}
+                  <small
+                    className="cc-exit-way"
+                    title={t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}.title`)}
+                  >
+                    {t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}`)}
+                  </small>
                 </span>
                 <span>
                   {t('app.crypto.trades.exits.ifReached')}{' '}
@@ -298,6 +305,42 @@ function CloseTrade({
   );
 }
 
+/**
+ * Why the result is what it is: what the price gives, the commissions and the net result (the
+ * headline of the card). When the price already favours the person but the commissions are not
+ * covered yet, a short sentence says so instead of leaving a red number unexplained.
+ */
+function Breakdown({ trade }: { trade: OpenTrade }) {
+  const { t, locale } = useI18n();
+  const money = useMoney();
+  const parts = openBreakdown(trade);
+  if (parts === null) return null;
+  const rows: [string, string, string][] = [
+    ['price', money.amount(parts.price, true), pnl(parts.price)],
+    ['fees', money.amount(-parts.fees, true), ''],
+    [
+      'net',
+      `${money.amount(parts.net, true)} (${formatChange(trade.pnlPercent!, locale)})`,
+      pnl(parts.net),
+    ],
+  ];
+  return (
+    <div className="cc-breakdown">
+      <dl className="cc-facts">
+        {rows.map(([key, text, tone]) => (
+          <div key={key}>
+            <dt>{t(`app.crypto.trades.breakdown.${key}`)}</dt>
+            <dd className={tone || undefined}>{text}</dd>
+          </div>
+        ))}
+      </dl>
+      {parts.price > 0 && parts.net < 0 && (
+        <p className="cc-hint">{t('app.crypto.trades.breakdown.feesNotCovered')}</p>
+      )}
+    </div>
+  );
+}
+
 function OpenCard({
   trade,
   orders,
@@ -321,6 +364,7 @@ function OpenCard({
     const order = orders.find((o) => o.type === type);
     if (order) exits[kind] = order.price;
   }
+  const breakdown = openBreakdown(trade);
   const facts: [string, string][] = [
     ['entry', `${money.price(trade.entryPrice)} · ${formatDateTime(trade.openedAt, locale)}`],
     [
@@ -339,7 +383,16 @@ function OpenCard({
         <DirectionBadge direction={trade.direction} />
         <b>{trade.symbol}</b>
         <span>{formatQuantity(trade.quantity, locale)}</span>
-        <Result pnl={trade.pnl} percent={trade.pnlPercent} />
+        <span className="cc-trade-result">
+          <Result pnl={trade.pnl} percent={trade.pnlPercent} />
+          {breakdown && (
+            <small className={`cc-price-result ${pnl(breakdown.price)}`}>
+              {t('app.crypto.trades.breakdown.priceShort', {
+                amount: money.amount(breakdown.price, true),
+              })}
+            </small>
+          )}
+        </span>
       </div>
       <dl className="cc-facts">
         {facts.map(([key, text]) => (
@@ -349,6 +402,7 @@ function OpenCard({
           </div>
         ))}
       </dl>
+      <Breakdown trade={trade} />
       <ExitFacts trade={trade} exits={exits} bps={bps} />
       <div className="button-row">
         <CloseTrade trade={trade} busy={busy} onClose={onClose} />

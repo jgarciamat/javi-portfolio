@@ -172,6 +172,22 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
   su precio, la **distancia en %** respecto al precio actual y el **resultado estimado si se
   alcanza** (mismas cuentas que el servidor, comisión incluida, en verde o rojo con `.pnl-pos` /
   `.pnl-neg`); «—» si no hay.
+- **Desglose del resultado** (tarjeta de «Abiertas», `Breakdown` y `openBreakdown` en
+  `domain/orders.ts`): el titular sigue siendo el **resultado neto** con su color, y al lado, en
+  pequeño, el **resultado del precio** («Precio: +7,26 €», verde o rojo). Debajo, tres filas:
+  _Resultado del precio_ (lo que da solo el movimiento del precio: un long gana si sube, un short
+  si baja) · _Comisiones (entrada + salida estimada)_ · _Resultado neto_ (con el %, siempre sobre
+  lo pagado: importe + comisión de entrada). Siempre: neto = precio − comisión de entrada −
+  comisión de salida estimada. Si el precio va a favor pero el neto es negativo sale la frase «El
+  precio ya juega a tu favor, pero las comisiones aún no están cubiertas». El «Si cerraras ahora
+  recibirías» = garantía (short) o valor (long) + resultado del precio − comisión de salida. El
+  resumen añade una nota: «Resultado de lo que aún tienes» ya descuenta las comisiones, por eso un
+  short con el precio a favor puede verse en rojo hasta cubrirlas. Revisión de cuentas (tests con
+  números inventados en `crypto-sim.test.ts`, `crypto.test.ts` y `domain.test.ts`): longs y
+  shorts dan el mismo resultado en espejo; no había error de cálculo, solo de presentación.
+- **Distancia del TP y del SL**: «+9,09 % del precio actual» seguido, en gris, de «(el precio debe
+  subir)» o «(el precio debe bajar)» (con tooltip): TP de un long y SL de un short, subir; TP de un
+  short y SL de un long, bajar (`needsRise`).
 - **«Editar TP/SL»** abre un formulario con las dos casillas rellenas: cambiar el precio lo mueve
   y dejarla vacía lo quita. Se comprueba en vivo contra el **precio actual** (long: TP por encima
   y SL por debajo; short: al revés; sin precio decide el servidor) y solo se envía lo que cambió.

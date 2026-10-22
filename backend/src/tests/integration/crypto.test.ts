@@ -682,6 +682,31 @@ describe('Crypto console', () => {
       expect(closed.body.account.cash).toBe(10_098.1);
     });
 
+    it('keeps the summary consistent: net results, equity and total all agree (invented)', async () => {
+      // A short of 1.000 at 50.000 (0,02 coins) and a long of 1.000 at 50.000.
+      const sh = (await short({ amount: 1000 }).expect(201)).body.open[0];
+      await buy({ amount: 1000 }).expect(201);
+      // Price falls 75: the short gains 1,50 before commissions, the long loses 1,50.
+      ctx.market.prices.set('BTC', 49_925);
+      const { body } = await get('/crypto/sim').expect(200);
+      const open = body.open as { direction: string; pnl: number; pnlPercent: number }[];
+      const s = open.find((p) => p.direction === 'short')!;
+      const l = open.find((p) => p.direction === 'long')!;
+      expect(s).toMatchObject({ pnl: -0.5, pnlPercent: -0.05, exitFee: 1, entryFee: 1 });
+      expect(l).toMatchObject({ pnl: -3.5, exitFee: 1 });
+      // The summary adds the net results (both commissions already inside), nothing else.
+      expect(body.summary.unrealized).toBeCloseTo(s.pnl + l.pnl);
+      expect(body.summary.equity).toBeCloseTo(10_000 + body.summary.unrealized);
+      expect(body.summary.total).toBeCloseTo(body.summary.unrealized);
+      // Closing the short now books exactly what the card showed.
+      const closed = await sell(sh.id).expect(201);
+      expect(closed.body.closed[0]).toMatchObject({ pnl: -0.5, pnlPercent: -0.05, fees: 2 });
+      expect(closed.body.summary.realized).toBeCloseTo(-0.5);
+      expect(closed.body.summary.total).toBeCloseTo(
+        closed.body.summary.realized + closed.body.summary.unrealized
+      );
+    });
+
     it('loses when the price rises, with take profit below and stop loss above', async () => {
       expect((await short({ takeProfit: 55_000 }).expect(400)).body.code).toBe(
         'CRYPTO_TAKE_PROFIT_SIDE'

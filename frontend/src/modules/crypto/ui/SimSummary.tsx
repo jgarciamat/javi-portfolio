@@ -62,6 +62,7 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
           <Help key={term} term={term} label={t(`app.crypto.help.${term}`)} />
         ))}
       </p>
+      <p className="cc-hint">{t('app.crypto.summary.netNote')}</p>
       <p className="cc-hint">
         {t('app.crypto.summary.since', { date: formatDateTime(account.startedAt, locale) })}
       </p>

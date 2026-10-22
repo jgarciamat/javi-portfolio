@@ -151,6 +151,69 @@ describe('result of a sale and the totals', () => {
     expect(sale({ quantity: 1, amountCents: 0, entryFeeCents: 0 }, 1, 0).pnlPercent).toBe(0);
   });
 
+  it('mirrors long and short: same price move, opposite sign, commission both ways (invented)', () => {
+    // 1.000 of purchase or guarantee at 50.000 = 0,02 coins, 0,10 % commission on each side.
+    const base = { quantity: 0.02, amountCents: 100_000, entryFeeCents: 100, entryPrice: 50_000 };
+    const long = { ...base, direction: 'long' as const };
+    const short = { ...base, direction: 'short' as const };
+    // Price result +1,50 but 1,00 + 1,00 of commissions: both end at -0,50 (-0,05 %).
+    expect(sale(long, 50_075, 10)).toEqual({
+      grossCents: 100_150,
+      feeCents: 100,
+      proceedsCents: 100_050,
+      pnlCents: -50,
+      pnlPercent: -0.05,
+    });
+    expect(sale(short, 49_925, 10)).toEqual({
+      grossCents: 99_850,
+      feeCents: 100,
+      proceedsCents: 100_050,
+      pnlCents: -50,
+      pnlPercent: -0.05,
+    });
+    // Moving the other way the signs flip.
+    expect(sale(short, 49_000, 10)).toMatchObject({
+      feeCents: 98,
+      proceedsCents: 101_902,
+      pnlCents: 1_802,
+      pnlPercent: 1.8,
+    });
+    expect(sale(short, 51_000, 10)).toMatchObject({ proceedsCents: 97_898, pnlCents: -2_202 });
+    expect(sale(long, 49_000, 10).pnlCents).toBe(-2_198);
+    // Past double the entry a short is worth nothing: the whole amount and its commission.
+    expect(sale(short, 100_000, 10)).toMatchObject({ proceedsCents: 0, pnlCents: -100_100 });
+    expect(sale(short, 150_000, 10)).toMatchObject({ proceedsCents: 0, pnlCents: -100_100 });
+  });
+
+  it('always equals price result minus both commissions, for longs and shorts', () => {
+    const base = { quantity: 0.02, amountCents: 100_000, entryFeeCents: 100, entryPrice: 50_000 };
+    for (const price of [30_000, 45_000, 49_925, 50_000, 50_075, 60_000, 80_000]) {
+      const long = sale({ ...base, direction: 'long' }, price, 10);
+      const short = sale({ ...base, direction: 'short' }, price, 10);
+      const longPrice = Math.round(0.02 * price * 100) - 100_000;
+      const shortPrice = Math.round((50_000 - price) * 0.02 * 100);
+      expect(long.pnlCents).toBe(longPrice - 100 - long.feeCents);
+      expect(short.pnlCents).toBe(shortPrice - 100 - short.feeCents);
+      // The percentage is always over what was paid (amount + entry commission).
+      expect(short.pnlPercent).toBe(Math.round((short.pnlCents / 100_100) * 10_000) / 100);
+    }
+  });
+
+  it('prices a short like the owner report with invented numbers: red only because of commissions', () => {
+    const short = {
+      direction: 'short' as const,
+      quantity: 48.39793926,
+      entryPrice: 103.31,
+      amountCents: 500_000,
+      entryFeeCents: 500,
+    };
+    const result = sale(short, 103.16, 10);
+    // Price result +7,26 (5.007,26 - 5.000,00) against 5,00 + 4,99 of commissions.
+    expect(result.proceedsCents - 500_000 + result.feeCents).toBe(726);
+    expect(result).toMatchObject({ feeCents: 499, proceedsCents: 500_227, pnlCents: -273 });
+    expect(result.pnlPercent).toBe(-0.05);
+  });
+
   it('counts gains, losses and the share of gains', () => {
     expect(performance([])).toEqual({
       trades: 0,

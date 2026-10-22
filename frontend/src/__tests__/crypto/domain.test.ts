@@ -32,6 +32,9 @@ import {
   feeOf,
   fillsNow,
   liquidationPrice,
+  needsRise,
+  openBreakdown,
+  exitResult,
   saleEstimate,
 } from '@modules/crypto/domain/orders';
 import { candleList } from '@test-utils/crypto';
@@ -215,5 +218,54 @@ describe('opening a position', () => {
     expect(amountForShare(10_000, 100, 10)).toBe(9990.0);
     expect(amountForShare(10_000, 25, 0)).toBe(2500);
     expect(liquidationPrice(30)).toBe(60);
+  });
+});
+
+describe('result of an open long and short (invented numbers)', () => {
+  // 1.000 € of guarantee/purchase at 50.000 € = 0,02 coins, 0,10 % commission each way.
+  const base = { quantity: 0.02, entryPrice: 50_000, invested: 1_000, entryFee: 1 };
+
+  it('mirrors a long and a short: same price move, opposite sign, same commissions', () => {
+    const long = exitResult({ ...base, direction: 'long' }, 50_075, 10);
+    const short = exitResult({ ...base, direction: 'short' }, 49_925, 10);
+    // Price result +1,50 €, commissions 1,00 + 1,00 (round of 0,9985 / 1,0015).
+    expect(long.fee).toBe(1);
+    expect(short.fee).toBe(1);
+    expect(long.pnl).toBeCloseTo(-0.5);
+    expect(short.pnl).toBeCloseTo(-0.5);
+    expect(long.percent).toBeCloseTo(-0.05, 2);
+    expect(short.percent).toBeCloseTo(-0.05, 2);
+    // The wrong way round the signs flip.
+    expect(exitResult({ ...base, direction: 'short' }, 50_075, 10).pnl).toBeCloseTo(-3.5);
+    expect(exitResult({ ...base, direction: 'long' }, 49_925, 10).pnl).toBeCloseTo(-3.5);
+  });
+
+  it('returns guarantee + price result - exit commission, over what was paid', () => {
+    const r = exitResult({ ...base, direction: 'short' }, 49_000, 10);
+    // 1.000 + (50.000 - 49.000) x 0,02 = 1.020; commission 0,10 % of 980 = 0,98.
+    expect(r.proceeds).toBeCloseTo(1_019.02);
+    expect(r.pnl).toBeCloseTo(18.02);
+    expect(r.percent).toBeCloseTo((18.02 / 1_001) * 100);
+  });
+
+  it('splits the result of an open trade into price, commissions and net', () => {
+    // A short from the owner report with invented figures: price result +7,26, fees 4,99 + 5,00.
+    const parts = openBreakdown({ pnl: -2.73, entryFee: 5, exitFee: 4.99 });
+    expect(parts).toEqual({ price: 7.26, fees: 9.99, net: -2.73 });
+    expect(parts!.price - parts!.fees).toBeCloseTo(parts!.net);
+    expect(openBreakdown({ pnl: null, entryFee: 1, exitFee: null })).toBeNull();
+    // A long that loses: the price result is negative and the net is worse.
+    expect(openBreakdown({ pnl: -102.1, entryFee: 1, exitFee: 1.1 })).toEqual({
+      price: -100,
+      fees: 2.1,
+      net: -102.1,
+    });
+  });
+
+  it('says whether the price must rise or fall to reach a take profit or stop loss', () => {
+    expect(needsRise('long', 'takeProfit')).toBe(true);
+    expect(needsRise('long', 'stopLoss')).toBe(false);
+    expect(needsRise('short', 'takeProfit')).toBe(false);
+    expect(needsRise('short', 'stopLoss')).toBe(true);
   });
 });
