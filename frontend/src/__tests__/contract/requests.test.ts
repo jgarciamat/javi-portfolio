@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { authApi } from '@core/api/authApi';
 import { captureCreatorCode, setCreatorConsent } from '@core/creatorCode';
 import { billingApi } from '@core/api/billingApi';
+import { cryptoApi } from '@core/api/cryptoApi';
 import {
   accountApi,
   budgetApi,
@@ -210,6 +211,21 @@ add('checkoutRentaPass', () =>
   billingApi.checkout('renta_pass', { acceptTerms: true, waiveWithdrawal: true })
 );
 add('rentaCalculation', () => rentaApi.register());
+// Crypto console (play money): purchases, sales of the purchase {position} and the settings.
+add('cryptoBuyMarket', () =>
+  cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'market', amount: 1000 })
+);
+add('cryptoBuyLimit', () =>
+  cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'limit', amount: 250.5, price: 40000 })
+);
+add('cryptoSellLimit', () =>
+  cryptoApi.placeOrder({ action: 'sell', positionId: '{position}', type: 'limit', price: 60000 })
+);
+add('cryptoSellMarket', () =>
+  cryptoApi.placeOrder({ action: 'sell', positionId: '{position}', type: 'market' })
+);
+add('cryptoFee', () => cryptoApi.setFee(25));
+add('cryptoReset', () => cryptoApi.reset(1000, 0));
 
 describe('what the app sends', () => {
   const mockFetch = jest.fn();

@@ -1255,5 +1255,72 @@
     "path": "/renta/calculation",
     "auth": true,
     "body": null
+  },
+  {
+    "name": "cryptoBuyMarket",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "market",
+      "amount": 1000
+    }
+  },
+  {
+    "name": "cryptoBuyLimit",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "limit",
+      "amount": 250.5,
+      "price": 40000
+    }
+  },
+  {
+    "name": "cryptoSellLimit",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "sell",
+      "positionId": "{position}",
+      "type": "limit",
+      "price": 60000
+    }
+  },
+  {
+    "name": "cryptoSellMarket",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "sell",
+      "positionId": "{position}",
+      "type": "market"
+    }
+  },
+  {
+    "name": "cryptoFee",
+    "method": "PATCH",
+    "path": "/crypto/sim/settings",
+    "auth": true,
+    "body": {
+      "feeBps": 25
+    }
+  },
+  {
+    "name": "cryptoReset",
+    "method": "POST",
+    "path": "/crypto/sim/reset",
+    "auth": true,
+    "body": {
+      "initial": 1000,
+      "feeBps": 0
+    }
   }
 ]

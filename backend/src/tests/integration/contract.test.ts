@@ -252,6 +252,59 @@ describe('API contract', () => {
     });
   });
 
+  describe('crypto console (play money)', () => {
+    // Made-up candles: the price goes down to the pending purchase of 40.000 € a minute later.
+    const candles = [
+      {
+        time: Date.parse('2026-03-15T12:00:00Z'),
+        open: 50_000,
+        high: 50_500,
+        low: 49_800,
+        close: 50_100,
+        volume: 2,
+      },
+      {
+        time: Date.parse('2026-03-15T12:01:00Z'),
+        open: 41_000,
+        high: 41_000,
+        low: 39_500,
+        close: 40_500,
+        volume: 3,
+      },
+    ];
+
+    it('answers (compared with the fixtures the app type-checks)', async () => {
+      ctx.market.setCandles('ETH', candles);
+      contract('cryptoCoins', (await get('/crypto/coins')).body);
+      contract('cryptoCandles', (await get('/crypto/candles?symbol=ETH&interval=1h')).body);
+      const position = (await send('cryptoBuyMarket')).body.open[0].id as string;
+      await send('cryptoSellLimit', { position });
+      await send('cryptoBuyMarket');
+      const second = (await get('/crypto/sim')).body.open.find(
+        (p: { id: string }) => p.id !== position
+      ).id as string;
+      await send('cryptoSellMarket', { position: second });
+      await send('cryptoBuyLimit');
+      contract('cryptoSim', (await get('/crypto/sim')).body);
+      ctx.market.setCandles('BTC', candles);
+      ctx.clock.set('2026-03-15T12:05:00Z');
+      contract('cryptoSimFilled', (await get('/crypto/sim')).body);
+    });
+
+    it('requests (the bodies the app sends are accepted by the routes)', async () => {
+      const position = (await send('cryptoBuyMarket')).body.open[0].id as string;
+      for (const name of [
+        'cryptoSellLimit',
+        'cryptoSellMarket',
+        'cryptoBuyLimit',
+        'cryptoFee',
+        'cryptoReset',
+      ]) {
+        await send(name, { position });
+      }
+    });
+  });
+
   describe('requests (the bodies the app sends are accepted by the routes)', () => {
     it('sign-up, sign-in and profile', async () => {
       await accepted(replay(ctx, 'register', null));
