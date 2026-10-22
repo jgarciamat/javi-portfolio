@@ -14,6 +14,8 @@ module.exports = {
     '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
     '^@revenuecat/purchases-capacitor$': '<rootDir>/src/__mocks__/purchases.ts',
     '^virtual:pwa-register/react$': '<rootDir>/src/__mocks__/pwaRegister.ts',
+    // TradingView Lightweight Charts draws on a canvas, which jsdom lacks: a recording fake.
+    '^lightweight-charts$': '<rootDir>/src/__mocks__/lightweightCharts.ts',
     // jsdom picks jspdf's ES module build, which Jest cannot load: use the UMD one.
     '^jspdf$': '<rootDir>/node_modules/jspdf/dist/jspdf.umd.min.js',
     '^@modules/(.*)$': '<rootDir>/src/modules/$1',

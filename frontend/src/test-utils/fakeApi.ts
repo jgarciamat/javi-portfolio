@@ -1,6 +1,8 @@
 import type { IApiContext } from '@core/context/ApiContext';
 import * as f from './fixtures';
 import { PREMIUM_TERMS, premiumContent } from './learn';
+import * as crypto from './crypto';
+import type { CryptoInterval } from '@modules/crypto/domain/types';
 
 type Mocked<T> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R ? jest.Mock<R, A> : T[K];
@@ -70,6 +72,21 @@ function fakeBusinessApi(): FakeApi['businessApi'] {
         irpfAdvance: 0,
       },
     }),
+  };
+}
+
+/** The crypto console answered with made-up prices and a portfolio with one purchase. */
+function fakeCryptoApi(): FakeApi['cryptoApi'] {
+  return {
+    coins: ok(crypto.coins()),
+    candles: jest.fn((symbol: string, interval: CryptoInterval) =>
+      Promise.resolve(crypto.candles(symbol, interval))
+    ),
+    portfolio: ok(crypto.portfolio()),
+    placeOrder: ok(crypto.portfolio()),
+    cancelOrder: ok(crypto.portfolio()),
+    reset: ok(crypto.portfolio({ open: [] })),
+    setFee: ok(crypto.portfolio()),
   };
 }
 
@@ -217,5 +234,6 @@ export function createFakeApi(): FakeApi {
       chapter: jest.fn((id: string) => Promise.resolve(premiumContent(id))),
       glossary: ok(PREMIUM_TERMS),
     },
+    cryptoApi: fakeCryptoApi(),
   } as unknown as FakeApi;
 }

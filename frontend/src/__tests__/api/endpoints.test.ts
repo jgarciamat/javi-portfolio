@@ -2,6 +2,7 @@ import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import { videosApi } from '@core/api/videosApi';
 import { learnApi } from '@core/api/learnApi';
+import { cryptoApi } from '@core/api/cryptoApi';
 import {
   accountApi,
   assetApi,
@@ -378,6 +379,30 @@ const cases: Case[] = [
     '/learn/chapters/etf-vs-fondos',
   ],
   ['course glossary', () => learnApi.glossary(), 'GET', '/learn/glossary'],
+  ['crypto coins', () => cryptoApi.coins(), 'GET', '/crypto/coins'],
+  [
+    'crypto candles',
+    () => cryptoApi.candles('BTC', '1h'),
+    'GET',
+    '/crypto/candles?symbol=BTC&interval=1h',
+  ],
+  ['crypto portfolio', () => cryptoApi.portfolio(), 'GET', '/crypto/sim'],
+  [
+    'crypto order',
+    () => cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'market', amount: 100 }),
+    'POST',
+    '/crypto/sim/orders',
+    { action: 'buy', symbol: 'BTC', type: 'market', amount: 100 },
+  ],
+  ['crypto cancel', () => cryptoApi.cancelOrder('o 1'), 'DELETE', '/crypto/sim/orders/o%201'],
+  [
+    'crypto reset',
+    () => cryptoApi.reset(1000, 25),
+    'POST',
+    '/crypto/sim/reset',
+    { initial: 1000, feeBps: 25 },
+  ],
+  ['crypto fee', () => cryptoApi.setFee(50), 'PATCH', '/crypto/sim/settings', { feeBps: 50 }],
   ['plans', () => billingApi.plans(), 'GET', '/billing/plans'],
   [
     'checkout',

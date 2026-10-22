@@ -48,6 +48,10 @@ const AssetsView = lazyNamed(() => import('../views/AssetsView'), 'AssetsView');
 const BusinessView = lazyNamed(() => import('../views/BusinessView'), 'BusinessView');
 const LearnView = lazyNamed(() => import('../views/LearnView'), 'LearnView');
 const InvestView = lazyNamed(() => import('@modules/invest/ui/InvestView'), 'InvestView');
+const CryptoConsoleView = lazyNamed(
+  () => import('@modules/crypto/ui/CryptoConsoleView'),
+  'CryptoConsoleView'
+);
 const HealthView = lazyNamed(() => import('../views/HealthView'), 'HealthView');
 const RentaView = lazyNamed(() => import('../views/RentaView'), 'RentaView');
 const HaciendaView = lazyNamed(() => import('../views/HaciendaView'), 'HaciendaView');
@@ -110,6 +114,7 @@ const SIMPLE_VIEWS: Partial<
   hacienda: (open) => <HaciendaView onOpenTab={open} />,
   learn: (open) => <LearnView onOpenTab={open} />,
   invest: () => <InvestView />,
+  crypto: () => <CryptoConsoleView />,
   videos: () => <VideosView />,
   plan: (open) => <PlanWithSteps onOpenTab={open} />,
   offers: () => <OffersView />,

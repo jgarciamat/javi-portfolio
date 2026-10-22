@@ -90,6 +90,8 @@ export default defineConfig({
           'logo-mark.png',
           // The layout of the Renta (25 pages): loaded when its preview is opened.
           '**/form-layout-100-*.js',
+          // The crypto console's chart (TradingView Lightweight Charts): online only anyway.
+          '**/PriceChart-*.js',
         ],
         // Shows the push notifications and opens the app when one is tapped.
         importScripts: ['push-sw.js'],

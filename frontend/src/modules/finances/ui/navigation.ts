@@ -15,6 +15,7 @@ export type DashboardTab =
   | 'hacienda'
   | 'learn'
   | 'invest'
+  | 'crypto'
   | 'videos'
   | 'automations'
   | 'custom-alerts'
@@ -121,6 +122,7 @@ const SECTIONS: Omit<DashboardSection, 'color'>[] = [
   },
   { id: 'learn', icon: 'book', labelKey: 'app.tabs.learn', group: 'learn' },
   { id: 'invest', icon: 'coins', labelKey: 'app.tabs.invest', group: 'learn' },
+  { id: 'crypto', icon: 'candles', labelKey: 'app.tabs.crypto', group: 'learn' },
   { id: 'videos', icon: 'video', labelKey: 'app.tabs.videos', group: 'learn' },
   { id: 'plan', icon: 'star', labelKey: 'app.tabs.plan', group: 'account' },
   { id: 'offers', icon: 'gift', labelKey: 'app.tabs.offers', group: 'account' },

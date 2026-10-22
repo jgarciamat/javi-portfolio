@@ -24,6 +24,7 @@ import {
 } from '@core/api/financeApi';
 import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
+import { cryptoApi } from '@core/api/cryptoApi';
 import { learnApi } from '@core/api/learnApi';
 import { videosApi } from '@core/api/videosApi';
 
@@ -55,6 +56,7 @@ export interface IApiContext {
   householdApi: typeof householdApi;
   videosApi: typeof videosApi;
   learnApi: typeof learnApi;
+  cryptoApi: typeof cryptoApi;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -87,6 +89,7 @@ const defaultValue: IApiContext = {
   householdApi,
   videosApi,
   learnApi,
+  cryptoApi,
 };
 
 /** Tests (or storybooks) can pass partial fakes through `value`. */

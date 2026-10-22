@@ -1,0 +1,92 @@
+.cc-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.cc-chart-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+  font-variant-numeric: tabular-nums;
+  min-height: 1.5rem;
+}
+
+.cc-chart-readout b {
+  color: var(--slate-100);
+}
+
+.cc-chart-period {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.cc-chart-canvas {
+  height: 380px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--slate-700);
+  touch-action: pan-y;
+}
+
+.cc-chart-canvas:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.cc-chart-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-chart-tools button {
+  min-height: 48px;
+}
+
+.cc-chart-help,
+.cc-chart-credit {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--slate-300);
+}
+
+.cc-chart-credit a {
+  color: var(--accent-400);
+}
+
+/* Full screen without the browser's API (which iPhone Safari lacks): the chart fills the view. */
+.cc-chart--expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  margin: 0;
+  padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem 0.75rem;
+  background: var(--slate-950);
+  overflow-y: auto;
+}
+
+.cc-chart--expanded .cc-chart-canvas {
+  height: calc(100dvh - 12rem);
+  min-height: 260px;
+}
+
+@media (max-width: 480px) {
+  .cc-chart-canvas {
+    height: 300px;
+  }
+}
+
+html.wiz-contrast .cc-chart-canvas {
+  border: 2px solid var(--slate-100);
+}
+
+html.wiz-contrast .cc-chart-readout,
+html.wiz-contrast .cc-chart-help,
+html.wiz-contrast .cc-chart-credit {
+  color: var(--slate-100);
+}

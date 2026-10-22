@@ -1,0 +1,430 @@
+/* ─── Consola crypto (simulator with play money) ─────────────────────────────
+   Big, calm text for older people; every colour comes from the theme tokens, so light, dark
+   and the wizard's contrast mode work without their own palette. */
+
+.cc {
+  gap: 1rem;
+}
+
+.cc .card {
+  margin: 0;
+}
+
+.cc-up {
+  color: var(--green-400);
+}
+
+.cc-down {
+  color: var(--red-400);
+}
+
+.cc-flat {
+  color: var(--slate-300);
+}
+
+/* The risk notice is always there and cannot be closed. */
+.cc-risk {
+  border: 2px solid var(--amber-500);
+  background: var(--slate-900);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  color: var(--slate-100);
+  line-height: 1.5;
+}
+
+.cc-risk strong {
+  display: block;
+  color: var(--amber-400);
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.cc-risk p {
+  margin: 0;
+}
+
+.cc-data {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+  line-height: 1.5;
+}
+
+.cc-data--warn {
+  color: var(--amber-400);
+}
+
+.cc-reminder {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--amber-400);
+}
+
+.cc-help {
+  display: inline;
+}
+
+.cc-help-toggle {
+  font-size: 0.9rem;
+  min-height: 44px;
+}
+
+.cc-help-text {
+  display: block;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--accent-400);
+  background: var(--slate-800);
+  border-radius: 6px;
+  color: var(--slate-200);
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.cc-help-text[hidden] {
+  display: none;
+}
+
+.cc-market-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.cc-market-head .field {
+  flex: 1 1 14rem;
+}
+
+.cc-market-head select {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1.05rem;
+}
+
+.cc-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.cc-quote-price {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--slate-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-quote-range {
+  font-size: 0.9rem;
+  color: var(--slate-300);
+}
+
+.cc-intervals,
+.cc-types {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-intervals legend,
+.cc-types legend {
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.cc-interval,
+.cc-type {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--slate-600);
+  border-radius: 10px;
+  background: var(--slate-900);
+  color: var(--slate-200);
+  cursor: pointer;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.cc-interval input,
+.cc-type input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cc-interval:focus-within,
+.cc-type:focus-within {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.cc-interval--on,
+.cc-type--on {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.cc-type {
+  flex: 1 1 10rem;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.cc-type span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cc-type small {
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.cc-types--inline .cc-type {
+  flex: 0 1 auto;
+}
+
+.cc-order input,
+.cc-schedule input,
+.cc-settings select {
+  min-height: 48px;
+  font-size: 1.05rem;
+  width: 100%;
+}
+
+.cc-quick {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cc-quick button {
+  min-height: 44px;
+}
+
+.cc-estimate,
+.cc-figures,
+.cc-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 1rem 0;
+}
+
+.cc-estimate dt,
+.cc-figures dt,
+.cc-facts dt {
+  font-size: 0.85rem;
+  color: var(--slate-300);
+}
+
+.cc-estimate dd,
+.cc-figures dd,
+.cc-facts dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--slate-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.cc-trades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cc-trade {
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: var(--slate-900);
+}
+
+.cc-trade-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  font-size: 1.05rem;
+}
+
+.cc-trade-head > :last-child {
+  margin-left: auto;
+}
+
+.cc-trade .button-row {
+  flex-wrap: wrap;
+}
+
+.cc-trade .button-row button {
+  min-height: 48px;
+}
+
+.cc-schedule {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--slate-700);
+  padding-top: 0.75rem;
+}
+
+.cc-fills {
+  border: 2px solid var(--accent-400);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  background: var(--slate-900);
+}
+
+.cc-fills p {
+  margin: 0 0 0.25rem;
+}
+
+.cc-fills ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.cc-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-top: 1rem;
+  border-top: 1px solid var(--slate-700);
+  padding-top: 1rem;
+}
+
+.cc-settings .field {
+  flex: 1 1 12rem;
+}
+
+.cc-settings .btn-danger {
+  min-height: 48px;
+}
+
+.cc-table-details summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--accent-400);
+}
+
+.cc-table-scroll {
+  overflow-x: auto;
+}
+
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+.cc-table th,
+.cc-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--slate-700);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cc-table th[scope='row'],
+.cc-table thead th:first-child {
+  text-align: left;
+}
+
+.cc-glossary dl {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cc-glossary dt {
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.cc-glossary dd {
+  margin: 0.2rem 0 0;
+  color: var(--slate-300);
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .cc-quote {
+    text-align: left;
+  }
+
+  .cc-interval {
+    flex: 1 0 22%;
+    padding: 0.4rem 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+/* High contrast (the wizard's switch): stronger borders and plain text colours. */
+html.wiz-contrast .cc-risk,
+html.wiz-contrast .cc-trade,
+html.wiz-contrast .cc-interval,
+html.wiz-contrast .cc-type {
+  border-width: 2px;
+  border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-data,
+html.wiz-contrast .cc-estimate dt,
+html.wiz-contrast .cc-figures dt,
+html.wiz-contrast .cc-facts dt,
+html.wiz-contrast .cc-glossary dd {
+  color: var(--slate-100);
+}
+
+.cc-helps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.cc-helps .cc-help {
+  flex: 0 1 auto;
+}
+
+.cc-helps .cc-help-text {
+  flex-basis: 100%;
+}
+
+.cc-scheduled {
+  margin: 0 0 0.75rem;
+  color: var(--slate-200);
+  font-size: 0.95rem;
+}
+
+.cc-settings .btn-danger {
+  margin-top: 0.75rem;
+}
