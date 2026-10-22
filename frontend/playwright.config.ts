@@ -47,6 +47,8 @@ export default defineConfig({
         SEED_DEMO_PASSWORD: DEMO_USER.password,
         RATE_LIMIT_DISABLED: 'true',
         AI_PROVIDER: 'none',
+        // The crypto console's prices are invented on the server: the tests never call the Internet.
+        CRYPTO_MARKET: 'demo',
       },
     },
     {
