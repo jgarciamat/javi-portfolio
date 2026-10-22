@@ -53,7 +53,7 @@ Abreviaturas:
 | Comparativa (individual frente a conjunta, borrador frente a app) | — (aritmética de dos resultados) | `rentaJoint.compareJoint`, `D/rentaCompare.ts` | `rentaCompare.test.ts`, `rentaJoint.test.ts` | — | **cubierto** |
 | Resultado a ingresar o a devolver (casilla 0670) | Orden 100, página 25 | `computeRenta` (`result`) | Prop. (resultado = cuota líquida − pagos a cuenta + anticipos), Banco | c18-01, c18-02 | **cubierto** |
 | Residencia y fuera de alcance | LIRPF art. 9; Ley 12/2002 y Ley 28/1990 (forales) | `D/rentaResidence.ts`; `regime: 'foral'` en `R/ccaa` | `rentaResidence.test.ts`, Prop. | — | Navarra y el País Vasco se marcan como forales y no se calculan. En Ceuta y Melilla, la deducción del 60 % (art. 68.4) la escribe la persona. No residentes, desplazados (art. 93) y regímenes especiales: fuera de alcance, se avisa |
-| Ejercicios 2024-2026 | [reglas-por-ejercicio.md](reglas-por-ejercicio.md) | `R/ejercicios/*` | `rentaRules.test.ts` | — | Hecho por la tarea de versionado (22-10-2026). Las reglas nuevas de esta tarea van en los datos del ejercicio (`baseReductions`, `artistic`) o en datos de la ley (`R/abatimiento.ts`, `R/capital-general.ts`) |
+| Ejercicios 2024-2026 | [reglas-por-ejercicio.md](reglas-por-ejercicio.md); Manual 2024 (tomo 2, c14 y c15) | `R/ejercicios/*`; comunidades de 2024 en `R/ejercicios/2024-ccaa.ts` (`regionOfYear`) | `rentaRules.test.ts`, `renta2024Regions.test.ts`, `rentaYearUi.test.tsx` | c15 de 2024 (Aragón, estatal y autonómica) y las tablas de c15 de Asturias, Canarias y Cataluña | Hecho por la tarea de versionado (22-10-2026). **2024: las 17 comunidades** (22-10-2026): las 15 de régimen común comparadas página a página con 2025; escalas distintas en Asturias, Canarias y Cataluña, mínimos del Estado en Asturias, importes o límites propios de 2024 en 7 comunidades, 37 deducciones de 2025 sin página en 2024 fuera y 7 de 2024 que la app no calcula listadas en pantalla. **Dudoso**: la app redondea cada tramo de la escala al céntimo y la tabla del Manual no, y puede haber un céntimo de diferencia (Asturias desde 53.407,20 €, Canarias desde 35.185 €; también en 2025). Las reglas nuevas van en los datos del ejercicio (`baseReductions`, `artistic`) o en datos de la ley (`R/abatimiento.ts`, `R/capital-general.ts`) |
 
 ## 3. Casos oficiales de la Renta sin reproducir y por qué
 
@@ -126,7 +126,7 @@ Fuentes: Ley 37/1992 del IVA ([BOE-A-1992-28740](https://www.boe.es/buscar/act.p
 8. **Complementarias en la vista previa en papel:** el fichero lleva la marca, la vista previa del 111 y del 115 no.
 4. **Tipos de IVA de 2023-2024** (5 % y 2 %, con sus recargos): sin soporte.
 5. **720:** pedir por separado el saldo a 31-12 y el saldo medio del 4T de cada bloque.
-6. **Versionado por ejercicio de la Renta** (P0-1): hecho el 22-10-2026 para 2024, 2025 y 2026 ([reglas-por-ejercicio.md](reglas-por-ejercicio.md)). Faltan las comunidades de 2024 y 2026 y lo que dependa del RDL 29/2026.
+6. **Versionado por ejercicio de la Renta** (P0-1): hecho el 22-10-2026 para 2024, 2025 y 2026 ([reglas-por-ejercicio.md](reglas-por-ejercicio.md)). Las comunidades de 2024, hechas el mismo día; faltan las de 2026 y lo que dependa del RDL 29/2026.
 
 ## 7. Siguiente ola propuesta
 

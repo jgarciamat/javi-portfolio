@@ -28,17 +28,42 @@ const render = (year: number) =>
   renderWithProviders(<RentaPlanner mode="account" year={year} />, { api: premium(), plan: true });
 
 describe('the Renta of a year without all its official figures', () => {
-  it('2024 in Madrid: says the regional figures are missing and shows no result', async () => {
-    saved(2024, { gross: '24000', ccaaId: 'madrid', answers: { ccaa: 'madrid' } });
-    render(2024);
-    expect(await screen.findByText(tr('tools.renta.year.missing', { year: 2024 }))).toBeVisible();
+  it('2026 in Madrid: says the regional figures are missing and shows no result', async () => {
+    saved(2026, { gross: '24000', ccaaId: 'madrid', answers: { ccaa: 'madrid' } });
+    render(2026);
+    expect(await screen.findByText(tr('tools.renta.year.missing', { year: 2026 }))).toBeVisible();
     expect(
       screen.getByText(
-        tr('tools.renta.year.part.regions', { year: 2024, name: 'Comunidad de Madrid' })
+        tr('tools.renta.year.part.regions', { year: 2026, name: 'Comunidad de Madrid' })
       )
     ).toBeVisible();
-    expect(screen.getByText(tr('tools.renta.year.noResult', { year: 2024 }))).toBeVisible();
-    expect(screen.queryByText(tr('tools.renta.year.provisional', { year: 2024 }))).toBeNull();
+    expect(screen.getByText(tr('tools.renta.year.noResult', { year: 2026 }))).toBeVisible();
+    expect(screen.getByText(tr('tools.renta.year.provisional', { year: 2026 }))).toBeVisible();
+  });
+
+  it('2024 in Aragón: a result, and the deductions of 2024 the app does not calculate', async () => {
+    saved(2024, { gross: '24000', ccaaId: 'aragon', answers: { ccaa: 'aragon' } });
+    render(2024);
+    expect(
+      await screen.findByText(tr('tools.renta.year.notInApp', { year: 2024, name: 'Aragón' }))
+    ).toBeVisible();
+    expect(
+      screen.getByText('Por ayudas de carácter humanitario al pueblo ucraniano')
+    ).toBeVisible();
+    expect(screen.queryByText(tr('tools.renta.year.missing', { year: 2024 }))).toBeNull();
+    expect(screen.queryByText(tr('tools.renta.year.noResult', { year: 2024 }))).toBeNull();
+  });
+
+  it('2024 in Madrid: all its figures are there, so nothing is said', async () => {
+    saved(2024, { gross: '24000', ccaaId: 'madrid', answers: { ccaa: 'madrid' } });
+    render(2024);
+    expect(await screen.findByText(tr('tools.renta.disclaimerFull', { year: 2024 }))).toBeVisible();
+    expect(screen.queryByText(tr('tools.renta.year.missing', { year: 2024 }))).toBeNull();
+    expect(
+      screen.queryByText(
+        tr('tools.renta.year.notInApp', { year: 2024, name: 'Comunidad de Madrid' })
+      )
+    ).toBeNull();
   });
 
   it('2026 in Ceuta: provisional figures of the BOE, with a result', async () => {

@@ -164,6 +164,8 @@ export interface RentaCcaa {
   deductions: Deduction[];
   /** The Tax Agency page of the community's deductions. */
   source: string;
+  /** Deductions of the year that the app does not calculate (copied from the draft, if they apply). */
+  notInApp?: string[];
 }
 
 export interface StateReduction {

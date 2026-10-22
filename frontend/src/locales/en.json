@@ -2027,6 +2027,7 @@
   "tools.renta.year.part.modules": "The tables of the módulos and the farming indexes of {year}.",
   "tools.renta.year.part.rentals": "The reductions for renting out a home in {year}: they depend on the Real Decreto-ley 29/2026, not yet convalidated by Parliament.",
   "tools.renta.year.part.imputation": "The rate of imputed income of properties with a revised cadastral value in {year}: it depends on the Real Decreto-ley 29/2026, not yet convalidated.",
+  "tools.renta.year.notInApp": "In {year}, {name} also had these deductions that the app does not calculate. If one applies to you, copy it from your draft:",
   "tools.renta.year.noResult": "We do not show the result of {year} until the missing official figures are published: we would rather not give you a number we cannot back up.",
   "tools.renta.nonSalaryHint": "Pension, unemployment or subsidy included in the total. They are not pay from a job and do not count for the work income deduction.",
   "tools.renta.secondPayers": "Of which, paid by the second and following payers",

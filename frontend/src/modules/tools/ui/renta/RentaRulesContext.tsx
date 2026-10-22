@@ -50,10 +50,19 @@ export function HeldNote({ parts }: { parts?: MissingPart[] }) {
  * The year's figures that are still to be published, at the top of the planner: a provisional year
  * says so, and what the return needs and is missing keeps the result back (never another year's).
  */
-export function YearNotice({ blockers, ccaaName }: { blockers: MissingPart[]; ccaaName: string }) {
+export function YearNotice({
+  blockers,
+  ccaaName,
+  notInApp = [],
+}: {
+  blockers: MissingPart[];
+  ccaaName: string;
+  /** The community's deductions of the year that the app does not calculate. */
+  notInApp?: string[];
+}) {
   const { t } = useI18n();
   const rules = useRentaRules();
-  if (rules.status === 'confirmed' && blockers.length === 0) return null;
+  if (rules.status === 'confirmed' && blockers.length === 0 && notInApp.length === 0) return null;
   return (
     <div className="section-hint renta-provisional" role="note">
       {rules.status === 'provisional' && (
@@ -67,6 +76,16 @@ export function YearNotice({ blockers, ccaaName }: { blockers: MissingPart[]; cc
               <li key={b}>
                 {t(`tools.renta.year.part.${b}`, { year: rules.year, name: ccaaName })}
               </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {notInApp.length > 0 && (
+        <>
+          <p>{t('tools.renta.year.notInApp', { year: rules.year, name: ccaaName })}</p>
+          <ul>
+            {notInApp.map((title) => (
+              <li key={title}>{title}</li>
             ))}
           </ul>
         </>

@@ -134,10 +134,11 @@ export const rules2024: RentaRules = {
   joint: { ...withManualOf(rentaJoint, 2025, 2024), year: 2024 },
   // The tables of the módulos of 2024 (Orden HFP/1359/2023) are not in the app.
   activityTables: null,
-  // The regional data of 2024 is not checked yet: only Ceuta and Melilla, whose part is the State's
-  // scale of art. 65 LIRPF (DA 32.ª), not changed since 2015, and the foral ones (they file apart).
-  regions: ['ceuta', 'melilla', 'navarra', 'pais-vasco'],
-  missing: ['regions', 'modules'],
+  // All: the 15 of the common regime compared page by page with 2025 (2024-ccaa.ts); Ceuta and
+  // Melilla, whose part is the State's scale of art. 65 LIRPF (DA 32.ª), not changed since 2015;
+  // and the foral ones (they file apart).
+  regions: 'all',
+  missing: ['modules'],
   sources: [
     {
       what: 'Manual práctico de Renta 2024 (parte 1)',
@@ -152,6 +153,21 @@ export const rules2024: RentaRules = {
     {
       what: 'Escala del ahorro de 2024: 28 % desde 300.000 € (arts. 66 y 76, Ley 31/2022)',
       url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-22128',
+      checkedOn: '2026-10-22',
+    },
+    {
+      what: 'Manual práctico de Renta 2024, tomo 2: deducciones autonómicas',
+      url: `${MANUAL}-deducciones-autonomicas/guia-deducciones-autonomicas.html`,
+      checkedOn: '2026-10-22',
+    },
+    {
+      what: 'Manual práctico de Renta 2024, c14: mínimos autonómicos (cuadro comparativo)',
+      url: `${MANUAL}/c14-adecuacion-impuesto-circunstancias-personales/minimo-autonomico-personal-familiar/cuadro-minimos-personales-familiares-estatal-autonomicos.html`,
+      checkedOn: '2026-10-22',
+    },
+    {
+      what: 'Manual práctico de Renta 2024, c15: escalas autonómicas',
+      url: `${MANUAL}/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-autonomico.html`,
       checkedOn: '2026-10-22',
     },
     {

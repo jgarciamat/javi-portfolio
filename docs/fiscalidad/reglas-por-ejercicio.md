@@ -12,7 +12,7 @@ Fuentes comprobadas el 22-10-2026 salvo que se diga otra cosa. Las versiones de 
 
 | Ejercicio | Estado | Estatal | Comunidades | Módulos | Falta |
 |---|---|---|---|---|---|
-| 2024 | confirmado | Manual práctico de Renta 2024 y BOE | Solo Ceuta, Melilla y forales | No están en la app (Orden HFP/1359/2023) | Comunidades de régimen común; módulos |
+| 2024 | confirmado | Manual práctico de Renta 2024 y BOE | Las 17 (las 15 de régimen común comparadas con 2025, ver abajo) | No están en la app (Orden HFP/1359/2023) | Módulos; 7 deducciones autonómicas de 2024 que no tiene la app (se listan en pantalla) |
 | 2025 | confirmado | Manual práctico de Renta 2025 (comprobado el 19-10-2026) | Las 17 | Orden HAC/1347/2024 | — |
 | 2026 | provisional | Solo BOE (no hay Manual 2026) | Solo Ceuta, Melilla y forales | Orden HAC/1425/2025 (igual que 2025) | Manual; comunidades; alquileres e imputación (RDL 29/2026) |
 
@@ -28,7 +28,37 @@ Fuentes comprobadas el 22-10-2026 salvo que se diga otra cosa. Las versiones de 
 
 Igual en 2024 y 2025 (BOE: artículo sin cambios desde antes de 2024, o Manual 2024 con las mismas cifras): escalas general y autonómica supletoria (arts. 63 y 65), mínimos (arts. 57-61), gastos del trabajo (art. 19), reducción del art. 20 (RDL 4/2024, con efectos desde el 1-1-2024: 7.302 € hasta 14.852 €), planes de pensiones (arts. 51 y 52), conjunta (art. 84: 3.400 y 2.150 €), donativos (art. 19 de la Ley 49/2002, RDL 6/2023: 80 % de 250 € y 40/45 %), imputación de inmuebles (2 % y 1,1 %), reducciones del alquiler (cuadro del art. 23.2 del Manual 2024), obligación de declarar (art. 96: 15.876 €) y gastos de difícil justificación (5 %, hasta 2.000 €: el 7 % de la DA 56.ª fue solo para 2023).
 
-Casos oficiales del Manual 2024 en las pruebas: c15, cuota estatal de la base de 23.900 € (2.140,50 + 266 = 2.406,50 €) y c16, alquiler anterior a 2015 (284,93 €).
+Casos oficiales del Manual 2024 en las pruebas: c15, cuota estatal de la base de 23.900 € (2.140,50 + 266 = 2.406,50 €) y autonómica de Aragón (2.094,64 + 266 = 2.360,64 €), y c16, alquiler anterior a 2015 (284,93 €).
+
+### Comunidades de régimen común en 2024
+
+`ejercicios/2024-ccaa.ts` construye cada comunidad de 2024 a partir de la de 2025 (`regionOfYear`, en `ejercicios/regions.ts`): se compararon una a una, el 22-10-2026, todas las páginas del Manual práctico de Renta 2024 (tomo 2, deducciones autonómicas; c14, mínimos autonómicos y su cuadro comparativo; c15, escalas) con las de 2025, cifra por cifra y frase por frase. Lo que no está en la tabla es igual en los dos años. Las casillas del anexo B son las mismas en 2024 (mismo elemento del diseño de registro, `xml/casillas-2024.json`; lo comprueba una prueba).
+
+- Escalas: [c15 de 2024](https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-autonomico.html). Distintas en Asturias, Canarias y Cataluña; las otras 12, iguales.
+- Mínimos: [c14 de 2024, cuadro comparativo](https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024/c14-adecuacion-impuesto-circunstancias-personales/minimo-autonomico-personal-familiar/cuadro-minimos-personales-familiares-estatal-autonomicos.html). Iguales salvo Asturias (en 2024, los del Estado).
+- Deducciones: [tomo 2 de 2024](https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024-deducciones-autonomicas/guia-deducciones-autonomicas.html), una página por deducción.
+
+| Comunidad | Qué cambia en 2024 | Deducciones de 2025 que no existían | De 2024 que la app no calcula |
+|---|---|---|---|
+| Andalucía | Nacimiento: bases hasta 25.000/30.000 €; vivienda protegida o jóvenes: 5 % (no 6 %); alquiler: 600 € (900 con discapacidad) y solo menores de 35, mayores de 65 y víctimas; cónyuge con discapacidad: que no declare | Deporte, veterinario, celiaquía | — |
+| Aragón | Nada | — | Acogimiento de personas ucranianas; ayudas humanitarias a Ucrania |
+| Asturias | Escala (10 % el primer tramo, 18,5 % el cuarto, 25,5 % el último); mínimos del Estado; cuidado de descendientes: 500 € el primero y 600 € los siguientes; vivienda protegida: 5.000 € al año; concejos en riesgo: hasta 20.000 habitantes y un 10 % menos de población que en 2000 (no el Decreto 83/2025); 3 páginas con otro nombre | Celiaquía | — |
+| Illes Balears | Alquiler: sin el supuesto de autónomo | Vivienda ocupada ilegalmente | Subida de las hipotecas a tipo variable; gastos de ascendientes mayores de 65 |
+| Canarias | Escala (tramos de 13.465 a 121.200 €); límites de renta 45.500/60.500 € (no 46.455/61.770), 36.300, 25.500 y 35.000 €; desempleo: trabajo desde 11.200 € | Acciones de empresas nuevas | Donaciones a descendientes menores de 35 para la vivienda |
+| Cantabria | Zonas rurales con reto demográfico (Orden HAC/11/2024), no la Orden PRE/1/2025; 4 páginas con otro nombre | Viviendas vacías, residencia en municipio en riesgo, inversiones de nuevos residentes del extranjero, desplazamiento de nuevos residentes | — |
+| Castilla-La Mancha | Los 5 alquileres: 450 € (no 500) | Ahorro para la primera vivienda, perros de asistencia | — |
+| Castilla y León | Solo los años de los textos | — | — |
+| Cataluña | Escala (10,5 % el primer tramo; 9 tramos); nacimiento sin acogimiento; alquiler: 32 años o menos, 300 € (600 en conjunta o familia numerosa/monoparental), bases hasta 20.000/30.000 € y alquiler por encima del 10 % de los rendimientos | Alquiler de víctimas de violencia machista, cooperativas agrarias y de vivienda | — |
+| Comunitat Valenciana | Nacimiento: 300 € por hijo, también los dos años siguientes (no 600/750/900); discapacidad: 246/303 € sin acogimiento; salud y deporte: bases hasta 32.000/48.000 € (completo bajo 29.000/45.000); bici con carga: 750 €; donativos: los primeros 150 € al 20 %; sin la guarda con fines de adopción | Formación musical | — |
+| Extremadura | Nada en las que quedan | ELA (2), traslado a Extremadura, donaciones culturales; y los arrendadores de viviendas vacías y la rehabilitación rural para alquilar, que en 2024 solo valían para fallecidos entre el 26-10 y el 21-11-2024 (Decreto-ley 2/2024, derogado) | — |
+| Galicia | Nada en las que quedan | ELA, talidomida, adecuación de inmueble vacío, viviendas vacías, incendios de 2025, libros de texto | Ayudas por los incendios de octubre de 2017; explosión de Tui de 2018 |
+| La Rioja | Intereses de la hipoteca: solo 2023 y 2024 | Celiaquía, población ocupada en el medio rural, cuotas agrarias | — |
+| Madrid | Solo los años de los textos | — | — |
+| Región de Murcia | Discapacidad: 120 € con bases hasta 19.000/24.000 €; idiomas: bases hasta 20.000 €; alquiler: menores de 40, base hasta 24.380 € (40.000 € si menos de 40 años) | Enfermedades raras, gafas y lentillas, deporte, veterinario, vehículo eléctrico y su recarga, economía social | — |
+
+Las deducciones de la última columna aparecen en la pantalla de 2024 de esa comunidad con el aviso de que la app no las calcula y que, si corresponden, se copian del borrador. Las demás deducciones de 2024 se ofrecen con sus cifras de 2024; ninguna de 2025 sin página en 2024 se ofrece.
+
+Al comparar se vio que cuatro enlaces de La Rioja de 2025 (donaciones de mecenazgo) daban error: les faltaba la página que las agrupa. Arreglados en `ccaa/la-rioja.ts` (solo el enlace).
 
 ### Qué cambia de 2025 a 2026 (solo lo publicado en el BOE)
 
@@ -65,7 +95,8 @@ Un año sin orden de cotización toma la última tabla y lo dice en el borrador;
 
 ## Pendiente
 
-- **Comunidades de 2024 y 2026.** Método propuesto para 2024: comparar página a página el Manual 2024 (tomo 2) con el de 2025, como se hizo con la parte estatal, y revisar las casillas del anexo B de 2024 (`xml/casillas-2024.json`). Para 2026, esperar al Manual 2026 (abril de 2027).
+- **Comunidades de 2026.** Esperar al Manual 2026 (abril de 2027) y hacer lo mismo que con 2024 (`regionOfYear` con su tabla de cambios).
+- **Deducciones autonómicas de 2024 que no tiene la app** (7, en la tabla de arriba): añadirlas si hay demanda.
 - **RDL 29/2026.** Si el Congreso lo convalida, añadir al paquete 2026 el art. 23.2 nuevo, la deducción del art. 68.6, el 1,1 % de 2026 y las DA 65.ª y 66.ª; si lo deroga, quitar el aviso de alquileres e imputación.
 - **Tipos de IVA de 2023-2024** (5 % y 2 %, también 7,5 %, con sus recargos): no hechos. Exigen los diseños del 303 y del 390 de esos años y las fechas de cada tipo (RDL 20/2022, art. 72; RDL 4/2024).
 - **DA 64.ª (Ceuta, 2026)**: 10 % de gastos de difícil justificación y de reducción de módulos para actividades en Ceuta; no está en el motor.

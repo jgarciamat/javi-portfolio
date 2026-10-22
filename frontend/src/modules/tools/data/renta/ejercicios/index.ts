@@ -4,6 +4,8 @@ import { loadCcaa } from '..';
 import { rules2024 } from './2024';
 import { rules2025 } from './2025';
 import { rules2026 } from './2026';
+import { regions2024 } from './2024-ccaa';
+import { regionOfYear, type RegionYear } from './regions';
 import { withManualOf } from './shared';
 
 /** The rules of the Renta by tax year: a year without its package is an error, not the last one. */
@@ -44,9 +46,17 @@ export function rentaRules(year: number): RentaRules {
   return rules;
 }
 
+/** The communities of a year built from those of 2025 (only what changed, with its source). */
+const REGIONS: Record<number, Record<string, RegionYear>> = { 2024: regions2024 };
+
 /** The community's data for a year; null when that year's data of the community is not available. */
 export function loadCcaaFor(year: number, id: string): Promise<RentaCcaa | null> {
   if (!hasRegion(rentaRules(year), id)) return Promise.resolve(null);
   // Before 2025 the links go to that year's Manual práctico; there is none after 2025 yet.
-  return loadCcaa(id).then((c) => (year < 2025 ? withManualOf(c, 2025, year) : c));
+  return loadCcaa(id).then((c) => {
+    if (year >= 2025) return c;
+    const own = withManualOf(c, 2025, year);
+    const changes = REGIONS[year]?.[id];
+    return changes ? regionOfYear(own, changes) : own;
+  });
 }

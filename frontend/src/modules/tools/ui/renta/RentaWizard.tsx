@@ -615,7 +615,7 @@ export function RentaWizard({
   return (
     <RentaRulesProvider value={p.rules}>
       <RentaHeldProvider value={{ blockers: p.blockers, ccaaName: p.ccaaName }}>
-        <YearNotice blockers={p.blockers} ccaaName={p.ccaaName} />
+        <YearNotice blockers={p.blockers} ccaaName={p.ccaaName} notInApp={p.ccaa?.notInApp} />
         <Wizard
           flow="renta"
           defs={RENTA_STEPS}

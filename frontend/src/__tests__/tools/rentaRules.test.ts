@@ -266,12 +266,14 @@ describe('the tables of the módulos of the year', () => {
 });
 
 describe('what each year has of the communities', () => {
-  it('2025 has them all; 2024 and 2026 only Ceuta, Melilla and the foral ones', async () => {
+  it('2025 and 2024 have them all; 2026 only Ceuta, Melilla and the foral ones', async () => {
     expect(hasRegion(rentaRules(2025), 'madrid')).toBe(true);
-    expect(hasRegion(rentaRules(2024), 'madrid')).toBe(false);
+    expect(hasRegion(rentaRules(2024), 'madrid')).toBe(true);
+    expect(hasRegion(rentaRules(2026), 'madrid')).toBe(false);
     expect(hasRegion(rentaRules(2026), 'ceuta')).toBe(true);
     expect(hasRegion(rentaRules(2026), '')).toBe(true);
-    await expect(loadCcaaFor(2024, 'madrid')).resolves.toBeNull();
+    await expect(loadCcaaFor(2026, 'madrid')).resolves.toBeNull();
+    expect((await loadCcaaFor(2024, 'madrid'))?.source).toContain('irpf-2024');
     const ceuta2024 = await loadCcaaFor(2024, 'ceuta');
     expect(ceuta2024?.source).toContain('irpf-2024');
     const ceuta2026 = await loadCcaaFor(2026, 'ceuta');
@@ -284,9 +286,9 @@ describe('what each year has of the communities', () => {
     expect(blockersOf(rentaRules(2025), { ...none, ccaaId: 'madrid', rents: true })).toEqual([]);
     expect(blockersOf(rentaRules(2024), none)).toEqual([]);
     expect(blockersOf(rentaRules(2024), { ...none, ccaaId: 'madrid', objective: true })).toEqual([
-      'regions',
       'modules',
     ]);
+    expect(blockersOf(rentaRules(2026), { ...none, ccaaId: 'madrid' })).toEqual(['regions']);
     // 2024 has the rented homes and imputations of the manual; 2026 does not yet.
     expect(blockersOf(rentaRules(2024), { ...none, rents: true, imputes: true })).toEqual([]);
     expect(blockersOf(rentaRules(2026), { ...none, rents: true, imputes: true })).toEqual([

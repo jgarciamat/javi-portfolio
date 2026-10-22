@@ -322,7 +322,7 @@ export function RentaPlanner({
     <RentaRulesProvider value={rules}>
       <RentaHeldProvider value={{ blockers, ccaaName }}>
         <div className="renta-planner">
-          <YearNotice blockers={blockers} ccaaName={ccaaName} />
+          <YearNotice blockers={blockers} ccaaName={ccaaName} notInApp={ccaa?.notInApp} />
           <div className="renta-wipe">
             {recovered && (
               <p className="renta-recovered" role="status">

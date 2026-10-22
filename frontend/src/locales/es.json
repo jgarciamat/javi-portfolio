@@ -2027,6 +2027,7 @@
   "tools.renta.year.part.modules": "Las tablas de módulos y los índices del régimen agrario de {year}.",
   "tools.renta.year.part.rentals": "Las reducciones del alquiler de vivienda de {year}: dependen del Real Decreto-ley 29/2026, que el Congreso aún no ha convalidado.",
   "tools.renta.year.part.imputation": "El porcentaje de imputación de los inmuebles con valor catastral revisado en {year}: depende del Real Decreto-ley 29/2026, aún sin convalidar.",
+  "tools.renta.year.notInApp": "En {year}, {name} tenía además estas deducciones que la app no calcula. Si te corresponde alguna, cópiala de tu borrador:",
   "tools.renta.year.noResult": "No mostramos el resultado de {year} hasta que se publiquen las cifras oficiales que faltan: preferimos no darte un número que no podamos respaldar.",
   "tools.renta.nonSalaryHint": "Pensión, paro o subsidio incluidos en el total. No son sueldo y no cuentan para la deducción por rendimientos del trabajo.",
   "tools.renta.secondPayers": "De ellos, lo pagado por el segundo y demás pagadores",
