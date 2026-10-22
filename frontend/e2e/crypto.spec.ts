@@ -4,7 +4,8 @@ import { test, expect, openSection, signIn } from './fixtures';
  * «Consola crypto» with the server's invented prices (CRYPTO_MARKET=demo in the config): the
  * chart and its layers, a long opened and closed with play money, a pending short cancelled,
  * dollars, the guide, every coin in one list, the zoom bar, the words of the console in the guide
- * and the layout on phones.
+ * and the layout on phones; the monthly season, a practice portfolio, the voluntary ranking and
+ * the Premium comforts.
  */
 test.beforeEach(async ({ page }) => {
   await signIn(page);
@@ -95,4 +96,51 @@ test('fits a phone upright and on its side without sideways scrolling', async ({
     );
     expect(overflow).toBeLessThanOrEqual(0);
   }
+});
+
+test('season, practice portfolio, ranking and Premium comforts', async ({ page, pageErrors }) => {
+  // The official season of this month, with its countdown and the fixed commission.
+  await expect(page.getByRole('heading', { name: /^Temporada de / })).toBeVisible();
+  await expect(page.getByRole('timer').first()).toContainText(/Nueva temporada|último día/);
+  await expect(page.getByText(/Comisión fija: 0,1\s%/)).toBeVisible();
+  await expect(page.getByText('Tu historial y ajustes')).toHaveCount(0);
+
+  // A practice portfolio: separate, restarted with its own button and deleted.
+  await page.getByRole('button', { name: /Nueva cartera de prácticas/ }).click();
+  await expect(page.getByRole('heading', { name: 'Cartera de prácticas' })).toBeVisible();
+  await page.getByLabel('Capital por operación').fill('100');
+  await page.getByRole('button', { name: 'Abrir long' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
+  await page.getByRole('button', { name: 'Empezar de nuevo con 10.000 €' }).click();
+  await page.getByRole('button', { name: 'Sí, empezar de nuevo' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (0)' })).toBeVisible();
+  await page.getByRole('button', { name: 'Borrar esta cartera' }).click();
+  await page.getByRole('button', { name: 'Sí, borrar' }).click();
+  await expect(page.getByRole('heading', { name: /^Temporada de / })).toBeVisible();
+
+  // The voluntary ranking: off by default, on with an alias, then off again.
+  const ranking = page.locator('section.cc-ranking');
+  const toggle = ranking.getByRole('switch', { name: 'Aparecer en el ranking' });
+  await expect(toggle).not.toBeChecked();
+  await ranking.getByLabel('Tu alias').fill('Lince E2E');
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await expect(ranking.getByLabel('Tu alias')).toHaveValue('Lince E2E');
+  await ranking.getByLabel('Tu alias').fill('yo@correo.es');
+  await ranking.getByRole('button', { name: 'Guardar alias' }).click();
+  await expect(ranking.getByRole('alert')).toContainText('correos');
+  // The refused alias is the only error the browser logs (the 400 of the API).
+  expect(pageErrors.splice(0)).toEqual([expect.stringContaining('400')]);
+  await ranking.getByLabel('Tu alias').fill('Lince E2E');
+  await toggle.click();
+  await expect(toggle).not.toBeChecked();
+
+  // Premium (the demo user is on the trial): statistics and a price alert.
+  await expect(page.getByRole('heading', { name: /Gratis y Premium en la consola/ })).toBeVisible();
+  const alerts = page.locator('section.cc-alerts-card');
+  await alerts.getByLabel('Precio (€)').fill('999999');
+  await alerts.getByRole('button', { name: 'Crear aviso' }).click();
+  await expect(alerts.getByText(/sube a/)).toBeVisible();
+  await alerts.getByRole('button', { name: /Borrar el aviso de BTC/ }).click();
+  await expect(alerts.getByText('Todavía no tienes avisos.')).toBeVisible();
 });
