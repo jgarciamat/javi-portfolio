@@ -1,5 +1,5 @@
 import { round2 } from './round';
-import type { ArtisticRule } from './rentaData';
+import type { ArtisticRule, CeutaActivityRule } from './rentaData';
 
 /**
  * Income from economic activities (rendimientos de actividades económicas) for the modelo 100 of
@@ -205,9 +205,9 @@ const homeOf = (h: DirectActivity['home']) =>
  * Net income in direct estimation (box 0224). Simplified: provisions and expenses hard to justify
  * are 5 % of the net income before them, up to 2,000 € (RIRPF art. 30.2.ª, 5 % kept in 2025 per
  * the AEAT Manual 2025, "Principales novedades"), and none when the reduction of art. 32.2.1.º is
- * used (`noFivePercent`).
+ * used (`noFivePercent`). `hardPercent`: the rate when it is not 5 % (DA 64.ª, Ceuta in 2026).
  */
-export function directNet(a: DirectActivity, noFivePercent = false): DirectResult {
+export function directNet(a: DirectActivity, noFivePercent = false, hardPercent = 5): DirectResult {
   const i = a.income;
   const income = round2(
     positive(i.sales) + positive(i.grants) + positive(i.ownUse) + finite(i.other)
@@ -238,7 +238,7 @@ export function directNet(a: DirectActivity, noFivePercent = false): DirectResul
       ? round2(positive(a.provisions))
       : noFivePercent
         ? 0
-        : round2(Math.min(2000, Math.max(0, difference) * 0.05));
+        : round2(Math.min(2000, Math.max(0, difference) * (hardPercent / 100)));
   return {
     income,
     expenses,
@@ -353,7 +353,11 @@ function corrected(reduced: number, a: ModulesActivity, excess: number | undefin
  * not used with the special ones of a.2 to a.5 nor with the excess one; the season one is not used
  * with the one for new activities.
  */
-export function modulesNet(a: ModulesActivity, table: ModuleActivity[]): ModulesResult {
+export function modulesNet(
+  a: ModulesActivity,
+  table: ModuleActivity[],
+  generalPercent = 5
+): ModulesResult {
   const act = table.find((t) => t.id === a.activityId);
   const mods = act?.modules ?? [];
   const previous = round2(sum(mods.map((m, i) => m.amount * positive(a.units[i]))));
@@ -367,7 +371,7 @@ export function modulesNet(a: ModulesActivity, table: ModuleActivity[]): Modules
   );
   const reduced = round2(previous - employment - investment);
   const modules = round2(corrected(reduced, a, act?.excess));
-  const general = modules > 0 ? round2(modules * 0.05) : 0;
+  const general = modules > 0 ? round2(modules * (generalPercent / 100)) : 0;
   return {
     previous,
     employment,
@@ -474,7 +478,7 @@ function farmCorrected(
  * product, in proportion to its base: the order does not say how to split the depreciation among
  * the products (NO CONFIRMADO with an official case when there is more than one product).
  */
-export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
+export function farmNet(a: FarmActivity, indices: FarmIndex[], generalPercent = 5): FarmResult {
   const bases = a.lines.map((l) => {
     const idx = indices.find((x) => x.id === l.indexId);
     const rate = (l.transformed ? idx?.transformed : undefined) ?? idx?.index ?? 0;
@@ -490,7 +494,7 @@ export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
   const reduced = round2(previous - dep);
   const value = farmCorrected(a, reduced, bases, forestry);
   const modules = round2(value);
-  const general = modules > 0 ? round2(modules * 0.05) : 0;
+  const general = modules > 0 ? round2(modules * (generalPercent / 100)) : 0;
   const young = a.young ? round2((modules - general) * 0.25) : 0;
   return {
     income,
@@ -532,6 +536,8 @@ export type ActivityInput = (
       payments: number;
     }
 ) & {
+  /** Carried out in Ceuta, its income with the deduction of art. 68.4 (for DA 64.ª, in 2026). */
+  ceuta?: boolean;
   /**
    * The share (0-1) of the net income that is the taxpayer's: 0.5 in a farm of shared ownership
    * (Ley 35/2011, art. 5: the income is split in equal parts between the two owners). 1 if unset.
@@ -609,6 +615,8 @@ export interface ActivityContext {
   assistance: boolean;
   /** The rule of the year for artistic activities (DA 60.ª); none: no reduction. */
   artistic?: ArtisticRule | null;
+  /** The rates of the year for the activities in Ceuta (DA 64.ª); none: 5 % as everywhere. */
+  ceuta?: CeutaActivityRule;
 }
 
 /**
@@ -626,6 +634,13 @@ export function artisticReduction(net: number, previous: number[], rule: Artisti
 const shareOf = (a: ActivityInput, net: number) =>
   a.share === undefined ? net : round2(net * Math.min(1, positive(a.share)));
 
+/** The rates of 5 % of everywhere (RIRPF art. 30 and DA 1.ª of the orders of módulos). */
+const FIVE: CeutaActivityRule = { hardPercent: 5, modulesPercent: 5 };
+
+/** DA 64.ª: an activity in Ceuta takes the rates of the year there (10 % in 2026). */
+const ratesOf = (a: ActivityInput, ctx: ActivityContext): CeutaActivityRule =>
+  (a.ceuta && ctx.ceuta) || FIVE;
+
 function netsOf(
   list: ActivityInput[],
   ctx: ActivityContext,
@@ -636,10 +651,12 @@ function netsOf(
   const totals = { direct: 0, modules: 0, agrarian: 0, start: 0, artistic: 0 };
   let dependent = false;
   for (const a of list) {
+    const rates = ratesOf(a, ctx);
     if (a.kind === 'direct') {
       const useDependent = a.dependent && !ctx.hasWork;
       dependent ||= useDependent;
-      const r = directNet(a.data, useDependent && a.data.method === 'simplified');
+      const noFive = useDependent && a.data.method === 'simplified';
+      const r = directNet(a.data, noFive, rates.hardPercent);
       const net = shareOf(a, r.net);
       totals.direct += net;
       if (a.newActivity && net > 0) totals.start += net;
@@ -651,7 +668,11 @@ function netsOf(
       totals[a.data.area] += net;
       each.push({ name: a.name, net, detail: { net } });
     } else {
-      const r = a.kind === 'modules' ? modulesNet(a.data, table) : farmNet(a.data, indices);
+      const percent = rates.modulesPercent;
+      const r =
+        a.kind === 'modules'
+          ? modulesNet(a.data, table, percent)
+          : farmNet(a.data, indices, percent);
       const net = shareOf(a, r.net);
       totals[a.kind] += net;
       each.push({ name: a.name, net, detail: r });

@@ -22,6 +22,9 @@ import { patched } from './shared';
  *   self-consumption (DA 62.ª: 10 % or 20 %, base up to 5,000 €): Real Decreto-ley 7/2026
  *   (BOE-A-2026-6544; convalidated, BOE-A-2026-7125).
  * - La Palma, also in 2026: Real Decreto-ley 23/2026 (BOE-A-2026-18828; convalidated, BOE-A-2026-19845).
+ * - Activities carried out in Ceuta with the deduction of art. 68.4: 10 % of hard-to-justify expenses
+ *   and 10 % off the módulos instead of 5 % (DA 64.ª, Real Decreto-ley 22/2026, BOE-A-2026-18429;
+ *   convalidated, BOE-A-2026-19420).
  * - Unchanged since before 2025: the scales (arts. 63, 65, 66 and 76), the minimums (arts. 57-61),
  *   art. 19, art. 20 and the joint return (art. 84).
  *
@@ -116,6 +119,9 @@ const state: RentaState = {
   year: 2026,
   deductions,
   lowPay: LOW_PAY_2026,
+  // DA 64.ª LIRPF, added by the Real Decreto-ley 22/2026, art. 2 (BOE-A-2026-18429; convalidated,
+  // BOE-A-2026-19420): 10 % in 2026 for the activities carried out in Ceuta.
+  ceutaActivities: { hardPercent: 10, modulesPercent: 10 },
   source: `${BOE}BOE-A-2006-20764`,
 };
 
@@ -195,6 +201,11 @@ export const rules2026: RentaRules = {
     {
       what: 'La Palma en 2026 (DA 57.ª, Real Decreto-ley 23/2026)',
       url: `${BOE}BOE-A-2026-18828`,
+      checkedOn: '2026-10-22',
+    },
+    {
+      what: 'Actividades en Ceuta: 10 % de gastos de difícil justificación y de reducción de módulos (DA 64.ª, Real Decreto-ley 22/2026)',
+      url: `${BOE}BOE-A-2026-18429`,
       checkedOn: '2026-10-22',
     },
     {

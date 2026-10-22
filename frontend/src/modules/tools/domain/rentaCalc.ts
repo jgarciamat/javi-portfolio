@@ -820,6 +820,7 @@ function activityRunner(input: RentaInput, otherIncome: number) {
     disability: input.family.disability,
     assistance: input.family.assistance === true,
     artistic: input.state.artistic,
+    ceuta: input.state.ceutaActivities,
   };
   return (workReduction: number) =>
     activities

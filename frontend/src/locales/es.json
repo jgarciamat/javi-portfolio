@@ -1895,6 +1895,8 @@
   "tools.renta.activities.title": "Actividades económicas",
   "tools.renta.activities.line": "{name}: rendimiento neto {net}",
   "tools.renta.activities.remove": "Quitar «{name}»",
+  "tools.renta.activities.ceuta": "La actividad se desarrolla en Ceuta y sus rendimientos tienen la deducción del 60 % de Ceuta.",
+  "tools.renta.activities.ceutaHint": "En {year} esas actividades aplican un {hard} % de gastos de difícil justificación en estimación directa simplificada (hasta 2.000 €) y un {modules} % de reducción en módulos, en lugar del 5 %.",
   "tools.renta.activities.artistic": "Es una actividad artística (grupos 851, 852, 853, 861, 862, 864 o 869 del IAE, o agrupaciones 01, 02, 03 o 05 de la sección tercera)",
   "tools.renta.activities.artisticHint": "Desde 2025, si este año ganas más del 130 % de la media de los tres anteriores, el exceso se reduce un 30 % (sobre 150.000 € como mucho). Un año con pérdidas cuenta como 0.",
   "tools.renta.activities.artisticPrevious": "Rendimiento neto de la actividad hace {ago} año(s)",

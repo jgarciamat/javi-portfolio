@@ -4,8 +4,53 @@ import type { ActivitiesResult, ActivityInput } from '../../domain/rentaActivity
 import { AUTONOMO_ACTIVITY, withoutAutonomoActivity } from '../../domain/rentaFromAutonomo';
 import { ActivityBoxes } from './ActivityBoxes';
 import { RemoveActivity } from './AutonomoBring';
+import { useRentaRules } from './RentaRulesContext';
 import { Field, useMoney, type StepProps } from './shared';
 import { HeldNote, useHeld } from './RentaRulesContext';
+
+/**
+ * An activity of a resident of Ceuta in a year with higher rates there (LIRPF DA 64.ª, 2026): the
+ * tick says it is carried out in Ceuta, with the deduction of art. 68.4.
+ */
+function CeutaQuestion({
+  a,
+  ccaaId,
+  onChange,
+}: {
+  a: ActivityInput;
+  ccaaId: string;
+  onChange: (a: ActivityInput) => void;
+}) {
+  const { t } = useI18n();
+  const { year, state } = useRentaRules();
+  const rule = state.ceutaActivities;
+  if (!rule || ccaaId !== 'ceuta') return null;
+  // DA 64.ª.1 is for the simplified direct estimation; 64.ª.2, for the módulos and farming ones.
+  const applies =
+    a.kind === 'modules' ||
+    a.kind === 'agrarian' ||
+    (a.kind === 'direct' && a.data.method === 'simplified');
+  if (!applies) return null;
+  const k = 'tools.renta.activities.ceuta';
+  return (
+    <div className="renta-block">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={a.ceuta === true}
+          onChange={(e) => {
+            const { ceuta: _, ...rest } = a;
+            onChange(e.target.checked ? { ...rest, ceuta: true } : rest);
+          }}
+        />
+        <span>{t(k)}</span>
+      </label>
+      <p className="section-hint">
+        {t(`${k}Hint`, { year, hard: rule.hardPercent, modules: rule.modulesPercent })}
+      </p>
+    </div>
+  );
+}
 
 /**
  * An activity in direct estimation that may be artistic (LIRPF DA 60.ª.2, from 2025): the tick and
@@ -105,6 +150,11 @@ export function ActivitiesList({
             <ArtisticQuestion
               a={a}
               n={i + 1}
+              onChange={(next) => set({ activities: list.map((x, j) => (j === i ? next : x)) })}
+            />
+            <CeutaQuestion
+              a={a}
+              ccaaId={form.ccaaId}
               onChange={(next) => set({ activities: list.map((x, j) => (j === i ? next : x)) })}
             />
           </li>

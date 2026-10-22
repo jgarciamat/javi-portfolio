@@ -223,6 +223,8 @@ export interface RentaState {
   lowPay?: LowPayRule | null;
   /** The reduction for artistic activities of the year (DA 60.ª); null: the year has none (2024). */
   artistic?: ArtisticRule | null;
+  /** The higher rates of the activities in Ceuta (DA 64.ª, only 2026); unset: the year has none. */
+  ceutaActivities?: CeutaActivityRule;
   source: string;
 }
 
@@ -254,6 +256,18 @@ export interface BaseReductions {
   /** Arts. 53 and 54 (a person with a disability); unset: the limits of 2025 (rentaDisability.ts). */
   disability?: DisabilityLimits;
   notes: string;
+}
+
+/**
+ * LIRPF DA 64.ª (Real Decreto-ley 22/2026, BOE-A-2026-18429; convalidated, BOE-A-2026-19420): in 2026
+ * the activities carried out in Ceuta whose income has the deduction of art. 68.4 take, instead of
+ * 5 %, `hardPercent` of provisions and hard-to-justify expenses (simplified direct estimation; the
+ * 2,000 € cap of RIRPF art. 30 is not changed) and `modulesPercent` off the net income of módulos
+ * (DA 1.ª of the Orden HAC/1425/2025, módulos and farming).
+ */
+export interface CeutaActivityRule {
+  hardPercent: number;
+  modulesPercent: number;
 }
 
 /**

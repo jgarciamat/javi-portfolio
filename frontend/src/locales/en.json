@@ -1895,6 +1895,8 @@
   "tools.renta.activities.title": "Economic activities",
   "tools.renta.activities.line": "{name}: net income {net}",
   "tools.renta.activities.remove": "Remove «{name}»",
+  "tools.renta.activities.ceuta": "The activity is carried out in Ceuta and its income gets the 60 % deduction of Ceuta.",
+  "tools.renta.activities.ceutaHint": "In {year} those activities take {hard} % of hard-to-justify expenses in simplified direct estimation (up to 2,000 €) and a {modules} % reduction in módulos, instead of 5 %.",
   "tools.renta.activities.artistic": "It is an artistic activity (IAE groups 851, 852, 853, 861, 862, 864 or 869, or groupings 01, 02, 03 or 05 of section three)",
   "tools.renta.activities.artisticHint": "From 2025, if this year you earn more than 130 % of the average of the three before, the excess is reduced by 30 % (on 150,000 € at most). A year with a loss counts as 0.",
   "tools.renta.activities.artisticPrevious": "Net income of the activity {ago} year(s) ago",

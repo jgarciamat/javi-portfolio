@@ -69,6 +69,7 @@ Al comparar se vio que cuatro enlaces de La Rioja de 2025 (donaciones de mecenaz
 | Eficiencia energética | Hasta 31-12-2026 (edificios, 31-12-2027) | RDL 7/2026 | Convalidado |
 | Vehículo eléctrico y recarga | Hasta 31-12-2026 | RDL 7/2026 | Convalidado |
 | La Palma | También en 2026 | RDL 23/2026 (BOE-A-2026-18828) | Convalidado (BOE-A-2026-19845) |
+| DA 64.ª, actividades en Ceuta con la deducción del art. 68.4 | 10 % de provisiones y gastos de difícil justificación en directa simplificada (el tope de 2.000 € del art. 30 RIRPF no cambia) y 10 % de reducción del rendimiento neto de módulos y agrario (DA 1.ª de la Orden HAC/1425/2025), en lugar del 5 % | RDL 22/2026, art. 2 (BOE-A-2026-18429, en vigor el 3-9-2026) | Convalidado (BOE-A-2026-19420, BOE del 18-9-2026) |
 | Art. 23.2 (alquiler de vivienda), art. 68.6 (deducción estatal por alquiler), DA 55.ª (1,1 % en 2026), DA 65.ª y 66.ª | Texto nuevo | RDL 29/2026 (BOE-A-2026-20823) | **Pendiente de convalidación** a 22-10-2026 (su antecesor, el RDL 26/2026, fue derogado el 2-10-2026). No se aplica: la app lo da como dato que falta |
 
 Igual que en 2025: escalas, mínimos, arts. 19 y 20, ahorro y conjunta.
@@ -99,4 +100,4 @@ Un año sin orden de cotización toma la última tabla y lo dice en el borrador;
 - **Deducciones autonómicas de 2024 que no tiene la app** (7, en la tabla de arriba): añadirlas si hay demanda.
 - **RDL 29/2026.** Si el Congreso lo convalida, añadir al paquete 2026 el art. 23.2 nuevo, la deducción del art. 68.6, el 1,1 % de 2026 y las DA 65.ª y 66.ª; si lo deroga, quitar el aviso de alquileres e imputación.
 - **Tipos de IVA de 2023-2024** (5 % y 2 %, también 7,5 %, con sus recargos): no hechos. Exigen los diseños del 303 y del 390 de esos años y las fechas de cada tipo (RDL 20/2022, art. 72; RDL 4/2024).
-- **DA 64.ª (Ceuta, 2026)**: 10 % de gastos de difícil justificación y de reducción de módulos para actividades en Ceuta; no está en el motor.
+- **DA 64.ª (Ceuta, 2026)**: hecha en la Renta 2026 (`state.ceutaActivities` de 2026; la persona de Ceuta marca en cada actividad simplificada, de módulos o agraria que se desarrolla allí con la deducción del 60 %). Falta: (1) la pantalla de autónomos (`hardRateOf` de `annualActivity.ts` y el 130/131 del servidor) sigue con el 5 % en Ceuta; según la DA 64.ª.3, el 10 % cuenta en los pagos fraccionados de 2026 cuyo plazo empiece pasado un mes desde el 3-9-2026, es decir, desde el del cuarto trimestre (enero de 2027); (2) quien no reside en Ceuta pero obtiene allí rentas con la deducción del art. 68.4 no tiene la pregunta (solo se pregunta con la comunidad Ceuta); (3) una actividad traída de la pantalla de autónomos llega con su rendimiento ya calculado al 5 %.
