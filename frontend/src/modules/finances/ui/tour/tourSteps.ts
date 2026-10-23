@@ -7,13 +7,15 @@ export interface TourStep {
   tab?: DashboardTab;
   /** CSS selector of what to highlight; without it (or when missing) the card is centred. */
   target?: string;
+  /** On phones, a smaller part of `target`: the whole would not fit above the card. */
+  phoneTarget?: string;
 }
 
 /**
  * Version of the tour. Raise it when the tour changes a lot: whoever turned the tour off is then
  * offered the new one once (discreetly), and the «seen» mark is kept per version.
  */
-export const TOUR_VERSION = 2;
+export const TOUR_VERSION = 3;
 
 const SECTION = '[data-tour="section"]';
 const WIZARD_ROUTE = '[data-tour="wizard-route"]';
@@ -32,6 +34,10 @@ const STEPS: TourStep[] = [
   { id: 'selection', tab: 'monthly', target: '[data-tour="movements"]' },
   { id: 'budgets', tab: 'budgets', target: SECTION },
   { id: 'goals', tab: 'goals', target: SECTION },
+  { id: 'split', tab: 'split', target: '[data-tour="split-new"]' },
+  { id: 'splitSettle', tab: 'split' },
+  { id: 'automations', tab: 'automations', target: SECTION },
+  { id: 'automationsNew', tab: 'automations', target: '[data-tour="recurring-new"]' },
   { id: 'menu', tab: 'monthly', target: '.burger-btn' },
   { id: 'invite', tab: 'monthly', target: '.burger-btn' },
   { id: 'profile', tab: 'monthly', target: '.burger-btn' },
@@ -50,12 +56,15 @@ const STEPS: TourStep[] = [
   { id: 'autoFiles', tab: 'business', target: WIZARD_ROUTE },
   { id: 'autoLimits', tab: 'business' },
   { id: 'autoPlan', tab: 'business' },
+  { id: 'cryptoIntro', tab: 'crypto' },
+  { id: 'cryptoChart', tab: 'crypto', target: '.cc-market-chart', phoneTarget: '.cc-layers' },
+  { id: 'cryptoTrade', tab: 'crypto', target: '.cc-order' },
   { id: 'settings', tab: 'settings', target: SECTION },
   { id: 'done', tab: 'monthly' },
 ];
 
 /** Steps whose text depends on the plan: `<id>Free` or `<id>Premium`. Nothing pushes to buy. */
-const BY_PLAN = new Set(['rentaPlan', 'autoPlan']);
+const BY_PLAN = new Set(['automationsNew', 'rentaPlan', 'autoPlan']);
 
 export function tourSteps(premium: boolean): TourStep[] {
   return STEPS.map((step) =>

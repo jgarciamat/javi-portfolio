@@ -173,6 +173,27 @@ describe('GuidedTour', () => {
     expect(document.querySelector('.tour-spotlight')).toHaveStyle({ top: '2px' });
   });
 
+  it('highlights a smaller part of the element on phones, when the step names one', () => {
+    placeTarget('whole', 100, 900);
+    placeTarget('part', 100, 80);
+    const steps: TourStep[] = [{ id: 'cryptoChart', target: '#whole', phoneTarget: '#part' }];
+    const show = () =>
+      renderWithI18n(
+        <GuidedTour
+          steps={steps}
+          onShowTab={jest.fn()}
+          onClose={jest.fn()}
+          initialDontShowAgain={false}
+        />
+      );
+    const desktop = show();
+    expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '684px' }); // clipped to the screen
+    desktop.unmount();
+    Object.defineProperty(window, 'innerWidth', { value: 500, configurable: true });
+    show();
+    expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '96px' });
+  });
+
   it('on phones keeps the element clear of the card: scroll margins and a clipped highlight', () => {
     Object.defineProperty(window, 'innerWidth', { value: 500, configurable: true });
     Object.defineProperty(window, 'innerHeight', { value: 700, configurable: true });
@@ -247,7 +268,7 @@ describe('GuidedTour', () => {
     document.documentElement.style.removeProperty('--sticky-bar-height');
   });
 
-  it('follows the element when it changes size after it appeared', () => {
+  it('follows the element when it or the page changes size after it appeared', () => {
     const observed: Array<() => void> = [];
     const disconnect = jest.fn();
     (window as { ResizeObserver?: unknown }).ResizeObserver = class {
@@ -259,15 +280,19 @@ describe('GuidedTour', () => {
         disconnect();
       }
     };
-    const { rect } = placeTarget('near-top', 100, 50);
+    const { element, rect } = placeTarget('near-top', 100, 50);
+    const scroll = jest.spyOn(element, 'scrollIntoView');
     const view = renderTour();
     next();
+    expect(scroll).toHaveBeenCalledTimes(1);
     rect.height = 120;
     rect.bottom = 220;
     act(() => observed.forEach((callback) => callback()));
     expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '136px' });
+    // The page grew (something loaded above it): it is brought back into view.
+    expect(scroll).toHaveBeenCalledTimes(2);
     view.unmount();
-    expect(disconnect).toHaveBeenCalled();
+    expect(disconnect).toHaveBeenCalledTimes(2);
   });
 
   it('centres the card when the highlighted element is not shown (hidden on this screen)', () => {
@@ -300,6 +325,29 @@ describe('tour steps', () => {
     expect(free).toEqual(expect.arrayContaining(['rentaPlanFree', 'autoPlanFree']));
     expect(premium).toEqual(expect.arrayContaining(['rentaPlanPremium', 'autoPlanPremium']));
     expect(premium).not.toContain('rentaPlanFree');
+  });
+
+  it('explains automatic operations, shared expenses and the crypto console in menu order', () => {
+    const free = tourSteps(false);
+    const ids = free.map((s) => s.id);
+    // «My money» (goals, shared expenses, automatic operations), then taxes, then «Learn».
+    const order = ['goals', 'split', 'automations', 'autoPlanFree', 'cryptoIntro', 'settings'];
+    const at = order.map((id) => ids.indexOf(id));
+    expect(at).not.toContain(-1);
+    expect(at).toEqual([...at].sort((a, b) => a - b));
+    expect(ids).toEqual(expect.arrayContaining(['splitSettle', 'cryptoChart', 'cryptoTrade']));
+    const byId = Object.fromEntries(free.map((s) => [s.id, s]));
+    expect(byId.split).toMatchObject({ tab: 'split', target: '[data-tour="split-new"]' });
+    expect(byId.automations).toMatchObject({ tab: 'automations' });
+    expect(byId.automationsNewFree).toMatchObject({ target: '[data-tour="recurring-new"]' });
+    expect(byId.cryptoChart).toMatchObject({ tab: 'crypto', target: '.cc-market-chart' });
+    expect(byId.cryptoTrade).toMatchObject({ tab: 'crypto', target: '.cc-order' });
+    // The limit of the free plan is only told to whoever has it.
+    expect(tr('app.tour.automationsNewFree.body')).toMatch(/hasta 5/);
+    expect(tourSteps(true).map((s) => s.id)).toContain('automationsNewPremium');
+    // The console is a simulator with play money, said in its first step.
+    expect(tr('app.tour.cryptoIntro.body')).toMatch(/10\.000 € virtuales/);
+    expect(tr('app.tour.cryptoIntro.body')).toMatch(/No es dinero real/);
   });
 
   it('has a text in every language for every step', () => {
@@ -465,6 +513,14 @@ describe('Welcome tour in the dashboard', () => {
         await screen.findByRole('heading', { name: tr('app.tour.welcome.title') })
       ).toBeInTheDocument();
       expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
+    });
+
+    it('is offered to whoever only saw the previous version, telling what is new', async () => {
+      localStorage.setItem(TOUR_SEEN_KEY, String(TOUR_VERSION - 1));
+      await signInWithTourOff();
+      const notice = await screen.findByRole('region', { name: tr('app.tour.offer.title') });
+      expect(notice).toHaveTextContent(/Autónomos/);
+      expect(notice).toHaveTextContent(/gastos compartidos y la consola crypto/);
     });
 
     it('is not offered again once this version was seen', async () => {

@@ -25,7 +25,7 @@ function NewGroup({
     .filter(Boolean);
 
   return (
-    <div className="card">
+    <div className="card" data-tour="split-new">
       <h2 className="section-title">
         <Icon name="plus" /> {t('app.split.new')}
       </h2>

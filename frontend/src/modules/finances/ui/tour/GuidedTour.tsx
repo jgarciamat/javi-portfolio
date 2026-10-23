@@ -108,39 +108,49 @@ function useTargetRect(
     let element: Element | null = null;
     let timer = 0;
     let observer: ResizeObserver | null = null;
+    let page: ResizeObserver | null = null;
     const started = Date.now();
     const measure = () => {
       if (element) setRect(visibleRect(element, bottomInset(card, element)));
+    };
+    /** Scrolls it into the part of the screen the pinned bars and the card leave free. */
+    const bringIntoView = (target: Element) => {
+      if (isPinned(target)) return;
+      const html = target as HTMLElement;
+      const top = pinnedTop() + TOP_GAP;
+      const inset = bottomInset(card, target);
+      const free = window.innerHeight - top - inset;
+      // The page already keeps `scroll-padding-top` under its fixed bar: only add the rest.
+      const padding = parseFloat(
+        window.getComputedStyle(document.documentElement).scrollPaddingTop
+      );
+      html.style.scrollMarginTop = `${Math.max(top - (padding || 0), 0)}px`;
+      html.style.scrollMarginBottom = `${inset}px`;
+      html.scrollIntoView({
+        block: target.getBoundingClientRect().height > free * 0.9 ? 'start' : 'center',
+        behavior: scrollBehavior(),
+      });
     };
     const find = () => {
       element = document.querySelector(selector);
       const size = element?.getBoundingClientRect();
       if (element && size && size.width > 0 && size.height > 0) {
-        // Scroll it into the part of the screen the pinned bars and the card leave free.
-        if (!isPinned(element)) {
-          const html = element as HTMLElement;
-          const top = pinnedTop() + TOP_GAP;
-          const inset = bottomInset(card, element);
-          const free = window.innerHeight - top - inset;
-          // The page already keeps `scroll-padding-top` under its fixed bar: only add the rest.
-          const padding = parseFloat(
-            window.getComputedStyle(document.documentElement).scrollPaddingTop
-          );
-          html.style.scrollMarginTop = `${Math.max(top - (padding || 0), 0)}px`;
-          html.style.scrollMarginBottom = `${inset}px`;
-          html.scrollIntoView({
-            block: size.height > free * 0.9 ? 'start' : 'center',
-            behavior: scrollBehavior(),
-          });
-        }
+        const found = element;
+        bringIntoView(found);
         measure();
         timer = window.setTimeout(measure, SETTLE_MS);
         // Sections fill in after they open: follow the element when it grows or shrinks.
         if (typeof ResizeObserver !== 'undefined') {
           observer = new ResizeObserver(measure);
-          observer.observe(element);
+          observer.observe(found);
           // The card too: its size changes with the text of the step and with the contrast mode.
           observer.observe(card.current as HTMLDivElement);
+          // What loads above it pushes it away: when the page grows or shrinks, bring it back.
+          page = new ResizeObserver(() => {
+            bringIntoView(found);
+            measure();
+          });
+          page.observe(document.body);
         }
       } else if (Date.now() - started < WAIT_MS) {
         timer = window.setTimeout(find, POLL_MS);
@@ -152,6 +162,7 @@ function useTargetRect(
     return () => {
       window.clearTimeout(timer);
       observer?.disconnect();
+      page?.disconnect();
       window.removeEventListener('resize', measure);
       window.removeEventListener('scroll', measure, true);
       if (element) {
@@ -183,6 +194,11 @@ function anchoredStyle(rect: Rect | null, card: HTMLDivElement | null): CSSPrope
   return undefined;
 }
 
+/** What the step highlights on this screen: on phones, the smaller part when it names one. */
+function targetOf(step: TourStep): string | undefined {
+  return (window.innerWidth < MOBILE_WIDTH && step.phoneTarget) || step.target;
+}
+
 interface GuidedTourProps {
   steps: TourStep[];
   /** Opens the section a step talks about. */
@@ -205,13 +221,12 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
   const bodyId = useId();
   const step = steps[index];
   const last = index === steps.length - 1;
-  const rect = useTargetRect(step.target, step.id, card);
+  const rect = useTargetRect(targetOf(step), step.id, card);
   const close = () => onClose(dontShowAgain);
   useDialog(card, close, true);
 
   // Short pages cannot scroll their last section above the card: give them room while it is open.
   useEffect(() => {
-    if (window.innerWidth >= MOBILE_WIDTH) return;
     const previous = document.body.style.paddingBottom;
     document.body.style.paddingBottom = `${CARD_HEIGHT + CARD_MARGIN}px`;
     return () => {
