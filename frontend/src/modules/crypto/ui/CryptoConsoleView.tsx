@@ -169,6 +169,7 @@ function SimulatorBody({
         portfolio={portfolio}
         busy={busy}
         onPlace={sim.place}
+        onGuide={onGlossary}
         practice={
           outOfBalance(portfolio) ? <PracticeOffer portfolio={portfolio} sim={sim} /> : undefined
         }

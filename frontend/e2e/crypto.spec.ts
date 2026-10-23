@@ -40,6 +40,16 @@ test('opens a long with take profit and stop loss, changes them and closes it at
   await page.getByLabel('Take profit (opcional)').fill('100000');
   await page.getByLabel('Stop loss (opcional)').fill('30000');
   await expect(page.getByText('Todo listo. Revisa las cifras de abajo.')).toBeVisible();
+  // The commission is explained before opening: amount and percentage, kind and reason.
+  await expect(
+    page.getByText(/Comisión simulada: .* \(0,1 %\) al abrir \+ otra similar al cerrar/)
+  ).toBeVisible();
+  const why = page.getByRole('button', { name: '¿Por qué hay comisión y de qué tipo es?' });
+  await expect(why).toHaveAttribute('aria-expanded', 'false');
+  await why.click();
+  await expect(why).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByText(/comisión porcentual fija sobre el importe/)).toBeVisible();
+  await expect(page.getByText(/no se cobra dinero real/)).toBeVisible();
   await page.getByRole('button', { name: 'Abrir long' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
 
@@ -311,7 +321,8 @@ test('fits a phone upright and on its side without sideways scrolling', async ({
 });
 
 test('season, practice portfolio, ranking and Premium comforts', async ({ page, pageErrors }) => {
-  // The official season of this month, with its countdown; no commission notice and no free CSV.
+  // The official season of this month, with its countdown; no commission notice before typing an
+  // amount (it appears in «Before opening») and no free CSV.
   await expect(page.getByRole('heading', { name: /^Temporada de / })).toBeVisible();
   await expect(page.getByRole('timer').first()).toContainText(/Nueva temporada|último día/);
   await expect(page.getByText(/Comisión fija/)).toHaveCount(0);

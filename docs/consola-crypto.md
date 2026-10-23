@@ -239,7 +239,7 @@ short (ejemplo con números inventados y la garantía del simulador); órdenes y
 profit y stop loss; apalancamiento (cómo funciona, por qué es peligroso y que Finanverso no lo
 ofrece); **«Palabras de la consola»**: el glosario completo (`GLOSSARY_TERMS` y las claves
 `app.crypto.glossary.*`) con buscador sin acentos ni mayúsculas; y la tarjeta «Gratis y Premium».
-La comisión fija del 0,10 % solo se menciona dentro de la guía.
+La comisión fija del 0,1 % se menciona en la guía (glosario «Comisión») y en el recuadro «Antes de abrir» de la caja de operar.
 
 ## Simulador
 
@@ -256,7 +256,7 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
 - **Órdenes** a mercado, límite o stop para abrir long o short; **take profit y stop loss**
   opcionales (largo: TP encima y SL debajo de la entrada; corto: al revés), guardados como órdenes
   de cierre vinculadas; una orden pendiente los deja al ejecutarse. Validación en vivo («Antes de
-  abrir», `aria-live`, con la comisión simulada en euros pero sin aviso del porcentaje) y en el
+  abrir», `aria-live`, con la comisión simulada, su porcentaje y una explicación desplegable; ver «Comisión explicada al abrir») y en el
   servidor. Las órdenes vinculadas **no caducan** ni la garantía de un short: duran lo que dure la
   posición (`findFill` recibe `Infinity` como fin); solo caducan las órdenes de entrada.
 - **Ejecución determinista sin procesos en segundo plano**: al abrir o refrescar la consola (cada
@@ -348,13 +348,31 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
 - **Lo que se quitó de la interfaz** (decisión del dueño): el selector de comisión
   (0/0,1/0,25/0,5/1 %), el selector de saldo (1.000/10.000/100.000 €) y el botón «Empezar de
   nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece. Después se quitan
-  también el enlace «¿Qué es la comisión?», el aviso «Comisión fija…» de «Antes de abrir» y el
-  botón **«Exportar CSV»** gratis del historial (panel de cerradas): no hay CSV gratis en la
+  también (y después se **recuperaron**, ver «Comisión explicada al abrir») el enlace «¿Qué es la
+  comisión?» y el aviso de comisión de «Antes de abrir»; y se quitó el botón **«Exportar CSV»** gratis del historial (panel de cerradas): no hay CSV gratis en la
   pantalla. Siguen el **informe Premium de temporada** en PDF y CSV y la exportación RGPD de la
   cuenta (que incluye todo el simulador). En el backend se elimina
   `PATCH /crypto/sim/settings` y `POST /crypto/sim/reset` solo sirve para **carteras de
   prácticas**: acepta e ignora `initial` y `feeBps` que mandaban versiones anteriores de la app y,
   sin cartera de prácticas, responde `CRYPTO_SEASON_NO_RESET`.
+
+### Comisión explicada al abrir
+
+En «Antes de abrir», con un importe válido, se ve la línea **«Comisión simulada: 1,00 € (0,1 %) al
+abrir + otra similar al cerrar (≈1,00 €)»** (en la moneda elegida) y un desplegable
+**«¿Por qué hay comisión y de qué tipo es?»** (`aria-expanded`, `aria-controls`). Lo que dice
+refleja el servidor (`crypto-sim.ts`: `feeCents(importe, 10 bps)` al abrir, sumada al importe;
+`sale()` al cerrar, sobre el valor de la posición en ese momento, restada de lo recibido; igual para
+largos y cortos; sin comisión por mantener):
+
+- **Tipo**: comisión porcentual fija sobre cada operación, del tipo «taker» de los mercados reales.
+- **Porqué**: operar tiene coste y el resultado neto lo resta; una operación debe ganar más que las
+  comisiones para salir en positivo.
+- **Simulada y fija**: no depende del plan y no se cobra dinero real. Ejemplo inventado con 1.000 €.
+- El botón **«¿Qué es la comisión?»** vive solo dentro del desplegable y abre la guía en «Palabras».
+  El glosario dice «0,1 % fijo por compra y por venta», sin elegir porcentaje.
+- Al armar el botón **Cerrar**, el aviso para lectores de pantalla añade la comisión de cierre
+  estimada. El porcentaje sale de `account.feeBps` (siempre 10 bps = 0,1 %).
 
 ## Temporada mensual
 

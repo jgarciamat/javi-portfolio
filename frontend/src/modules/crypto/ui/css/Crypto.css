@@ -1209,6 +1209,36 @@
   margin: 0.5rem 0 0;
 }
 
+.cc-fee {
+  margin: 0.55rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--cc-line);
+  font-size: 0.8125rem;
+  color: var(--cc-text);
+}
+
+.cc-fee p {
+  margin: 0 0 0.35rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.cc-fee-toggle {
+  font-size: 0.8125rem;
+  min-height: 32px;
+}
+
+.cc-fee-body {
+  margin: 0.2rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--accent-400);
+  border-radius: 6px;
+}
+
+.cc-fee-body[hidden] {
+  display: none;
+}
+
 .cc-submit {
   width: 100%;
   min-height: 44px;

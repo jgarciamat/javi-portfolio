@@ -795,11 +795,40 @@ describe('Crypto console: opening positions', () => {
       stopLoss: 45_000,
     });
     expect(capital()).toHaveValue('');
-    expect(box).toContain('Comisión simulada1,00 €');
-    expect(screen.queryByRole('button', { name: '¿Qué es la comisión?' })).toBeNull();
     const help = screen.getByRole('button', { name: '¿Qué es una orden a mercado?' });
     fireEvent.click(help);
     expect(help).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('explains the commission before opening: line, kind, reason and the guide', async () => {
+    setup();
+    await ready();
+    expect(screen.queryByText(/Comisión simulada:/)).toBeNull();
+    expect(screen.queryByRole('button', { name: '¿Qué es la comisión?' })).toBeNull();
+    fireEvent.change(capital(), { target: { value: '1000' } });
+    expect(nb(check().textContent)).toContain(
+      'Comisión simulada: 1,00 € (0,1 %) al abrir + otra similar al cerrar (≈1,00 €)'
+    );
+    const toggle = screen.getByRole('button', { name: '¿Por qué hay comisión y de qué tipo es?' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    const body = document.getElementById(toggle.getAttribute('aria-controls')!)!;
+    expect(body).not.toBeVisible();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(body).toBeVisible();
+    expect(body).toHaveTextContent('comisión porcentual fija sobre el importe de cada operación');
+    expect(body).toHaveTextContent('0,1 % al abrir');
+    expect(body).toHaveTextContent('«taker»');
+    expect(body).toHaveTextContent('no se cobra dinero real');
+    expect(body).toHaveTextContent(
+      /Ejemplo inventado: abres con 1\.000,00 €.*resultado neto es −2,00 €/
+    );
+    fireEvent.click(within(body).getByRole('button', { name: '¿Qué es la comisión?' }));
+    expect(
+      await screen.findByRole('region', { name: 'Palabras de la consola' })
+    ).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('opens a pending short and checks every field live', async () => {
@@ -1128,6 +1157,9 @@ describe('Crypto console: open, pending and closed', () => {
     expect(close).toHaveClass('cc-close--armed');
     expect(
       screen.getByText('Pulsa otra vez en 4 segundos para cerrarla al precio de ahora.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Se cobrará una comisión simulada de cierre de unos/)
     ).toBeInTheDocument();
     act(() => jest.advanceTimersByTime(CONFIRM_MS));
     expect(close).toHaveAccessibleName('Cerrar operación (Long de BTC #1)');
