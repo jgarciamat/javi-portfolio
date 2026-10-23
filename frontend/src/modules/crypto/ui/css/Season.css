@@ -607,6 +607,104 @@
   line-height: 1.5;
 }
 
+/* «Invite a friend and compete» (next to the ranking) and its short notice: the rainbow of «Invite
+   a friend» in the menu on the border, drifting slowly as on the prize; the text sits on the card
+   colour. */
+.cc .card.cc-invite,
+.cc-invite-nudge {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--cc-surface), var(--cc-surface)) padding-box,
+    linear-gradient(90deg, var(--rainbow-stops), #ff5c5c) 0 0 / 200% 100% border-box;
+  box-shadow: 0 0 22px -8px color-mix(in srgb, #8b7bff 55%, transparent);
+  animation: cc-prize-shine 8s linear infinite;
+}
+
+.cc-invite {
+  display: grid;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.cc-invite p {
+  margin: 0;
+}
+
+.cc-invite .section-title .icon,
+.cc-invite-nudge h2 .icon {
+  color: var(--accent-300);
+}
+
+.cc-invite-link {
+  display: block;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background: var(--cc-field);
+  color: var(--cc-strong);
+  font-family: var(--cc-num);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.cc-invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cc-invite-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 36px;
+}
+
+.cc .cc-save.is-copied {
+  border-color: var(--green-400);
+  color: var(--green-300);
+}
+
+.cc-invite-later {
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--cc-text-2);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cc-invite-later:hover {
+  color: var(--cc-strong);
+}
+
+.cc-invite-nudge {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--cc-radius);
+  color: var(--cc-text);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cc-invite-nudge h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-invite-nudge p {
+  margin: 0;
+}
+
 html.wiz-contrast .cc-podium-row,
 html.wiz-contrast .cc-badges li,
 html.wiz-contrast .cc-plan,
@@ -622,7 +720,9 @@ html.wiz-contrast .cc .cc-save {
 }
 
 /* Contrast: a plain light frame instead of the rainbow. */
-html.wiz-contrast .cc-prize {
+html.wiz-contrast .cc-prize,
+html.wiz-contrast .cc .card.cc-invite,
+html.wiz-contrast .cc-invite-nudge {
   border-color: var(--slate-100);
   background: var(--cc-surface);
   box-shadow: none;
@@ -630,12 +730,16 @@ html.wiz-contrast .cc-prize {
 }
 
 html.wiz-contrast .cc .cc-save,
-html.wiz-contrast .cc-alias-notice {
+html.wiz-contrast .cc-alias-notice,
+html.wiz-contrast .cc-invite-link,
+html.wiz-contrast .cc-invite-later {
   color: var(--slate-50);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cc-prize {
+  .cc-prize,
+  .cc .card.cc-invite,
+  .cc-invite-nudge {
     animation: none;
   }
 

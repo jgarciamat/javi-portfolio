@@ -29,6 +29,16 @@ describe('Crypto console wording', () => {
     expect(keys(en)).toEqual(keys(es));
   });
 
+  it('invites without pressure, bets or promises', () => {
+    const invite = (texts: Record<string, string>) =>
+      crypto(texts).filter(([key]) => key.startsWith('app.crypto.invite.'));
+    const PRESSURE =
+      /apuest|apost|casino|suerte|ya mismo|no te lo pierdas|última|antes de que|seguro que|\bbet|gambl|luck|last chance|hurry|don't miss/i;
+    expect(invite(es).length).toBeGreaterThan(0);
+    expect(invite(es).filter(([, text]) => PRESSURE.test(text))).toEqual([]);
+    expect(invite(en).filter(([, text]) => PRESSURE.test(text))).toEqual([]);
+  });
+
   it('carries the full risk notice', () => {
     const notice = (es as Record<string, string>)['app.crypto.risk.body'];
     for (const part of [

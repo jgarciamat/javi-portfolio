@@ -498,3 +498,60 @@ test('pages the open trades ten at a time and goes back a page when the last row
   if (last > 2) await expect(pager).toContainText(`Página ${last - 1} de ${last - 1}`);
   else await expect(pager).toHaveCount(0);
 });
+
+/**
+ * Nobody invited yet and a place in the ranking (the demo has no month of trades behind it), so
+ * the notice after something good can come.
+ */
+async function invitable(page: Page) {
+  await page.route('**/api/referral', async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    await route.fulfill({ response, json: { ...body, qualified: 0, pending: 0 } });
+  });
+  await page.route('**/api/crypto/ranking', async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.me = { ...body.me, place: 3, qualified: true };
+    await route.fulfill({ response, json: body });
+  });
+  await page.evaluate(() => {
+    localStorage.setItem('mm_crypto_ranking_intro', '1');
+    localStorage.removeItem('mm_crypto_invite_nudge');
+  });
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+}
+
+test('invites a friend from the ranking: the card, its link copied and a notice closed for good', async ({
+  page,
+  context,
+  pageErrors,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await invitable(page);
+  const card = page.getByRole('region', { name: 'Invita a un amigo y competid' });
+  await expect(card).toContainText('recibe 30 días de Premium y tú sumas meses de Premium');
+  await expect(card).toContainText('Operar en la consola no cuenta para la invitación.');
+  // Only the random code of the invitation: nothing about the person.
+  const link = card.getByLabel('Tu enlace de invitación');
+  await expect(link).toHaveText(/^https:\/\/finanverso\.app\/\?ref=[A-Z2-9]{8}$/);
+  await card.getByRole('button', { name: 'Copiar enlace' }).click();
+  await expect(card.getByRole('button', { name: '¡Copiado!' })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await link.textContent());
+  await expect(card.getByRole('button', { name: 'Compartir' })).toBeVisible();
+
+  // The notice: not a dialog, closed with «Ahora no» and not back after reloading.
+  const notice = page.getByRole('complementary', {
+    name: 'Ya tienes puesto en el ranking del mes',
+  });
+  await expect(notice).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await notice.getByRole('button', { name: 'Ahora no' }).click();
+  await expect(notice).toHaveCount(0);
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  await expect(card).toBeVisible();
+  await expect(notice).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});

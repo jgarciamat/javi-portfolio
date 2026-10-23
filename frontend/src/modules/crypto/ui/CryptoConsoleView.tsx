@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import type { ReferralSummary } from '@modules/billing/domain/types';
+import { useResource } from '@shared/hooks/useResource';
 import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
@@ -17,6 +20,7 @@ import {
   type DisplayChoice,
   type Money,
 } from './money';
+import { InviteCard, InviteNudge } from './InvitePanel';
 import { DataNotice, GlossaryButton, RiskBanner } from './Notices';
 import { OrderBox } from './OrderBox';
 import { AlertsCard, PlansCard, StatsCard } from './PremiumPanel';
@@ -200,10 +204,12 @@ function SeasonExtras({
   portfolio,
   coins,
   ranking,
+  referral,
 }: {
   portfolio: SimPortfolio;
   coins: CryptoCoin[];
   ranking: Ranking;
+  referral: ReferralSummary | undefined;
 }) {
   const { t } = useI18n();
   const premium = portfolio.plan.premium;
@@ -211,6 +217,7 @@ function SeasonExtras({
   return (
     <>
       <RankingCard state={ranking} />
+      <InviteCard referral={referral} />
       <AlertsCard premium={premium} alerts={alerts} coins={coins} />
       <BadgesCard portfolio={portfolio} />
       <div id="cc-plans">
@@ -254,6 +261,9 @@ function Console({ currency }: { currency: DisplayChoice }) {
   const sim = useSimulator(t('app.crypto.sim.error'));
   // Asked for once the portfolio of the month is there (the server starts it on the first visit).
   const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
+  // «Invite a friend» of the menu, the same programme: without an answer nothing is offered.
+  const { billingApi } = useApi();
+  const { data: referral } = useResource(() => billingApi.referral(), [billingApi]);
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
   const rate = useServerRate(market, currency);
   const premium = !!sim.portfolio?.plan.premium;
@@ -278,7 +288,12 @@ function Console({ currency }: { currency: DisplayChoice }) {
         usdPerEur={rate}
       />
       <RankingIntro ranking={ranking.ranking} />
-      {sim.portfolio && <SeasonPanel portfolio={sim.portfolio} sim={sim} />}
+      {sim.portfolio && (
+        <>
+          <SeasonPanel portfolio={sim.portfolio} sim={sim} />
+          <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral} />
+        </>
+      )}
       <SimulatorHead sim={sim} />
       <MarketPanel
         view={view}
@@ -306,6 +321,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
             portfolio={sim.portfolio}
             coins={market.coins?.coins ?? []}
             ranking={ranking}
+            referral={referral}
           />
         </>
       )}

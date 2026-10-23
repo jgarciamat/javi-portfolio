@@ -460,6 +460,46 @@ largos y cortos; sin comisión por mantener):
   primer take profit alcanzado (`firstTakeProfit`), 10 operaciones (`tenTrades`) y mes en
   positivo (`positiveMonth`).
 
+## Invitar desde la consola
+
+Un empujón al programa «Invita a un amigo» del menú, **sin sistema nuevo**: el mismo enlace
+(`inviteLink`, `https://finanverso.app/?ref=CÓDIGO`, solo el código aleatorio, nada de la persona),
+los mismos contadores y la misma recompensa, leídos de `GET /referral` (`ReferralService`).
+
+- **Recompensa real** (la del programa, sin inventar nada): si el amigo se registra con el enlace y
+  completa los primeros pasos de la app (3 movimientos, un presupuesto, una meta y una
+  automatización), recibe 30 días de Premium (`rewardDays`), y quien invita suma meses según los
+  amigos que lo consiguen: 1 mes con el primero, 2 con 5, 3 con 20, 4 con 40 y 5 con 50
+  (`tiers`, máximo `maxRewards`). **Operar en la consola no cuenta** para la invitación, y la
+  tarjeta lo dice.
+- **Tarjeta «Invita a un amigo y competid»** (`ui/InvitePanel.tsx`), debajo del ranking del mes:
+  la recompensa con las cifras del servidor, el enlace, «Copiar enlace», «Compartir» (Web Share;
+  donde el navegador no comparte, copia) y «Tus invitaciones: completadas · en camino · meses
+  conseguidos». Si el portapapeles falla, dice cómo copiarlo a mano. Si `/referral` no responde,
+  no se muestra nada (no hay interruptor del programa en el servidor: se trata como apagado).
+- **Aviso puntual** (no modal, no bloqueante, se cierra con «Ahora no»), tras algo bueno:
+  la primera operación cerrada con resultado neto positivo (`pnl > 0`, ya con comisiones), al
+  conseguir puesto en el ranking del mes (`me.place`) y con el resumen de la temporada que acaba
+  de terminar (mientras ese resumen sigue sin cerrar). Reglas (`domain/invite.ts`):
+  - como mucho **un aviso cada 7 días por dispositivo**; cada suceso cuenta una sola vez y, si
+    llega dentro de esos 7 días, se gasta sin aviso (no vuelve más tarde con un texto viejo);
+  - el aviso abierto sigue hasta cerrarlo (7 días como mucho); usar su enlace también lo da por
+    visto;
+  - nunca si la persona ya invitó a alguien (`qualified + pending > 0`), si `/referral` falla o
+    mientras el primer aviso del ranking («Apareces en el ranking del mes…») sigue abierto, para
+    no juntar dos avisos.
+  - Se recuerda en `localStorage` (`mm_crypto_invite_nudge`: `at`, `done`, `open`), siempre con
+    el envoltorio `storage` que nunca lanza errores.
+- **Estilo**: el mismo arcoíris de «Invita a un amigo» del menú y del premio (`--rainbow-stops`)
+  en el borde, moviéndose despacio; quieto con `prefers-reduced-motion` y un marco claro liso en
+  Contraste. El texto va siempre sobre el color de la tarjeta.
+- **Textos**: lenguaje claro, sin presión, sin lenguaje de apuesta ni promesas
+  (`__tests__/crypto/wording.test.ts` lo comprueba en español e inglés).
+- **Analítica** (la propia y anónima de `docs/analitica.md`, tabla `funnel_daily` de la
+  migración 034): `cons_invite_view` (tarjeta vista, una vez por visita a la consola),
+  `cons_invite_copy` (enlace copiado) y `cons_invite_share` (compartido de verdad; cancelar no
+  cuenta). Sin el enlace, el código ni ningún dato de la persona. El aviso no tiene evento propio.
+
 ## Premium en la consola (comodidades, sin ventaja en el ranking)
 
 Función de plan `cryptoPro`, comprobada en el servidor como las demás funciones Premium. Todos
