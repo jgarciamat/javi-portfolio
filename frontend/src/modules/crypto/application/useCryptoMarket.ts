@@ -10,8 +10,8 @@ export const MARKET_REFRESH_MS = 30_000;
 export interface CryptoMarket {
   coins: CryptoCoins | null;
   candles: CryptoCandles | null;
-  /** The first answer for this coin and size has not arrived yet. */
-  loading: boolean;
+  /** The coin list answered or failed (without it the console goes on with no list). */
+  coinsDone: boolean;
   error: string | null;
   refresh: () => void;
 }
@@ -27,6 +27,7 @@ export function useCryptoMarket(
 ): CryptoMarket {
   const { cryptoApi } = useApi();
   const [coins, setCoins] = useState<CryptoCoins | null>(null);
+  const [coinsFailed, setCoinsFailed] = useState(false);
   const [candles, setCandles] = useState<CryptoCandles | null>(null);
   const [error, setError] = useState<string | null>(null);
   const request = useRef(0);
@@ -38,7 +39,9 @@ export function useCryptoMarket(
       .then((value) => {
         if (id === request.current) setCoins(value);
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (id === request.current) setCoinsFailed(true);
+      });
     cryptoApi
       .candles(symbol, interval)
       .then((value) => {
@@ -61,7 +64,7 @@ export function useCryptoMarket(
   return {
     coins,
     candles: current ? candles : null,
-    loading: !current && !error,
+    coinsDone: coins !== null || coinsFailed,
     error,
     refresh,
   };

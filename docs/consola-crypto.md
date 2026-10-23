@@ -589,6 +589,46 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - Cada función Premium bloqueada muestra una **maqueta con datos de ejemplo** y qué desbloquea,
   sin presión ni lenguaje de apuesta.
 
+## Carga: esqueleto azul y nada a medias (octubre de 2026)
+
+- **Primera carga** (y al volver a la consola o cambiar de cartera: pestañas de temporada y
+  prácticas, crear o borrar una de prácticas): mientras falte algo del primer pintado solo se ve
+  el aviso de riesgo y el **esqueleto** (`ConsoleSkeleton.tsx`, `css/Skeleton.css`): la silueta del
+  panel «Gráfica de precios» con el marco, la columna de monedas con filas de contorno, la
+  cabecera (icono, nombre, precio), las temporalidades y la moneda, la caja de datos del día y la
+  gráfica con su rejilla y velas inventadas, más los chips de capas, «Aprende», la barra de zoom y
+  las notas. Solo **contornos finos** en el azul de acento (`--accent-400`, el de los chips
+  activos), sin texto ni cifras. Un brillo lento recorre los bordes (un pulso cada 1,8 s, en
+  cascada por filas y chips); con «reducir movimiento» queda quieto con un azul tenue; en
+  Contraste el borde es azul sólido (2 px en las cajas); con colores forzados usa `CanvasText`.
+- **Qué se espera** (`useMarketReady` y `allThere` en `CryptoConsoleView.tsx`): lista de monedas
+  (o su fallo: entonces la consola sigue sin lista), velas de la moneda y temporalidad elegidas,
+  el chunk de la gráfica (`loadChart` en `MarketPanel.tsx`, pedido al abrir la consola y pintado
+  sin `Suspense`, así la gráfica sale en el mismo pintado), cartera, ranking (o su error) e
+  invitaciones. Cuando todo está, se pasa **de golpe** a la consola real; no hay «Cargando…» suelto
+  ni datos parciales (`DataNotice` ya no tiene estado «Cargando precios…»).
+- **Mismas medidas**: el esqueleto usa la rejilla real (`cc-market-grid`, `cc-coins`,
+  `cc-market-head`, `cc-stats`) y la altura de la gráfica es una sola variable
+  (`--cc-canvas-h`: 420 px, 480 px desde 1680 px, 320 px en móvil y el alto disponible en
+  horizontal) que comparten la gráfica y su marco. Diferencia medida entre esqueleto y panel:
+  4 px en 1440, 2 px en 390 y 4 px en 844x390 (6–8 px en Contraste). Guarda también el hueco de
+  «Gira el móvil» mientras no se haya descartado. Lo que va encima del panel (nota de datos,
+  temporada, resumen) aparece a la vez que él.
+- **Accesibilidad**: el contenedor lleva `role="status"` y `aria-busy="true"` con el texto oculto
+  «Cargando la consola…» / «Loading the console…» (`app.crypto.skeleton.label`); el dibujo es
+  `aria-hidden` y no hay nada enfocable, así que no atrapa el foco. Tras cambiar de cartera el foco
+  vuelve a la pestaña de la cartera elegida.
+- **Errores**: si falla la primera respuesta de velas o de la cartera se muestra su mensaje con
+  «Reintentar» en lugar del esqueleto; si en **20 s** (`FIRST_PAINT_MS`) no ha llegado todo, se
+  muestra «No se han podido cargar los precios.» (o «No se ha podido cargar tu simulador.» si lo
+  que falta es la cartera). «Reintentar» vuelve a montar la consola: pide todo otra vez y reinicia
+  la espera.
+- **Dentro del panel ya montado** (otra moneda, temporalidad o divisa, también en pantalla
+  completa) no vuelve el esqueleto: la gráfica sigue montada y vacía y encima se pone un **velo**
+  con el mismo marco azul (`cc-chart-veil`, `aria-busy` en la gráfica) hasta que llegan las
+  velas, sin mezclar velas antiguas. El aviso de error de velas con «Reintentar» dentro del panel
+  se mantiene.
+
 ## Móvil y accesibilidad
 
 - 390 px sin desplazamiento lateral; en horizontal (844x390) la gráfica ocupa casi todo el alto y
@@ -626,6 +666,10 @@ cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste). Filas co
 operación, con y sin Detalles) en `/tmp/gf70-shots/` (1440 y 390; claro, oscuro y Contraste).
 Operaciones numeradas (#1 y #2 en filas, líneas de la gráfica con precios cercanos y aviso de la
 caja de operar con 2 de 2) en `/tmp/gf71-shots/` (1440 y 390; claro, oscuro y Contraste).
+Esqueleto de carga, panel real y velo de la gráfica (`*-loading`, `*-panel`, `*-veil`, más el velo
+en pantalla completa) en `/tmp/gf77-shots/` (1440, 390 y 844x390; claro, oscuro y Contraste); el
+E2E «shows only the blue outline of the panel until everything is there» retiene las velas y
+comprueba que no asoma ninguna cifra ni «Cargando» hasta que el panel llega entero.
 
 Fuente por moneda (USDT convertido): `backend/src/tests/infrastructure/market.test.ts` (plan de
 pares, conversión y redondeo, caché por par convertida al leer, tasa de reserva de 7 días, sin

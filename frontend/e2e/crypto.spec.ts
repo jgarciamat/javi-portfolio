@@ -306,6 +306,107 @@ test('keeps candle sizes, currency, coin and zoom in the full screen chart', asy
   }
 });
 
+/**
+ * Watches the console while it loads: whenever the real panel is not there yet, records any text
+ * on screen (screen-reader words and the risk notice aside) with a figure or «Cargando», and when
+ * the panel appears, whether the price, the figures of the day and the chart came all at once.
+ */
+async function watchLoading(page: Page) {
+  await page.evaluate(() => {
+    const w = window as unknown as { leaks: string[]; arrival: string | null };
+    w.leaks = [];
+    w.arrival = null;
+    const visibleText = (root: Element) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let text = '';
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const el = n.parentElement!;
+        if (el.closest('.sr-only, .cc-risk') || !el.checkVisibility()) continue;
+        text += `${n.textContent} `;
+      }
+      return text;
+    };
+    const check = () => {
+      const cc = document.querySelector('.cc');
+      if (!cc || w.arrival) return;
+      const panel = cc.querySelector('section.cc-market');
+      if (panel) {
+        const price = panel.querySelector('.cc-quote-price')?.textContent ?? '';
+        const stats = panel.querySelector('.cc-stats')?.textContent ?? '';
+        const chart = panel.querySelector('[role="img"][aria-label^="Gráfica de"]');
+        w.arrival = `${/\d/.test(price)} ${/\d/.test(stats)} ${!!chart}`;
+        return;
+      }
+      const text = visibleText(cc);
+      if (/\d|Cargando/.test(text)) w.leaks.push(text.trim().slice(0, 120));
+    };
+    new MutationObserver(check).observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+    });
+    check();
+  });
+}
+
+test('shows only the blue outline of the panel until everything is there', async ({ page }) => {
+  // The candles take their time: nothing of the console may show meanwhile.
+  let release: () => void = () => undefined;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/api/crypto/candles**', async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.evaluate(() => localStorage.removeItem('mm_crypto_rotate_hint'));
+  await page.reload();
+  await watchLoading(page);
+  await openSection(page, 'Consola crypto');
+  const skeleton = page.getByRole('status').filter({ hasText: 'Cargando la consola…' });
+  await expect(skeleton).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('.cc-skel .cc-skel-canvas svg')).toBeVisible();
+  // The outline in the accent blue, and as tall as the chart will be.
+  const frame = page.locator('.cc-skel .cc-skel-canvas');
+  expect((await frame.boundingBox())!.height).toBe(420);
+  const skeletonBox = await page.locator('.cc-skel').boundingBox();
+  await page.waitForTimeout(1500);
+  await expect(page.getByRole('img', { name: /Gráfica de/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Bitcoin/ })).toHaveCount(0);
+  release();
+  await expect(
+    page.getByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 hora' })
+  ).toBeVisible();
+  await expect(page.locator('.cc-skeleton')).toHaveCount(0);
+  const result = await page.evaluate(() => {
+    const w = window as unknown as { leaks: string[]; arrival: string | null };
+    return { leaks: w.leaks, arrival: w.arrival };
+  });
+  expect(result.leaks).toEqual([]);
+  expect(result.arrival).toBe('true true true');
+  // The panel takes the room of its outline: the same height, give or take a few pixels.
+  const panelBox = await page.locator('section.cc-market').boundingBox();
+  expect(Math.abs(panelBox!.height - skeletonBox!.height)).toBeLessThan(12);
+  await page.unroute('**/api/crypto/candles**');
+
+  // Another candle size veils only the chart: the panel stays and nothing old shows through.
+  let next: () => void = () => undefined;
+  const second = new Promise<void>((resolve) => (next = resolve));
+  await page.route('**/api/crypto/candles**', async (route) => {
+    await second;
+    await route.continue();
+  });
+  await page.getByRole('radio', { name: '1 día' }).check();
+  await expect(page.locator('.cc-chart-veil')).toBeVisible();
+  await expect(
+    page.getByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 día' })
+  ).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('.cc-skeleton')).toHaveCount(0);
+  await expect(page.getByText(/^Cargando/)).toHaveCount(0);
+  next();
+  await expect(page.locator('.cc-chart-veil')).toHaveCount(0);
+  await page.unroute('**/api/crypto/candles**');
+  await page.evaluate(() => localStorage.removeItem('mm_crypto_view'));
+});
+
 test('fits a phone upright and on its side without sideways scrolling', async ({ page }) => {
   for (const size of [
     { width: 390, height: 844 },

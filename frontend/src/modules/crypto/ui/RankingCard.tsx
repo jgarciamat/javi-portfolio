@@ -151,14 +151,15 @@ export function RankingIntro({ ranking }: { ranking: CryptoRanking | null }) {
 export function RankingCard({ state }: { state: Ranking }) {
   const { t, locale } = useI18n();
   const { ranking, error } = state;
+  // The console waits for the ranking: without one, it failed.
   if (!ranking) {
-    return error ? (
+    return (
       <section className="card cc-ranking">
         <p className="error-banner" role="alert">
           {error}
         </p>
       </section>
-    ) : null;
+    );
   }
   const { rules, season, previous } = ranking;
   return (

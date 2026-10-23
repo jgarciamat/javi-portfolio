@@ -25,6 +25,7 @@ import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/forma
 import type { LayerId } from '../domain/indicators';
 import { layerLevels, layerLines, legend } from '../domain/layers';
 import type { Candle, CryptoInterval } from '../domain/types';
+import { ChartFrame, HINT_KEY } from './ConsoleSkeleton';
 import { LayerBar } from './LayerBar';
 import { useMoney } from './money';
 import { useCandleChart, type CandleChart, type ChartLine } from './useCandleChart';
@@ -51,9 +52,10 @@ interface PriceChartProps {
   fullBar?: ReactNode;
   /** Change (%) of the candles on screen, for the header; null when there are none. */
   onVisibleChange: (percent: number | null) => void;
+  /** Other candles are on their way: a blue frame covers the empty chart until they arrive. */
+  loading?: boolean;
 }
 
-const HINT_KEY = 'mm_crypto_rotate_hint';
 const PORTRAIT_PHONE = '(orientation: portrait) and (max-width: 719px)';
 
 type LockableOrientation = ScreenOrientation & {
@@ -350,6 +352,16 @@ function Unless({ hide, children }: { hide: boolean; children: ReactNode }) {
   return hide ? null : children;
 }
 
+/** The drawing and, while other candles load, the blue frame over it (no old candle shows). */
+function Stage({ loading, children }: { loading?: boolean; children: ReactNode }) {
+  return (
+    <div className="cc-chart-stage">
+      {children}
+      {loading && <ChartFrame className="cc-chart-veil" />}
+    </div>
+  );
+}
+
 /** In full screen the chart is a dialog that holds the focus. */
 const dialogProps = (expanded: boolean, name: string) =>
   expanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': name } : {};
@@ -426,6 +438,7 @@ export function PriceChart({
   layerExtra,
   fullBar,
   onVisibleChange,
+  loading,
 }: PriceChartProps) {
   const { t, locale } = useI18n();
   const money = useMoney();
@@ -499,16 +512,19 @@ export function PriceChart({
         onToggle={onToggleLayer}
       />
       <Unless hide={full.expanded}>{layerExtra}</Unless>
-      <div
-        ref={container}
-        className="cc-chart-canvas"
-        tabIndex={0}
-        role="img"
-        aria-roledescription={t('app.crypto.chart.role')}
-        aria-label={label}
-        aria-describedby={`${summaryId} ${linesId} ${helpId}`}
-        onKeyDown={onKeyDown}
-      />
+      <Stage loading={loading}>
+        <div
+          ref={container}
+          className="cc-chart-canvas"
+          tabIndex={0}
+          role="img"
+          aria-roledescription={t('app.crypto.chart.role')}
+          aria-label={label}
+          aria-describedby={`${summaryId} ${linesId} ${helpId}`}
+          aria-busy={loading}
+          onKeyDown={onKeyDown}
+        />
+      </Stage>
       <p id={summaryId} className="sr-only">
         {whole
           ? t('app.crypto.chart.summary', {

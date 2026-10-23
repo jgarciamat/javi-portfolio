@@ -1,12 +1,14 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { ApiError } from '@core/api/http';
 import { translate } from '@core/i18n/I18nContext';
 import { savedLayers } from '@modules/crypto/application/useLayers';
+import type { ReferralSummary } from '@modules/billing/domain/types';
 import type {
   ClosedTrade,
   CryptoCandles,
   CryptoCoins,
   CryptoInterval,
+  CryptoRanking,
   OpenTrade,
   PendingOrder,
   SimFill,
@@ -14,6 +16,7 @@ import type {
 } from '@modules/crypto/domain/types';
 import {
   CryptoConsoleView,
+  FIRST_PAINT_MS,
   chartLines,
   fillText,
   savedView,
@@ -23,6 +26,7 @@ import { LEARN_SEEN_KEY } from '@modules/crypto/ui/Learn';
 import { makeMoney } from '@modules/crypto/ui/money';
 import { CONFIRM_MS } from '@modules/crypto/ui/TradePanels';
 import * as fx from '@test-utils/crypto';
+import { referral } from '@test-utils/fixtures';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
 import { mockMatchMedia } from '@test-utils/dom';
 import { renderWithProviders } from '@test-utils/render';
@@ -118,7 +122,7 @@ describe('Crypto console: market', () => {
     expect(screen.getByRole('note', { name: 'Aviso importante' })).toHaveTextContent(
       /Operar en corto o con apalancamiento en el mercado real puede hacer perder más de lo invertido/
     );
-    expect(screen.getByText('Cargando precios…')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
     await ready();
     expect(screen.getByText(/Precios públicos de Binance en euros/)).toBeInTheDocument();
     expect(nb(document.querySelector('.cc-quote-price')!.textContent)).toBe('50.000,00 €');
@@ -290,8 +294,9 @@ describe('Crypto console: market', () => {
     unmount();
     localStorage.clear();
     setup((api) => api.cryptoApi.coins.mockReturnValue(new Promise(() => undefined)));
+    await act(async () => undefined);
     expect(screen.queryByRole('button', { name: /Bitcoin/ })).toBeNull();
-    expect(document.querySelector('.cc-quote-name')!.textContent).toContain('BTC');
+    expect(document.querySelector('.cc-skeleton')).not.toBeNull();
   });
 
   it('explains when the market data cannot be loaded and lets the person retry', async () => {
@@ -322,10 +327,9 @@ describe('Crypto console: market', () => {
     expect(await screen.findByText(/La fuente no responde: ves los datos de/)).toBeInTheDocument();
     unmount();
     const down = { ...fx.MARKET, available: false, updatedAt: null };
-    const second = setup((api) => {
-      api.cryptoApi.candles.mockRejectedValue(new Error('x'));
-      api.cryptoApi.coins.mockResolvedValue({ ...fx.coins(), market: down });
-    });
+    const second = setup((api) =>
+      api.cryptoApi.candles.mockResolvedValue({ ...fx.candles(), market: down })
+    );
     expect(await screen.findByText(/Ahora no hay datos de mercado/)).toBeInTheDocument();
     second.unmount();
     setup((api) =>
@@ -341,25 +345,32 @@ describe('Crypto console: market', () => {
     let late: (value: CryptoCandles) => void = () => undefined;
     let lateCoins: (value: CryptoCoins) => void = () => undefined;
     let lateFail: (reason: unknown) => void = () => undefined;
+    let lateCoinsFail: (reason: unknown) => void = () => undefined;
     const { api } = setup((a) => {
       a.cryptoApi.candles
-        .mockImplementationOnce(() => new Promise((resolve) => (late = resolve)))
-        .mockImplementationOnce(() => new Promise((_, reject) => (lateFail = reject)));
+        .mockResolvedValueOnce(fx.candles())
+        .mockImplementationOnce(() => new Promise((_, reject) => (lateFail = reject)))
+        .mockImplementationOnce(() => new Promise((resolve) => (late = resolve)));
       a.cryptoApi.coins
         .mockResolvedValueOnce(fx.coins())
-        .mockImplementationOnce(() => new Promise((resolve) => (lateCoins = resolve)));
+        .mockImplementationOnce(() => new Promise((resolve) => (lateCoins = resolve)))
+        .mockImplementationOnce(() => new Promise((_, reject) => (lateCoinsFail = reject)));
     });
-    fireEvent.click(await screen.findByRole('button', { name: /Ethereum/ }));
+    await ready();
+    fireEvent.click(screen.getByRole('button', { name: /Ethereum/ }));
     fireEvent.click(screen.getByRole('button', { name: /Bitcoin/ }));
-    await screen.findByRole('img', { name: /Bitcoin/ });
+    fireEvent.click(screen.getByRole('button', { name: /Ethereum/ }));
+    await screen.findByRole('img', { name: /Ethereum/ });
     await act(async () => {
       late(fx.candles('BTC', '1h', 2));
       lateCoins({ ...fx.coins(), coins: [] });
       lateFail(new Error('old'));
+      lateCoinsFail(new Error('old'));
     });
-    expect(api.cryptoApi.candles).toHaveBeenCalledTimes(3);
+    expect(api.cryptoApi.candles).toHaveBeenCalledTimes(4);
     expect(screen.queryByText('old')).toBeNull();
-    expect(screen.getByRole('button', { name: /Ethereum/ })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Ethereum/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Bitcoin/ })).toBeInTheDocument();
   });
 
   it('refreshes while on screen and not while hidden, and counts down the candle', async () => {
@@ -384,6 +395,152 @@ describe('Crypto console: market', () => {
     });
     expect(api.cryptoApi.portfolio.mock.calls.length).toBe(before + 2);
     expect(screen.getByText(/La vela cierra en/)).toHaveTextContent('00:00');
+  });
+});
+
+/** A promise answered by hand, to hold one request of the console back. */
+function later<T>() {
+  let resolve: (value: T) => void = () => undefined;
+  const promise = new Promise<T>((r) => (resolve = r));
+  return { promise, resolve };
+}
+
+/** What the console shows on screen, apart from the risk notice and the words for screen readers. */
+function onScreen(): string {
+  const copy = document.querySelector('.cc')!.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('.sr-only, .cc-risk').forEach((e) => e.remove());
+  return copy.textContent ?? '';
+}
+
+describe('Crypto console: loading', () => {
+  it('shows only the outline of the panel until everything is there, then the whole console', async () => {
+    const coins = later<CryptoCoins>();
+    const candles = later<CryptoCandles>();
+    const portfolio = later<SimPortfolio>();
+    const ranking = later<CryptoRanking>();
+    const invites = later<ReferralSummary>();
+    setup((api) => {
+      api.cryptoApi.coins.mockReturnValueOnce(coins.promise);
+      api.cryptoApi.candles.mockReturnValueOnce(candles.promise);
+      api.cryptoApi.portfolio.mockReturnValueOnce(portfolio.promise);
+      api.cryptoApi.ranking.mockReturnValueOnce(ranking.promise);
+      api.billingApi.referral.mockReturnValueOnce(invites.promise);
+    });
+    const steps = [
+      () => coins.resolve(fx.coins()),
+      () => candles.resolve(fx.candles()),
+      () => portfolio.resolve(fx.portfolio()),
+      () => ranking.resolve(fx.ranking()),
+    ];
+    for (const step of steps) {
+      await act(async () => step());
+      const status = screen.getByRole('status');
+      expect(status).toHaveAttribute('aria-busy', 'true');
+      expect(status).toHaveTextContent('Cargando la consola…');
+      expect(onScreen()).toBe('');
+      expect(screen.queryByRole('button')).toBeNull();
+    }
+    expect(document.querySelector('.cc-skel-canvas svg')).not.toBeNull();
+    await act(async () => invites.resolve(referral()));
+    expect(await screen.findByRole('img', { name: /Gráfica de Bitcoin/ })).toBeInTheDocument();
+    expect(document.querySelector('.cc-skeleton')).toBeNull();
+    expect(screen.getByText('Abiertas (1)')).toBeInTheDocument();
+  });
+
+  it('keeps the room of «turn the phone» only while it has not been dismissed', async () => {
+    setup((api) => api.cryptoApi.candles.mockReturnValue(new Promise(() => undefined)));
+    await act(async () => undefined);
+    expect(document.querySelector('.cc-skel-rotate')).not.toBeNull();
+    cleanup();
+    localStorage.setItem('mm_crypto_rotate_hint', '1');
+    setup((api) => api.cryptoApi.candles.mockReturnValue(new Promise(() => undefined)));
+    await act(async () => undefined);
+    expect(document.querySelector('.cc-skel-rotate')).toBeNull();
+  });
+
+  it('says the prices failed after 20 seconds without them, and «Retry» asks for all again', async () => {
+    jest.useFakeTimers();
+    const { api } = setup((a) =>
+      a.cryptoApi.coins.mockReturnValueOnce(new Promise(() => undefined))
+    );
+    await act(async () => undefined);
+    await act(async () => {
+      jest.advanceTimersByTime(FIRST_PAINT_MS - 1);
+    });
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent('No se han podido cargar los precios.');
+    expect(document.querySelector('.cc-skeleton')).toBeNull();
+    const before = api.cryptoApi.portfolio.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
+    await act(async () => undefined);
+    await act(async () => undefined);
+    expect(screen.getByRole('img', { name: /Gráfica de Bitcoin/ })).toBeInTheDocument();
+    expect(api.cryptoApi.portfolio.mock.calls.length).toBe(before + 1);
+  });
+
+  it('says the simulator failed after 20 seconds without the portfolio', async () => {
+    jest.useFakeTimers();
+    setup((a) => a.cryptoApi.portfolio.mockReturnValueOnce(new Promise(() => undefined)));
+    await act(async () => undefined);
+    await act(async () => {
+      jest.advanceTimersByTime(FIRST_PAINT_MS);
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent('No se ha podido cargar tu simulador.');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('precios');
+  });
+
+  it('veils the chart, not the console, while the candles of another coin arrive', async () => {
+    const eth = later<CryptoCandles>();
+    setup((api) =>
+      api.cryptoApi.candles.mockResolvedValueOnce(fx.candles()).mockReturnValueOnce(eth.promise)
+    );
+    await ready();
+    fireEvent.click(screen.getByRole('button', { name: /Ethereum/ }));
+    const chart = screen.getByRole('img', { name: /Gráfica de Ethereum/ });
+    expect(chart).toHaveAttribute('aria-busy', 'true');
+    expect(document.querySelector('.cc-chart-veil')).not.toBeNull();
+    expect(document.querySelector('.cc-skeleton')).toBeNull();
+    expect(screen.queryByText(/Cargando/)).toBeNull();
+    expect(charts[charts.length - 1].series[0].data).toEqual([]);
+    await act(async () => eth.resolve(fx.candles('ETH')));
+    expect(document.querySelector('.cc-chart-veil')).toBeNull();
+    expect(chart).toHaveAttribute('aria-busy', 'false');
+  });
+  it('keeps the note on the data while other candles load without a coin list', async () => {
+    const day = later<CryptoCandles>();
+    setup((api) => {
+      api.cryptoApi.coins.mockRejectedValue(new Error('down'));
+      api.cryptoApi.candles.mockResolvedValueOnce(fx.candles()).mockReturnValueOnce(day.promise);
+    });
+    await screen.findByRole('img', { name: 'Gráfica de BTC, velas de 1 hora' });
+    fireEvent.click(screen.getByRole('radio', { name: '1 día' }));
+    expect(screen.getByText(/Precios públicos de Binance en euros/)).toBeInTheDocument();
+    expect(screen.queryByText(/Cargando/)).toBeNull();
+    await act(async () => day.resolve(fx.candles('BTC', '1d')));
+    expect(screen.getByRole('img', { name: 'Gráfica de BTC, velas de 1 día' })).toBeInTheDocument();
+  });
+
+  it('says inside the panel when the candles of another size fail, and retries them', async () => {
+    const { api } = setup((a) =>
+      a.cryptoApi.candles
+        .mockResolvedValueOnce(fx.candles())
+        .mockRejectedValueOnce(new Error('Sin velas'))
+    );
+    await ready();
+    fireEvent.click(screen.getByRole('radio', { name: '1 día' }));
+    expect(await screen.findByText('Sin velas')).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: /Gráfica de/ })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Abiertas (1)' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(
+      await screen.findByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 día' })
+    ).toBeInTheDocument();
+    expect(api.cryptoApi.candles).toHaveBeenLastCalledWith('BTC', '1d');
   });
 });
 

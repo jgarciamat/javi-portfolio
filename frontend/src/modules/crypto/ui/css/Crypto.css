@@ -28,6 +28,8 @@
   --pnl-pos: var(--green-400);
   --pnl-neg: var(--red-400);
   --pnl-zero: var(--cc-text-2);
+  /* Height of the chart, shared with its loading frame so nothing moves when the candles arrive. */
+  --cc-canvas-h: 420px;
   gap: var(--cc-gap);
   font-size: 0.875rem;
   font-weight: 400;
@@ -1826,7 +1828,17 @@
   }
 }
 
+@media (min-width: 1680px) {
+  .cc {
+    --cc-canvas-h: 480px;
+  }
+}
+
 @media (max-width: 719px) {
+  .cc {
+    --cc-canvas-h: 320px;
+  }
+
   .cc .card {
     padding: 0.75rem;
   }
@@ -1912,6 +1924,10 @@
 
 /* A phone on its side: the chart gets the height, the rest becomes compact rows. */
 @media (orientation: landscape) and (max-height: 500px) {
+  .cc {
+    --cc-canvas-h: max(200px, calc(100dvh - 6.5rem));
+  }
+
   .cc-market-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:

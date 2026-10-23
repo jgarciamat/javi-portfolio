@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { ReferralSummary } from '@modules/billing/domain/types';
@@ -12,7 +12,8 @@ import { withSlot } from '../domain/orders';
 import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
 import type { CryptoCoin, SimFill, SimPortfolio } from '../domain/types';
-import { Loading, MarketPanel, type View } from './MarketPanel';
+import { ConsoleSkeleton } from './ConsoleSkeleton';
+import { MarketPanel, loadChart, type View } from './MarketPanel';
 import {
   MoneyProvider,
   useDisplayCurrency,
@@ -127,16 +128,7 @@ export function chartLines(
 }
 
 /** Summary first, then (after the chart) the order box and the operations. */
-function SimulatorHead({ sim }: { sim: Simulator }) {
-  if (!sim.portfolio) {
-    return sim.loadError ? (
-      <p className="error-banner" role="alert">
-        {sim.loadError}
-      </p>
-    ) : (
-      <Loading />
-    );
-  }
+function SimulatorHead({ portfolio, sim }: { portfolio: SimPortfolio; sim: Simulator }) {
   return (
     <>
       <FillsNotice fills={sim.fills} />
@@ -145,7 +137,7 @@ function SimulatorHead({ sim }: { sim: Simulator }) {
           {sim.action.error}
         </p>
       )}
-      <SimSummary portfolio={sim.portfolio} />
+      <SimSummary portfolio={portfolio} />
     </>
   );
 }
@@ -227,9 +219,16 @@ function SeasonExtras({
   );
 }
 
-/** The freshest word on the market data: the chart's, else the coin list's. */
-const statusOf = (market: ReturnType<typeof useCryptoMarket>) =>
-  market.candles?.market ?? market.coins?.market ?? null;
+/**
+ * The freshest word on the market data: the chart's, else the coin list's, else the last one
+ * (while the candles of another coin load without a coin list).
+ */
+function useMarketStatus(market: ReturnType<typeof useCryptoMarket>) {
+  const now = market.candles?.market ?? market.coins?.market ?? null;
+  const [last, setLast] = useState(now);
+  if (now && now !== last) setLast(now);
+  return now ?? last;
+}
 
 /**
  * The ECB rate the server converted the USDT prices with (the coin list's covers every coin),
@@ -251,7 +250,84 @@ function quotedCoin(market: ReturnType<typeof useCryptoMarket>, symbol: string) 
   return quote ? { symbol, quote } : null;
 }
 
-function Console({ currency }: { currency: DisplayChoice }) {
+/** Longest wait for the whole console before saying what is missing (the requests go on). */
+export const FIRST_PAINT_MS = 20_000;
+
+/** The market part of the first paint: the coins (or their failure), the candles, the chart's code. */
+function useMarketReady(market: ReturnType<typeof useCryptoMarket>): boolean {
+  const [chart, setChart] = useState(false);
+  useEffect(() => {
+    void loadChart().then(() => setChart(true));
+  }, []);
+  return !!market.candles && market.coinsDone && chart;
+}
+
+/** All of the first paint: the market, the portfolio, the ranking and the invitations. */
+const allThere = (marketReady: boolean, sim: Simulator, ranking: Ranking, invites: boolean) =>
+  marketReady &&
+  !!sim.portfolio &&
+  !sim.switching &&
+  invites &&
+  !!(ranking.ranking || ranking.error);
+
+/**
+ * The console shows whole or not at all: the skeleton stands in for it until everything of the
+ * first paint is there, and once shown it stays (another coin or size only veils the chart).
+ * Another portfolio waits again. `late` turns true after FIRST_PAINT_MS without everything.
+ */
+function useFirstPaint(ready: boolean, switching: boolean) {
+  const [shown, setShown] = useState(false);
+  const [late, setLate] = useState(false);
+  if (shown ? switching : ready) {
+    setShown(!shown);
+    setLate(false);
+  }
+  useEffect(() => {
+    if (shown) return;
+    const timer = window.setTimeout(() => setLate(true), FIRST_PAINT_MS);
+    return () => window.clearTimeout(timer);
+  }, [shown]);
+  // Back from another portfolio, the focus returns to its tab (the skeleton took the clicked one).
+  const before = useRef(false);
+  useEffect(() => {
+    if (shown && before.current)
+      document.querySelector<HTMLElement>('.cc-portfolio.is-on')?.focus();
+    if (shown) before.current = true;
+  }, [shown]);
+  return { shown, late };
+}
+
+/** Why the console cannot be shown yet: the first answers that failed, or a wait too long. */
+function failures(
+  market: ReturnType<typeof useCryptoMarket>,
+  sim: Simulator,
+  marketReady: boolean,
+  late: boolean,
+  t: Translate
+): string[] {
+  const marketError = market.candles ? null : market.error;
+  const simError = sim.portfolio ? null : sim.loadError;
+  return [
+    marketError ?? (late && !marketReady ? t('app.crypto.market.error') : null),
+    simError ?? (late && marketReady ? t('app.crypto.sim.error') : null),
+  ].filter((message): message is string => !!message);
+}
+
+/** The skeleton while loading or, when something failed, what and «Retry» (all is asked again). */
+function Waiting({ errors, onRetry }: { errors: string[]; onRetry: () => void }) {
+  const { t } = useI18n();
+  if (!errors.length) return <ConsoleSkeleton />;
+  return (
+    <p className="error-banner" role="alert">
+      {errors.join(' ')}{' '}
+      <button type="button" className="btn-link" onClick={onRetry}>
+        {t('app.crypto.market.retry')}
+      </button>
+    </p>
+  );
+}
+
+function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () => void }) {
   const { t } = useI18n();
   const money = useMoney();
   const [view, setView] = useState(savedView);
@@ -263,14 +339,18 @@ function Console({ currency }: { currency: DisplayChoice }) {
   const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
   // «Invite a friend» of the menu, the same programme: without an answer nothing is offered.
   const { billingApi } = useApi();
-  const { data: referral } = useResource(() => billingApi.referral(), [billingApi]);
+  const referral = useResource(() => billingApi.referral(), [billingApi]);
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
   const rate = useServerRate(market, currency);
+  const status = useMarketStatus(market);
   const premium = !!sim.portfolio?.plan.premium;
   const lines = useMemo(
     () => chartLines(sim.portfolio, view.symbol, t, money),
     [sim.portfolio, view.symbol, t, money]
   );
+  const marketReady = useMarketReady(market);
+  const ready = allThere(marketReady, sim, ranking, !referral.loading);
+  const { shown, late } = useFirstPaint(ready, sim.switching);
 
   const change = (next: Partial<View>) => {
     const value = { ...view, ...next };
@@ -278,23 +358,28 @@ function Console({ currency }: { currency: DisplayChoice }) {
     storage.set(VIEW_KEY, JSON.stringify(value));
   };
 
+  if (!shown || !sim.portfolio) {
+    return (
+      <div className="section-view cc">
+        <RiskBanner />
+        <Waiting errors={failures(market, sim, marketReady, late, t)} onRetry={onRetry} />
+      </div>
+    );
+  }
   return (
     <div className="section-view cc">
       <RiskBanner />
       <DataNotice
-        market={statusOf(market)}
+        // Never null here: the candles came with it before the console was shown.
+        market={status!}
         unavailable={currency.unavailable}
         coin={quotedCoin(market, view.symbol)}
         usdPerEur={rate}
       />
       <RankingIntro ranking={ranking.ranking} />
-      {sim.portfolio && (
-        <>
-          <SeasonPanel portfolio={sim.portfolio} sim={sim} />
-          <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral} />
-        </>
-      )}
-      <SimulatorHead sim={sim} />
+      <SeasonPanel portfolio={sim.portfolio} sim={sim} />
+      <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral.data} />
+      <SimulatorHead portfolio={sim.portfolio} sim={sim} />
       <MarketPanel
         view={view}
         market={market}
@@ -308,23 +393,19 @@ function Console({ currency }: { currency: DisplayChoice }) {
         guide={guide}
         premium={premium}
       />
-      {sim.portfolio && (
-        <>
-          <SimulatorBody
-            portfolio={sim.portfolio}
-            sim={sim}
-            symbol={view.symbol}
-            coin={coin}
-            onGlossary={() => guide.show('glossary')}
-          />
-          <SeasonExtras
-            portfolio={sim.portfolio}
-            coins={market.coins?.coins ?? []}
-            ranking={ranking}
-            referral={referral}
-          />
-        </>
-      )}
+      <SimulatorBody
+        portfolio={sim.portfolio}
+        sim={sim}
+        symbol={view.symbol}
+        coin={coin}
+        onGlossary={() => guide.show('glossary')}
+      />
+      <SeasonExtras
+        portfolio={sim.portfolio}
+        coins={market.coins?.coins ?? []}
+        ranking={ranking}
+        referral={referral.data}
+      />
       <GlossaryButton onOpen={() => guide.show('glossary')} />
     </div>
   );
@@ -338,9 +419,11 @@ function Console({ currency }: { currency: DisplayChoice }) {
  */
 export function CryptoConsoleView() {
   const choice = useDisplayCurrency();
+  // «Retry» starts the console again: every request and the wait of the first paint.
+  const [attempt, setAttempt] = useState(0);
   return (
     <MoneyProvider display={choice.display}>
-      <Console currency={choice} />
+      <Console key={attempt} currency={choice} onRetry={() => setAttempt((n) => n + 1)} />
     </MoneyProvider>
   );
 }

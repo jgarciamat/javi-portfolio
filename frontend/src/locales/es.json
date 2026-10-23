@@ -5146,7 +5146,7 @@
   "app.crypto.data.usdtRate": "1 € = {rate} US$; tomamos 1 USDT = 1 US$",
   "app.crypto.data.usdtParity": "tomamos 1 USDT = 1 US$",
   "app.crypto.data.demo": "Precios inventados de demostración (entorno de pruebas).",
-  "app.crypto.data.loading": "Cargando precios…",
+  "app.crypto.skeleton.label": "Cargando la consola…",
   "app.crypto.data.fresh": "Actualizado: {when}.",
   "app.crypto.data.stale": "La fuente no responde: ves los datos de {when}.",
   "app.crypto.data.down": "Ahora no hay datos de mercado. Vuelve a intentarlo en unos minutos.",

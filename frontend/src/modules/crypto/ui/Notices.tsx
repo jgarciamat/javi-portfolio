@@ -22,8 +22,7 @@ export function RiskBanner() {
 }
 
 /** The sentence about how fresh the prices are, and whether to show it as a warning. */
-function freshness(market: MarketStatus | null, t: Translate, locale: Locale) {
-  if (!market) return { text: t('app.crypto.data.loading'), warn: false };
+function freshness(market: MarketStatus, t: Translate, locale: Locale) {
   if (!market.available) return { text: t('app.crypto.data.down'), warn: true };
   const when = formatDateTime(market.updatedAt!, locale);
   if (market.stale) return { text: t('app.crypto.data.stale', { when }), warn: true };
@@ -32,13 +31,13 @@ function freshness(market: MarketStatus | null, t: Translate, locale: Locale) {
 
 /** Where the prices of the coin on screen come from, in the currency they are shown in. */
 function sourceText(
-  market: MarketStatus | null,
+  market: MarketStatus,
   coin: { symbol: string; quote: Quote } | null,
   usd: boolean,
   usdPerEur: string | null,
   t: Translate
 ): string {
-  if (market?.source === 'demo') return t('app.crypto.data.demo');
+  if (market.source === 'demo') return t('app.crypto.data.demo');
   if (coin?.quote !== 'USDT')
     return t(usd ? 'app.crypto.data.sourceUsd' : 'app.crypto.data.source');
   if (usd) return t('app.crypto.data.sourceUsdtUsd', { coin: coin.symbol });
@@ -60,7 +59,7 @@ export function DataNotice({
   coin,
   usdPerEur,
 }: {
-  market: MarketStatus | null;
+  market: MarketStatus;
   unavailable: boolean;
   /** The coin on screen and the market its prices come from (null while it loads). */
   coin: { symbol: string; quote: Quote } | null;

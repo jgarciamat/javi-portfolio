@@ -16,6 +16,8 @@ export interface Simulator {
   /** Pending orders filled or expired since the last look (to announce them). */
   fills: SimFill[];
   action: Action;
+  /** Another portfolio is on its way (the console waits for it whole, as on the first visit). */
+  switching: boolean;
   place: (order: OrderRequest) => Promise<boolean>;
   cancel: (id: string) => Promise<boolean>;
   /** Take profit and stop loss of an open position (null removes it). */
@@ -36,6 +38,7 @@ export function useSimulator(fallback: string): Simulator {
   const [portfolio, setPortfolio] = useState<SimPortfolio | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [fills, setFills] = useState<SimFill[]>([]);
+  const [switching, setSwitching] = useState(false);
   const action = useAction(fallback);
   const mounted = useRef(true);
   const selected = useRef<string | undefined>(storage.get(PORTFOLIO_KEY) ?? undefined);
@@ -74,6 +77,10 @@ export function useSimulator(fallback: string): Simulator {
       setFills([]);
       apply(await call());
     });
+  const swap = (call: () => Promise<SimPortfolio>) => {
+    setSwitching(true);
+    return run(call).finally(() => setSwitching(false));
+  };
   const current = () => portfolio!.portfolio.id;
 
   return {
@@ -81,6 +88,7 @@ export function useSimulator(fallback: string): Simulator {
     loadError,
     fills,
     action,
+    switching,
     place: (order) =>
       run(() =>
         cryptoApi.placeOrder(
@@ -89,9 +97,9 @@ export function useSimulator(fallback: string): Simulator {
       ),
     cancel: (id) => run(() => cryptoApi.cancelOrder(id)),
     setExits: (id, exits) => run(() => cryptoApi.setExits(id, exits)),
-    select: (id) => run(() => cryptoApi.portfolio(id)),
-    createPractice: () => run(() => cryptoApi.createPractice()),
+    select: (id) => swap(() => cryptoApi.portfolio(id)),
+    createPractice: () => swap(() => cryptoApi.createPractice()),
     resetPractice: () => run(() => cryptoApi.resetPractice(current())),
-    deletePractice: () => run(() => cryptoApi.deletePractice(current())),
+    deletePractice: () => swap(() => cryptoApi.deletePractice(current())),
   };
 }
