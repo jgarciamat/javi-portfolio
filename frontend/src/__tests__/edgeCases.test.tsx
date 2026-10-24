@@ -828,7 +828,7 @@ describe('more edge cases', () => {
     renderWithProviders(
       <>
         <BudgetsView />
-        <GoalsView />
+        <GoalsView onOpenTab={jest.fn()} />
       </>,
       { api }
     );

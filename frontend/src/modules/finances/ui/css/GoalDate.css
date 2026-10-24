@@ -1,0 +1,118 @@
+/* ─── La fecha de tu meta ───
+   The month in words at 1.25rem, buttons of at least 48 px with words, and the «what if…»
+   sheet as a bottom sheet on phones (a centred dialog on wide screens). */
+
+.goal-date {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--slate-800);
+}
+
+.goal-date-big {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--slate-50);
+}
+
+.goal-date-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.goal-sheet-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.75rem;
+}
+
+.goal-sheet-input {
+  width: 8rem;
+  min-height: 3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.goal-sheet {
+  width: min(32rem, 100%);
+}
+
+.goal-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.goal-sheet-head .icon-btn {
+  min-width: 3rem;
+  min-height: 3rem;
+}
+
+.goal-sheet-slider {
+  display: grid;
+  grid-template-columns: 3rem 1fr 3rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+}
+
+.goal-sheet-slider .leak-btn {
+  padding: 0;
+}
+
+.goal-sheet-slider input[type='range'] {
+  width: 100%;
+  min-height: 3rem;
+  accent-color: var(--accent-400);
+}
+
+.goal-sheet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.goal-sheet-chips .leak-btn[aria-pressed='true'] {
+  outline: 2px solid var(--accent-400);
+  outline-offset: -2px;
+}
+
+.goal-sheet-leaks {
+  width: 100%;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.goal-sheet-result {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--slate-800);
+}
+
+.goal-sheet-result .goal-date-big {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay:has(> .goal-sheet) {
+    align-items: flex-end;
+  }
+
+  .goal-sheet {
+    max-height: 92vh;
+    overflow-y: auto;
+    border-radius: 18px 18px 0 0;
+  }
+}
+
+html.wiz-contrast .goal-date,
+html.wiz-contrast .goal-sheet-result {
+  border: 2px solid var(--slate-200);
+}

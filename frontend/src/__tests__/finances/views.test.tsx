@@ -267,7 +267,7 @@ describe('GoalsView', () => {
     const api = createFakeApi();
     api.goalApi.getAll.mockResolvedValue(goals);
     api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ahorro' })]);
-    return renderWithProviders(<GoalsView />, { api });
+    return renderWithProviders(<GoalsView onOpenTab={jest.fn()} />, { api });
   }
 
   it('shows progress and toggles archived goals', async () => {

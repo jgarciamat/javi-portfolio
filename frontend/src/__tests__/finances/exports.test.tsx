@@ -302,7 +302,7 @@ describe.each(LOCALES)('exports in %s', (locale) => {
         progress: { ...f.goal().progress, monthlyNeeded: null },
       }),
     ]);
-    render(<GoalsView />, api);
+    render(<GoalsView onOpenTab={jest.fn()} />, api);
     const button = await csvButton(locale, 'app.goals.title');
     await waitFor(() => expect(button).toBeEnabled());
     const file = await download(button);

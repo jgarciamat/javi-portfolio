@@ -107,7 +107,7 @@ const SIMPLE_VIEWS: Partial<
   health: () => <HealthView />,
   accounts: () => <AccountsView />,
   budgets: () => <BudgetsView />,
-  goals: () => <GoalsView />,
+  goals: (open) => <GoalsView onOpenTab={open} />,
   split: () => <SplitView />,
   assets: () => <AssetsView />,
   business: (open) => <BusinessView onOpenTab={open} />,

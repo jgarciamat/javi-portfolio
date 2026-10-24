@@ -334,7 +334,7 @@ describe('GoalsView', () => {
   });
 
   it('shows progress and the monthly saving needed', async () => {
-    render(<GoalsView />);
+    render(<GoalsView onOpenTab={jest.fn()} />);
     expect(await screen.findByRole('progressbar', { name: 'Viaje' })).toHaveAttribute(
       'aria-valuenow',
       '20'
@@ -343,7 +343,7 @@ describe('GoalsView', () => {
   });
 
   it('creates a goal', async () => {
-    render(<GoalsView />);
+    render(<GoalsView onOpenTab={jest.fn()} />);
     await screen.findByText(/Viaje/, { selector: '.goal-name' });
     fireEvent.change(screen.getByLabelText(t('app.goals.name')), {
       target: { value: 'Moto' },
