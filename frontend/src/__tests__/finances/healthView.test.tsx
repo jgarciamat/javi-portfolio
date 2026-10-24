@@ -82,7 +82,15 @@ describe('Monthly challenges', () => {
   const challengeCard = async () =>
     within((await screen.findByText(tr('app.challenge.title'))).closest('.card') as HTMLElement);
 
-  it('lets you pick a challenge, follow it and change it', async () => {
+  it('lists the three challenges with nothing chosen', async () => {
+    setup({ overview: { budgets: [f.budgetLine()] } });
+    const card = await challengeCard();
+    expect(card.getAllByRole('button', { name: tr('app.challenge.choose') })).toHaveLength(3);
+    expect(card.queryByText(tr('app.challenge.doneBadge'))).toBeNull();
+    expect(card.queryByRole('progressbar')).toBeNull();
+  });
+
+  it('follows a challenge in progress and lets you change it', async () => {
     setup({
       overview: {
         transactions: [f.transaction({ date: '2026-03-14', type: 'EXPENSE' })],
@@ -90,22 +98,73 @@ describe('Monthly challenges', () => {
       },
     });
     const card = await challengeCard();
-    const buttons = card.getAllByRole('button', { name: tr('app.challenge.choose') });
-    fireEvent.click(buttons[0]);
-    expect(card.getByText(tr('app.challenge.noSpend'))).toBeInTheDocument();
-    expect(card.getByText(/14 de 8/)).toBeInTheDocument();
-    expect(card.getByText(tr('app.challenge.done'))).toBeInTheDocument();
-    expect(card.getByText(/Racha actual: 1 días/)).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem('mm_challenge') as string)).toEqual({
-      id: 'noSpend',
-      period: '2026-3',
-    });
+    fireEvent.click(card.getAllByRole('button', { name: tr('app.challenge.choose') })[1]);
+    expect(card.getByText(tr('app.challenge.inProgress'))).toBeInTheDocument();
+    expect(card.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '10');
     fireEvent.click(card.getByRole('button', { name: tr('app.challenge.change') }));
     expect(localStorage.getItem('mm_challenge')).toBeNull();
-    fireEvent.click(card.getAllByRole('button', { name: tr('app.challenge.choose') })[1]);
-    expect(card.getByText(tr('app.challenge.save20'))).toBeInTheDocument();
-    expect(card.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '10');
+    expect(card.getAllByRole('button', { name: tr('app.challenge.choose') })).toHaveLength(3);
+  });
+
+  it('keeps a completed challenge completed and caps the counter at the target', async () => {
+    setup({
+      overview: {
+        transactions: [f.transaction({ date: '2026-03-14', type: 'EXPENSE' })],
+        budgets: [f.budgetLine()],
+      },
+    });
+    const card = await challengeCard();
+    fireEvent.click(card.getAllByRole('button', { name: tr('app.challenge.choose') })[0]);
+    expect(card.getByText('8 de 8')).toBeInTheDocument();
+    expect(card.getByText(tr('app.challenge.done'))).toBeInTheDocument();
+    expect(card.getByText(/Racha actual: 1 días/)).toBeInTheDocument();
+    expect(card.getByText(tr('app.challenge.doneBadge'))).toBeInTheDocument();
+    expect(card.getByRole('progressbar').firstElementChild).toHaveStyle({ width: '100%' });
+    expect(card.queryByRole('button', { name: tr('app.challenge.change') })).toBeNull();
+    expect(card.getAllByRole('button', { name: tr('app.challenge.choose') })).toHaveLength(2);
+    expect(JSON.parse(localStorage.getItem('mm_challenge_done') as string)).toEqual({
+      period: '2026-3',
+      ids: ['noSpend'],
+    });
+    // Choosing another one leaves the first marked as completed.
+    fireEvent.click(card.getAllByRole('button', { name: tr('app.challenge.choose') })[0]);
+    expect(card.getByText(tr('app.challenge.doneBadge'))).toBeInTheDocument();
+    expect(card.getByText(tr('app.challenge.inProgress'))).toBeInTheDocument();
     expect(card.queryByText(tr('app.challenge.done'))).toBeNull();
+  });
+
+  it('remembers a completed challenge in a later visit', async () => {
+    localStorage.setItem(
+      'mm_challenge_done',
+      JSON.stringify({ period: '2026-3', ids: ['noSpend'] })
+    );
+    setup({ overview: { budgets: [f.budgetLine()] } });
+    const card = await challengeCard();
+    expect(card.getByText(tr('app.challenge.doneBadge'))).toBeInTheDocument();
+    expect(card.getAllByRole('button', { name: tr('app.challenge.choose') })).toHaveLength(2);
+  });
+
+  it('says so when all three are completed', async () => {
+    localStorage.setItem(
+      'mm_challenge_done',
+      JSON.stringify({ period: '2026-3', ids: ['noSpend', 'save20', 'budgets'] })
+    );
+    setup({ overview: { budgets: [] } });
+    const card = await challengeCard();
+    expect(card.getAllByText(tr('app.challenge.doneBadge'))).toHaveLength(3);
+    expect(card.getByText(tr('app.challenge.allDone'))).toBeInTheDocument();
+    expect(card.queryByRole('button')).toBeNull();
+    expect(card.queryByText(tr('app.challenge.noBudgets'))).toBeNull();
+  });
+
+  it('forgets the completed challenges of another month', async () => {
+    localStorage.setItem(
+      'mm_challenge_done',
+      JSON.stringify({ period: '2026-2', ids: ['noSpend'] })
+    );
+    setup({ overview: { budgets: [f.budgetLine()] } });
+    const card = await challengeCard();
+    expect(card.queryByText(tr('app.challenge.doneBadge'))).toBeNull();
   });
 
   it('tracks the budgets challenge and keeps it for the month', async () => {
