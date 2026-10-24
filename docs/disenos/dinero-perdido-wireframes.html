@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maquetas Dinero perdido</title>
+    <!--
+  Maquetas estáticas del diseño docs/disenos/dinero-perdido-y-fecha-meta.md.
+  Sin dependencias externas. Todos los comercios, importes y fechas son inventados.
+-->
+    <style>
+      :root {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --border: #cbd5e1;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #4f46e5;
+        --accent-ink: #ffffff;
+        --ok: #047857;
+        --warn: #b45309;
+        --danger: #b91c1c;
+        --skeleton: #e2e8f0;
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #0b1120;
+          --surface: #111827;
+          --surface-2: #1e293b;
+          --border: #334155;
+          --text: #f1f5f9;
+          --muted: #cbd5e1;
+          --accent: #818cf8;
+          --accent-ink: #0b1120;
+          --ok: #34d399;
+          --warn: #fbbf24;
+          --danger: #f87171;
+          --skeleton: #1e293b;
+        }
+      }
+      :root[data-theme='dark'] {
+        --bg: #0b1120;
+        --surface: #111827;
+        --surface-2: #1e293b;
+        --border: #334155;
+        --text: #f1f5f9;
+        --muted: #cbd5e1;
+        --accent: #818cf8;
+        --accent-ink: #0b1120;
+        --ok: #34d399;
+        --warn: #fbbf24;
+        --danger: #f87171;
+        --skeleton: #1e293b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          16px/1.5 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 4px;
+      }
+      h2.sec {
+        font-size: 1.2rem;
+        margin: 40px 0 12px;
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+      }
+      .note {
+        color: var(--muted);
+        margin: 0 0 16px;
+        max-width: 70ch;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .frame-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin: 0 0 6px;
+      }
+      .phone {
+        width: 390px;
+        max-width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 16px;
+        overflow: hidden;
+      }
+      .desktop {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(240px, 320px) 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 760px) {
+        .desktop {
+          grid-template-columns: 1fr;
+        }
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+      }
+      .burger {
+        width: 48px;
+        height: 48px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+      }
+      .hero {
+        background: var(--surface-2);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+      .hero .k {
+        color: var(--muted);
+        margin: 0;
+      }
+      .hero .big {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.2;
+      }
+      .hero .sub {
+        margin: 4px 0 0;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .chip {
+        min-height: 48px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .chip[aria-pressed='true'] {
+        border-color: var(--accent);
+        outline: 2px solid var(--accent);
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+        margin-bottom: 12px;
+        background: var(--surface);
+      }
+      .card h3 {
+        margin: 0 0 4px;
+        font-size: 1.05rem;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .tag {
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+      }
+      .tag.inc {
+        color: var(--warn);
+      }
+      .tag.dup {
+        color: var(--danger);
+      }
+      .tag.med {
+        color: var(--muted);
+      }
+      .line {
+        margin: 2px 0;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .amount {
+        font-weight: 700;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .btn {
+        min-height: 48px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-weight: 600;
+        padding: 8px 12px;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .link {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: underline;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .lock {
+        border-style: dashed;
+      }
+      .disclaimer {
+        font-size: 0.9rem;
+        color: var(--muted);
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        margin-top: 8px;
+      }
+      .progress {
+        height: 12px;
+        border-radius: 6px;
+        background: var(--skeleton);
+        overflow: hidden;
+        margin: 8px 0;
+      }
+      .progress > i {
+        display: block;
+        height: 100%;
+        background: var(--ok);
+      }
+      .date {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin: 0;
+      }
+      .sk {
+        background: var(--skeleton);
+        border-radius: 8px;
+      }
+      .toast {
+        background: var(--text);
+        color: var(--surface);
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+      }
+      .toast b {
+        text-decoration: underline;
+      }
+      .slider {
+        display: grid;
+        grid-template-columns: 48px 1fr 48px;
+        gap: 8px;
+        align-items: center;
+        margin: 8px 0;
+      }
+      .track {
+        height: 8px;
+        background: var(--skeleton);
+        border-radius: 4px;
+        position: relative;
+      }
+      .track i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 28%;
+        background: var(--accent);
+        border-radius: 4px;
+      }
+      .track b {
+        position: absolute;
+        left: calc(28% - 14px);
+        top: -10px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 3px solid var(--surface);
+      }
+      .field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+      }
+      .input {
+        min-height: 48px;
+        min-width: 110px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0 12px;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 700;
+      }
+      .result {
+        background: var(--surface-2);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+      }
+      .share {
+        width: 270px;
+        aspect-ratio: 4 / 5;
+        border-radius: 18px;
+        padding: 22px;
+        color: #f8fafc;
+        background: radial-gradient(circle at 30% 20%, #4338ca, #0f172a 70%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .ring {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: conic-gradient(#34d399 0 38%, rgba(255, 255, 255, 0.18) 38% 100%);
+        display: grid;
+        place-items: center;
+        margin: 0 auto;
+      }
+      .ring span {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: #111827;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 1.3rem;
+      }
+      .ascii {
+        white-space: pre;
+        font:
+          13px/1.35 ui-monospace,
+          Menlo,
+          monospace;
+        background: var(--surface-2);
+        padding: 12px;
+        border-radius: 12px;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      table.spec {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.95rem;
+      }
+      table.spec th,
+      table.spec td {
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      .wrap {
+        overflow-x: auto;
+      }
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Maquetas: Tu dinero perdido y La fecha de tu meta</h1>
+      <p class="note">
+        Anexo de <code>docs/disenos/dinero-perdido-y-fecha-meta.md</code>. Maquetas estáticas (no
+        son la app): sirven para fijar textos, jerarquía, tamaños y estados. Botones de 48 px
+        mínimo, texto base 16 px. Datos inventados.
+      </p>
+
+      <h2 class="sec">1. Dinero perdido, móvil 390 px (plan gratis, análisis completo)</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Lista con hallazgos</p>
+          <section class="phone" aria-label="Maqueta móvil: Tu dinero perdido">
+            <div class="bar">
+              <span class="burger" aria-hidden="true">☰</span> Tu dinero perdido
+            </div>
+            <div class="hero">
+              <p class="k">Esto te cuesta</p>
+              <p class="big">unos 870 € al año</p>
+              <p class="sub">5 cosas que conviene revisar</p>
+              <p class="sub muted">y 89 € de un posible cobro doble</p>
+            </div>
+            <div class="chips" role="group" aria-label="Filtrar por tipo">
+              <button class="chip" aria-pressed="true">Todo 5</button>
+              <button class="chip" aria-pressed="false">↻ Cobros que se repiten 3</button>
+              <button class="chip" aria-pressed="false">▲ Subidas 1</button>
+              <button class="chip" aria-pressed="false">⧉ Cobros dobles 1</button>
+              <button class="chip" aria-pressed="false">☕ Pequeños gastos 1</button>
+            </div>
+
+            <article class="card" aria-labelledby="f1">
+              <h3 id="f1">↻ FITBOX</h3>
+              <p class="line muted">Se cobra cada mes desde agosto de 2025 (15 cobros)</p>
+              <p class="line">
+                <span class="amount">39,90 €</span> al mes · unos
+                <span class="amount">479 €</span> al año
+              </p>
+              <p class="line">Si lo dieras de baja, te ahorrarías aprox. 479 € al año.</p>
+              <div class="actions">
+                <button class="btn">Lo sigo usando</button>
+                <button class="btn primary">Quiero darlo de baja</button>
+              </div>
+              <div class="links">
+                <span class="link">Más opciones ▾</span
+                ><span class="link">Ver los 15 cobros ▸</span>
+              </div>
+            </article>
+
+            <article class="card" aria-labelledby="f2">
+              <h3 id="f2">⧉ ELECTRO MARKET <span class="tag dup">Cobro doble</span></h3>
+              <p class="line">
+                <span class="amount">89,00 €</span> cobrados dos veces el 12 de septiembre
+              </p>
+              <p class="line muted">Si fue un error, puedes reclamarlo al comercio o a tu banco.</p>
+              <div class="actions">
+                <button class="btn">Eran dos compras a propósito</button>
+                <button class="btn primary">Lo reclamaré</button>
+              </div>
+              <div class="links"><span class="link">No reconozco este cobro</span></div>
+            </article>
+
+            <article class="card" aria-labelledby="f3">
+              <h3 id="f3">
+                ▲ SEGUROS HOGAR ALFA <span class="tag inc">Subida</span>
+                <span class="tag med">Revisa si es correcto</span>
+              </h3>
+              <p class="line">Subió de 186 € a 214 € al año</p>
+              <p class="line"><span class="amount">28 € más al año</span></p>
+              <div class="actions">
+                <button class="btn">Lo he visto</button>
+                <button class="btn">Más opciones ▾</button>
+              </div>
+            </article>
+
+            <div class="card lock">
+              <p class="line">🔒 2 hallazgos más con Premium</p>
+              <div class="actions" style="grid-template-columns: 1fr">
+                <button class="btn primary">Ver planes</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="line"><span class="link">Revisados (2) ▸</span></p>
+              <p class="line">Vas a dejar de pagar unos <span class="amount">43 € al mes</span></p>
+            </div>
+            <p class="disclaimer">
+              ⓘ Estimaciones orientativas a partir de tus movimientos. Finanverso no sabe si usas un
+              servicio: revisa cada cobro. No es asesoramiento financiero.
+            </p>
+          </section>
+        </div>
+
+        <div>
+          <p class="frame-label">«Más opciones» abierto y aviso de deshacer</p>
+          <section class="phone" aria-label="Maqueta móvil: más opciones">
+            <article class="card" aria-labelledby="f4">
+              <h3 id="f4">↻ CLOUDY</h3>
+              <p class="line">
+                <span class="amount">2,99 €</span> al mes · unos <span class="amount">35 €</span> al
+                año
+              </p>
+              <div class="actions">
+                <button class="btn">Lo sigo usando</button>
+                <button class="btn primary">Quiero darlo de baja</button>
+              </div>
+              <div class="card" style="margin-top: 10px">
+                <button class="btn" style="width: 100%; margin-bottom: 8px">
+                  No es una suscripción
+                </button>
+                <button class="btn" style="width: 100%">No reconozco este cobro</button>
+                <p class="line muted" style="margin-top: 8px">
+                  Si no reconoces un cobro, llama a tu banco cuanto antes. Finanverso no puede
+                  anularlo.
+                </p>
+              </div>
+            </article>
+            <article class="card" aria-labelledby="f5">
+              <h3 id="f5">
+                ↻ FITBOX <span class="tag" style="color: var(--ok)">Vas a darlo de baja</span>
+              </h3>
+              <p class="line muted">
+                Entra en la web o la app del servicio, en Cuenta o Suscripción. Si es un recibo
+                domiciliado, tu banco te informa de cómo devolverlo.
+              </p>
+            </article>
+            <div class="toast" role="status"><span>Hecho.</span><b>Deshacer</b></div>
+            <p class="frame-label" style="margin-top: 16px">Semanas después</p>
+            <article class="card" aria-labelledby="f6">
+              <h3 id="f6">✓ FITBOX</h3>
+              <p class="line">
+                Ya no se cobra: dejas de pagar unos <span class="amount">479 € al año</span>
+              </p>
+            </article>
+          </section>
+        </div>
+      </div>
+
+      <h2 class="sec">2. Estados de Dinero perdido (móvil)</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Carga (esqueleto, aria-busy)</p>
+          <section class="phone" aria-busy="true" aria-label="Maqueta: cargando">
+            <span class="sr">Revisando tus movimientos…</span>
+            <div class="hero">
+              <div class="sk" style="height: 16px; width: 40%"></div>
+              <div class="sk" style="height: 34px; width: 75%; margin-top: 10px"></div>
+              <div class="sk" style="height: 16px; width: 55%; margin-top: 10px"></div>
+            </div>
+            <div class="card">
+              <div class="sk" style="height: 18px; width: 50%"></div>
+              <div class="sk" style="height: 14px; width: 85%; margin-top: 10px"></div>
+              <div class="sk" style="height: 48px; margin-top: 12px"></div>
+            </div>
+            <div class="card">
+              <div class="sk" style="height: 18px; width: 60%"></div>
+              <div class="sk" style="height: 14px; width: 70%; margin-top: 10px"></div>
+              <div class="sk" style="height: 48px; margin-top: 12px"></div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Sin movimientos (none)</p>
+          <section class="phone" aria-label="Maqueta: vacío">
+            <div class="hero" style="text-align: center">
+              <p style="font-size: 2.4rem; margin: 0" aria-hidden="true">🔍</p>
+              <p class="big" style="font-size: 1.4rem">Descubre cuánto se te escapa al año</p>
+              <p class="sub">
+                Importa el extracto de tu banco y buscamos cobros que se repiten, subidas de precio,
+                cobros dobles y pequeños gastos frecuentes.
+              </p>
+            </div>
+            <button class="btn primary" style="width: 100%">Importar mi extracto</button>
+            <p class="line muted" style="margin-top: 10px">
+              Descarga de tu banco los últimos 12 meses en un solo archivo.
+            </p>
+            <p class="line"><span class="link">Cómo descargar el extracto de mi banco</span></p>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Pocos datos (partial)</p>
+          <section class="phone" aria-label="Maqueta: parcial">
+            <div class="hero">
+              <p class="line">
+                Llevas 41 de 90 días de movimientos. Con 3 meses veremos mucho más.
+              </p>
+              <div
+                class="progress"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="90"
+                aria-valuenow="41"
+                aria-label="Días de movimientos"
+              >
+                <i style="width: 46%"></i>
+              </div>
+              <button class="btn" style="width: 100%">Importar mi extracto</button>
+            </div>
+            <article class="card" aria-labelledby="p1">
+              <h3 id="p1">⧉ ELECTRO MARKET <span class="tag dup">Cobro doble</span></h3>
+              <p class="line">
+                <span class="amount">89,00 €</span> cobrados dos veces el 12 de septiembre
+              </p>
+            </article>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Error</p>
+          <section class="phone" aria-label="Maqueta: error">
+            <div class="card" role="alert">
+              <p class="line">No hemos podido revisar tus movimientos. Inténtalo de nuevo.</p>
+              <div class="actions" style="grid-template-columns: 1fr">
+                <button class="btn primary">Reintentar</button>
+              </div>
+            </div>
+            <p class="frame-label">Sin hallazgos (complete)</p>
+            <div class="hero">
+              <p class="line">No hemos encontrado nada que revisar. ¡Bien hecho!</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <h2 class="sec">3. Dinero perdido, escritorio</h2>
+      <section class="desktop" aria-label="Maqueta escritorio: Tu dinero perdido">
+        <div>
+          <div class="hero">
+            <p class="k">Esto te cuesta</p>
+            <p class="big">unos 870 € al año</p>
+            <p class="sub">5 cosas que conviene revisar</p>
+            <p class="sub muted">y 89 € de un posible cobro doble</p>
+          </div>
+          <div
+            class="chips"
+            role="group"
+            aria-label="Filtrar por tipo"
+            style="flex-direction: column; align-items: stretch"
+          >
+            <button class="chip" aria-pressed="true">Todo 5</button>
+            <button class="chip" aria-pressed="false">↻ Cobros que se repiten 3</button>
+            <button class="chip" aria-pressed="false">▲ Subidas 1</button>
+            <button class="chip" aria-pressed="false">⧉ Cobros dobles 1</button>
+            <button class="chip" aria-pressed="false">☕ Pequeños gastos 1</button>
+          </div>
+          <div class="card">
+            <p class="line"><span class="link">Revisados (2) ▸</span></p>
+            <p class="line">Vas a dejar de pagar unos <b>43 € al mes</b></p>
+          </div>
+          <p class="disclaimer">
+            ⓘ Estimaciones orientativas a partir de tus movimientos. No es asesoramiento financiero.
+          </p>
+        </div>
+        <div style="max-width: 720px">
+          <article class="card" aria-labelledby="d1">
+            <h3 id="d1">↻ FITBOX</h3>
+            <p class="line muted">
+              Se cobra cada mes desde agosto de 2025 (15 cobros) · próximo hacia el 3 de noviembre
+            </p>
+            <p class="line">
+              <b>39,90 €</b> al mes · unos <b>479 €</b> al año. Si lo dieras de baja, te ahorrarías
+              aprox. 479 € al año.
+            </p>
+            <div class="actions" style="grid-template-columns: max-content max-content">
+              <button class="btn">Lo sigo usando</button
+              ><button class="btn primary">Quiero darlo de baja</button>
+            </div>
+          </article>
+          <article class="card" aria-labelledby="d2">
+            <h3 id="d2">☕ CAFETERÍA LA PLAZA <span class="tag med">Pequeños gastos</span></h3>
+            <p class="line">Unos 7 gastos al mes de menos de 12 €. Al año son unos <b>160 €</b>.</p>
+            <p class="line muted">Si los redujeras a la mitad, serían aprox. 80 € menos al año.</p>
+            <div class="actions" style="grid-template-columns: max-content max-content">
+              <button class="btn">Lo he visto</button
+              ><button class="btn">No es un gasto hormiga</button>
+            </div>
+          </article>
+          <div class="wrap">
+            <p class="frame-label">
+              «Ver los 15 cobros» (tabla de pruebas, se despliega dentro de la tarjeta)
+            </p>
+            <table class="spec">
+              <caption class="sr">
+                Cobros de FITBOX
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>3 de octubre de 2026</td>
+                  <td>39,90 €</td>
+                </tr>
+                <tr>
+                  <td>2 de septiembre de 2026</td>
+                  <td>39,90 €</td>
+                </tr>
+                <tr>
+                  <td>4 de agosto de 2026</td>
+                  <td>39,90 €</td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="muted">… 12 más</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <h2 class="sec">4. La fecha de tu meta (móvil)</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Tarjeta de la meta en «Metas»</p>
+          <section class="phone" aria-label="Maqueta: meta con fecha">
+            <article class="card" data-tour="goal-date" aria-labelledby="g1">
+              <h3 id="g1">
+                ✈️ Viaje
+                <span class="muted" style="margin-left: auto; font-weight: 600"
+                  >1.150 / 3.000 €</span
+                >
+              </h3>
+              <div
+                class="progress"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="38"
+                aria-label="Conseguido"
+              >
+                <i style="width: 38%"></i>
+              </div>
+              <p class="line muted">38 %</p>
+              <p class="line">A tu ritmo (120 €/mes) llegas en</p>
+              <p class="date">febrero de 2028</p>
+              <p class="line muted">
+                Tu fecha es junio de 2027: llegas 8 meses tarde. Para llegar a tiempo, unos 206
+                €/mes.
+              </p>
+              <div class="actions" style="grid-template-columns: 1fr">
+                <button class="btn primary">¿Y si aparto más?</button>
+              </div>
+            </article>
+            <article class="card" aria-labelledby="g2">
+              <h3 id="g2">🛟 Colchón</h3>
+              <p class="line">Dinos cuánto piensas apartar al mes y te decimos cuándo llegas.</p>
+              <div class="field">
+                <span class="input">— €</span><button class="btn">Calcular</button>
+              </div>
+            </article>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Hoja «¿Y si apartas más cada mes?»</p>
+          <section class="phone" aria-label="Maqueta: simulador">
+            <div class="bar" style="justify-content: space-between">
+              ¿Y si apartas más cada mes? <span class="burger" aria-label="Cerrar">✕</span>
+            </div>
+            <div class="field">
+              <span>Aparto al mes</span><span class="input">120 €</span
+              ><span class="muted">(tu ritmo)</span>
+            </div>
+            <p class="line">Extra: <b>50 € más al mes</b></p>
+            <div class="slider">
+              <button class="btn" aria-label="10 euros menos">−10</button>
+              <div
+                class="track"
+                role="slider"
+                aria-valuemin="0"
+                aria-valuemax="300"
+                aria-valuenow="50"
+                aria-valuetext="50 euros más al mes"
+                aria-label="Extra al mes"
+                tabindex="0"
+              >
+                <i></i><b></b>
+              </div>
+              <button class="btn" aria-label="10 euros más">+10</button>
+            </div>
+            <div class="chips">
+              <button class="chip">+25 €</button
+              ><button class="chip" aria-pressed="true">+50 €</button
+              ><button class="chip">+100 €</button>
+            </div>
+            <button class="btn" style="width: 100%">
+              Usar lo que vas a dar de baja (43 €/mes)
+            </button>
+            <div class="result" aria-live="polite">
+              <p class="line">Llegarías en</p>
+              <p class="date">septiembre de 2027</p>
+              <p class="line" style="color: var(--ok); font-weight: 700">5 meses antes</p>
+            </div>
+            <p class="line"><span class="link">▸ Añadir rentabilidad estimada</span></p>
+            <div class="actions">
+              <button class="btn">Compartir mi fecha</button
+              ><button class="btn">Apuntar 50 € al mes</button>
+            </div>
+            <p class="disclaimer">
+              Estimación con tu ritmo de ahorro; la fecha real puede cambiar. No es asesoramiento
+              financiero.
+            </p>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Tarjeta compartible (por defecto sin importes ni nombre)</p>
+          <div
+            class="share"
+            role="img"
+            aria-label="Imagen para compartir: llegaré a mi meta en febrero de 2028, 38 por ciento conseguido"
+          >
+            <div style="font-weight: 700; opacity: 0.85">✈️ Mi meta</div>
+            <div class="ring"><span>38 %</span></div>
+            <div style="text-align: center">
+              <div style="opacity: 0.85">Llegaré a mi meta en</div>
+              <div style="font-size: 1.5rem; font-weight: 800">febrero de 2028</div>
+            </div>
+            <div style="text-align: center; opacity: 0.7; font-size: 0.85rem">finanverso.app</div>
+          </div>
+          <div class="field">
+            <span class="input" style="min-width: auto">☐</span> Mostrar importes
+          </div>
+          <div class="field">
+            <span class="input" style="min-width: auto">☐</span> Mostrar el nombre de la meta
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec">5. Puntos de entrada</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Resumen mensual: aviso (se cierra con ✕)</p>
+          <section class="phone" aria-label="Maqueta: aviso en resumen mensual">
+            <div class="card" style="display: flex; gap: 10px; align-items: center">
+              <span aria-hidden="true">🪙</span>
+              <p class="line" style="flex: 1">
+                Tu dinero perdido: unos <b>870 €</b> al año en 5 cosas.
+                <span class="link">Ver</span>
+              </p>
+              <span class="burger" aria-label="Cerrar aviso">✕</span>
+            </div>
+          </section>
+        </div>
+        <div>
+          <p class="frame-label">Resultado de la importación</p>
+          <section class="phone" aria-label="Maqueta: resultado de importación">
+            <div class="card">
+              <p class="line"><b>312 movimientos importados</b> · 4 repetidos omitidos</p>
+              <p class="line">
+                Hemos revisado tus movimientos: unos <b>870 € al año</b> que conviene mirar.
+              </p>
+              <div class="actions" style="grid-template-columns: 1fr">
+                <button class="btn primary">Ver</button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div style="flex: 1; min-width: 280px">
+          <p class="frame-label">Menú (grupo «Resumen»)</p>
+          <div class="ascii">
+            Resumen 📅 Resumen mensual 📊 Balance anual 📈 Análisis 🪙 Dinero perdido ← nuevo ❤️
+            Salud financiera 🔍 Buscar
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
