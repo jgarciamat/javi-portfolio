@@ -553,7 +553,7 @@ describe('AnalysisView', () => {
       { year: 2026, month: 2, available: 100, saved: 50, assets: 0, debts: 0, netWorth: 150 },
       { year: 2026, month: 3, available: 200, saved: 60, assets: 0, debts: 0, netWorth: 260 },
     ]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText(tr('app.categories.Ocio'))).toBeInTheDocument();
     expect(screen.getByText(/▲ 50%/)).toBeInTheDocument();
     expect(screen.getByText(/▼ 10%/)).toBeInTheDocument();
@@ -575,65 +575,19 @@ describe('AnalysisView', () => {
     await waitFor(() => expect(api.insightsApi.netWorth).toHaveBeenLastCalledWith(24));
   });
 
-  it('lists the detected subscriptions with the yearly cost and price increases', async () => {
-    const api = createFakeApi();
-    renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
-    const rows = screen
-      .getAllByRole('row')
-      .filter((r) => /Netflix|Seguro coche/.test(r.textContent ?? ''));
-    expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByText(/subió de .*12,99.* a .*13,99/)).toBeInTheDocument();
-    expect(within(rows[0]).getByText(tr('app.subscriptions.monthly'))).toBeInTheDocument();
-    expect(within(rows[1]).getByText(tr('app.subscriptions.yearly'))).toBeInTheDocument();
-    expect(within(rows[1]).queryByText(/subió/)).toBeNull();
-  });
-
-  it('shows the free plan the total and the most expensive ones, and the rest with Premium', async () => {
-    const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(
-      f.billing({ plan: 'free', trialDaysLeft: 0, limits: f.catalog().limits.free })
-    );
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 5 }));
-    renderWithProviders(<AnalysisView />, { api, plan: true });
-    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
-    expect(screen.getByText(tr('app.subscriptions.found', { count: 5 }))).toBeInTheDocument();
-    expect(
-      screen.getByText(tr('app.subscriptions.moreLocked', { count: 3 }), { exact: false })
-    ).toBeInTheDocument();
-    const buttons = await screen.findAllByRole('button', { name: tr('billing.seePlans') });
-    fireEvent.click(buttons[0]);
-    expect(
-      await screen.findByText(
-        tr('billing.reason.feature', { feature: tr('billing.feature.insights') })
-      )
-    ).toBeInTheDocument();
-  });
-
-  it('says the full list is Premium when every subscription found is shown', async () => {
-    const api = createFakeApi();
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 2 }));
-    renderWithProviders(<AnalysisView />, { api });
-    expect(
-      await screen.findByText(tr('app.subscriptions.fullLocked'), { exact: false })
-    ).toBeInTheDocument();
-  });
-
-  it('says so when there are no subscriptions or they cannot be loaded', async () => {
-    const api = createFakeApi();
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ subscriptions: [] }));
-    const { unmount } = renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText(tr('app.subscriptions.none'))).toBeInTheDocument();
-    unmount();
-    api.insightsApi.subscriptions.mockRejectedValue(new Error('Sin suscripciones'));
-    renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText('Sin suscripciones')).toBeInTheDocument();
+  it('sends to «Tu dinero perdido», where the detected subscriptions are now', async () => {
+    const onOpenTab = jest.fn();
+    renderWithProviders(<AnalysisView onOpenTab={onOpenTab} />);
+    expect(screen.getByText(tr('app.leaks.analysisLine'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.leaks.analysisCta') }));
+    expect(onOpenTab).toHaveBeenCalledWith('leaks');
+    await screen.findByText(tr('app.analysis.noData'));
   });
 
   it('handles empty data and errors', async () => {
     const api = createFakeApi();
     api.insightsApi.netWorth.mockRejectedValue(new Error('Sin patrimonio'));
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText(tr('app.analysis.noData'))).toBeInTheDocument();
     expect(await screen.findByText('Sin patrimonio')).toBeInTheDocument();
   });
@@ -643,7 +597,7 @@ describe('AnalysisView', () => {
     api.insightsApi.netWorth.mockResolvedValue([
       { year: 2026, month: 3, available: 0, saved: 0, assets: 0, debts: 0, netWorth: 0 },
     ]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(
       await screen.findByRole('img', { name: tr('app.analysis.netWorthTitle') })
     ).toBeInTheDocument();

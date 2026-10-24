@@ -968,6 +968,8 @@ export const funnelBody = funnelOrigin
   });
 
 export const leakParams = z.object({ id: z.string().regex(/^[0-9a-f]{16}$/) });
+/** Other screens that show a figure of the section (goals, monthly summary, import result). */
+export const leakQuery = z.object({ from: z.enum(['goal', 'summary', 'import']).optional() });
 export const leakDecisionBody = z
   .object({ status: z.enum(['keep', 'cancel', 'dismissed', 'not_mine']) })
   .strict();

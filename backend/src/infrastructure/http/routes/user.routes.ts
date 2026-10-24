@@ -36,6 +36,7 @@ import {
   idParam,
   leakDecisionBody,
   leakParams,
+  leakQuery,
   netWorthQuery,
   pushSubscribeBody,
   pushUnsubscribeBody,
@@ -411,7 +412,11 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   /** «Tu dinero perdido»: the findings and the user's decisions (same data in a household). */
   router.get(
     '/stats/money-leaks',
-    authed((req, res) => res.json(presentMoneyLeaks(c.moneyLeaks.view(req.dataUserId))))
+    authed((req, res) => {
+      // Only the section itself counts as «findings seen» (dp_found), not the other screens.
+      const { from } = leakQuery.parse(req.query);
+      res.json(presentMoneyLeaks(c.moneyLeaks.view(req.dataUserId, { count: !from })));
+    })
   );
   const leakLimiter = limiter({
     windowMs: 60 * 1000,

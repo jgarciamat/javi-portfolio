@@ -41,6 +41,7 @@ import '../css/Sections.css';
 
 // The monthly view is the landing tab; every other section and dialog is its own chunk.
 const AnalysisView = lazyNamed(() => import('../views/AnalysisView'), 'AnalysisView');
+const MoneyLeaksView = lazyNamed(() => import('../views/MoneyLeaksView'), 'MoneyLeaksView');
 const AccountsView = lazyNamed(() => import('../views/AccountsView'), 'AccountsView');
 const BudgetsView = lazyNamed(() => import('../views/BudgetsView'), 'BudgetsView');
 const GoalsView = lazyNamed(() => import('../views/GoalsView'), 'GoalsView');
@@ -102,7 +103,7 @@ function TourAndNotices({
 const SIMPLE_VIEWS: Partial<
   Record<DashboardTab, (open: (tab: DashboardTab) => void) => ReactElement>
 > = {
-  analysis: () => <AnalysisView />,
+  analysis: (open) => <AnalysisView onOpenTab={open} />,
   health: () => <HealthView />,
   accounts: () => <AccountsView />,
   budgets: () => <BudgetsView />,
@@ -153,6 +154,8 @@ function TabContent({
           <AnnualChart initialYear={year} onMonthClick={dash.handleMonthClick} />
         </div>
       );
+    case 'leaks':
+      return <MoneyLeaksView onImport={onImport} onOpenTab={dash.setTab} />;
     case 'search':
       return <SearchView onEdit={dash.setEditingTransaction} refreshKey={dash.editVersion} />;
     case 'automations':

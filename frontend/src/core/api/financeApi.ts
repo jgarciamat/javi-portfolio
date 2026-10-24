@@ -428,8 +428,9 @@ export const insightsApi = {
   subscriptions() {
     return apiRequest<SubscriptionReport>('/stats/subscriptions');
   },
-  moneyLeaks() {
-    return apiRequest<MoneyLeaks>('/stats/money-leaks');
+  /** `from`: another screen showing the figure (it is not counted as a visit to the section). */
+  moneyLeaks(from?: 'goal' | 'summary' | 'import') {
+    return apiRequest<MoneyLeaks>(`/stats/money-leaks${query({ from })}`);
   },
   decideLeak(id: string, status: LeakDecision) {
     return apiRequest<LeakFinding>(`/stats/money-leaks/${id}`, {

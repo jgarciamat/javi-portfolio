@@ -254,7 +254,7 @@ describe('billing edge cases', () => {
     const api = createFakeApi();
     let resolve!: (v: ReturnType<typeof f.billing>) => void;
     api.billingApi.get.mockReturnValue(new Promise((r) => (resolve = r)));
-    renderWithProviders(<AnalysisView />, { api, plan: true });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api, plan: true });
     expect(screen.getAllByText(tr('app.common.loading'))).toHaveLength(2);
     expect(screen.queryByRole('button', { name: tr('billing.seePlans') })).toBeNull();
     await act(async () => resolve(f.billing({ plan: 'free', trialDaysLeft: 0 })));
@@ -440,7 +440,7 @@ describe('finances edge cases', () => {
         netWorth: i * 11,
       }))
     );
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText('Sin tendencias')).toBeInTheDocument();
     const chart = await screen.findByRole('img', { name: tr('app.analysis.netWorthTitle') });
     expect(within(chart).getAllByText(/^(Ene|Mar|May|Jul|Ago)$/)).toHaveLength(5);

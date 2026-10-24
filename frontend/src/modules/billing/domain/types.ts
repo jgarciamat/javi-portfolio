@@ -156,7 +156,8 @@ export interface InviteeStatus {
 /** Why the paywall was opened. */
 export type UpgradeReason =
   | { kind: 'limit'; resource: LimitedResource; limit: number }
-  | { kind: 'feature'; feature: PremiumFeature }
+  /** `from`: the screen it was opened from, counted with the paywall (only «Tu dinero perdido»). */
+  | { kind: 'feature'; feature: PremiumFeature; from?: 'dp' }
   | { kind: 'generic' };
 
 export interface LocalizedText {

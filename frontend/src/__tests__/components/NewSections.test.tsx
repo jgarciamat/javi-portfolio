@@ -436,7 +436,7 @@ describe('AnalysisView', () => {
         ]),
       },
     });
-    render(<AnalysisView />);
+    render(<AnalysisView onOpenTab={jest.fn()} />);
     const row = (await screen.findByText('Ocio')).closest('tr')!;
     expect(within(row).getByText(/▲ 33%/)).toBeInTheDocument();
     expect(

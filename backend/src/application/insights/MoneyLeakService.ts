@@ -119,12 +119,14 @@ export class MoneyLeakService {
     };
   }
 
-  view(userId: string): MoneyLeaksView {
+  /** `count`: the section itself, counted as «findings seen» when there are any. */
+  view(userId: string, { count = true }: { count?: boolean } = {}): MoneyLeaksView {
     const report = this.analyse(userId);
     // The figures are the real ones: the plan only cuts the list, after adding up.
     const summary = summarizeLeaks(report.findings);
     const { list, locked } = this.visible(userId, report.findings);
-    if (summary.count > 0) this.funnel.record('dp_found', { detail: foundBucket(summary.count) });
+    if (count && summary.count > 0)
+      this.funnel.record('dp_found', { detail: foundBucket(summary.count) });
     return { ...summary, coverage: report.coverage, findings: list, locked };
   }
 

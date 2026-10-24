@@ -116,6 +116,12 @@ describe('Money leaks («Tu dinero perdido»)', () => {
     });
     expect(body.findings[1]).toMatchObject({ kind: 'duplicate', oneOff: 89, annual: 0 });
     expect(funnel(ctx, 'dp_found')).toEqual([{ detail: '1-2', count: 1 }]);
+    // The goals, the monthly summary and the import result show the figure without counting.
+    for (const from of ['goal', 'summary', 'import']) {
+      await request(ctx.app).get(`/api/stats/money-leaks?from=${from}`).set(user.auth).expect(200);
+    }
+    await request(ctx.app).get('/api/stats/money-leaks?from=x').set(user.auth).expect(400);
+    expect(funnel(ctx, 'dp_found')).toEqual([{ detail: '1-2', count: 1 }]);
   });
 
   it('leaves out what a recurring rule already covers', async () => {

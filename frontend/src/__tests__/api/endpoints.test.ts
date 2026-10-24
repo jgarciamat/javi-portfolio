@@ -357,6 +357,12 @@ const cases: Case[] = [
   ['subscriptions', () => insightsApi.subscriptions(), 'GET', '/stats/subscriptions'],
   ['money leaks', () => insightsApi.moneyLeaks(), 'GET', '/stats/money-leaks'],
   [
+    'money leaks from the goals',
+    () => insightsApi.moneyLeaks('goal'),
+    'GET',
+    '/stats/money-leaks?from=goal',
+  ],
+  [
     'decide on a leak',
     () => insightsApi.decideLeak('0123456789abcdef', 'cancel'),
     'PUT',
