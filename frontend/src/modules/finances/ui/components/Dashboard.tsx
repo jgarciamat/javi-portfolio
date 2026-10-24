@@ -258,6 +258,10 @@ function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
           accounts={finances.accounts}
           onClose={dash.closeImport}
           onImported={() => finances.refresh({ invalidate: true })}
+          onOpenLeaks={() => {
+            dash.closeImport();
+            dash.setTab('leaks');
+          }}
         />
       )}
       {dash.editingTransaction && (

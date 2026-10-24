@@ -177,6 +177,11 @@ const ESSENTIAL_CATEGORIES = new Set([
   'nino',
 ]);
 const ESSENTIAL_WORDS = ['prestamo', 'hipoteca', 'comunidad', 'seguro', 'impuesto', 'ayuntamiento'];
+/**
+ * The app files gyms under «Salud» (see categorizer.ts), but a gym fee is the classic charge
+ * worth checking: these words are never essential by their category.
+ */
+const NOT_ESSENTIAL_WORDS = ['gimnasio', 'gym', 'fitness', 'crossfit', 'pilates', 'yoga'];
 /** Paying a person (your share of the flat) is not a subscription. */
 const TRANSFER_WORDS = ['bizum', 'transferencia'];
 /** The weekly shop and the travel pass are not small leaks either. */
@@ -288,11 +293,10 @@ export function merchantKey(description: string, aliases: readonly string[] = []
 
 function isEssential(description: string, categoryName: string): boolean {
   const text = normalizeText(description);
-  return (
-    ESSENTIAL_CATEGORIES.has(normalizeText(categoryName)) ||
-    ESSENTIAL_WORDS.some((w) => text.includes(w)) ||
-    isTransfer(description)
-  );
+  const byCategory =
+    ESSENTIAL_CATEGORIES.has(normalizeText(categoryName)) &&
+    !NOT_ESSENTIAL_WORDS.some((w) => text.includes(w));
+  return byCategory || ESSENTIAL_WORDS.some((w) => text.includes(w)) || isTransfer(description);
 }
 
 function isTransfer(description: string): boolean {

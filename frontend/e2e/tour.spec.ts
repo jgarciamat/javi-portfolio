@@ -22,6 +22,8 @@ const EXPECTED_TITLES = [
   /Tu resultado/,
   /Qué trimestre abre/,
   /Ficheros para la sede/,
+  /¿Cuándo llegas a tu meta\?/,
+  /Tu dinero perdido/,
   /Gastos compartidos/,
   /Operaciones automáticas/,
   /Crea una/,

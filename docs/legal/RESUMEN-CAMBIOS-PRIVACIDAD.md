@@ -410,3 +410,28 @@ tanda anterior quedan así (detalle en `docs/consola-crypto.md`, «Ranking mensu
       pila.
     - Siguen abiertos los puntos del 53 (premio promocional, edad mínima, insignia Premium,
       retención y territorialidad).
+
+## Cambio propuesto: «Tu dinero perdido» y «La fecha de tu meta» (25/10/2026)
+
+**Propuesta, no aplicada**: los textos legales publicados no se han tocado. Diseño en
+`docs/disenos/dinero-perdido-y-fecha-meta.md` (secciones I.1 a I.5).
+
+- **Qué hace el código**: revisa en el servidor (Hetzner, UE), sin IA y sin terceros, los
+  movimientos de los últimos 25 meses para mostrar cobros que se repiten, subidas de precio,
+  posibles cobros dobles y pequeños gastos frecuentes. Los hallazgos no se guardan: se calculan en
+  cada lectura. Solo se guardan las **decisiones** del usuario (tabla `money_leak_decisions`:
+  huella del hallazgo, tipo, decisión, coste anual al decidir y fechas), hasta 500 por usuario; las
+  de hallazgos que ya no aparecen se borran a los 400 días. Se borran al eliminar la cuenta
+  (cascada) y salen en la exportación (`moneyLeakDecisions`).
+- **Base**: ejecución del contrato (art. 6.1.b): es una función del servicio con los datos que el
+  usuario sube. No hay decisiones automatizadas con efectos (art. 22): la app solo muestra y el
+  usuario decide.
+- **Texto propuesto** para `app.privacy.s3.item1`: añadir «la revisión de tus movimientos para
+  detectar cobros repetidos, subidas de precio y posibles cobros dobles, y las decisiones que tomas
+  sobre ellos». Para `app.privacy.s5`: «las decisiones sobre esos avisos, mientras tengas la
+  cuenta».
+- **Analítica**: solo contadores anónimos nuevos en `funnel_daily` (`dp_*`, `goal_*`, ver
+  `docs/analitica.md`), ya cubiertos por el apartado de analítica propia.
+- **Duda para el abogado**: si basta con el texto propuesto o hace falta mencionar la función en
+  las condiciones (que no prometa ahorros: la pantalla ya lo dice en su aviso fijo).
+

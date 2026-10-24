@@ -426,3 +426,28 @@ html.wiz-contrast .leak-tag {
     animation: none;
   }
 }
+
+/* ─── The notice in the monthly summary and after an import ─── */
+
+.leaks-teaser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  border-left: 4px solid var(--accent-400);
+}
+
+.leaks-teaser p {
+  margin: 0;
+  flex: 1 1 14rem;
+  color: var(--slate-100);
+}
+
+.leaks-teaser-close {
+  min-width: 3rem;
+  min-height: 3rem;
+}
+
+.leaks-after-import {
+  margin-top: 0.75rem;
+}

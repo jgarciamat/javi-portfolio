@@ -330,7 +330,8 @@ export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
           </button>
         )}
       </div>
-      <div className="card">
+      {/* The tour's «when will you reach your goal?» points at the first goal's date, or here. */}
+      <div className="card" data-tour="goal-date">
         <h3 className="subsection-title">
           <Icon name="plus" /> {t('app.goals.new')}
         </h3>

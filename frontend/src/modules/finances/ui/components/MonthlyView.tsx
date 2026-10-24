@@ -26,6 +26,7 @@ import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
 import { RatePrompt } from './RatePrompt';
 import { MonthRecap } from './MonthRecap';
+import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
@@ -226,6 +227,7 @@ function CurrentPeriodPanels({
       {!checklist.visible && (
         <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
       )}
+      <LeaksTeaser onOpen={() => onOpenTab('leaks')} />
       <ForecastPanel />
     </>
   );

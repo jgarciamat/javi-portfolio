@@ -1,11 +1,63 @@
 # Diseño: «Tu dinero perdido» y «La fecha de tu meta»
 
-Estado: **propuesta de diseño, sin código**. Fecha: 24/10/2026. Rama: `develop`.
+Estado: **MVP implementado** el 25/10/2026 en `develop` (ver «Estado de la implementación»; lo
+marcado _fase 2_ no está hecho). Diseño: 24/10/2026.
 Anexo con maquetas estáticas: [`dinero-perdido-wireframes.html`](./dinero-perdido-wireframes.html).
 
 Todos los comercios, importes y fechas de este documento son **inventados**.
 
 ---
+
+## Estado de la implementación (MVP, 25/10/2026)
+
+Decisiones del dueño (K): las seis con la recomendación. Hecho en cuatro commits de `develop`:
+
+| Bloque                                                                                                                                              | Estado                         | Dónde                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------- |
+| Motor (C.1-C.9), decisiones, cifra y cobertura                                                                                                      | implementado                   | `backend/src/domain/services/money-leaks.ts`, `application/insights/MoneyLeakService.ts`     |
+| Migración 041, exportación y borrado                                                                                                                | implementado                   | `041-money-leak-decisions.ts`, `SqliteLeakDecisionRepository.ts`, `SqlitePersonalDataReader` |
+| `GET/PUT/DELETE /stats/money-leaks` y corte gratis (F)                                                                                              | implementado                   | `user.routes.ts`, `presenters.ts`, `schemas.ts`                                              |
+| Ritmo de las metas en `GET /goals`                                                                                                                  | implementado                   | `computeGoalPace` en `Goal.ts`                                                               |
+| Sección, estados, accesibilidad (E.1, E.4, E.5)                                                                                                     | implementado                   | `MoneyLeaksView.tsx`, `LeakCard.tsx`, `MoneyLeaks.css`                                       |
+| Fecha de la meta y «¿y si…?» (D.1-D.4, D.5 sin tarjeta)                                                                                             | implementado                   | `goalDate.ts`, `GoalDateSheet.tsx`, `GoalsView.tsx`                                          |
+| Menú, tour, aviso en el Resumen, tras importar, Análisis (E.6)                                                                                      | implementado                   | `navigation.ts`, `tourSteps.ts`, `LeaksTeaser.tsx`, `ImportModal.tsx`, `AnalysisView.tsx`    |
+| Analítica (H)                                                                                                                                       | implementado, sin `goal_share` | `docs/analitica.md`                                                                          |
+| Guía corta                                                                                                                                          | implementado                   | guía `/guias/tu-dinero-perdido`                                                              |
+| Avisos Premium, tarjeta compartible, «Apuntar como operación automática», pequeños gastos por categoría, apuntes repetidos, «Borrar mis decisiones» | _fase 2_                       | —                                                                                            |
+
+Diferencias con el diseño, elegidas por seguridad o porque el código real lo pedía:
+
+- **Gimnasios**: el categorizador de la app los pone en `Salud`, que el diseño trata como esencial.
+  Un concepto con «gimnasio», «gym», «fitness», «crossfit», «pilates» o «yoga» nunca es esencial
+  por su categoría (si no, el ejemplo FITBOX no saldría nunca).
+- **Subidas de lo no esencial**: mientras el cobro está por revisar, la subida se cuenta dentro de
+  su tarjeta («Subió de… a…»); es un hallazgo propio cuando el usuario dijo «Lo sigo usando» (así
+  el ejemplo de C.8 da «Subidas 1» y no hay doble cuenta).
+- **Precio anterior** de una subida: la racha de cobros al mismo precio (±2 %) justo antes del
+  cambio; media confianza solo con un cobro antes y uno después (anuales). Los recibos variables
+  (luz, gas) no generan subidas.
+- **Semanales y `Alimentación`/`Transporte`**: piden el mismo importe (±5 %) en cada cobro, para
+  que la compra de la semana no parezca una suscripción.
+- **Cifras de cada hallazgo** redondeadas hacia abajo al euro («unos 478 €», no 479), como pidió
+  el dueño; `toCancel` también hacia abajo.
+- **`TOUR_VERSION` sube a 4** (orden del dueño, en contra de E.6), con el aviso de tour renovado
+  que nombra «Tu dinero perdido» y la fecha de las metas. Pasos: `goals` → `goalDate` → `leaks`.
+  El paso `goalDate` señala la primera meta con fecha o, sin metas, la tarjeta «Nueva meta».
+- **`MoneyLeakService`** es una clase propia (no `StatsService.moneyLeaks`), para no tocar el
+  constructor de `StatsService`. Sin caché LRU en el MVP: 20.000 movimientos se calculan en unos
+  120 ms en el test de rendimiento; se mide en producción antes de añadirla.
+- **`GET /stats/money-leaks?from=goal|summary|import`**: las otras pantallas piden la cifra sin
+  contar `dp_found` (si no, la métrica «¿Encuentra cosas?» se inflaría).
+- **`GET /goals`** añade también `savedThisMonth` (lo ahorrado en el periodo actual), que hace falta
+  para saber si el mes 1 es este o el siguiente (D.2).
+- **Decisiones permitidas por tipo** (C.7) comprobadas en el servidor (`LEAK_STATUS_INVALID`).
+- **Análisis**: la tarjeta antigua se quita y se borran las claves `app.subscriptions.*`; el endpoint
+  `/stats/subscriptions` sigue igual para las versiones de Android instaladas.
+- **Contraste**: la pantalla refuerza bordes y texto con la clase `wiz-contrast` (la opción
+  «Contraste» del asistente).
+- **Textos**: algunas claves se parten para poder dar estilo o plural (`headlineLead` +
+  `headlineFigure`, `countOne/Other`, `done` + `undoButton`, `late/lateOne`…); el texto es el del
+  diseño.
 
 ## A. Resumen ejecutivo
 
@@ -69,7 +121,7 @@ otras en paralelo.
 
 ## C. Diseño funcional: «Tu dinero perdido»
 
-### C.0 Entrada y salida
+### C.0 Entrada y salida (implementado)
 
 - **Entrada:** movimientos de tipo `EXPENSE` (e `INCOME`, solo para detectar devoluciones) de los
   últimos **25 meses** del dueño de los datos (`req.dataUserId`, así funciona igual con hogar
@@ -80,7 +132,7 @@ otras en paralelo.
 - **Nada se guarda del cálculo.** Solo se guardan las decisiones del usuario (G.1). El cálculo
   se repite en cada lectura y es reproducible: mismo historial y misma fecha, mismo resultado.
 
-### C.1 Normalización del comercio (`merchantKey`)
+### C.1 Normalización del comercio (`merchantKey`) (implementado)
 
 Objetivo: que «COMPRA TARJ. 5402 STREAMFLIX.COM 28/09», «STREAMFLIX.COM» y
 «PAYPAL *STREAMFLIX» caigan en el mismo grupo.
@@ -101,7 +153,7 @@ google pay, paypal, www, es, sl, s.l., sa, s.a., sociedad, oficina, madrid…` (
 Se muestra al usuario el **concepto del último cobro** tal cual (no la clave), para que lo
 reconozca en su banco.
 
-### C.2 Cobros que se repiten (incluye «suscripciones»)
+### C.2 Cobros que se repiten (incluye «suscripciones») (implementado)
 
 **Agrupación:** por `merchantKey`. Dentro del grupo, ordenado por fecha.
 
@@ -145,7 +197,7 @@ revisar**: pagar la luz no es «dinero perdido». Sí se vigilan sus **subidas d
 Las transferencias y Bizum a personas tampoco cuentan (pagar la parte del piso no es una
 suscripción): se reconocen por la palabra «bizum»/«transferencia» en el concepto.
 
-### C.3 Subidas de precio
+### C.3 Subidas de precio (implementado)
 
 Mismo grupo y ritmo que C.2, **incluidos los esenciales**.
 
@@ -160,7 +212,7 @@ Mismo grupo y ritmo que C.2, **incluidos los esenciales**.
 - Para no contar dos veces: si el cobro no es esencial, su coste anual ya incluye la subida y el
   total solo suma el cobro. Si es esencial, el total suma **solo la diferencia**.
 
-### C.4 Posibles cobros dobles
+### C.4 Posibles cobros dobles (implementado; apunte repetido en la app: fase 2)
 
 - Mismo `merchantKey`, **mismo importe exacto** (al céntimo), ambos gastos, separados por
   **0-2 días**, importe **≥ 10 €**.
@@ -174,7 +226,7 @@ Mismo grupo y ritmo que C.2, **incluidos los esenciales**.
   día e importe, uno sin huella de importación). No es dinero perdido sino un apunte repetido en
   la app: fase 2, como aviso «Puede que esté apuntado dos veces» con botón para borrar uno.
 
-### C.5 Gastos hormiga (pequeños gastos muy frecuentes)
+### C.5 Gastos hormiga (pequeños gastos muy frecuentes) (implementado por comercio; por categoría: fase 2)
 
 - **Pequeño:** importe ≤ **12 €**.
 - **Frecuente:** ≥ **12** gastos pequeños en el mismo comercio en los **últimos 90 días**
@@ -189,7 +241,7 @@ Mismo grupo y ritmo que C.2, **incluidos los esenciales**.
 - Por categoría (todos los cafés juntos aunque sean sitios distintos): fase 2, con umbral ≥ 20 en
   90 días y ≥ 200 €/año.
 
-### C.6 Niveles de confianza
+### C.6 Niveles de confianza (implementado)
 
 Solo se enseñan **alta** y **media**. La baja no se muestra ni suma (se cuenta internamente para
 ajustar umbrales).
@@ -204,7 +256,7 @@ ajustar umbrales).
 En la UI la confianza no aparece como palabra técnica. Media lleva el texto «Revisa si es
 correcto»; alta, ninguno.
 
-### C.7 Falsos positivos y decisiones del usuario
+### C.7 Falsos positivos y decisiones del usuario (implementado)
 
 Cada hallazgo tiene **dos botones grandes** y un enlace «Más opciones»:
 
@@ -228,7 +280,7 @@ Cada hallazgo tiene **dos botones grandes** y un enlace «Más opciones»:
 - Si un usuario descarta más del 40 % de los hallazgos de un tipo, los umbrales están mal: lo
   vemos en la analítica agregada (H), no por usuario.
 
-### C.8 La cifra: «esto te cuesta X € al año»
+### C.8 La cifra: «esto te cuesta X € al año» (implementado)
 
 **Total anual a revisar** = suma, de los hallazgos en estado `new` con confianza alta o media, de:
 coste anual de los cobros repetidos no esenciales + diferencia anual de las subidas de esenciales
@@ -259,7 +311,7 @@ Ejemplo inventado (persona con 15 meses de movimientos importados):
   seguro), «olvidada», «gestor», «garantizado».
 - Aviso fijo al pie: ver I.4.
 
-### C.9 Datos mínimos y qué ve quien tiene pocos datos
+### C.9 Datos mínimos y qué ve quien tiene pocos datos (implementado)
 
 Cobertura = días entre el gasto más antiguo y el más reciente de la ventana, y número de gastos.
 
@@ -277,7 +329,7 @@ añade al texto de `ImportModal`, sin cambiar el límite.
 
 ## D. Diseño funcional: «La fecha de tu meta»
 
-### D.1 Datos
+### D.1 Datos (implementado)
 
 - `objetivo` y `ahorrado` (ya existen en `GoalView.progress`).
 - **Ritmo real** (nuevo, del servidor): media mensual de los movimientos de tipo Ahorro en la
@@ -289,7 +341,7 @@ añade al texto de `ImportModal`, sin cambiar el límite.
 - **Rentabilidad anual estimada** (opcional, por defecto 0 %, máximo 10 %), con el aviso ya
   existente `tools.goal.disclaimer`.
 
-### D.2 Fórmula
+### D.2 Fórmula (implementado)
 
 ```
 falta      = max(0, objetivo − ahorrado)
@@ -315,7 +367,7 @@ en octubre, así que el mes 1 es noviembre.
 | «¿Y si aparto 50 € más?»                                 | 170 €      | ceil(1.850 / 170) = 11    | septiembre de 2027 | 5 meses antes |
 | Con lo que vas a dar de baja (FITBOX + CLOUDY = 42,89 €) | 162,89 €   | ceil(1.850 / 162,89) = 12 | octubre de 2027    | 4 meses antes |
 
-### D.3 Casos límite
+### D.3 Casos límite (implementado)
 
 | Caso                         | Qué se muestra                                                                                                                                               |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -329,7 +381,7 @@ en octubre, así que el mes 1 es noviembre.
 | Rentabilidad negativa        | No se permite (mínimo 0 %) en esta pantalla                                                                                                                  |
 | Ahorro sacado de la meta     | La app no tiene retiradas de ahorro (solo suma movimientos Ahorro); se documenta, no se calcula                                                              |
 
-### D.4 Deslizador «¿y si ahorro X más?»
+### D.4 Deslizador «¿y si ahorro X más?» (implementado; «Apuntar como operación automática»: fase 2)
 
 - Rango 0 a máx(300 €, 2 × ritmo), pasos de 10 €. Botones rápidos **+25 €**, **+50 €**, **+100 €**
   y botones **−10 / +10** al lado del deslizador (más fáciles que arrastrar para personas mayores
@@ -339,7 +391,7 @@ en octubre, así que el mes 1 es noviembre.
 - No se guarda nada. Botón opcional «Apuntar 50 € al mes como operación automática»: crea una
   `RecurringRule` de tipo Ahorro en la categoría de la meta (reutiliza `RecurringService`).
 
-### D.5 Enlace con «Tu dinero perdido» y tarjeta compartible
+### D.5 Enlace con «Tu dinero perdido» y tarjeta compartible (enlace implementado; tarjeta: fase 2)
 
 - Si el usuario tiene hallazgos en `cancel` o `recovered`, aparece el botón «Usar lo que vas a dar
   de baja (43 €/mes)», que suma esa cantidad como extra. Solo con lo que **el usuario decidió**,
@@ -359,7 +411,7 @@ en octubre, así que el mes 1 es noviembre.
 Maquetas completas (móvil 390 px y escritorio, estados) en
 [`dinero-perdido-wireframes.html`](./dinero-perdido-wireframes.html). Abajo, lo esencial.
 
-### E.1 «Tu dinero perdido», móvil 390 px
+### E.1 «Tu dinero perdido», móvil 390 px (implementado)
 
 ```
 ┌──────────────────────────────────────┐
@@ -404,7 +456,7 @@ Maquetas completas (móvil 390 px y escritorio, estados) en
 En escritorio: dos columnas; a la izquierda el titular, los filtros y «Revisados»; a la derecha
 la lista de hallazgos (máx. 720 px de ancho de lectura).
 
-### E.2 Meta con fecha, móvil 390 px
+### E.2 Meta con fecha, móvil 390 px (implementado sin compartir ni apuntar)
 
 ```
 ┌──────────────────────────────────────┐
@@ -430,7 +482,7 @@ la lista de hallazgos (máx. 720 px de ancho de lectura).
 └──────────────────────────────────────┘
 ```
 
-### E.3 Textos exactos (es / en)
+### E.3 Textos exactos (es / en) (implementado)
 
 Claves nuevas con prefijo `app.leaks.*` y `app.goals.date.*`. Se mantienen las de
 `app.subscriptions.*` mientras exista la tarjeta antigua.
@@ -510,7 +562,7 @@ Claves nuevas con prefijo `app.leaks.*` y `app.goals.date.*`. Se mantienen las d
 Los textos pasan por `finanverso-ig-human` (limpieza) antes de entrar en `es.json`/`en.json`. Si
 el i18n actual no soporta `plural` ICU, se usan dos claves `…One` / `…Other` como en el resto.
 
-### E.4 Estados
+### E.4 Estados (implementado)
 
 | Estado                     | Dinero perdido                                                                                                                                               | Fecha de meta                                                                                 |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
@@ -522,7 +574,7 @@ el i18n actual no soporta `plural` ICU, se usan dos claves `…One` / `…Other`
 | Plan gratis                | 3 hallazgos completos + `app.leaks.locked` + «Ver planes»                                                                                                    | Todo disponible                                                                               |
 | Sin conexión               | Lo último cargado, con el `OfflineBanner` existente; los botones de decisión se desactivan                                                                   | Funciona (cálculo local)                                                                      |
 
-### E.5 Accesibilidad (público mayor incluido)
+### E.5 Accesibilidad (público mayor incluido) (implementado)
 
 - Texto base 16 px (el de la app); la cifra del titular a 2rem y las fechas de la meta a 1.25rem.
   Respeta el zoom del sistema (todo en `rem`), sin cortes al 200 %.
@@ -542,7 +594,7 @@ el i18n actual no soporta `plural` ICU, se usan dos claves `…One` / `…Other`
   (y queda la lista «Revisados» para volver atrás).
 - Orden de foco: titular → filtros → tarjetas → revisados → aviso. Foco visible.
 
-### E.6 Menú y tour
+### E.6 Menú y tour (implementado, con TOUR_VERSION 4)
 
 - **Menú:** sección nueva `leaks` en el grupo `overview` de `navigation.ts`, justo después de
   `analysis`, icono `coins`, etiqueta corta «Dinero perdido».
@@ -567,7 +619,7 @@ el i18n actual no soporta `plural` ICU, se usan dos claves `…One` / `…Other`
 
 ---
 
-## F. Gratis y Premium
+## F. Gratis y Premium (implementado)
 
 Principio: el plan gratis **ve su cifra y puede actuar sobre lo más caro**; Premium da comodidad
 y vigilancia continua, no información que haga falta para no perder dinero.
@@ -594,7 +646,7 @@ cifra sea la real. Los `id` de los hallazgos ocultos no se envían.
 
 ## G. Modelo de datos y API
 
-### G.1 Migración 041: decisiones
+### G.1 Migración 041: decisiones (implementado)
 
 `backend/src/infrastructure/sqlite/migrations/041-money-leak-decisions.ts` (aditiva, sin tocar
 datos):
@@ -621,7 +673,7 @@ CREATE TABLE money_leak_decisions (
 - Hogar compartido: las decisiones van con `dataUserId` (los datos son del dueño); cualquier
   miembro las ve y cambia, como el resto de los datos.
 
-### G.2 Endpoints
+### G.2 Endpoints (implementado)
 
 | Método y ruta                   | Cuerpo / parámetros (zod)                                                                                             | Respuesta                                                                                                                                                                                                    |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -705,7 +757,7 @@ interface LeakFinding {
   (`AdviceService`) podría recibir **solo** el total agregado («870 € al año en cobros a revisar»),
   sin conceptos, en fase 3.
 
-### G.5 Rendimiento y límites
+### G.5 Rendimiento y límites (sin caché en el MVP)
 
 - `better-sqlite3` es síncrono: el cálculo bloquea el hilo. Ventana de 25 meses y tope de las
   **20.000** filas más recientes. Agrupar es O(n) y ordenar cada grupo O(k log k): con 5.000
@@ -718,7 +770,7 @@ movimientos, último created_at, última decisión)`; se invalida sola al import
 
 ---
 
-## H. Analítica y medición
+## H. Analítica y medición (implementado sin goal_share)
 
 Eventos nuevos en la **lista cerrada** (`TRACK_EVENTS` y `CLIENT_FUNNEL_EVENTS` para los del
 navegador, `SERVER_FUNNEL_EVENTS` para los del servidor), contadores diarios anónimos en
@@ -774,7 +826,7 @@ descrita en `docs/analitica.md`.
 Nada. El cálculo es local en el servidor (Hetzner, UE), sin IA y sin terceros. La imagen
 compartible se genera en el dispositivo y, por defecto, sin importes ni nombre.
 
-### I.3 Conservación, exportación y borrado
+### I.3 Conservación, exportación y borrado (implementado; «Borrar mis decisiones»: fase 2)
 
 - Los hallazgos no se guardan; las decisiones viven en `money_leak_decisions` mientras exista la
   cuenta. Al eliminar la cuenta se borran en el momento (`ON DELETE CASCADE`); las copias de
@@ -784,7 +836,7 @@ compartible se genera en el dispositivo y, por defecto, sin importes ni nombre.
   vuelve a leer esos archivos, no hace falta subir la versión (lo dice el propio `ExportService`).
 - Botón «Borrar mis decisiones» en «Revisados» (fase 2; con el borrado de cuenta ya se cumple).
 
-### I.4 Textos
+### I.4 Textos (avisos implementados; política: propuesta en docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md)
 
 - Aviso fijo en la pantalla: `app.leaks.disclaimer` (E.3).
 - Aviso de la fecha de meta: `app.goals.date.disclaimer`, y `tools.goal.disclaimer` cuando se usa
@@ -812,7 +864,7 @@ compartible se genera en el dispositivo y, por defecto, sin importes ni nombre.
 
 ## J. Plan de entrega
 
-### J.1 MVP (2 semanas, unos 9,5 días de trabajo)
+### J.1 MVP (2 semanas, unos 9,5 días de trabajo) (implementado)
 
 Objetivo: validar con usuarios reales si la cifra engancha y si acierta.
 

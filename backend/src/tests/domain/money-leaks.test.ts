@@ -276,6 +276,14 @@ describe('detectMoneyLeaks: repeating charges', () => {
     expect(kinds(report.findings)).toEqual(['recurring:SPOTIMUS']);
   });
 
+  it('counts a gym filed under «Salud», but not the rest of «Salud»', () => {
+    const report = detect([
+      ...monthly('CUOTA GIMNASIO ALFA', '2026-04', 6, 3, 39.9, { categoryName: 'Salud' }),
+      ...monthly('CLINICA DENTAL', '2026-04', 6, 3, 60, { categoryName: 'Salud' }),
+    ]);
+    expect(kinds(report.findings)).toEqual(['recurring:CUOTA GIMNASIO ALFA']);
+  });
+
   it('puts first what tends to go unnoticed: old, cheap and alone', () => {
     const report = detect([
       // 15 €/month, 15 months old, no other spending there.

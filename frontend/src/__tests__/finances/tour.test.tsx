@@ -350,6 +350,22 @@ describe('tour steps', () => {
     expect(tr('app.tour.cryptoIntro.body')).toMatch(/No es dinero real/);
   });
 
+  it('explains «Tu dinero perdido» and the date of the goals after the goals', () => {
+    const free = tourSteps(false);
+    const ids = free.map((s) => s.id);
+    expect(ids.slice(ids.indexOf('goals'), ids.indexOf('goals') + 3)).toEqual([
+      'goals',
+      'goalDate',
+      'leaks',
+    ]);
+    const byId = Object.fromEntries(free.map((s) => [s.id, s]));
+    expect(byId.goalDate).toMatchObject({ tab: 'goals', target: '[data-tour="goal-date"]' });
+    expect(byId.leaks).toMatchObject({ tab: 'leaks', target: '[data-tour="section"]' });
+    // A renewed tour is offered again to whoever turned it off, telling what is new.
+    expect(TOUR_VERSION).toBe(4);
+    expect(tr('app.tour.offer.body')).toMatch(/Tu dinero perdido, la fecha de tus metas/);
+  });
+
   it('has a text in every language for every step', () => {
     for (const premium of [false, true]) {
       for (const step of tourSteps(premium)) {

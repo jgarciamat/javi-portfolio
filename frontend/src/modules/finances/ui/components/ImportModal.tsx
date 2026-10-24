@@ -10,11 +10,14 @@ import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/tra
 import { useImport } from '../../application/hooks/useImport';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { LeaksAfterImport } from './LeaksTeaser';
 
 interface ImportModalProps {
   accounts: Account[];
   onClose: () => void;
   onImported: () => void;
+  /** Opens «Tu dinero perdido» (after an import it says what was found). */
+  onOpenLeaks?: () => void;
 }
 
 type ImportState = ReturnType<typeof useImport>;
@@ -106,6 +109,7 @@ function FileStep({ imp }: { imp: ImportState }) {
       onFiles={(list) => void imp.loadFile(list[0])}
     >
       <p className="section-hint">{t('app.import.hint')}</p>
+      <p className="section-hint">{t('app.leaks.importTip')}</p>
       <TemplateLink />
       <label className="file-drop">
         <input
@@ -328,7 +332,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
   );
 }
 
-function DoneStep({ result }: { result: ImportResult }) {
+function DoneStep({ result, onOpenLeaks }: { result: ImportResult; onOpenLeaks?: () => void }) {
   const { t } = useI18n();
   return (
     <div className="modal-body">
@@ -336,6 +340,7 @@ function DoneStep({ result }: { result: ImportResult }) {
         <Icon name="checkCircle" />{' '}
         {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
       </p>
+      {onOpenLeaks && result.imported > 0 && <LeaksAfterImport onOpen={onOpenLeaks} />}
     </div>
   );
 }
@@ -375,15 +380,25 @@ function defaultAccountId(accounts: Account[]): string | null {
 }
 
 /** Body of the current step (the preview step renders its own buttons). */
-function StepBody({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
+function StepBody({
+  imp,
+  accounts,
+  onOpenLeaks,
+}: {
+  imp: ImportState;
+  accounts: Account[];
+  onOpenLeaks?: () => void;
+}) {
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
-  if (imp.step === 'done' && imp.result) return <DoneStep result={imp.result} />;
+  if (imp.step === 'done' && imp.result) {
+    return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} />;
+  }
   return <FileStep imp={imp} />;
 }
 
 /** Bank statement import: choose file → map columns → preview → import. */
-export function ImportModal({ accounts, onClose, onImported }: ImportModalProps) {
+export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: ImportModalProps) {
   const { t } = useI18n();
   const activeAccounts = accounts.filter((a) => !a.archived);
   const imp = useImport(onImported, defaultAccountId(activeAccounts));
@@ -403,7 +418,7 @@ export function ImportModal({ accounts, onClose, onImported }: ImportModalProps)
           <Icon name="close" />
         </button>
       </div>
-      <StepBody imp={imp} accounts={activeAccounts} />
+      <StepBody imp={imp} accounts={activeAccounts} onOpenLeaks={onOpenLeaks} />
       {imp.error && <p className="form-error">{t(imp.error)}</p>}
       {imp.step !== 'preview' && <Footer imp={imp} onClose={onClose} />}
     </Modal>
