@@ -367,6 +367,12 @@ export interface GoalProgress {
   monthsLeft: number | null;
   monthlyNeeded: number | null;
   completed: boolean;
+  /** Real saving pace: average per month in the goal's category (null with under 2 months). */
+  averageMonthly: number | null;
+  /** Complete months that pace is based on (0 to 6). */
+  historyMonths: number;
+  /** Saved this month: the estimate then starts next month. */
+  savedThisMonth: number;
 }
 
 export interface Goal {
@@ -535,6 +541,65 @@ export interface SubscriptionReport {
   count: number;
   /** Free plan: the list is cut to the first few; the full list is Premium. */
   locked: boolean;
+}
+
+// ─── Tu dinero perdido ───────────────────────────────────────────────────────
+
+export type LeakKind = 'recurring' | 'increase' | 'duplicate' | 'small';
+export type LeakCadence = 'weekly' | 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';
+/** What the user can decide; `recovered` (no longer charged) is set by the server. */
+export type LeakDecision = 'keep' | 'cancel' | 'dismissed' | 'not_mine';
+export type LeakStatus = 'new' | LeakDecision | 'recovered' | 'refunded';
+
+export interface LeakFinding {
+  /** Hash of the finding: never the merchant's name. */
+  id: string;
+  kind: LeakKind;
+  /** «medium» shows «Check this is right». */
+  confidence: 'high' | 'medium';
+  status: LeakStatus;
+  /** Description of the latest charge, as the bank wrote it. */
+  label: string;
+  /** Rent, power, loans, insurance or a transfer: only its rises are told. */
+  essential: boolean;
+  cadence: LeakCadence | null;
+  /** Latest charge / the charge seen twice / the average small purchase. */
+  amount: number;
+  /** Price before a rise. */
+  previousAmount: number | null;
+  /** Yearly cost (0 for double charges). */
+  annual: number;
+  /** Double charges: the amount of one of the two. */
+  oneOff: number;
+  count: number;
+  firstDate: string;
+  lastDate: string;
+  nextDate: string | null;
+  /** Small purchases per month. */
+  perMonth: number | null;
+  /** Newest first, at most 24. */
+  evidence: { date: string; amount: number }[];
+}
+
+export interface MoneyLeaks {
+  coverage: {
+    level: 'none' | 'partial' | 'complete';
+    from: string | null;
+    to: string | null;
+    days: number;
+    movements: number;
+    /** More than a year of movements: yearly charges can be seen. */
+    yearlyReady: boolean;
+  };
+  /** Only what is still to check; `annual` rounded down to tens. */
+  total: { annual: number; oneOff: number; count: number };
+  byKind: Record<LeakKind, { count: number; annual: number }>;
+  /** On the free plan only the most expensive ones and every double charge (see `locked`). */
+  findings: LeakFinding[];
+  /** Findings still to check, also those not listed. */
+  count: number;
+  locked: boolean;
+  reviewed: { count: number; cancelMonthly: number; recoveredAnnual: number };
 }
 
 export interface AIAdvice {

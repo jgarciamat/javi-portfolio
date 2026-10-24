@@ -39,11 +39,11 @@ export function recordSignup(c: Container, origin: unknown): void {
 export function funnelRoutes(c: Container, limiter: RateLimiterFactory): Router {
   const router = Router();
   router.post('/funnel', limiter({ windowMs: 60 * 1000, limit: 30 }), (req, res) => {
-    const { event, guide, ...origin } = funnelBody.parse(req.body);
+    const { event, guide, detail, ...origin } = funnelBody.parse(req.body);
     if (!BOTS.test(req.get('user-agent') ?? '')) {
       c.repos.funnel.record(event, {
         ...normalizeOrigin(origin, ownHosts(c)),
-        detail: guide ?? '',
+        detail: guide ?? detail ?? '',
       });
     }
     res.status(204).end();

@@ -254,6 +254,22 @@
     }
   },
   {
+    "name": "leakDecide",
+    "method": "PUT",
+    "path": "/stats/money-leaks/{leak}",
+    "auth": true,
+    "body": {
+      "status": "keep"
+    }
+  },
+  {
+    "name": "leakUndo",
+    "method": "DELETE",
+    "path": "/stats/money-leaks/{leak}",
+    "auth": true,
+    "body": null
+  },
+  {
     "name": "recurringCreate",
     "method": "POST",
     "path": "/recurring-rules",

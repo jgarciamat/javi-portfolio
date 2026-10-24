@@ -10,6 +10,8 @@ import {
   presentSplitGroup,
   presentTax,
   presentForecast,
+  presentLeakFinding,
+  presentMoneyLeaks,
   presentNetWorth,
   presentSubscriptions,
   presentTrend,
@@ -32,6 +34,8 @@ import {
   categoryIdParam,
   assetValueBody,
   idParam,
+  leakDecisionBody,
+  leakParams,
   netWorthQuery,
   pushSubscribeBody,
   pushUnsubscribeBody,
@@ -398,9 +402,38 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       res.json(presentAnnualReport(c.stats.annualReport(req.dataUserId, year)));
     })
   );
+  // Kept as it is for the app versions already installed (the new screen uses /money-leaks).
   router.get(
     '/stats/subscriptions',
     authed((req, res) => res.json(presentSubscriptions(c.stats.subscriptions(req.dataUserId))))
+  );
+
+  /** «Tu dinero perdido»: the findings and the user's decisions (same data in a household). */
+  router.get(
+    '/stats/money-leaks',
+    authed((req, res) => res.json(presentMoneyLeaks(c.moneyLeaks.view(req.dataUserId))))
+  );
+  const leakLimiter = limiter({
+    windowMs: 60 * 1000,
+    limit: 60,
+    keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+  });
+  router.put(
+    '/stats/money-leaks/:id',
+    leakLimiter,
+    authed((req, res) => {
+      const { id } = leakParams.parse(req.params);
+      const { status } = leakDecisionBody.parse(req.body);
+      res.json(presentLeakFinding(c.moneyLeaks.decide(req.dataUserId, id, status)));
+    })
+  );
+  router.delete(
+    '/stats/money-leaks/:id',
+    leakLimiter,
+    authed((req, res) => {
+      c.moneyLeaks.undo(req.dataUserId, leakParams.parse(req.params).id);
+      res.status(204).end();
+    })
   );
 
   router.post(

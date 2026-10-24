@@ -10,7 +10,7 @@ import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
-import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
+import { CLIENT_FUNNEL_DETAILS, CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
 export const money = z
@@ -958,7 +958,18 @@ export const funnelBody = funnelOrigin
       .string()
       .regex(/^[a-z0-9-]{1,80}$/)
       .optional(),
+    /** From the closed list of its event (CLIENT_FUNNEL_DETAILS). */
+    detail: z.string().max(20).optional(),
   })
+  .strict()
+  .refine((b) => !b.detail || (CLIENT_FUNNEL_DETAILS[b.event] ?? []).includes(b.detail), {
+    message: 'Detalle no permitido para este evento',
+    path: ['detail'],
+  });
+
+export const leakParams = z.object({ id: z.string().regex(/^[0-9a-f]{16}$/) });
+export const leakDecisionBody = z
+  .object({ status: z.enum(['keep', 'cancel', 'dismissed', 'not_mine']) })
   .strict();
 
 export const clientErrorBody = z.object({

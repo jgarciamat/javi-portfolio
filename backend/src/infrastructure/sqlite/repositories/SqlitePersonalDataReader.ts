@@ -52,6 +52,12 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
          WHERE b.user_id = ? ORDER BY c.name`,
         userId
       ),
+      moneyLeakDecisions: this.all(
+        `SELECT fingerprint, kind, status, annual_cents AS annualCents, decided_at AS decidedAt,
+                recovered_at AS recoveredAt
+           FROM money_leak_decisions WHERE user_id = ? ORDER BY decided_at`,
+        userId
+      ),
       recurringSkips: this.all(
         `SELECT s.rule_id AS recurringRuleId, s.year, s.month
          FROM recurring_rule_skips s JOIN recurring_rules r ON r.id = s.rule_id

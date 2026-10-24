@@ -19,6 +19,7 @@ import {
   categoryApi,
   customAlertApi,
   goalApi,
+  insightsApi,
   recurringApi,
   rentaApi,
   settingsApi,
@@ -161,6 +162,8 @@ add('accountCreate', () =>
 );
 add('budgetSet', () => budgetApi.set(C('Ocio'), 150));
 add('goalCreate', () => goalApi.create({ name: 'Viaje', target: 500, targetDate: '2027-01-01' }));
+add('leakDecide', () => insightsApi.decideLeak('{leak}', 'keep'));
+add('leakUndo', () => insightsApi.undoLeak('{leak}'));
 add('recurringCreate', () =>
   recurringApi.create({
     description: 'Alquiler',

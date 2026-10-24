@@ -196,6 +196,9 @@ export const goal = (over: Partial<Goal> = {}): Goal => ({
     monthsLeft: 9,
     monthlyNeeded: 266.67,
     completed: false,
+    averageMonthly: null,
+    historyMonths: 0,
+    savedThisMonth: 0,
   },
   ...over,
 });

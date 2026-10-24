@@ -11,6 +11,7 @@ import { User } from '@domain/model/User';
 import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
+import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
@@ -236,6 +237,15 @@ export interface TransactionRepository {
   ): CategoryPeriodTotal[];
   /** All-time SAVING per category id (used by goals). */
   savedByCategory(userId: string): Record<string, Cents>;
+  /** SAVING per category and period, all time (the saving pace of goals). */
+  savingByCategoryAndPeriod(
+    userId: string
+  ): { categoryId: string; year: number; month: number; cents: Cents }[];
+  /**
+   * Movements dated from `fromDate` on, the most recent `limit` of them, with their category
+   * name (what «Tu dinero perdido» looks at).
+   */
+  listSince(userId: string, fromDate: string, limit: number): LeakMovement[];
   existingImportHashes(userId: string, hashes: string[]): Set<string>;
   /** Most recent category used for each normalised description. */
   lastCategoryByDescription(userId: string, descriptionKeys: string[]): Map<string, string>;
@@ -279,6 +289,16 @@ export interface CategoryBudgetRepository {
   findByCategory(userId: string, categoryId: string): CategoryBudget | null;
   save(budget: CategoryBudget): void;
   delete(userId: string, id: string): void;
+}
+
+/** What each user decided about the findings of «Tu dinero perdido» (never the findings). */
+export interface LeakDecisionRepository {
+  listByUser(userId: string): LeakDecision[];
+  /** Creates or replaces the decision on a finding; keeps the newest `max` of the user. */
+  save(userId: string, decision: LeakDecision, max: number): void;
+  delete(userId: string, findingId: string): boolean;
+  /** Forgets decisions on findings that are gone (lazy clean-up). */
+  deleteMany(userId: string, findingIds: string[]): void;
 }
 
 export interface GoalRepository {

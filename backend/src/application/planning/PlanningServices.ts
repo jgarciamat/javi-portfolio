@@ -1,18 +1,27 @@
 import { NotFoundError } from '@domain/errors';
 import { CategoryBudget } from '@domain/model/CategoryBudget';
 import { CustomAlert, CustomAlertInput, CustomAlertProps } from '@domain/model/CustomAlert';
-import { Goal, GoalInput, GoalProgress, GoalProps, computeGoalProgress } from '@domain/model/Goal';
+import {
+  Goal,
+  GoalInput,
+  GoalPace,
+  GoalProgress,
+  GoalProps,
+  computeGoalPace,
+  computeGoalProgress,
+} from '@domain/model/Goal';
 import {
   BudgetView,
   CategoryBudgetRepository,
   CustomAlertRepository,
   GoalRepository,
+  SettingsRepository,
   TransactionRepository,
   UnitOfWork,
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { Cents } from '@domain/shared/money';
-import { todayDateOnly } from '@domain/shared/period';
+import { currentPeriod, periodOrdinal, todayDateOnly } from '@domain/shared/period';
 import { CategoryRef, CategoryResolver } from '@application/shared/resolvers';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
@@ -135,7 +144,7 @@ export class BudgetService {
 
 export interface GoalView extends GoalProps {
   categoryName: string;
-  progress: GoalProgress;
+  progress: GoalProgress & GoalPace;
 }
 
 export type GoalRequest = Partial<Omit<GoalInput, 'categoryId'>> & CategoryRef;
@@ -147,18 +156,31 @@ export class GoalService {
     private readonly categories: CategoryResolver,
     private readonly entitlements: EntitlementService,
     private readonly uow: UnitOfWork,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly settings: SettingsRepository
   ) {}
 
   private views(userId: string, goals: Goal[]): GoalView[] {
     const saved = this.transactions.savedByCategory(userId);
-    const today = todayDateOnly(this.clock.now());
+    const now = this.clock.now();
+    const today = todayDateOnly(now);
+    const current = currentPeriod(this.settings.get(userId).monthStartDay, now);
+    // The saving of each category per period, for the real pace of every goal.
+    const byPeriod = new Map<string, Map<number, Cents>>();
+    for (const row of this.transactions.savingByCategoryAndPeriod(userId)) {
+      const periods = byPeriod.get(row.categoryId) ?? new Map<number, Cents>();
+      periods.set(periodOrdinal(row), row.cents);
+      byPeriod.set(row.categoryId, periods);
+    }
     return goals.map((g) => {
       const p = g.toPrimitives();
       return {
         ...p,
         categoryName: this.categories.requireById(userId, p.categoryId).name,
-        progress: computeGoalProgress(p, saved[p.categoryId] ?? 0, today),
+        progress: {
+          ...computeGoalProgress(p, saved[p.categoryId] ?? 0, today),
+          ...computeGoalPace(byPeriod.get(p.categoryId) ?? new Map(), current),
+        },
       };
     });
   }

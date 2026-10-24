@@ -355,6 +355,20 @@ const cases: Case[] = [
   ['annual report', () => insightsApi.report(2026), 'GET', '/stats/report/2026'],
   ['ask the assistant', () => insightsApi.ask('hola', 'es'), 'POST', '/ai/ask'],
   ['subscriptions', () => insightsApi.subscriptions(), 'GET', '/stats/subscriptions'],
+  ['money leaks', () => insightsApi.moneyLeaks(), 'GET', '/stats/money-leaks'],
+  [
+    'decide on a leak',
+    () => insightsApi.decideLeak('0123456789abcdef', 'cancel'),
+    'PUT',
+    '/stats/money-leaks/0123456789abcdef',
+    { status: 'cancel' },
+  ],
+  [
+    'undo a leak decision',
+    () => insightsApi.undoLeak('0123456789abcdef'),
+    'DELETE',
+    '/stats/money-leaks/0123456789abcdef',
+  ],
   ['forecast', () => insightsApi.forecast(), 'GET', '/stats/forecast?months=6'],
   [
     'forecast without rules',

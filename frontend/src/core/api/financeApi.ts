@@ -6,6 +6,9 @@ import type {
   AnnualReport,
   Forecast,
   SubscriptionReport,
+  LeakDecision,
+  LeakFinding,
+  MoneyLeaks,
   AnnualSummary,
   Asset,
   AssetKind,
@@ -424,6 +427,18 @@ export const insightsApi = {
   },
   subscriptions() {
     return apiRequest<SubscriptionReport>('/stats/subscriptions');
+  },
+  moneyLeaks() {
+    return apiRequest<MoneyLeaks>('/stats/money-leaks');
+  },
+  decideLeak(id: string, status: LeakDecision) {
+    return apiRequest<LeakFinding>(`/stats/money-leaks/${id}`, {
+      method: 'PUT',
+      body: jsonBody({ status }),
+    });
+  },
+  undoLeak(id: string) {
+    return apiRequest<void>(`/stats/money-leaks/${id}`, { method: 'DELETE' });
   },
   forecast(months = 6, exclude: string[] = []) {
     return apiRequest<Forecast>(

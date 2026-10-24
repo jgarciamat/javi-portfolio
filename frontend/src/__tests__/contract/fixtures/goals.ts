@@ -18,6 +18,9 @@ export const goals = [
       monthsLeft: 11,
       monthlyNeeded: 45.46,
       completed: false,
+      averageMonthly: null,
+      historyMonths: 0,
+      savedThisMonth: 0,
     },
   },
 ] as const;

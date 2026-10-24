@@ -29,6 +29,11 @@ export type PremiumFeature =
 export const FREE_FORECAST_MONTHS = 1;
 /** Detected subscriptions the free plan sees in full (the rest come back locked). */
 export const FREE_SUBSCRIPTIONS_SHOWN = 3;
+/**
+ * Findings of «Tu dinero perdido» the free plan sees in full: the most expensive ones. Possible
+ * double charges are always shown on top of these (a wrong charge is never behind a payment).
+ */
+export const FREE_LEAKS_SHOWN = 3;
 
 export interface PlanLimits {
   resources: Record<LimitedResource, number>;
