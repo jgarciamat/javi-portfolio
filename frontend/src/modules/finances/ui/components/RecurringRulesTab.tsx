@@ -359,7 +359,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
             </h2>
             <p className="recurring-tab-subtitle">{t('app.recurring.subtitle')}</p>
           </div>
-          <button className="btn-primary" onClick={editor.openCreate}>
+          <button className="btn-primary" data-tour="recurring-new" onClick={editor.openCreate}>
             {t('app.recurring.new')}
           </button>
         </div>

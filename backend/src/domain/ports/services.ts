@@ -269,6 +269,10 @@ export const CLIENT_FUNNEL_EVENTS = [
   'guide_cta_click',
   'pricing_view',
   'paywall_view',
+  // «Invite a friend» in the crypto console: card seen, link copied, link shared.
+  'cons_invite_view',
+  'cons_invite_copy',
+  'cons_invite_share',
 ] as const;
 
 /** Funnel events only the server records, when the thing really happens. */

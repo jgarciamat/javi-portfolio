@@ -7,6 +7,8 @@ const NO_ELEMENT = [
   /Qué hace y qué no hace/,
   /Con tu (plan gratis|Premium)/,
   /Autónomos, por trimestres/,
+  /Quién debe a quién/,
+  /Consola crypto: un simulador/,
   /¡Listo!/,
 ];
 
@@ -20,6 +22,11 @@ const EXPECTED_TITLES = [
   /Tu resultado/,
   /Qué trimestre abre/,
   /Ficheros para la sede/,
+  /Gastos compartidos/,
+  /Operaciones automáticas/,
+  /Crea una/,
+  /La gráfica y sus capas/,
+  /Practica una operación/,
 ];
 
 async function totalSteps(page: Page): Promise<number> {

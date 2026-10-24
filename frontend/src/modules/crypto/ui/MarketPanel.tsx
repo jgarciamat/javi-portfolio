@@ -1,6 +1,5 @@
-import { Suspense, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { lazyNamed } from '@shared/utils/lazyNamed';
 import type { CryptoMarket } from '../application/useCryptoMarket';
 import { CHART_INTERVALS } from '../domain/chart';
 import { DISPLAY_CURRENCIES, convertCandles, type DisplayCurrency } from '../domain/currency';
@@ -13,21 +12,21 @@ import { LearnButton, LearnPanel, type Guide } from './Learn';
 import { useMoney } from './money';
 import type { ChartLine } from './useCandleChart';
 
-// The chart library goes in its own chunk, downloaded only when a chart is shown.
-const PriceChart = lazyNamed(() => import('./PriceChart'), 'PriceChart');
+let chart: typeof import('./PriceChart') | null = null;
+let chartChunk: Promise<void> | null = null;
+
+/**
+ * The chart library goes in its own chunk, asked for once as soon as the console opens. The
+ * console waits for it with the data, so the chart is drawn in the same paint as the rest.
+ */
+export const loadChart = () =>
+  (chartChunk ??= import('./PriceChart').then((module) => {
+    chart = module;
+  }));
 
 export interface View {
   symbol: string;
   interval: CryptoInterval;
-}
-
-export function Loading() {
-  const { t } = useI18n();
-  return (
-    <p className="empty-block" role="status">
-      {t('app.common.loading')}
-    </p>
-  );
 }
 
 function Intervals({
@@ -203,8 +202,8 @@ function FullBar({
 const coinName = (coin: CryptoCoin | undefined, symbol: string): string => coin?.name ?? symbol;
 
 /**
- * Once drawn, the chart stays mounted (empty) while other candles load, so a chart in full screen
- * survives a change of coin, candle size or currency.
+ * Once drawn, the chart stays mounted (empty, under a blue frame) while other candles load, so a
+ * chart in full screen survives a change of coin, candle size or currency.
  */
 function useWaiting(market: CryptoMarket): boolean {
   const [drawn, setDrawn] = useState(false);
@@ -240,6 +239,8 @@ function ChartArea({
 }) {
   const { t } = useI18n();
   const waiting = useWaiting(market);
+  // Loaded before the panel is shown (see loadChart).
+  const { PriceChart } = chart!;
   return (
     <>
       {market.error && !market.candles && (
@@ -250,22 +251,20 @@ function ChartArea({
           </button>
         </p>
       )}
-      {market.loading && <Loading />}
       {(market.candles || waiting) && (
-        <Suspense fallback={<Loading />}>
-          <PriceChart
-            candles={waiting ? [] : candles}
-            viewKey={waiting ? `${viewKey}:loading` : viewKey}
-            label={label}
-            interval={interval}
-            lines={lines}
-            layers={layers}
-            onToggleLayer={onToggleLayer}
-            layerExtra={layerExtra}
-            fullBar={fullBar}
-            onVisibleChange={onVisibleChange}
-          />
-        </Suspense>
+        <PriceChart
+          candles={waiting ? [] : candles}
+          viewKey={waiting ? `${viewKey}:loading` : viewKey}
+          loading={waiting}
+          label={label}
+          interval={interval}
+          lines={lines}
+          layers={layers}
+          onToggleLayer={onToggleLayer}
+          layerExtra={layerExtra}
+          fullBar={fullBar}
+          onVisibleChange={onVisibleChange}
+        />
       )}
     </>
   );

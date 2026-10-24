@@ -93,7 +93,9 @@ describe('POST /api/funnel', () => {
     );
     await send(ctx, { event: 'guide_view', guide: 'modelo-303', ref: 'www.google.es' }).expect(204);
     await send(ctx, { event: 'paywall_view', app: true }).expect(204);
+    await send(ctx, { event: 'cons_invite_copy' }).expect(204);
     expect(rows(ctx)).toEqual([
+      { event: 'cons_invite_copy', source: '(direct)', campaign: '', detail: '', count: 1 },
       { event: 'guide_view', source: 'google', campaign: '', detail: 'modelo-303', count: 1 },
       { event: 'paywall_view', source: '(app)', campaign: '', detail: '', count: 1 },
       { event: 'visit', source: 'tiktok', campaign: 'renta2026', detail: '', count: 2 },

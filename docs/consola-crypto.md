@@ -239,7 +239,7 @@ short (ejemplo con números inventados y la garantía del simulador); órdenes y
 profit y stop loss; apalancamiento (cómo funciona, por qué es peligroso y que Finanverso no lo
 ofrece); **«Palabras de la consola»**: el glosario completo (`GLOSSARY_TERMS` y las claves
 `app.crypto.glossary.*`) con buscador sin acentos ni mayúsculas; y la tarjeta «Gratis y Premium».
-La comisión fija del 0,10 % solo se menciona dentro de la guía.
+La comisión fija del 0,1 % se menciona en la guía (glosario «Comisión») y en el recuadro «Antes de abrir» de la caja de operar.
 
 ## Simulador
 
@@ -256,7 +256,7 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
 - **Órdenes** a mercado, límite o stop para abrir long o short; **take profit y stop loss**
   opcionales (largo: TP encima y SL debajo de la entrada; corto: al revés), guardados como órdenes
   de cierre vinculadas; una orden pendiente los deja al ejecutarse. Validación en vivo («Antes de
-  abrir», `aria-live`, con la comisión simulada en euros pero sin aviso del porcentaje) y en el
+  abrir», `aria-live`, con la comisión simulada, su porcentaje y una explicación desplegable; ver «Comisión explicada al abrir») y en el
   servidor. Las órdenes vinculadas **no caducan** ni la garantía de un short: duran lo que dure la
   posición (`findFill` recibe `Infinity` como fin); solo caducan las órdenes de entrada.
 - **Ejecución determinista sin procesos en segundo plano**: al abrir o refrescar la consola (cada
@@ -348,13 +348,31 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
 - **Lo que se quitó de la interfaz** (decisión del dueño): el selector de comisión
   (0/0,1/0,25/0,5/1 %), el selector de saldo (1.000/10.000/100.000 €) y el botón «Empezar de
   nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece. Después se quitan
-  también el enlace «¿Qué es la comisión?», el aviso «Comisión fija…» de «Antes de abrir» y el
-  botón **«Exportar CSV»** gratis del historial (panel de cerradas): no hay CSV gratis en la
+  también (y después se **recuperaron**, ver «Comisión explicada al abrir») el enlace «¿Qué es la
+  comisión?» y el aviso de comisión de «Antes de abrir»; y se quitó el botón **«Exportar CSV»** gratis del historial (panel de cerradas): no hay CSV gratis en la
   pantalla. Siguen el **informe Premium de temporada** en PDF y CSV y la exportación RGPD de la
   cuenta (que incluye todo el simulador). En el backend se elimina
   `PATCH /crypto/sim/settings` y `POST /crypto/sim/reset` solo sirve para **carteras de
   prácticas**: acepta e ignora `initial` y `feeBps` que mandaban versiones anteriores de la app y,
   sin cartera de prácticas, responde `CRYPTO_SEASON_NO_RESET`.
+
+### Comisión explicada al abrir
+
+En «Antes de abrir», con un importe válido, se ve la línea **«Comisión simulada: 1,00 € (0,1 %) al
+abrir + otra similar al cerrar (≈1,00 €)»** (en la moneda elegida) y un desplegable
+**«¿Por qué hay comisión y de qué tipo es?»** (`aria-expanded`, `aria-controls`). Lo que dice
+refleja el servidor (`crypto-sim.ts`: `feeCents(importe, 10 bps)` al abrir, sumada al importe;
+`sale()` al cerrar, sobre el valor de la posición en ese momento, restada de lo recibido; igual para
+largos y cortos; sin comisión por mantener):
+
+- **Tipo**: comisión porcentual fija sobre cada operación, del tipo «taker» de los mercados reales.
+- **Porqué**: operar tiene coste y el resultado neto lo resta; una operación debe ganar más que las
+  comisiones para salir en positivo.
+- **Simulada y fija**: no depende del plan y no se cobra dinero real. Ejemplo inventado con 1.000 €.
+- El botón **«¿Qué es la comisión?»** vive solo dentro del desplegable y abre la guía en «Palabras».
+  El glosario dice «0,1 % fijo por compra y por venta», sin elegir porcentaje.
+- Al armar el botón **Cerrar**, el aviso para lectores de pantalla añade la comisión de cierre
+  estimada. El porcentaje sale de `account.feeBps` (siempre 10 bps = 0,1 %).
 
 ## Temporada mensual
 
@@ -441,6 +459,46 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
 - **Insignias** sencillas que se conservan entre temporadas: primera operación (`firstTrade`),
   primer take profit alcanzado (`firstTakeProfit`), 10 operaciones (`tenTrades`) y mes en
   positivo (`positiveMonth`).
+
+## Invitar desde la consola
+
+Un empujón al programa «Invita a un amigo» del menú, **sin sistema nuevo**: el mismo enlace
+(`inviteLink`, `https://finanverso.app/?ref=CÓDIGO`, solo el código aleatorio, nada de la persona),
+los mismos contadores y la misma recompensa, leídos de `GET /referral` (`ReferralService`).
+
+- **Recompensa real** (la del programa, sin inventar nada): si el amigo se registra con el enlace y
+  completa los primeros pasos de la app (3 movimientos, un presupuesto, una meta y una
+  automatización), recibe 30 días de Premium (`rewardDays`), y quien invita suma meses según los
+  amigos que lo consiguen: 1 mes con el primero, 2 con 5, 3 con 20, 4 con 40 y 5 con 50
+  (`tiers`, máximo `maxRewards`). **Operar en la consola no cuenta** para la invitación, y la
+  tarjeta lo dice.
+- **Tarjeta «Invita a un amigo y competid»** (`ui/InvitePanel.tsx`), debajo del ranking del mes:
+  la recompensa con las cifras del servidor, el enlace, «Copiar enlace», «Compartir» (Web Share;
+  donde el navegador no comparte, copia) y «Tus invitaciones: completadas · en camino · meses
+  conseguidos». Si el portapapeles falla, dice cómo copiarlo a mano. Si `/referral` no responde,
+  no se muestra nada (no hay interruptor del programa en el servidor: se trata como apagado).
+- **Aviso puntual** (no modal, no bloqueante, se cierra con «Ahora no»), tras algo bueno:
+  la primera operación cerrada con resultado neto positivo (`pnl > 0`, ya con comisiones), al
+  conseguir puesto en el ranking del mes (`me.place`) y con el resumen de la temporada que acaba
+  de terminar (mientras ese resumen sigue sin cerrar). Reglas (`domain/invite.ts`):
+  - como mucho **un aviso cada 7 días por dispositivo**; cada suceso cuenta una sola vez y, si
+    llega dentro de esos 7 días, se gasta sin aviso (no vuelve más tarde con un texto viejo);
+  - el aviso abierto sigue hasta cerrarlo (7 días como mucho); usar su enlace también lo da por
+    visto;
+  - nunca si la persona ya invitó a alguien (`qualified + pending > 0`), si `/referral` falla o
+    mientras el primer aviso del ranking («Apareces en el ranking del mes…») sigue abierto, para
+    no juntar dos avisos.
+  - Se recuerda en `localStorage` (`mm_crypto_invite_nudge`: `at`, `done`, `open`), siempre con
+    el envoltorio `storage` que nunca lanza errores.
+- **Estilo**: el mismo arcoíris de «Invita a un amigo» del menú y del premio (`--rainbow-stops`)
+  en el borde, moviéndose despacio; quieto con `prefers-reduced-motion` y un marco claro liso en
+  Contraste. El texto va siempre sobre el color de la tarjeta.
+- **Textos**: lenguaje claro, sin presión, sin lenguaje de apuesta ni promesas
+  (`__tests__/crypto/wording.test.ts` lo comprueba en español e inglés).
+- **Analítica** (la propia y anónima de `docs/analitica.md`, tabla `funnel_daily` de la
+  migración 034): `cons_invite_view` (tarjeta vista, una vez por visita a la consola),
+  `cons_invite_copy` (enlace copiado) y `cons_invite_share` (compartido de verdad; cancelar no
+  cuenta). Sin el enlace, el código ni ningún dato de la persona. El aviso no tiene evento propio.
 
 ## Premium en la consola (comodidades, sin ventaja en el ranking)
 
@@ -531,6 +589,46 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - Cada función Premium bloqueada muestra una **maqueta con datos de ejemplo** y qué desbloquea,
   sin presión ni lenguaje de apuesta.
 
+## Carga: esqueleto azul y nada a medias (octubre de 2026)
+
+- **Primera carga** (y al volver a la consola o cambiar de cartera: pestañas de temporada y
+  prácticas, crear o borrar una de prácticas): mientras falte algo del primer pintado solo se ve
+  el aviso de riesgo y el **esqueleto** (`ConsoleSkeleton.tsx`, `css/Skeleton.css`): la silueta del
+  panel «Gráfica de precios» con el marco, la columna de monedas con filas de contorno, la
+  cabecera (icono, nombre, precio), las temporalidades y la moneda, la caja de datos del día y la
+  gráfica con su rejilla y velas inventadas, más los chips de capas, «Aprende», la barra de zoom y
+  las notas. Solo **contornos finos** en el azul de acento (`--accent-400`, el de los chips
+  activos), sin texto ni cifras. Un brillo lento recorre los bordes (un pulso cada 1,8 s, en
+  cascada por filas y chips); con «reducir movimiento» queda quieto con un azul tenue; en
+  Contraste el borde es azul sólido (2 px en las cajas); con colores forzados usa `CanvasText`.
+- **Qué se espera** (`useMarketReady` y `allThere` en `CryptoConsoleView.tsx`): lista de monedas
+  (o su fallo: entonces la consola sigue sin lista), velas de la moneda y temporalidad elegidas,
+  el chunk de la gráfica (`loadChart` en `MarketPanel.tsx`, pedido al abrir la consola y pintado
+  sin `Suspense`, así la gráfica sale en el mismo pintado), cartera, ranking (o su error) e
+  invitaciones. Cuando todo está, se pasa **de golpe** a la consola real; no hay «Cargando…» suelto
+  ni datos parciales (`DataNotice` ya no tiene estado «Cargando precios…»).
+- **Mismas medidas**: el esqueleto usa la rejilla real (`cc-market-grid`, `cc-coins`,
+  `cc-market-head`, `cc-stats`) y la altura de la gráfica es una sola variable
+  (`--cc-canvas-h`: 420 px, 480 px desde 1680 px, 320 px en móvil y el alto disponible en
+  horizontal) que comparten la gráfica y su marco. Diferencia medida entre esqueleto y panel:
+  4 px en 1440, 2 px en 390 y 4 px en 844x390 (6–8 px en Contraste). Guarda también el hueco de
+  «Gira el móvil» mientras no se haya descartado. Lo que va encima del panel (nota de datos,
+  temporada, resumen) aparece a la vez que él.
+- **Accesibilidad**: el contenedor lleva `role="status"` y `aria-busy="true"` con el texto oculto
+  «Cargando la consola…» / «Loading the console…» (`app.crypto.skeleton.label`); el dibujo es
+  `aria-hidden` y no hay nada enfocable, así que no atrapa el foco. Tras cambiar de cartera el foco
+  vuelve a la pestaña de la cartera elegida.
+- **Errores**: si falla la primera respuesta de velas o de la cartera se muestra su mensaje con
+  «Reintentar» en lugar del esqueleto; si en **20 s** (`FIRST_PAINT_MS`) no ha llegado todo, se
+  muestra «No se han podido cargar los precios.» (o «No se ha podido cargar tu simulador.» si lo
+  que falta es la cartera). «Reintentar» vuelve a montar la consola: pide todo otra vez y reinicia
+  la espera.
+- **Dentro del panel ya montado** (otra moneda, temporalidad o divisa, también en pantalla
+  completa) no vuelve el esqueleto: la gráfica sigue montada y vacía y encima se pone un **velo**
+  con el mismo marco azul (`cc-chart-veil`, `aria-busy` en la gráfica) hasta que llegan las
+  velas, sin mezclar velas antiguas. El aviso de error de velas con «Reintentar» dentro del panel
+  se mantiene.
+
 ## Móvil y accesibilidad
 
 - 390 px sin desplazamiento lateral; en horizontal (844x390) la gráfica ocupa casi todo el alto y
@@ -568,6 +666,10 @@ cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste). Filas co
 operación, con y sin Detalles) en `/tmp/gf70-shots/` (1440 y 390; claro, oscuro y Contraste).
 Operaciones numeradas (#1 y #2 en filas, líneas de la gráfica con precios cercanos y aviso de la
 caja de operar con 2 de 2) en `/tmp/gf71-shots/` (1440 y 390; claro, oscuro y Contraste).
+Esqueleto de carga, panel real y velo de la gráfica (`*-loading`, `*-panel`, `*-veil`, más el velo
+en pantalla completa) en `/tmp/gf77-shots/` (1440, 390 y 844x390; claro, oscuro y Contraste); el
+E2E «shows only the blue outline of the panel until everything is there» retiene las velas y
+comprueba que no asoma ninguna cifra ni «Cargando» hasta que el panel llega entero.
 
 Fuente por moneda (USDT convertido): `backend/src/tests/infrastructure/market.test.ts` (plan de
 pares, conversión y redondeo, caché por par convertida al leer, tasa de reserva de 7 días, sin

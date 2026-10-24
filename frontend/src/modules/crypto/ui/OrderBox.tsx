@@ -1,14 +1,8 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
-import { formatChange, formatQuantity, pnl } from '../domain/format';
-import {
-  AMOUNT_SHARES,
-  amountForShare,
-  checkOpen,
-  coinSlots,
-  type OrderProblem,
-} from '../domain/orders';
+import { formatChange, formatQuantity, intlTag, pnl } from '../domain/format';
+import { AMOUNT_SHARES, amountForShare, checkOpen, coinSlots, feeOf } from '../domain/orders';
 import type { Direction, OrderRequest, SimPortfolio, TradeType } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
@@ -35,6 +29,8 @@ interface OrderBoxProps {
   portfolio: SimPortfolio;
   busy: boolean;
   onPlace: (order: OrderRequest) => Promise<boolean>;
+  /** Opens the guide on its words tab (the entry «What is the commission?»). */
+  onGuide: () => void;
   /** What to do when the money ran out (the official season offers a practice portfolio). */
   practice?: ReactNode;
 }
@@ -125,25 +121,30 @@ interface Line {
 
 /** «Before opening»: what is missing, or what it would cost and give. */
 function BeforeOpening({
-  problems,
-  lines,
+  check,
+  symbol,
   direction,
+  bps,
+  onGuide,
 }: {
-  problems: OrderProblem[];
-  lines: Line[];
+  check: ReturnType<typeof checkOpen>;
+  symbol: string;
   direction: Direction;
+  bps: number;
+  onGuide: () => void;
 }) {
   const { t } = useI18n();
+  const lines = useLines(check, symbol);
   return (
     <div className="cc-check" aria-live="polite">
       <h4>{t('app.crypto.order.check.title')}</h4>
       <ul>
-        {problems.map((p) => (
+        {check.problems.map((p) => (
           <li key={p} className="cc-check-bad">
             {t(`app.crypto.order.check.${p}.${direction}`)}
           </li>
         ))}
-        {problems.length === 0 && (
+        {check.problems.length === 0 && (
           <li className="cc-check-good">{t('app.crypto.order.check.ready')}</li>
         )}
       </ul>
@@ -157,6 +158,63 @@ function BeforeOpening({
           ))}
         </dl>
       )}
+      {check.estimate && <FeeInfo fee={check.estimate.fee} bps={bps} onGuide={onGuide} />}
+    </div>
+  );
+}
+
+/**
+ * The commission of the operation, in plain words: how much it is on opening (and about the same
+ * on closing), what kind it is, why it exists and a made-up example. The percentage is the fixed
+ * one of the server (`FIXED_FEE_BPS`); on closing it applies to the value at that moment.
+ */
+function FeeInfo({ fee, bps, onGuide }: { fee: number; bps: number; onGuide: () => void }) {
+  const { t, locale } = useI18n();
+  const money = useMoney();
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const percent = new Intl.NumberFormat(intlTag(locale), { maximumFractionDigits: 2 }).format(
+    bps / 100
+  );
+  const example = feeOf(1000, bps);
+  return (
+    <div className="cc-fee">
+      <p className="cc-fee-line">
+        {t('app.crypto.order.fee.line', {
+          open: money.shownAmount(fee),
+          percent,
+          close: money.shownAmount(fee),
+        })}
+      </p>
+      <button
+        type="button"
+        className="btn-link cc-fee-toggle"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {t('app.crypto.order.fee.toggle')}
+      </button>
+      <div id={id} className="cc-fee-body" hidden={!open}>
+        <p>
+          <strong>{t('app.crypto.order.fee.typeTitle')}</strong>{' '}
+          {t('app.crypto.order.fee.type', { percent })}
+        </p>
+        <p>
+          <strong>{t('app.crypto.order.fee.whyTitle')}</strong> {t('app.crypto.order.fee.why')}
+        </p>
+        <p>{t('app.crypto.order.fee.simulated')}</p>
+        <p>
+          {t('app.crypto.order.fee.example', {
+            amount: money.shownAmount(1000),
+            fee: money.shownAmount(example),
+            total: money.shownAmount(example * 2),
+          })}
+        </p>
+        <button type="button" className="btn-link" onClick={onGuide}>
+          {t('app.crypto.order.fee.guide')}
+        </button>
+      </div>
     </div>
   );
 }
@@ -278,10 +336,6 @@ function useLines(check: ReturnType<typeof checkOpen>, symbol: string): Line[] {
         label: t('app.crypto.order.coins', { symbol }),
         value: formatQuantity(check.estimate.quantity, locale),
       },
-      {
-        label: t('app.crypto.order.fee'),
-        value: money.shownAmount(check.estimate.fee),
-      },
       { label: t('app.crypto.order.total'), value: money.shownAmount(check.estimate.total) }
     );
   }
@@ -341,7 +395,7 @@ function SlotNote({
  * Positions are closed from the «Open» panel.
  */
 export function OrderBox(props: OrderBoxProps) {
-  const { symbol, coinName, price, portfolio, busy, onPlace, practice } = props;
+  const { symbol, coinName, price, portfolio, busy, onPlace, onGuide, practice } = props;
   const { t } = useI18n();
   const money = useMoney();
   const [direction, setDirection] = useState<Direction>('long');
@@ -373,7 +427,6 @@ export function OrderBox(props: OrderBoxProps) {
     cash,
     bps,
   });
-  const lines = useLines(check, symbol);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -477,7 +530,7 @@ export function OrderBox(props: OrderBoxProps) {
           onStopLoss={setStopLoss}
         />
 
-        <BeforeOpening problems={check.problems} lines={lines} direction={direction} />
+        <BeforeOpening {...{ check, symbol, direction, bps, onGuide }} />
 
         <button
           type="submit"

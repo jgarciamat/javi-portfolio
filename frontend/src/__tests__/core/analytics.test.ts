@@ -47,6 +47,9 @@ describe('track', () => {
       'guide_cta_click',
       'pricing_view',
       'paywall_view',
+      'cons_invite_view',
+      'cons_invite_copy',
+      'cons_invite_share',
     ]);
   });
 

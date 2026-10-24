@@ -409,6 +409,7 @@ function CloseTrade({
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const money = useMoney();
   const [armed, setArmed] = useState(false);
   useEffect(() => {
     if (!armed) return;
@@ -439,7 +440,10 @@ function CloseTrade({
         </span>
       </button>
       <span className="sr-only" aria-live="polite">
-        {armed ? t('app.crypto.trades.close.armed', { seconds: CONFIRM_MS / 1000 }) : ''}
+        {armed && <span>{t('app.crypto.trades.close.armed', { seconds: CONFIRM_MS / 1000 })}</span>}
+        {armed && trade.exitFee !== null && (
+          <span> {t('app.crypto.trades.close.fee', { fee: money.amount(trade.exitFee) })}</span>
+        )}
       </span>
     </>
   );

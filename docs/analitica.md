@@ -15,6 +15,7 @@ Contadores **diarios y agregados** en la tabla `funnel_daily` (migración 034): 
 | `guide_view` / `guide_cta_click` | navegador | vista de una guía / clic en «Crear cuenta» (detalle = slug) | sí |
 | `signup_view` | navegador | se abre la página de registro | sí |
 | `pricing_view` / `paywall_view` | navegador | página de precios / aviso Premium | sí |
+| `cons_invite_view` / `cons_invite_copy` / `cons_invite_share` | navegador | tarjeta «Invita a un amigo y competid» de la consola crypto vista / enlace copiado / enlace compartido (sin el enlace ni el código) | sí |
 | `signup`, `trial_start` | servidor | cuenta nueva (email o Google); hoy la prueba de 14 días empieza con el alta | sí, llega en la propia petición de registro |
 | `email_verified` | servidor | se verifica el email (Google cuenta como verificado) | no |
 | `first_transaction` | servidor | primer movimiento (a mano o importado) | no |

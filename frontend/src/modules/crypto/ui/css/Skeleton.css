@@ -1,0 +1,435 @@
+/* ─── Loading skeleton ───
+   While the console loads, only the silhouette of the market panel: thin outlines in the accent
+   blue of the active chips, no text and no figures, with a slow glow that travels across them
+   (one pulse every 1.8 s, still when the person asks for less motion). It uses the layout of the
+   real panel and the same heights, so the panel takes its place without moving anything. */
+
+.cc-skeleton,
+.cc-chart-veil {
+  --sk: color-mix(in srgb, var(--accent-400) 75%, transparent);
+  --sk-faint: color-mix(in srgb, var(--accent-400) 40%, transparent);
+  --sk-still: color-mix(in srgb, var(--accent-400) 50%, transparent);
+}
+
+.cc-skeleton {
+  /* Heights of the rows of the chart column, as in the real panel on a wide screen. */
+  --sk-head: 2.375rem;
+  --sk-chips: 1.5rem;
+  --sk-tools: 1.75rem;
+  --sk-help: 2.125rem;
+  --sk-credit: 1.0625rem;
+  --sk-stat: 3.5625rem;
+  --sk-quote: 6.875rem;
+}
+
+.cc-skel {
+  user-select: none;
+  pointer-events: none;
+}
+
+.cc .cc-skeleton .cc-skel {
+  border-color: var(--sk-faint);
+}
+
+.cc-skel .cc-coins,
+.cc-skel .cc-segmented,
+.cc-skel .cc-stats {
+  border-color: var(--sk-faint);
+  background: transparent;
+}
+
+.cc .cc-skel .cc-coins-title {
+  border-bottom-color: var(--sk-faint);
+}
+
+/* Every outline: lines of text, coins, chips, boxes and the frame of the chart. */
+.cc-skel-bar,
+.cc-skel-dot,
+.cc-skel-coin,
+.cc-skel-seg,
+.cc-skel-price,
+.cc-skel-chip,
+.cc-skel-box,
+.cc-skel-canvas {
+  border: 1px solid var(--sk-faint);
+  animation: cc-skel-glow 1.8s ease-in-out infinite;
+  animation-delay: var(--sk-delay, 0s);
+}
+
+.cc-skel-bar {
+  display: block;
+  width: var(--w);
+  max-width: 100%;
+  height: 0.5625rem;
+  margin: 0.25rem 0;
+  border-radius: 999px;
+}
+
+.cc-skel .cc-coins-title .cc-skel-bar {
+  margin: 0.2rem 0;
+}
+
+.cc-skel-dot {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+}
+
+.cc-skel-dot--big {
+  width: 2rem;
+  height: 2rem;
+}
+
+.cc-skel .cc-skel-coin {
+  cursor: default;
+}
+
+.cc-skel-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cc-skel-col--end {
+  align-items: flex-end;
+}
+
+.cc-skel-col .cc-skel-bar {
+  height: 0.5rem;
+  margin: 0.2rem 0;
+}
+
+/* The glow runs down the coins and along the chips, one after the other. */
+.cc-skel .cc-coins-list li:nth-child(2) > *,
+.cc-skel-row > :nth-child(2) {
+  --sk-delay: 0.12s;
+}
+
+.cc-skel .cc-coins-list li:nth-child(3) > *,
+.cc-skel-row > :nth-child(3) {
+  --sk-delay: 0.24s;
+}
+
+.cc-skel .cc-coins-list li:nth-child(4) > *,
+.cc-skel-row > :nth-child(4) {
+  --sk-delay: 0.36s;
+}
+
+.cc-skel .cc-coins-list li:nth-child(5) > *,
+.cc-skel-row > :nth-child(5) {
+  --sk-delay: 0.48s;
+}
+
+.cc-skel .cc-coins-list li:nth-child(n + 6) > *,
+.cc-skel-row > :nth-child(n + 6) {
+  --sk-delay: 0.6s;
+}
+
+.cc-skel .cc-coin > * {
+  animation-delay: inherit;
+}
+
+.cc-skel-quote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  column-gap: 0.55rem;
+  flex: 1 1 16rem;
+  min-width: 0;
+  min-height: var(--sk-quote);
+}
+
+.cc-skel-price {
+  grid-column: 1 / -1;
+  width: 11rem;
+  max-width: 100%;
+  height: calc(clamp(1.5rem, 1rem + 1.6vw, 2.25rem) * 1.15);
+  border-radius: 8px;
+}
+
+.cc-skel-changes {
+  grid-column: 1 / -1;
+}
+
+.cc-skel-seg {
+  min-width: 3.3rem;
+  min-height: 32px;
+  border-radius: 6px;
+}
+
+.cc-skel-seg--wide {
+  min-width: 3.75rem;
+}
+
+.cc-skel .cc-stats {
+  background: var(--sk-faint);
+}
+
+.cc-skel .cc-stats > div {
+  min-height: var(--sk-stat);
+  background: var(--cc-surface);
+}
+
+.cc-skel .cc-stats .cc-skel-bar:last-child {
+  height: 0.75rem;
+}
+
+/* The chart column: the same rows as the chart, top to bottom. */
+.cc-skel-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cc-skel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  overflow: hidden;
+}
+
+.cc-skel-head {
+  justify-content: space-between;
+  height: var(--sk-head);
+}
+
+.cc-skel-chips {
+  height: var(--sk-chips);
+  align-content: flex-start;
+}
+
+.cc-skel-chip {
+  width: var(--w);
+  height: 24px;
+  border-radius: 6px;
+}
+
+.cc-skel-tools {
+  height: var(--sk-tools);
+  align-content: flex-start;
+}
+
+.cc-skel-tools .cc-skel-chip {
+  height: 28px;
+}
+
+.cc-skel-box {
+  display: block;
+  border-radius: 10px;
+}
+
+.cc-skel-learn {
+  height: 2.75rem;
+}
+
+.cc-skel-rotate {
+  display: none;
+  height: 11.9375rem;
+  border-radius: 14px;
+}
+
+.cc-skel-lines {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cc-skel-help {
+  height: var(--sk-help);
+}
+
+.cc-skel-credit {
+  height: var(--sk-credit);
+}
+
+.cc-skel-table {
+  height: 1.5rem;
+  margin-top: -0.05rem;
+}
+
+.cc-skel-lines .cc-skel-bar {
+  height: 0.5rem;
+  margin: 0.125rem 0;
+}
+
+/* The frame of the chart: as tall as the chart, with a faint grid and candle outlines. */
+.cc-skel-canvas {
+  position: relative;
+  height: var(--cc-canvas-h);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cc-skel-canvas svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--sk);
+  stroke-width: 1;
+  animation: cc-skel-fade 1.8s ease-in-out infinite;
+}
+
+.cc-skel-canvas svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.cc-skel-grid {
+  stroke: var(--sk-faint);
+  stroke-dasharray: 3 5;
+}
+
+/* Over the chart while the candles of another coin or size arrive: nothing old shows through. */
+.cc-chart-veil {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  background: var(--cc-surface);
+  z-index: 2;
+}
+
+@keyframes cc-skel-glow {
+  0%,
+  100% {
+    border-color: var(--sk-faint);
+    box-shadow: none;
+  }
+
+  50% {
+    border-color: var(--sk);
+    box-shadow: 0 0 6px -1px var(--sk-faint);
+  }
+}
+
+@keyframes cc-skel-fade {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 719px) {
+  .cc-skeleton {
+    --sk-head: 5.1875rem;
+    --sk-chips: 6.625rem;
+    --sk-tools: 4.3125rem;
+    --sk-help: 3.125rem;
+    --sk-credit: 2.125rem;
+    --sk-stat: 2.5rem;
+    --sk-quote: 6rem;
+  }
+
+  .cc-skel .cc-coins {
+    border: 0;
+  }
+
+  .cc-skel .cc-coins-list {
+    overflow: hidden;
+  }
+
+  .cc-skel .cc-intervals .cc-skel-seg {
+    min-width: 0;
+  }
+
+  .cc-skel-tools .cc-skel-chip {
+    flex: 1 1 auto;
+    height: 32px;
+  }
+
+  .cc-skel-table {
+    height: 2rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 719px) {
+  .cc-skel-rotate {
+    display: block;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-skeleton {
+    --sk-head: 2.375rem;
+    --sk-chips: 1.8rem;
+    --sk-tools: 1.75rem;
+    --sk-credit: 1.0625rem;
+    --sk-quote: 4.125rem;
+  }
+
+  .cc-skel .cc-coins {
+    border: 0;
+  }
+
+  .cc-skel .cc-coins-list {
+    overflow: hidden;
+  }
+
+  .cc-skel-chips {
+    flex-wrap: nowrap;
+  }
+
+  .cc-skel-help,
+  .cc-skel-changes {
+    display: none;
+  }
+}
+
+/* Less motion: still outlines in a quiet blue. */
+@media (prefers-reduced-motion: reduce) {
+  .cc-skeleton *,
+  .cc-chart-veil * {
+    animation: none !important;
+  }
+
+  .cc-skel-bar,
+  .cc-skel-dot,
+  .cc-skel-coin,
+  .cc-skel-seg,
+  .cc-skel-price,
+  .cc-skel-chip,
+  .cc-skel-box,
+  .cc-skel-canvas {
+    border-color: var(--sk-still);
+  }
+
+  .cc-skel-canvas svg {
+    opacity: 0.7;
+  }
+}
+
+/* Contrast (the wizard's switch): solid outlines in the full accent, two pixels for the boxes. */
+html.wiz-contrast .cc-skeleton,
+html.wiz-contrast .cc-chart-veil {
+  --sk: var(--accent-400);
+  --sk-faint: var(--accent-400);
+  --sk-still: var(--accent-400);
+}
+
+html.wiz-contrast .cc .cc-skeleton .cc-skel,
+html.wiz-contrast .cc-skel :is(.cc-coins, .cc-coins-title, .cc-segmented, .cc-stats, .cc-coin) {
+  border-color: var(--sk);
+}
+
+html.wiz-contrast .cc .cc-skeleton .cc-skel,
+html.wiz-contrast .cc-skel .cc-coins,
+html.wiz-contrast .cc-skel .cc-stats,
+html.wiz-contrast .cc-skel-canvas,
+html.wiz-contrast .cc-skel-box {
+  border-width: 2px;
+}
+
+@media (forced-colors: active) {
+  .cc-skeleton *,
+  .cc-chart-veil * {
+    border-color: CanvasText;
+    stroke: CanvasText;
+  }
+}

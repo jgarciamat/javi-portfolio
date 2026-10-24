@@ -18,6 +18,9 @@ const STEPS: { event: string; label: string; chain?: boolean }[] = [
   { event: 'premium', label: 'Compras confirmadas (Premium)', chain: true },
   { event: 'cancel', label: 'Bajas de Premium' },
   { event: 'trial_notice', label: 'Avisos del fin de la prueba enviados' },
+  { event: 'cons_invite_view', label: 'Vistas de «Invita a un amigo» (consola crypto)' },
+  { event: 'cons_invite_copy', label: 'Enlaces de invitación copiados (consola crypto)' },
+  { event: 'cons_invite_share', label: 'Enlaces de invitación compartidos (consola crypto)' },
 ];
 
 const STEP_LABELS: Record<string, string> = {

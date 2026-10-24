@@ -53,8 +53,15 @@
   border-left: 1px solid var(--slate-700);
 }
 
+/* The drawing and, while other candles load, the blue frame over it. */
+.cc-chart-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
 .cc-chart-canvas {
-  height: 420px;
+  height: var(--cc-canvas-h);
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
@@ -230,6 +237,7 @@
   overflow: hidden;
 }
 
+.cc-chart--expanded .cc-chart-stage,
 .cc-chart--expanded .cc-chart-canvas {
   flex: 1 1 0;
   height: auto;
@@ -322,17 +330,7 @@
   }
 }
 
-@media (min-width: 1680px) {
-  .cc-chart-canvas {
-    height: 480px;
-  }
-}
-
 @media (max-width: 719px) {
-  .cc-chart-canvas {
-    height: 320px;
-  }
-
   /* Full screen on a phone held upright: three short rows on top, the chips in one row. */
   .cc-chart--expanded .cc-chart-head,
   .cc-chart--expanded .cc-full-bar .cc-quote-changes span + span {
@@ -377,11 +375,6 @@
 
 /* A phone on its side: the chart takes nearly all the height. */
 @media (orientation: landscape) and (max-height: 500px) {
-  .cc-chart-canvas {
-    height: calc(100dvh - 6.5rem);
-    min-height: 200px;
-  }
-
   .cc-chart--expanded .cc-chart-head {
     display: none;
   }

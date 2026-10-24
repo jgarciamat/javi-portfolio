@@ -95,7 +95,10 @@ describe('Crypto console: the season', () => {
   it('shows the month, its countdown and rules, badges and what each plan includes', async () => {
     setup();
     await ready();
-    expect(screen.getByRole('timer')).toHaveTextContent('Nueva temporada en 16 días');
+    const card = screen
+      .getByRole('heading', { name: /Temporada de marzo de 2026/ })
+      .closest('section')!;
+    expect(within(card).getByRole('timer')).toHaveTextContent('Nueva temporada en 16 días');
     expect(screen.queryByText(/Quedan pocos días/)).toBeNull();
     expect(screen.getByText(/todos empiezan el día 1 con 10.000 € virtuales/)).toBeInTheDocument();
     const bar = screen.getByRole('group', { name: 'Tus carteras' });
@@ -257,7 +260,10 @@ describe('Crypto console: practice portfolios', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
     expect(tabs[1]).toHaveTextContent('Prácticas 1');
     fireEvent.click(screen.getByRole('tab', { name: /Temporada de marzo/ }));
+    // The other portfolio comes whole, as on the first visit; then the focus is back on its tab.
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
     await waitFor(() => expect(api.cryptoApi.portfolio).toHaveBeenLastCalledWith(fx.SEASON_REF.id));
+    await waitFor(() => expect(document.activeElement).toHaveAttribute('aria-selected', 'true'));
     unmount();
     setup(
       withPortfolio({
@@ -438,15 +444,16 @@ describe('Crypto console: ranking of the month', () => {
     ).toBeInTheDocument();
   });
 
-  it('says when the ranking cannot be loaded, and shows nothing while it loads', async () => {
+  it('says when the ranking cannot be loaded, and waits for it before showing the console', async () => {
     const { unmount } = setup((api) => api.cryptoApi.ranking.mockRejectedValue(new Error('')));
     expect(
       await screen.findByText('No hemos podido cargar el ranking. Inténtalo más tarde.')
     ).toBeInTheDocument();
     unmount();
     setup((api) => api.cryptoApi.ranking.mockReturnValue(new Promise(() => undefined)));
-    await ready();
+    await act(async () => undefined);
     expect(screen.queryByText(/Ranking de marzo/)).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
   });
 
   it('builds the sentence of what is missing', () => {
@@ -638,8 +645,8 @@ describe('Crypto console: Premium comforts', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens the guide before the portfolio arrives', async () => {
-    setup((api) => api.cryptoApi.portfolio.mockReturnValue(new Promise(() => undefined)));
+  it('opens the tab of the plans in the guide', async () => {
+    setup();
     fireEvent.click(await screen.findByRole('button', { name: 'Aprende antes de jugar' }));
     fireEvent.click(await screen.findByRole('tab', { name: 'Gratis y Premium' }));
     expect(

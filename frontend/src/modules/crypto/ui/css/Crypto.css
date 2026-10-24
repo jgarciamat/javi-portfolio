@@ -28,6 +28,8 @@
   --pnl-pos: var(--green-400);
   --pnl-neg: var(--red-400);
   --pnl-zero: var(--cc-text-2);
+  /* Height of the chart, shared with its loading frame so nothing moves when the candles arrive. */
+  --cc-canvas-h: 420px;
   gap: var(--cc-gap);
   font-size: 0.875rem;
   font-weight: 400;
@@ -1209,6 +1211,36 @@
   margin: 0.5rem 0 0;
 }
 
+.cc-fee {
+  margin: 0.55rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--cc-line);
+  font-size: 0.8125rem;
+  color: var(--cc-text);
+}
+
+.cc-fee p {
+  margin: 0 0 0.35rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.cc-fee-toggle {
+  font-size: 0.8125rem;
+  min-height: 32px;
+}
+
+.cc-fee-body {
+  margin: 0.2rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--accent-400);
+  border-radius: 6px;
+}
+
+.cc-fee-body[hidden] {
+  display: none;
+}
+
 .cc-submit {
   width: 100%;
   min-height: 44px;
@@ -1796,7 +1828,17 @@
   }
 }
 
+@media (min-width: 1680px) {
+  .cc {
+    --cc-canvas-h: 480px;
+  }
+}
+
 @media (max-width: 719px) {
+  .cc {
+    --cc-canvas-h: 320px;
+  }
+
   .cc .card {
     padding: 0.75rem;
   }
@@ -1882,6 +1924,10 @@
 
 /* A phone on its side: the chart gets the height, the rest becomes compact rows. */
 @media (orientation: landscape) and (max-height: 500px) {
+  .cc {
+    --cc-canvas-h: max(200px, calc(100dvh - 6.5rem));
+  }
+
   .cc-market-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
