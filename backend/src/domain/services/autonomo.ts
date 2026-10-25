@@ -21,7 +21,7 @@ import {
   vatYear,
 } from './autonomo-vat';
 import type { QuarterVat, VatOptions } from './autonomo-vat-data';
-import { businessDay, filingDeadline } from './working-days';
+import { businessDay, filingDeadline, lastDayOf } from './working-days';
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const euros = (cents: number): number => round2(cents / 100);
@@ -427,10 +427,11 @@ export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4, intraEU = fal
     list.push(
       { model: '390', label: 'Resumen anual de IVA', date: businessDay(year + 1, 1, 30) },
       { model: '190', label: 'Resumen anual de retenciones', date: businessDay(year + 1, 1, 31) },
+      // «Durante el mes de febrero» (Orden EHA/3012/2008, art. 10, BOE-A-2008-16973): its last day.
       {
         model: '347',
         label: 'Operaciones con terceros de más de 3.005,06 €',
-        date: businessDay(year + 1, 2, 28),
+        date: businessDay(year + 1, 2, lastDayOf(year + 1, 2)),
       }
     );
   }

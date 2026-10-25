@@ -103,6 +103,7 @@ Un plazo que acaba en sábado, domingo o festivo pasa al primer día hábil sigu
 | 303 y 130 del 1T, 2T y 3T (día 20) | 20-04, 20-07, 20-10 | 20-04, 20-07, 20-10 |
 | 303, 130 y 390 del 4T del año anterior (30 de enero) | 30-01-2026 (viernes) | **1-02-2027** (el 30 es sábado) |
 | 111 y 115 del 4T (20 de enero) | 20-01-2026 | 20-01-2027 |
+| 347 del año anterior («durante el mes de febrero»: Orden EHA/3012/2008, art. 10, [BOE-A-2008-16973](https://www.boe.es/buscar/act.php?id=BOE-A-2008-16973)) | 2-03-2026 (el 28-02 es sábado) | 1-03-2027 (el 28-02 es domingo); en 2028, el 29-02 |
 
 El plan gratis deja preparar el trimestre recién terminado hasta ese último día real, con el día de la península o el de Canarias (el que aún esté en plazo).
 

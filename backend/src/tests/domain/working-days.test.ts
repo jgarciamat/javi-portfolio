@@ -5,6 +5,7 @@ import {
   lastDayOf,
   spanishDays,
 } from '@domain/services/working-days';
+import { deadlinesFor } from '@domain/services/autonomo';
 
 describe('national holidays', () => {
   it('knows the fixed ones and Good Friday', () => {
@@ -54,5 +55,18 @@ describe('the day in Spain', () => {
   it('is that of Madrid and of the Canary Islands', () => {
     expect(spanishDays(new Date('2027-02-01T23:30:00Z'))).toEqual(['2027-02-02', '2027-02-01']);
     expect(spanishDays(new Date('2026-07-20T12:00:00Z'))).toEqual(['2026-07-20', '2026-07-20']);
+  });
+});
+
+describe('the deadline of the modelo 347', () => {
+  const m347 = (year: number) => deadlinesFor(year, 4).find((d) => d.model === '347')?.date;
+
+  it('is the last day of February, moved to the next working day', () => {
+    // 28 February 2027 is a Sunday: Monday 1 March.
+    expect(m347(2026)).toBe('2027-03-01');
+    // 2028 is a leap year: Tuesday 29 February, not the 28th.
+    expect(m347(2027)).toBe('2028-02-29');
+    // 28 February 2026 was a Saturday.
+    expect(m347(2025)).toBe('2026-03-02');
   });
 });
