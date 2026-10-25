@@ -191,7 +191,7 @@ export interface CryptoSeasonResultView {
   trades: number;
   wins: number;
   activeDays: number;
-  /** It met the minimums of the ranking (5 operations, 3 days). */
+  /** It met the minimums of the ranking (5 operations closed). */
   qualified: boolean;
   /** It had asked to appear in the ranking. */
   ranked: boolean;

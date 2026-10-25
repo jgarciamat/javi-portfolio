@@ -44,9 +44,36 @@ function Podium({ rows }: { rows: RankingRow[] }) {
   );
 }
 
+/** How many operations of the minimum are closed, as a bar and in words («3 de 5»). */
+function Progress({ ranking }: { ranking: CryptoRanking }) {
+  const { t } = useI18n();
+  const total = ranking.rules.minTrades;
+  const done = Math.min(ranking.me.trades, total);
+  const label = t('app.crypto.ranking.progress', { count: done, total });
+  return (
+    <div className="cc-ranking-progress">
+      <div
+        className="cc-ranking-bar"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={done}
+      >
+        <span style={{ width: `${(done / total) * 100}%` }} />
+      </div>
+      <span className="cc-hint">{label}</span>
+    </div>
+  );
+}
+
+/**
+ * The person's month: their place, else what is missing (with the progress), else why a person
+ * with the operations does not show yet (no market price of what they have open).
+ */
 function Mine({ ranking }: { ranking: CryptoRanking }) {
   const { t, locale } = useI18n();
-  const { me } = ranking;
+  const { me, rules } = ranking;
   return (
     <div className="cc-ranking-me" role="status">
       <p>
@@ -57,11 +84,16 @@ function Mine({ ranking }: { ranking: CryptoRanking }) {
           </span>
         )}
       </p>
-      <p>
-        {me.place
-          ? t('app.crypto.ranking.myPlace', { place: me.place, total: ranking.participants })
-          : missingText(me, t)}
-      </p>
+      {me.place ? (
+        <p>{t('app.crypto.ranking.myPlace', { place: me.place, total: ranking.participants })}</p>
+      ) : me.qualified ? (
+        <p>{t('app.crypto.ranking.pending', { trades: rules.minTrades })}</p>
+      ) : (
+        <>
+          <p>{missingText(me, t)}</p>
+          <Progress ranking={ranking} />
+        </>
+      )}
     </div>
   );
 }
@@ -134,6 +166,7 @@ export function RankingIntro({ ranking }: { ranking: CryptoRanking | null }) {
         <Icon name="star" />{' '}
         {t('app.crypto.ranking.intro.title', { alias: ranking.settings.alias })}
       </h2>
+      <p>{t('app.crypto.ranking.rules.minimums', { trades: ranking.rules.minTrades })}</p>
       <p>{t('app.crypto.ranking.aliasNotice')}</p>
       <div className="cc-ranking-intro-actions">
         <button type="button" className="cc-save" onClick={change}>
@@ -179,7 +212,7 @@ export function RankingCard({ state }: { state: Ranking }) {
       {ranking.top.length ? (
         <Podium rows={ranking.top} />
       ) : (
-        <p className="cc-hint">{t('app.crypto.ranking.empty')}</p>
+        <p className="cc-hint">{t('app.crypto.ranking.empty', { trades: rules.minTrades })}</p>
       )}
       <Mine ranking={ranking} />
       <Settings key={String(ranking.settings.alias)} ranking={ranking} state={state} />
@@ -192,7 +225,6 @@ export function RankingCard({ state }: { state: Ranking }) {
                 {t(`app.crypto.ranking.rules.${rule}`, {
                   initial: rules.initial.toLocaleString(intlTag(locale)),
                   trades: rules.minTrades,
-                  days: rules.minDays,
                   size: rules.size,
                 })}
               </li>

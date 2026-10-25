@@ -10,7 +10,6 @@ import {
   ALIAS_MAX,
   ALIAS_MIN,
   PRIZE_DAYS,
-  RANKING_MIN_DAYS,
   RANKING_MIN_TRADES,
   RANKING_SIZE,
   SEASON_HISTORY_MONTHS,
@@ -58,7 +57,8 @@ export interface CryptoRankingView {
     trades: number;
     activeDays: number;
     qualified: boolean;
-    missing: { trades: number; days: number };
+    /** `days` is always 0 (no minimum of days): kept for older versions of the app. */
+    missing: { trades: number; days: 0 };
   };
   /**
    * The alias shown in the ranking and the one given when the person never chose one. `optIn` is
@@ -69,7 +69,8 @@ export interface CryptoRankingView {
   rules: {
     size: number;
     minTrades: number;
-    minDays: number;
+    /** Always 0: there is no minimum of days. Kept because older versions of the app read it. */
+    minDays: 0;
     prizeDays: number;
     initial: number;
     aliasMin: number;
@@ -131,10 +132,15 @@ export class CryptoRankingService {
     const own = await this.sim.ensureSeason(userId);
     const now = this.clock.now();
     const month = madridMonth(now);
-    const entries = await this.live(month);
+    const counted = this.sim.activityOf(own.id);
+    let entries = await this.live(month);
+    // Whoever has just closed the operation that gets them in should not wait for the cache.
+    if (qualifies(counted) && !entries.some((e) => e.userId === userId)) {
+      this.cache = null;
+      entries = await this.live(month);
+    }
     const who = this.repo.rankingIdentity(userId);
     const place = entries.findIndex((e) => e.userId === userId);
-    const counted = this.sim.activityOf(own.id);
     const tickers = await this.tickers();
     const equity = tickers ? this.sim.equityCents(own, priceMap(tickers)) : null;
     const previous = previousMonth(month);
@@ -163,7 +169,7 @@ export class CryptoRankingService {
       rules: {
         size: RANKING_SIZE,
         minTrades: RANKING_MIN_TRADES,
-        minDays: RANKING_MIN_DAYS,
+        minDays: 0,
         prizeDays: PRIZE_DAYS,
         initial: fromCents(SEASON_INITIAL_CENTS),
         aliasMin: ALIAS_MIN,

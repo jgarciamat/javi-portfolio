@@ -449,8 +449,9 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   // The ranking: everybody is in with an alias (no switch), told once on entering.
   const ranking = page.locator('section.cc-ranking');
   await expect(ranking.getByRole('switch')).toHaveCount(0);
-  await expect(ranking.getByText(/Tu alias aparece en el ranking del mes/)).toBeVisible();
-  const intro = page.getByRole('complementary', { name: /Apareces en el ranking del mes/ });
+  await expect(ranking.getByText(/Si estás en el ranking del mes, se ve tu alias/)).toBeVisible();
+  const intro = page.getByRole('complementary', { name: /En el ranking del mes saldrás como/ });
+  await expect(intro).toContainText('Para entrar necesitas al menos 5 operaciones cerradas');
   await intro.getByRole('button', { name: 'Cambiar mi alias' }).click();
   await expect(intro).toHaveCount(0);
   await expect(ranking.getByLabel('Tu alias')).toBeFocused();
@@ -471,6 +472,54 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await expect(alerts.getByText(/sube a/)).toBeVisible();
   await alerts.getByRole('button', { name: /Borrar el aviso de BTC/ }).click();
   await expect(alerts.getByText('Todavía no tienes avisos.')).toBeVisible();
+});
+
+test('gets into the ranking with five operations closed on the same day, with no days asked', async ({
+  page,
+  request,
+}) => {
+  const login = await request.post(`${API_URL}/auth/login`, { data: DEMO_USER });
+  const { accessToken } = await login.json();
+  const headers = { Authorization: `Bearer ${accessToken}` };
+  const trades = async () =>
+    (await (await request.get(`${API_URL}/crypto/ranking`, { headers })).json()).me
+      .trades as number;
+  /** A purchase and its sale at once, in the official portfolio (today, like all the others). */
+  const roundTrip = async () => {
+    const bought = await request.post(`${API_URL}/crypto/sim/orders`, {
+      headers,
+      data: { action: 'buy', symbol: 'BTC', type: 'market', amount: 10 },
+    });
+    const positionId = (await bought.json()).open[0].id;
+    const sold = await request.post(`${API_URL}/crypto/sim/orders`, {
+      headers,
+      data: { action: 'sell', positionId, type: 'market' },
+    });
+    expect(sold.ok()).toBe(true);
+  };
+  const before = await trades();
+  expect(before).toBeLessThan(5);
+  for (let i = before; i < 4; i++) await roundTrip();
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  const ranking = page.locator('section.cc-ranking');
+  await expect(ranking.getByText('Te falta 1 operación para entrar al ranking.')).toBeVisible();
+  await expect(
+    ranking.getByRole('progressbar', { name: '4 de 5 operaciones cerradas' })
+  ).toBeVisible();
+  await ranking.getByText('Cómo funciona el ranking (bases)').click();
+  await expect(ranking).toContainText(
+    'Para entrar necesitas al menos 5 operaciones cerradas este mes en tu cartera oficial. Las carteras de prácticas no cuentan.'
+  );
+  await expect(ranking).not.toContainText(/días? con actividad/);
+
+  // The fifth, on the same day: in at once, without waiting for the minute of the cache.
+  await roundTrip();
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  await expect(ranking.getByText(/^Vas en el puesto \d+ de \d+\.$/)).toBeVisible();
+  await expect(ranking.getByRole('progressbar')).toHaveCount(0);
+  await expect(ranking.getByText(/Te faltan? /)).toHaveCount(0);
 });
 
 test('numbers two operations per coin on rows and chart lines, and refuses a third', async ({

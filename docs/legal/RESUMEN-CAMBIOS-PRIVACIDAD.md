@@ -368,8 +368,10 @@ ranking** en `docs/consola-crypto.md`.
 decisión del dueño se quita el interruptor «Aparecer en el ranking»: los puntos 45 a 52 de la
 tanda anterior quedan así (detalle en `docs/consola-crypto.md`, «Ranking mensual»).
 
-54. **Qué cambia**: participan **todas las temporadas oficiales** del mes que cumplan los
-    mínimos (5 operaciones cerradas y 3 días con actividad), sin activar nada. Cada persona
+54. **Qué cambia**: participan **todas las temporadas oficiales** del mes con al menos **5
+    operaciones cerradas** en la cartera oficial (las de prácticas no cuentan), sin activar nada.
+    Desde el 25/10/2026 ya no se piden días con actividad (decisión del dueño); esos días se
+    siguen guardando en el resultado de cada temporada (punto 46), pero no deciden nada. Cada persona
     aparece con un **alias**: el que haya elegido; si no, su **nombre de pila** del perfil; si no
     se puede usar, «Jugador» y cuatro cifras estables. Solo puede **cambiar el alias** (3 a 20
     caracteres, sin correos, enlaces ni teléfonos); no puede salir del ranking.
@@ -381,10 +383,12 @@ tanda anterior quedan así (detalle en `docs/consola-crypto.md`, «Ranking mensu
     el **alias** (por defecto, el nombre de pila), la **rentabilidad**, el **número de
     operaciones** y la **insignia Premium** si la tiene. Nunca el correo, el nombre completo ni
     identificadores. Tu posición y lo que te falta para puntuar solo los ves tú.
-57. **Información en la app**: junto al alias se muestra siempre «Tu alias aparece en el ranking
-    del mes con tu rentabilidad y tu número de operaciones. Puedes cambiarlo cuando quieras;
-    nunca se muestra tu correo ni tu nombre completo». La primera vez que se entra en la consola
-    sale un aviso descartable con el alias con el que aparece y un botón para cambiarlo.
+57. **Información en la app**: junto al alias se muestra siempre «Si estás en el ranking del
+    mes, se ve tu alias con tu rentabilidad y tu número de operaciones. Puedes cambiarlo cuando
+    quieras; nunca se muestra tu correo ni tu nombre completo». La primera vez que se entra en la
+    consola sale un aviso descartable con el alias con el que saldrá, lo que hace falta para
+    entrar («Para entrar necesitas al menos 5 operaciones cerradas este mes en tu cartera
+    oficial. Las carteras de prácticas no cuentan.») y un botón para cambiar el alias.
     Para el punto s8 (almacenamiento local) se añaden dos marcas del dispositivo: si ya se
     descartó ese aviso (`mm_crypto_ranking_intro`) y si ya se abrió «Aprende antes de jugar»
     (`mm_crypto_learn_seen`, que deja de parpadear).
