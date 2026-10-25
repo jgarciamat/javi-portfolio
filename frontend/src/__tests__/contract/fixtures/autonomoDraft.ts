@@ -194,6 +194,7 @@ export const autonomoDraft = {
       { box: '17', label: 'Total (14 − 15 − 16)', amount: 153.85 },
       { box: '19', label: 'Resultado de la autoliquidación', amount: 153.85 },
     ],
+    rate: 0.2,
   },
   reta: {
     monthlyNet: 1308.67,

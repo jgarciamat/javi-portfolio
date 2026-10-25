@@ -320,7 +320,8 @@
       "hardToJustify": true,
       "priorYearNet": null,
       "exempt130": false,
-      "vatToOffset": 0
+      "vatToOffset": 0,
+      "territory": "ceuta"
     }
   },
   "documentos": {
@@ -1309,18 +1310,18 @@
         ],
         [
           "02",
-          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
-          11316.19
+          "Gastos fiscalmente deducibles acumulados (con el 10 % de difícil justificación)",
+          11806.52
         ],
         [
           "03",
           "Rendimiento neto (01 − 02)",
-          28683.81
+          28193.48
         ],
         [
           "04",
           "8 % de la casilla 03",
-          2294.7
+          2255.48
         ],
         [
           "05",
@@ -1335,12 +1336,12 @@
         [
           "07",
           "Pago fraccionado previo (04 − 05 − 06)",
-          725.67
+          686.45
         ],
         [
           "12",
           "Suma (07 + 11), mínimo 0",
-          725.67
+          686.45
         ],
         [
           "13",
@@ -1350,7 +1351,7 @@
         [
           "14",
           "Diferencia (12 − 13)",
-          725.67
+          686.45
         ],
         [
           "15",
@@ -1360,12 +1361,12 @@
         [
           "17",
           "Total (14 − 15 − 16)",
-          725.67
+          686.45
         ],
         [
           "19",
           "Resultado de la autoliquidación",
-          725.67
+          686.45
         ]
       ]
     ],

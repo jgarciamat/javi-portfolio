@@ -11,6 +11,7 @@ import { WithholdingsForm } from './AutonomoWithholdings';
 import { QuarterVatPanel } from './AutonomoVatQuarter';
 import { toQuarterVat, vatOfForm, type VatExtras, type VatForm } from './vatForm';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
+import type { ActivityTerritory } from '@modules/finances/domain/activityTerritory';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { ActivityForm } from './activityForm';
 import {
@@ -102,6 +103,11 @@ export interface Extras {
    * (instructions of the 130, box 13). Unset in older data: an empty `priorNet` stays «unknown».
    */
   noPriorActivity?: boolean;
+  /**
+   * Where the activity is carried out: Ceuta, Melilla and some quarters of La Palma pay 8 % in the
+   * 130 (activityTerritory.ts). Unset in older data: the general rate.
+   */
+  territory?: ActivityTerritory;
   /** VAT left to offset at the start of the year (box 110 of the first quarter). */
   toOffset: string;
   /** The VAT of the year: prorrata, investment goods, refund… (older data has none). */

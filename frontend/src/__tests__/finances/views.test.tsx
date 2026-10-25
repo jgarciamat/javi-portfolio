@@ -784,6 +784,10 @@ describe('the self-employed draft', () => {
     fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.toOffset'))), {
       target: { value: '40' },
     });
+    // An activity in Melilla: the 130 at 8 % (art. 110.2 RIRPF).
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'melilla' },
+    });
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
 
     await waitFor(() =>
@@ -797,6 +801,7 @@ describe('the self-employed draft', () => {
         hardToJustify: true,
         priorYearNet: 9500,
         exempt130: true,
+        territory: 'melilla',
         // What was left to offset at the start of the year: the quarters carry it on.
         vatToOffset: 0,
         vat: { offsetStart: 40 },

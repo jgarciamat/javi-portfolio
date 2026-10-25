@@ -24,6 +24,7 @@ import { vatExtrasOf, type VatExtras } from './vatForm';
 import { activityOf, inModules } from './activityForm';
 import { ModulesResult, ObjectiveFields } from './AutonomoModules';
 import type { ActivityMethod } from '../../domain/types';
+import { ACTIVITY_TERRITORIES, type ActivityTerritory } from '../../domain/activityTerritory';
 import { YEARS, useAutonomoDraft, type AutonomoState } from './useAutonomoDraft';
 import { Icon } from '@shared/components/Icon';
 import '../css/Sections.css';
@@ -143,6 +144,10 @@ function activityScreens(ctx: Ctx): WizardScreen[] {
         ...s.extras,
         vat: { ...vatExtrasOf(s.extras.vat), regime: regime as VatExtras['regime'] },
       })
+    ),
+    // Ceuta, Melilla and La Palma: 8 % instead of 20 % in the 130 and the 60 % cut in the 131.
+    asked(ctx, 'territory', [...ACTIVITY_TERRITORIES], undefined, (territory) =>
+      s.setExtras({ ...s.extras, territory: territory as ActivityTerritory })
     ),
     // In modules the 131 has no exemption for withholdings nor the 5 % of the direct estimation.
     ...(modules

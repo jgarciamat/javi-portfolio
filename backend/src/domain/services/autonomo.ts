@@ -1,8 +1,5 @@
 import {
   HARD_TO_JUSTIFY_MAX,
-  HARD_TO_JUSTIFY_RATE,
-  AGRARIAN_ADVANCE,
-  IRPF_ADVANCE,
   LOW_INCOME_REDUCTIONS,
   RETA_GENERAL_EXPENSES,
   type RetaBracket,
@@ -22,6 +19,12 @@ import {
 } from './autonomo-vat';
 import type { QuarterVat, VatOptions } from './autonomo-vat-data';
 import { businessDay, filingDeadline, lastDayOf } from './working-days';
+import {
+  type ActivityTerritory,
+  hardToJustifyRate,
+  instalmentRates,
+  percentLabel,
+} from './autonomo-territory';
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const euros = (cents: number): number => round2(cents / 100);
@@ -66,6 +69,11 @@ export interface DraftInputs {
   /** Professional whose clients withheld at least 70 % of last year's income: no modelo 130. */
   exempt130: boolean;
   /**
+   * Where the activity is carried out (autonomo-territory.ts): Ceuta, Melilla and some quarters of
+   * La Palma pay 8 % instead of 20 % (art. 110.2 RIRPF). Unset (older apps): the general rate.
+   */
+  territory?: ActivityTerritory;
+  /**
    * VAT to offset from earlier periods (modelo 303, box 110) of the viewed quarter, as older data
    * gives it; `vat.offsetStart` (the amount left at the start of the year) replaces it.
    */
@@ -109,6 +117,8 @@ export interface Draft130 {
   result: 'pay' | 'negative' | 'zero' | 'notRequired';
   amountDue: number;
   boxes: Box[];
+  /** Rate of box 04 (or of box 09 in farming) of the viewed quarter: 0.2, 0.08, 0.02 or 0.008. */
+  rate: number;
 }
 
 export interface RetaEstimate {
@@ -229,6 +239,7 @@ function section1Of(s: {
   income: number;
   expenses: number;
   net: number;
+  rate: number;
   fourth: number;
   previousPayments: number;
   withheld: number;
@@ -238,7 +249,11 @@ function section1Of(s: {
     { box: '01', label: 'Ingresos íntegros acumulados', amount: euros(s.income) },
     { box: '02', label: 'Gastos fiscalmente deducibles acumulados', amount: euros(s.expenses) },
     { box: '03', label: 'Rendimiento neto (01 − 02)', amount: euros(s.net) },
-    { box: '04', label: '20 % del rendimiento neto', amount: round2(s.fourth) },
+    {
+      box: '04',
+      label: `${percentLabel(s.rate)} del rendimiento neto`,
+      amount: round2(s.fourth),
+    },
     { box: '05', label: 'Pagos de trimestres anteriores', amount: round2(s.previousPayments) },
     { box: '06', label: 'Retenciones soportadas acumuladas', amount: round2(s.withheld) },
     { box: '07', label: 'Resultado (04 − 05 − 06)', amount: s.box07 },
@@ -250,16 +265,20 @@ function section1Of(s: {
  * grants and without the capital ones and compensations for damage, less the withholdings of the
  * quarter (art. 110.1.c and 110.3.b RIRPF; instructions of the modelo 130, box 08).
  */
-function agrarianSection(q: Quarter, e: QuarterExtras): { box11: number; boxes: Box[] } {
+function agrarianSection(
+  q: Quarter,
+  e: QuarterExtras,
+  rate: number
+): { box11: number; boxes: Box[] } {
   // Whether the REAGP compensations go here is NOT CONFIRMED (the instructions do not say): left out.
   const volume = euros(q.incomeBase + cents(e.subsidies ?? 0));
-  const box09 = round2(volume * AGRARIAN_ADVANCE);
+  const box09 = round2(volume * rate);
   const box11 = round2(box09 - e.withheld);
   return {
     box11,
     boxes: [
       { box: '08', label: 'Volumen de ingresos del trimestre', amount: volume },
-      { box: '09', label: '2 % del volumen de ingresos', amount: box09 },
+      { box: '09', label: `${percentLabel(rate)} del volumen de ingresos`, amount: box09 },
       {
         box: '10',
         label: 'Retenciones e ingresos a cuenta del trimestre',
@@ -292,8 +311,20 @@ function carryOf(
 }
 
 /** Modelo 130 up to a quarter: real cumulative figures, with the payments of the earlier quarters. */
-function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): Draft130 {
-  if (inputs.exempt130) return { required: false, result: 'notRequired', amountDue: 0, boxes: [] };
+function draft130(
+  year: number,
+  quarters: Quarter[],
+  inputs: DraftInputs,
+  upTo: 1 | 2 | 3 | 4
+): Draft130 {
+  const agrarian = Boolean(inputs.agrarian);
+  const rateOf = (n: number): number => {
+    const rates = instalmentRates(inputs.territory, year, n);
+    return agrarian ? rates.agrarian : rates.direct;
+  };
+  if (inputs.exempt130) {
+    return { required: false, result: 'notRequired', amountDue: 0, boxes: [], rate: rateOf(upTo) };
+  }
   const reduction = lowIncomeReduction(inputs.priorYearNet);
   const window = windowOf(inputs, upTo);
   let previousPayments = window.payments;
@@ -316,19 +347,20 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
     const hard =
       inputs.hardToJustify && inputs.modality !== 'normal' && !window.prior
         ? Math.min(
-            Math.round(Math.max(0, preNet) * HARD_TO_JUSTIFY_RATE),
+            Math.round(Math.max(0, preNet) * hardToJustifyRate(inputs.territory, year, n)),
             HARD_TO_JUSTIFY_MAX * 100
           )
         : 0;
     const expenses = baseExpenses + hard;
     const net = income - expenses;
-    const fourth = Math.max(0, euros(net)) * IRPF_ADVANCE;
+    // 20 %, or 8 % where art. 110.2 RIRPF applies, of the cumulative net income of the year.
+    const rate = rateOf(n);
+    const fourth = Math.max(0, euros(net)) * rate;
     const withheld = window.withheld + extras.reduce((s, e) => s + e.withheld, 0);
-    // A farming activity fills in section II only: 2 % of the income of the quarter.
-    const agrarian = Boolean(inputs.agrarian);
+    // A farming activity fills in section II only: 2 % (0.8 %) of the income of the quarter.
     const box07 = agrarian ? 0 : round2(round2(fourth) - previousPayments - withheld);
     const section2 = agrarian
-      ? agrarianSection(quarters[n - 1], inputs.quarters[n - 1])
+      ? agrarianSection(quarters[n - 1], inputs.quarters[n - 1], rate)
       : { box11: 0, boxes: [] };
     const box12 = Math.max(0, round2(box07 + section2.box11));
     const box14 = round2(box12 - reduction);
@@ -337,7 +369,7 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
     last = [
       ...(agrarian
         ? []
-        : section1Of({ income, expenses, net, fourth, previousPayments, withheld, box07 })),
+        : section1Of({ income, expenses, net, rate, fourth, previousPayments, withheld, box07 })),
       ...section2.boxes,
       { box: '12', label: 'Suma de 07 y 11 (si es negativa, 0)', amount: round2(box12) },
       { box: '13', label: 'Minoración por rentas bajas del ejercicio anterior', amount: reduction },
@@ -354,7 +386,7 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
     carriedNegative = carry.carried;
   }
   const result: Draft130['result'] = amountDue > 0 ? 'pay' : amountDue < 0 ? 'negative' : 'zero';
-  return { required: true, result, amountDue, boxes: last };
+  return { required: true, result, amountDue, boxes: last, rate: rateOf(upTo) };
 }
 
 /** The contribution bracket for a monthly net income (after the 7 % general expenses) in a year. */
@@ -470,7 +502,7 @@ export function prepareDraft(
     vat: viewed.draft,
     m349,
     m390: quarter === 4 ? draft390(year303, options) : null,
-    irpf: draft130(quarters, inputs, quarter),
+    irpf: draft130(year, quarters, inputs, quarter),
     reta: retaEstimate(year, quarters, inputs, quarter),
     deadlines: deadlinesFor(year, quarter, m349 !== null),
   };

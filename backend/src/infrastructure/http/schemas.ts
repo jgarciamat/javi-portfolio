@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
+import { ACTIVITY_TERRITORIES } from '@domain/services/autonomo-territory';
 import {
   DEDUCTION_USES,
   KEYS_349,
@@ -499,6 +500,8 @@ export const autonomoDraftBody = z.object({
     agrarian: z.boolean().optional(),
     priorYearNet: z.number().finite().min(-100_000_000).max(100_000_000).nullable().default(null),
     exempt130: z.boolean().default(false),
+    /** Where the activity is carried out (8 % in Ceuta, Melilla and some quarters of La Palma). */
+    territory: z.enum(ACTIVITY_TERRITORIES).optional(),
     vatToOffset: euroAmount.default(0),
     /** Income and expenses typed by hand instead of the movements. */
     manual: manualData.nullish(),
@@ -833,6 +836,8 @@ const autonomoSaved = z
         priorNet: formText,
         /** No activity last year: box 13 of the 130 takes 0 € (frontend AutonomoManual.tsx, Extras). */
         noPriorActivity: z.boolean().optional(),
+        /** Where the activity is carried out (frontend AutonomoDraftCard.tsx, ExtrasPanel). */
+        territory: z.enum(ACTIVITY_TERRITORIES).optional(),
         toOffset: formText,
         /** The VAT of the year (frontend vatForm.ts, VatExtras). */
         vat: z

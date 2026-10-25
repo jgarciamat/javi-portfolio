@@ -293,6 +293,15 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       );
     });
 
+    it('takes 8 % in Melilla (art. 110.2 RIRPF) and refuses an unknown territory', async () => {
+      // Net income of the 1T: 1,100 − 200 = 900; 8 % = 72 (20 % would be 180).
+      const { body } = await draft(1, { territory: 'melilla' }).expect(201);
+      expect(box(body.irpf.boxes, '04')).toBe(72);
+      expect(body.irpf.rate).toBe(0.08);
+      expect((await draft(1).expect(201)).body.irpf.rate).toBe(0.2);
+      await draft(1, { territory: 'madrid' }).expect(400);
+    });
+
     describe('with the income and expenses typed by hand', () => {
       const profile = {
         workArea: 20,

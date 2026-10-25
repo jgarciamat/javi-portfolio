@@ -21,6 +21,10 @@ import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { vatExtrasOf } from './vatForm';
 import { ModulesResult } from './AutonomoModules';
 import { inModules } from './activityForm';
+import {
+  ACTIVITY_TERRITORIES,
+  type ActivityTerritory,
+} from '@modules/finances/domain/activityTerritory';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
 import { QUARTERS, YEARS, useAutonomoDraft, type Quarter } from './useAutonomoDraft';
@@ -130,6 +134,21 @@ export function ExtrasPanel({
             )}
           </small>
         </div>
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.territory')}</span>
+          <select
+            className="tx-input"
+            value={extras.territory ?? 'general'}
+            onChange={(e) => onChange({ territory: e.target.value as ActivityTerritory })}
+          >
+            {ACTIVITY_TERRITORIES.map((territory) => (
+              <option key={territory} value={territory}>
+                {t(`app.autonomo.territoryOpt.${territory}`)}
+              </option>
+            ))}
+          </select>
+          <small className="autonomo-hint">{t('app.autonomo.territoryHint')}</small>
+        </label>
         <label className="field">
           <span className="field-label">{t('app.autonomo.toOffset')}</span>
           <input

@@ -41,19 +41,34 @@ function vatSentence(t: Translate, money: Money, vat: AutonomoDraft['vat']): str
   }
 }
 
-/** The modelo 130 in one sentence: 20 % of the profit so far, less what has already been paid. */
+/**
+ * «20», «8», «0,8»: the rate of the 130 as the sentences write it, with the decimal mark of the
+ * language (as money is written); older servers send no rate.
+ */
+const pctOf = (rate: number | undefined, fallback: number, money: Money): string =>
+  String(Math.round((rate ?? fallback) * 1000) / 10).replace(
+    '.',
+    money(1.5).includes(',') ? ',' : '.'
+  );
+
+/** Section II of the 130: 2 % (0.8 %) of the income of the quarter less its withholdings. */
+function agrarianSentence(t: Translate, money: Money, irpf: AutonomoDraft['irpf']): string {
+  return t('app.autonomo.explain.irpf.agrarian', {
+    due: money(Math.max(0, irpf.amountDue)),
+    volume: money(box(irpf.boxes, '08')),
+    withheld: money(box(irpf.boxes, '10')),
+    pct: pctOf(irpf.rate, 0.02, money),
+  });
+}
+
+/** The modelo 130 in one sentence: 20 % (8 %) of the profit so far, less what was already paid. */
 function irpfSentence(t: Translate, money: Money, irpf: AutonomoDraft['irpf']): string {
   const key = (k: string) => `app.autonomo.explain.irpf.${k}`;
   if (!irpf.required) return t(key('notRequired'));
   const b = (id: string) => box(irpf.boxes, id);
   // Farming fills in section II only: 2 % of the income of the quarter less its withholdings.
-  if (irpf.boxes.some((x) => x.box === '08')) {
-    return t(key('agrarian'), {
-      due: money(Math.max(0, irpf.amountDue)),
-      volume: money(b('08')),
-      withheld: money(b('10')),
-    });
-  }
+  if (irpf.boxes.some((x) => x.box === '08')) return agrarianSentence(t, money, irpf);
+  const pct = pctOf(irpf.rate, 0.2, money);
   if (b('01') === 0 && b('02') === 0) return t(key('noActivity'));
   const parts = (
     [
@@ -72,12 +87,13 @@ function irpfSentence(t: Translate, money: Money, irpf: AutonomoDraft['irpf']): 
       return t(key('negative'), { due, reduction: money(b('13')) });
     case 'zero':
       return b('03') <= 0 || parts.length === 0
-        ? t(key('noProfit'), { income: money(b('01')), expenses: money(b('02')) })
-        : t(key('zeroCovered'), { net, fourth: money(b('04')), parts: list(t, parts) });
+        ? t(key('noProfit'), { income: money(b('01')), expenses: money(b('02')), pct })
+        : t(key('zeroCovered'), { net, fourth: money(b('04')), parts: list(t, parts), pct });
     default:
       return t(key('pay'), {
         due,
         net,
+        pct,
         minus: parts.length > 0 ? t(key('minus'), { parts: list(t, parts) }) : '',
       });
   }

@@ -1,3 +1,4 @@
+import { hardToJustifyRate } from '@modules/finances/domain/activityTerritory';
 import {
   annualActivity,
   estimate130,
@@ -186,12 +187,22 @@ describe('Annual activity: the payments of the 130', () => {
     const quarters4 = [f(1000, 300), f(2000, 0), f(0, 300), f(0, 0)];
     // Q1: 200 − 300 → 0 − 100 (reduction) = −100; Q2: 600 − 300 = 300 − 100 = 200 − 100 carried = 100;
     // Q3: 600 − 300 − 600 = −300 → 0 − 100 = −100; Q4 the same.
-    expect(estimate130(quarters4, { hardRate: 0, agrarian: false, priorYearNet: 8000 })).toEqual([
-      -100, 100, -100, -100,
-    ]);
-    expect(estimate130(quarters4, { hardRate: 0, agrarian: false, priorYearNet: 20000 })).toEqual([
-      0, 300, 0, 0,
-    ]);
+    expect(
+      estimate130(quarters4, {
+        year: 2026,
+        hardToJustify: false,
+        agrarian: false,
+        priorYearNet: 8000,
+      })
+    ).toEqual([-100, 100, -100, -100]);
+    expect(
+      estimate130(quarters4, {
+        year: 2026,
+        hardToJustify: false,
+        agrarian: false,
+        priorYearNet: 20000,
+      })
+    ).toEqual([0, 300, 0, 0]);
     // Section II: 2 % of 10,000 − 100 = 100 each quarter alone.
     const farm = [0, 1, 2, 3].map(() => ({
       income: 0,
@@ -199,8 +210,47 @@ describe('Annual activity: the payments of the 130', () => {
       expenses: 0,
       withheld: 100,
     }));
-    expect(estimate130(farm, { hardRate: 0, agrarian: true, priorYearNet: null })).toEqual([
-      100, 100, 100, 100,
+    expect(
+      estimate130(farm, { year: 2026, hardToJustify: false, agrarian: true, priorYearNet: null })
+    ).toEqual([100, 100, 100, 100]);
+  });
+
+  it('pays 8 % in Ceuta and Melilla and in some quarters of La Palma (art. 110.2 RIRPF)', () => {
+    // 10,000 of income and 4,000 of expenses each quarter, no 5 %: cumulative net 6,000 … 24,000.
+    const even = [0, 1, 2, 3].map(() => ({
+      income: 10000,
+      agrarianIncome: 10000,
+      expenses: 4000,
+      withheld: 0,
+    }));
+    const of = (year: number, territory: 'general' | 'melilla' | 'laPalma', agrarian = false) =>
+      estimate130(even, { year, hardToJustify: false, agrarian, priorYearNet: null, territory });
+    // 20 %: 1,200 each quarter. Melilla, 8 %: 480 each quarter.
+    expect(of(2026, 'general')).toEqual([1200, 1200, 1200, 1200]);
+    expect(of(2026, 'melilla')).toEqual([480, 480, 480, 480]);
+    // La Palma 2026: 3T 18,000 × 8 % = 1,440 − 2,400 → 0; 4T 1,920 − 2,400 → 0.
+    expect(of(2026, 'laPalma')).toEqual([1200, 1200, 0, 0]);
+    // La Palma 2025: only the 4T, 1,920 − 3,600 → 0.
+    expect(of(2025, 'laPalma')).toEqual([1200, 1200, 1200, 0]);
+    // Farming in Melilla: 0.8 % of 10,000 = 80 a quarter.
+    expect(of(2026, 'melilla', true)).toEqual([80, 80, 80, 80]);
+  });
+
+  it('takes 10 % of hard-to-justify expenses in the 4T of 2026 in Ceuta (DA 64.ª)', () => {
+    // Persona 49 (p2-49-abogada-ceuta): 4T 686.45 instead of 725.67 (backend autonomo-territory.test).
+    const p49 = [9000, 11000, 8000, 12000].map((income) => ({
+      income,
+      agrarianIncome: 0,
+      expenses: 2451.63,
+      withheld: 0,
+    }));
+    const options = { year: 2026, hardToJustify: true, agrarian: false, priorYearNet: null };
+    expect(estimate130(p49, { ...options, territory: 'ceuta' })).toEqual([
+      497.68, 649.67, 421.68, 686.45,
+    ]);
+    expect(estimate130(p49, { ...options, territory: 'melilla' })[3]).toBe(725.67);
+    expect([hardToJustifyRate('ceuta', 2026, 3), hardToJustifyRate('general', 2023, 1)]).toEqual([
+      0.05, 0.07,
     ]);
   });
 

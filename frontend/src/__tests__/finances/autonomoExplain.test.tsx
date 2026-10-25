@@ -49,6 +49,27 @@ const irpf = (
 const nb = (text: string) => text.replace(/\u00a0/g, ' ');
 
 describe('The draft in plain words', () => {
+  it('says the 8 % of Ceuta, Melilla and La Palma, and the 0,8 % of farming there', () => {
+    const reduced = explain({ vat: vat(), irpf: irpf({}, { rate: 0.08 }) });
+    expect(nb(reduced.irpf)).toContain('el 8 % de tus beneficios acumulados (12.329,75 €)');
+    const zero = irpf(
+      { '01': 1000, '02': 1500, '03': -500 },
+      { result: 'zero', amountDue: 0, rate: 0.08 }
+    );
+    expect(nb(explain({ vat: vat(), irpf: zero }).irpf)).toContain('pagar el 8 %.');
+    const covered = irpf(
+      { '04': 986.38, '05': 1000 },
+      { result: 'zero', amountDue: 0, rate: 0.08 }
+    );
+    expect(nb(explain({ vat: vat(), irpf: covered }).irpf)).toContain('El 8 % de tus beneficios');
+    const farm = irpf({ '08': 10000, '09': 80, '10': 0 }, { amountDue: 80, rate: 0.008 });
+    expect(nb(explain({ vat: vat(), irpf: farm }).irpf)).toContain('el 0,8 % de los ingresos');
+    expect(nb(explain({ vat: vat(), irpf: farm }, 'en').irpf)).toContain('0.8 % of the income');
+    // Without the rate (older servers): 2 % of farming.
+    const oldFarm = irpf({ '08': 10000, '09': 200, '10': 0 }, { amountDue: 200 });
+    expect(nb(explain({ vat: vat(), irpf: oldFarm }).irpf)).toContain('el 2 % de los ingresos');
+  });
+
   it('explains a 303 and a 130 to pay with the figures of the draft', () => {
     const { vat: v, irpf: i } = explain({ vat: vat(), irpf: irpf() });
     expect(nb(v)).toBe(

@@ -3,6 +3,7 @@ import type { Asset as FixedAsset } from './depreciation';
 import type { Subsidy } from './subsidies';
 import type { AgrarianModulesInput } from './agrarianModules';
 import type { ObjectiveInput } from './objectiveModules';
+import type { ActivityTerritory } from './activityTerritory';
 
 export type TransactionType = 'INCOME' | 'EXPENSE' | 'SAVING';
 
@@ -901,6 +902,8 @@ export interface AutonomoInputs {
   hardToJustify: boolean;
   priorYearNet: number | null;
   exempt130: boolean;
+  /** Where the activity is carried out: 8 % of the 130 in Ceuta, Melilla and some quarters of La Palma. */
+  territory?: ActivityTerritory;
   vatToOffset: number;
   /** The VAT of the year: prorrata, investment goods, what is left to offset, refund. */
   vat?: VatOptions | null;
@@ -950,6 +953,8 @@ export interface AutonomoDraft {
     result: 'pay' | 'negative' | 'zero' | 'notRequired';
     amountDue: number;
     boxes: TaxBox[];
+    /** Rate of box 04 (or 09 in farming): 0.2, 0.08, 0.02 or 0.008 (older servers: none). */
+    rate?: number;
   };
   reta: {
     monthlyNet: number;

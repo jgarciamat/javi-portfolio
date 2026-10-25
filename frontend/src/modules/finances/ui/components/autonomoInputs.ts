@@ -25,6 +25,10 @@ export const priorNetOf = (extras: Extras): number | null => {
   return extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet);
 };
 
+/** Ceuta, Melilla and La Palma: 8 % instead of 20 % (art. 110.2 RIRPF); sent only away from the general. */
+export const territoryOf = (extras: Extras): Pick<AutonomoInputs, 'territory'> =>
+  extras.territory && extras.territory !== 'general' ? { territory: extras.territory } : {};
+
 /** The totals of the 130 already filed for the quarters before the viewed one. */
 const priorOf = (manual: ManualForm, quarter: Quarter): AutonomoInputs['prior'] =>
   manual.prior.on && quarter > 1
@@ -85,6 +89,7 @@ export function buildInputs(
     hardToJustify: extras.hardToJustify && activity.method === 'simplified',
     priorYearNet: priorNetOf(extras),
     exempt130: extras.exempt,
+    ...territoryOf(extras),
     // The VAT left to offset is the one at the start of the year: the quarters carry it on.
     vatToOffset: 0,
     vat: investments.length > 0 ? { ...vat, investments } : vat,

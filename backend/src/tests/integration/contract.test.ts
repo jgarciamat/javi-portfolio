@@ -410,6 +410,8 @@ describe('API contract', () => {
         'autonomoDraftEmpty',
         'autonomoDraftTyped',
         'autonomoDraftFiled',
+        'autonomoSaveTerritory',
+        'autonomoDraftTerritory',
         'checkoutMonthly',
         'checkoutRentaPass',
         'rentaCalculation',
