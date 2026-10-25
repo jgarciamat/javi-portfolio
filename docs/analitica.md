@@ -23,6 +23,16 @@ Contadores **diarios y agregados** en la tabla `funnel_daily` (migración 034): 
 | `activation_done` | servidor | se completan los cuatro primeros pasos | no |
 | `checkout_start`, `premium`, `cancel` | servidor | pago iniciado, compra confirmada (web o Play) y baja de una suscripción | no |
 | `trial_notice` | servidor | aviso del fin de la prueba enviado (detalle = `ends_soon`, `last_day` o `ended`, más `:email` o `:push`) | no |
+| `paywall_view` con detalle `dp` | navegador | aviso Premium abierto desde «Tu dinero perdido» | sí |
+| `dp_view` | navegador | se abre «Tu dinero perdido» (detalle = cobertura: `none`, `partial` o `complete`) | sí |
+| `dp_import_cta` | navegador | «Importar mi extracto» desde la sección (detalle = `none` o `partial`) | sí |
+| `dp_found` | servidor | la sección se lee con algo por revisar (detalle = `1-2`, `3-5` o `6+`); no cuentan las otras pantallas que piden la cifra (`?from=goal`, `summary`, `import`) | no |
+| `dp_confirm` | servidor | «Lo sigo usando» / «Quiero darlo de baja» (detalle = `keep:<tipo>` o `cancel:<tipo>`; tipo `recurring`, `increase`, `duplicate` o `small`) | no |
+| `dp_ignore` | servidor | «No es…» / «No reconozco este cobro» (detalle = `dismissed:<tipo>` o `not_mine:<tipo>`) | no |
+| `dp_recovered` | servidor | una baja se comprueba: ya no se cobra (detalle = el tipo) | no |
+| `goal_date_view` | navegador | se ve la fecha de las metas, una vez por apertura (detalle = `real`, `asked` o `done`) | sí |
+| `goal_sim_change` | navegador | primer cambio en «¿Y si apartas más?» de cada apertura (detalle = `chip`, `slider` o `input`) | sí |
+| `goal_dp_apply` | navegador | «Usar lo que vas a dar de baja» | sí |
 
 - **Origen**: el servidor lo normaliza a partir de `utm_source` o, si no hay, del dominio que
   enlaza (`google`, `tiktok`, `youtube`, `x`…); sin nada, `(direct)`; en la app, `(app)`.
@@ -33,6 +43,11 @@ Contadores **diarios y agregados** en la tabla `funnel_daily` (migración 034): 
 - **Lista cerrada**: `frontend/src/core/analytics.ts` (`TRACK_EVENTS`) y
   `backend/src/domain/ports/services.ts` (`CLIENT_FUNNEL_EVENTS`). Los eventos del servidor no se
   aceptan desde el navegador.
+- **Detalle de lista cerrada** (`CLIENT_FUNNEL_DETAILS` en `services.ts`): cada evento del
+  navegador solo admite los valores de su lista (los de la tabla); cualquier otro, o un detalle en
+  un evento que no lo lleva, da 400. Nunca importes, comercios ni identificadores. Con estos
+  contadores no se puede medir la retención de quien usa «Tu dinero perdido» frente a quien no
+  (no hay id ni cohortes): decisión del dueño, de momento solo contadores.
 
 Uso en el frontend:
 

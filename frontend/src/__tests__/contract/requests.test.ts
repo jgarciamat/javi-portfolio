@@ -19,6 +19,7 @@ import {
   categoryApi,
   customAlertApi,
   goalApi,
+  insightsApi,
   recurringApi,
   rentaApi,
   settingsApi,
@@ -161,6 +162,8 @@ add('accountCreate', () =>
 );
 add('budgetSet', () => budgetApi.set(C('Ocio'), 150));
 add('goalCreate', () => goalApi.create({ name: 'Viaje', target: 500, targetDate: '2027-01-01' }));
+add('leakDecide', () => insightsApi.decideLeak('{leak}', 'keep'));
+add('leakUndo', () => insightsApi.undoLeak('{leak}'));
 add('recurringCreate', () =>
   recurringApi.create({
     description: 'Alquiler',
@@ -204,6 +207,10 @@ const filed = {
 };
 add('autonomoSaveFiled', () => businessApi.saveData(toSaved(filed, NO_EXTRAS, {}), 2));
 add('autonomoDraftFiled', () => businessApi.draft(2026, 2, buildInputs(filed, NO_EXTRAS, 2026, 2)));
+// An activity in Ceuta: the 130 at 8 % (older apps send no territory and still work).
+const ceuta = { ...NO_EXTRAS, hardToJustify: true, territory: 'ceuta' as const };
+add('autonomoSaveTerritory', () => businessApi.saveData(toSaved(typed, ceuta, {}), 3));
+add('autonomoDraftTerritory', () => businessApi.draft(2026, 4, buildInputs(typed, ceuta, 2026, 4)));
 add('checkoutMonthly', () =>
   billingApi.checkout('monthly', { acceptTerms: true, waiveWithdrawal: true })
 );

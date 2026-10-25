@@ -13,6 +13,7 @@ import {
   type AutonomoInputs,
   type TaxBox,
 } from '@modules/finances/domain/types';
+import { hardToJustifyRate } from '../../domain/activityTerritory';
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
 import { AutonomoExplain } from './AutonomoExplain';
 import { VatFamily } from './AutonomoVatResult';
@@ -115,7 +116,8 @@ const retaText = (t: Translate, money: Format['money'], reta: AutonomoDraft['ret
 function pdfText(
   t: Translate,
   { money, date }: Pick<Format, 'money' | 'date'>,
-  draft: AutonomoDraft
+  draft: AutonomoDraft,
+  inputs: AutonomoInputs | null
 ): PdfText {
   const kinds = Object.fromEntries(EXPENSE_KINDS.map((k) => [k, t(`app.autonomo.kind.${k}`)]));
   const notes = Object.fromEntries(
@@ -182,7 +184,10 @@ function pdfText(
       withheld: '{withheld}',
     }),
     flags: {
-      hardToJustify: t('app.autonomo.pdf.hardToJustify'),
+      // The rate of that quarter: 7 % in 2023, 10 % in the 4T of 2026 in Ceuta, 5 % otherwise.
+      hardToJustify: t('app.autonomo.pdf.hardToJustify', {
+        rate: Math.round(hardToJustifyRate(inputs?.territory, draft.year, draft.quarter) * 100),
+      }),
       exempt: t('app.autonomo.pdf.exempt'),
       priorNet: t('app.autonomo.priorNet'),
       toOffset: t('app.autonomo.toOffset'),
@@ -205,7 +210,7 @@ function usePdfDownload(draft: AutonomoDraft, inputs: AutonomoInputs | null) {
     try {
       // Counted first: the free plan has one PDF, and a 402 opens the plans instead.
       await businessApi.recordPdf();
-      const text = pdfText(t, { money, date }, draft);
+      const text = pdfText(t, { money, date }, draft, inputs);
       const blob = await buildAutonomoPdf(draft, inputs, text, date);
       await shareImage(
         blob,

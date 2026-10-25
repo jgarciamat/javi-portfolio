@@ -50,7 +50,17 @@ describe('track', () => {
       'cons_invite_view',
       'cons_invite_copy',
       'cons_invite_share',
+      'dp_view',
+      'dp_import_cta',
+      'goal_date_view',
+      'goal_sim_change',
+      'goal_dp_apply',
     ]);
+  });
+
+  it('sends the detail of the closed list of an event', () => {
+    track('dp_view', { detail: 'partial' });
+    expect(sent()).toEqual({ event: 'dp_view', detail: 'partial' });
   });
 
   it('sends the event, the guide and the landing origin, without cookies', () => {

@@ -190,6 +190,35 @@ describe('API contract', () => {
       contract('importResult', (await send('importPreview')).body);
     });
 
+    it('money leaks', async () => {
+      // Made-up charges: a monthly gym and a shop charged twice the same day.
+      for (const date of ['2025-12-05', '2026-01-05', '2026-02-05', '2026-03-05']) {
+        await request(ctx.app)
+          .post('/api/transactions')
+          .set(user.auth)
+          .send({ description: 'Fitbox', type: 'EXPENSE', category: 'Ocio', amount: 39.9, date })
+          .expect(201);
+      }
+      for (let i = 0; i < 2; i++) {
+        await request(ctx.app)
+          .post('/api/transactions')
+          .set(user.auth)
+          .send({
+            description: 'Electro Market',
+            type: 'EXPENSE',
+            category: 'Ocio',
+            amount: 89,
+            date: '2026-03-01',
+          })
+          .expect(201);
+      }
+      const leaks = (await get('/stats/money-leaks')).body;
+      contract('moneyLeaks', leaks);
+      const leak = leaks.findings[0].id as string;
+      contract('leakDecision', (await send('leakDecide', { leak })).body);
+      await send('leakUndo', { leak });
+    });
+
     it('plan, catalog and referral', async () => {
       contract('billingOverview', (await get('/billing')).body);
       contract('planCatalog', (await request(ctx.app).get('/api/billing/plans').expect(200)).body);
@@ -381,6 +410,8 @@ describe('API contract', () => {
         'autonomoDraftEmpty',
         'autonomoDraftTyped',
         'autonomoDraftFiled',
+        'autonomoSaveTerritory',
+        'autonomoDraftTerritory',
         'checkoutMonthly',
         'checkoutRentaPass',
         'rentaCalculation',

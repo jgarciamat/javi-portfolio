@@ -273,7 +273,25 @@ export const CLIENT_FUNNEL_EVENTS = [
   'cons_invite_view',
   'cons_invite_copy',
   'cons_invite_share',
+  // «Tu dinero perdido» and «La fecha de tu meta» (detail from a closed list, FUNNEL_DETAILS).
+  'dp_view',
+  'dp_import_cta',
+  'goal_date_view',
+  'goal_sim_change',
+  'goal_dp_apply',
 ] as const;
+
+/**
+ * The only `detail` each browser event may carry (docs/analitica.md): never an amount, a
+ * merchant or an id. Events not listed take none (guides use `guide`).
+ */
+export const CLIENT_FUNNEL_DETAILS: Partial<Record<ClientFunnelEvent, readonly string[]>> = {
+  paywall_view: ['dp'],
+  dp_view: ['none', 'partial', 'complete'],
+  dp_import_cta: ['none', 'partial'],
+  goal_date_view: ['real', 'asked', 'done'],
+  goal_sim_change: ['chip', 'slider', 'input'],
+};
 
 /** Funnel events only the server records, when the thing really happens. */
 export const SERVER_FUNNEL_EVENTS = [
@@ -288,6 +306,14 @@ export const SERVER_FUNNEL_EVENTS = [
   'cancel',
   /** A trial notice went out (detail: `ends_soon:email`, `last_day:push`, `ended:email`…). */
   'trial_notice',
+  /** «Tu dinero perdido» read with findings to check (detail: `1-2`, `3-5`, `6+`). */
+  'dp_found',
+  /** A finding kept or to cancel (detail: `keep:recurring`, `cancel:duplicate`…). */
+  'dp_confirm',
+  /** A finding dismissed or not recognised (detail: `dismissed:small`, `not_mine:recurring`…). */
+  'dp_ignore',
+  /** A cancellation checked: no longer charged (detail: the kind). */
+  'dp_recovered',
 ] as const;
 
 export type ClientFunnelEvent = (typeof CLIENT_FUNNEL_EVENTS)[number];

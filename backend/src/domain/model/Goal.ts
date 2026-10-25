@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { ValidationError } from '@domain/errors';
 import { Cents, assertPositiveCents } from '@domain/shared/money';
-import { toDateOnly } from '@domain/shared/period';
+import { Period, periodOrdinal, toDateOnly } from '@domain/shared/period';
 import { isHexColor } from '@domain/shared/text';
 
 /**
@@ -119,5 +119,43 @@ export function computeGoalProgress(
     monthsLeft,
     monthlyNeededCents,
     completed: savedCents >= goal.targetCents,
+  };
+}
+
+/** Complete periods the saving pace of a goal looks back on. */
+export const PACE_PERIODS = 6;
+
+export interface GoalPace {
+  /**
+   * Average SAVING per month in the goal's category over the last complete periods (the current
+   * one left out), counting the months with nothing since the first saving there; null with
+   * fewer than 2 such periods.
+   */
+  averageMonthlyCents: Cents | null;
+  /** Complete periods that average is based on (0 to 6). */
+  historyMonths: number;
+  /** Saved in the current period: the estimate then starts next month. */
+  savedThisPeriodCents: Cents;
+}
+
+/**
+ * The real saving pace of a goal, for «at your pace you get there in…»
+ * (docs/disenos/dinero-perdido-y-fecha-meta.md, D.1). `savings` holds the SAVING of the goal's
+ * category per period ordinal (see `periodOrdinal`).
+ */
+export function computeGoalPace(savings: ReadonlyMap<number, Cents>, current: Period): GoalPace {
+  const now = periodOrdinal(current);
+  const saved = [...savings].filter(([, cents]) => cents > 0).map(([ordinal]) => ordinal);
+  const savedThisPeriodCents = savings.get(now) ?? 0;
+  if (saved.length === 0)
+    return { averageMonthlyCents: null, historyMonths: 0, savedThisPeriodCents };
+  const from = Math.max(Math.min(...saved), now - PACE_PERIODS);
+  const historyMonths = Math.max(0, now - from);
+  let total = 0;
+  for (let p = from; p < now; p++) total += savings.get(p) ?? 0;
+  return {
+    averageMonthlyCents: historyMonths >= 2 ? Math.round(total / historyMonths) : null,
+    historyMonths,
+    savedThisPeriodCents,
   };
 }

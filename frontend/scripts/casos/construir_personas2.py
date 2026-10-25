@@ -812,6 +812,8 @@ def build_autonomo2(a):
     figs = []
     issued, received, bank, movements = [], [], [], []
     m303s, m130s, m111s, m115s = [], [], [], []
+    # Notes printed at the end of resumen-casillas.pdf (generar-personas2.ts).
+    notes = []
     start = a.get('start', 1)
     vat = a['vat']
     rate130 = a.get('irpfRate', 20)
@@ -1022,7 +1024,9 @@ def build_autonomo2(a):
         cum_income = r2(cum_income + q_income)
         cum_exp = r2(cum_exp + cost)
         prenet = r2(cum_income - cum_exp)
-        hard = r2(min(max(0.0, prenet) * 0.05, 2000)) if a['method'] == 'simplificada' else 0.0
+        # DA 64.ª LIRPF (RDL 22/2026): Ceuta, 10 % from the 4T of 2026 (the 2,000 € cap stays).
+        hard_pct = 10 if a['ccaa'] == 'ceuta' and q == 4 else 5
+        hard = r2(min(max(0.0, prenet) * hard_pct / 100, 2000)) if a['method'] == 'simplificada' else 0.0
         exp02 = r2(cum_exp + hard)
         net03 = r2(cum_income - exp02)
         cum_withheld = r2(cum_withheld + withheld_q)
@@ -1035,21 +1039,28 @@ def build_autonomo2(a):
             b07 = r2(b04 - paid130 - cum_withheld)
             b12 = max(0.0, b07)
             rows = [('01', 'Ingresos computables acumulados', cum_income),
-                    ('02', 'Gastos fiscalmente deducibles acumulados' + (' (con el 5 % de difícil justificación)' if hard else ''), exp02),
+                    ('02', 'Gastos fiscalmente deducibles acumulados' + (f' (con el {hard_pct} % de difícil justificación)' if hard else ''), exp02),
                     ('03', 'Rendimiento neto (01 − 02)', net03), ('04', f'{rate130} % de la casilla 03', b04), ('05', 'Pagos fraccionados de trimestres anteriores', paid130),
                     ('06', 'Retenciones soportadas acumuladas', cum_withheld), ('07', 'Pago fraccionado previo (04 − 05 − 06)', b07), ('12', 'Suma (07 + 11), mínimo 0', b12),
                     ('13', 'Minoración (art. 110.3.c RIRPF)', 0.0), ('14', 'Diferencia (12 − 13)', b12), ('15', 'Resultados negativos de trimestres anteriores', 0.0),
                     ('17', 'Total (14 − 15 − 16)', b12), ('19', 'Resultado de la autoliquidación', b12)]
             m130s.append(rows)
+            if hard_pct == 10:
+                # The same quarter with the general 5 %, so the summary shows what the DA 64.ª changes.
+                net5 = r2(cum_income - r2(cum_exp + r2(min(max(0.0, prenet) * 5 / 100, 2000))))
+                b12_5 = max(0.0, r2(r2(max(0.0, net5) * rate130 / 100) - paid130 - cum_withheld))
+                notes.append(f'{q}T de 2026: en Ceuta los gastos de difícil justificación son el 10 % del rendimiento neto, con el tope de '
+                             f'2.000 € al año (DA 64.ª LIRPF, RDL 22/2026). Resultado del 130: {eur(b12)} € (con el 5 % general, {eur(b12_5)} €).')
             for box, label, amount in rows:
                 fig('130', f'{q}T', box, label, amount, campo=f'm130.{box}')
             steps.s(f'130 (acumulado): ingresos {eur(cum_income)}' + (' (con el IVA que cobra: recargo de equivalencia)' if vat == 'recargo' else '')
                     + f' − gastos {eur(cum_exp)} (incluye la cuota de autónomo {eur(reta_q)} del trimestre'
                     + (f', la amortización {eur(a["amortization"])}' if a.get('amortization') else '') + (', el IVA y el recargo soportados' if vat == 'recargo' else '')
                     + (', el IVA no deducible por la prorrata' if vat == 'prorrata' else '') + ')'
-                    + (f' − 5 % de difícil justificación {eur(hard)}' if hard else (' (estimación directa normal: sin el 5 %)' if a['method'] == 'normal' else ''))
+                    + (f' − {hard_pct} % de difícil justificación {eur(hard)}'
+                       + (' (DA 64.ª LIRPF: 10 % en Ceuta desde el 4T de 2026; máximo 2.000 €)' if hard_pct == 10 else '') if hard else (' (estimación directa normal: sin el 5 %)' if a['method'] == 'normal' else ''))
                     + f' = {eur(net03)}; {rate130} % = {eur(b04)} − pagos anteriores {eur(paid130)} − retenciones {eur(cum_withheld)} → **{eur(b12)}**'
-                    + (' (art. 110.1 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)' if rate130 == 8 else ''))
+                    + (' (art. 110.2 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)' if rate130 == 8 else ''))
             paid130 = r2(paid130 + max(0.0, b07))
         # 111 y 115
         if staff or pro['base']:
@@ -1135,7 +1146,7 @@ def build_autonomo2(a):
         net = net03
     else:
         net = net03
-    fig('100', '2026', None, 'Rendimiento neto de la actividad para la Renta 2026 (estimación directa' + (' normal)' if a['method'] == 'normal' else ' simplificada, con el 5 %)'), net,
+    fig('100', '2026', None, 'Rendimiento neto de la actividad para la Renta 2026 (estimación directa' + (' normal)' if a['method'] == 'normal' else (' simplificada, con el 10 % de la DA 64.ª)' if a['ccaa'] == 'ceuta' else ' simplificada, con el 5 %)')), net,
         motivo='Cifra de la Renta 2026: el motor de la Renta no calcula actividades económicas.')
     figs.append(dict(modelo='100', declaracion='individual', casilla=None, concepto='Renta 2026 completa del autónomo', importe=None, origen='pendiente',
                      motivo='El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.', campo=None))
@@ -1143,7 +1154,10 @@ def build_autonomo2(a):
         figs.append(dict(modelo='100', declaracion='individual', casilla=None, concepto='Renta 2026 con nómina y actividad (pluriactividad)', importe=None, origen='pendiente',
                          motivo='Falta su nómina de 2026 y el motor no suma actividades: la reducción del art. 20 no se aplica si las otras rentas pasan de 6.500 €.', campo=None))
     inputs = dict(quarters=[], hardToJustify=a['method'] == 'simplificada', priorYearNet=None, exempt130=bool(a.get('exempt130')), vatToOffset=0)
-    data = dict(movements=movements, inputs=inputs, issued=issued, received=received, bank=bank, m303=m303s, m130=m130s, m111=m111s, m115=m115s)
+    # Where the activity is carried out: 8 % of the 130 in Ceuta and Melilla (art. 110.2 RIRPF).
+    if a['ccaa'] in ('ceuta', 'melilla'):
+        inputs['territory'] = a['ccaa']
+    data = dict(movements=movements, inputs=inputs, issued=issued, received=received, bank=bank, m303=m303s, m130=m130s, m111=m111s, m115=m115s, notes=notes)
     return figs, steps, data
 
 
@@ -1351,6 +1365,8 @@ def main():
         persona['documentos'] = dict(emitidas=data['issued'], recibidas=data['received'], banco=data['bank'], m303=data['m303'], m130=data['m130'],
                                      m111=data['m111'], m115=data['m115'])
         esperado = dict(slug=a['slug'], ejercicio=2026, comprobado=CHECKED, cifras=figs)
+        if data['notes']:
+            esperado['notas'] = data['notes']
         write(os.path.join(OUT, a['slug']), persona, esperado, a['title'], a['story'], steps)
         index.append(dict(slug=a['slug'], titulo=a['title'], comunidad=a['ccaa'], modelos=a['models'], prueba=a['tests'], alcance='parcial'))
     for o in FUERA:

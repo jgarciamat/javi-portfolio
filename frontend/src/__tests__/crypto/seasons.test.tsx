@@ -192,7 +192,9 @@ describe('Crypto console: the season', () => {
       withPortfolio({ season: season({ history: [result({ qualified: false })] }) })
     );
     expect(
-      await screen.findByText('Estabas en el ranking pero no llegaste a los mínimos para puntuar.')
+      await screen.findByText(
+        'No llegaste a las 5 operaciones cerradas que hacían falta para entrar al ranking.'
+      )
     ).not.toBeNull();
     short.unmount();
     // Here «qualified» but nobody asked to appear: the result is only for the person.
@@ -327,26 +329,37 @@ describe('Crypto console: ranking of the month', () => {
     const mine = within(ranking).getByText(/Tú este mes/).parentElement!;
     expect(nb(mine.textContent)).toContain('+0,98 %');
     expect(mine.querySelector('.pnl-pos')).not.toBeNull();
+    // Only the closed operations are missing (no days), with the progress «2 de 5».
     expect(
-      within(ranking).getByText(
-        'Para puntuar te falta 3 operaciones cerradas y 2 días con actividad.'
-      )
+      within(ranking).getByText('Te faltan 3 operaciones para entrar al ranking.')
     ).toBeInTheDocument();
+    expect(within(ranking).queryByText(/días? con actividad/)).toBeNull();
+    const bar = within(ranking).getByRole('progressbar', { name: '2 de 5 operaciones cerradas' });
+    expect(bar).toHaveAttribute('aria-valuenow', '2');
+    expect(bar).toHaveAttribute('aria-valuemax', '5');
+    expect(bar.querySelector('span')).toHaveStyle({ width: '40%' });
+    expect(within(ranking).getByText('2 de 5 operaciones cerradas')).toBeInTheDocument();
     // Everybody is in: no switch, and what the others see next to the alias.
     expect(within(ranking).queryByRole('switch')).toBeNull();
     expect(
-      within(ranking).getByText(/Tu alias aparece en el ranking del mes con tu rentabilidad/)
+      within(ranking).getByText(/Si estás en el ranking del mes, se ve tu alias/)
     ).toBeInTheDocument();
     expect(
       within(ranking).getByText(/nunca se muestra tu correo ni tu nombre completo/)
     ).toBeInTheDocument();
     fireEvent.click(within(ranking).getByText('Cómo funciona el ranking (bases)'));
+    const rules = within(ranking)
+      .getByText(/Para entrar necesitas/)
+      .closest('ul')!;
     expect(
-      within(ranking).getByText(/al menos 5 operaciones cerradas y 3 días/)
+      within(rules).getByText(
+        'Para entrar necesitas al menos 5 operaciones cerradas este mes en tu cartera oficial. Las carteras de prácticas no cuentan.'
+      )
     ).toBeInTheDocument();
+    expect(rules.textContent).not.toMatch(/días? con actividad/);
     expect(within(ranking).getByText(/sus 10.000 € virtuales/)).toBeInTheDocument();
     expect(
-      within(ranking).getByText(/Participan todas las temporadas oficiales del mes/)
+      within(ranking).getByText(/Participan las carteras oficiales del mes/)
     ).toBeInTheDocument();
     expect(within(ranking).getByLabelText('Tu alias')).toHaveValue('Ana');
   });
@@ -368,6 +381,8 @@ describe('Crypto console: ranking of the month', () => {
       expect(api.cryptoApi.setRanking).toHaveBeenCalledWith({ alias: 'Lince Azul' })
     );
     expect(await within(ranking).findByText('Vas en el puesto 2 de 7.')).toBeInTheDocument();
+    // With a place, nothing missing and no progress.
+    expect(within(ranking).queryByRole('progressbar')).toBeNull();
     expect(within(ranking).getByLabelText('Tu alias')).toHaveValue('Lince Azul');
     api.cryptoApi.setRanking.mockRejectedValue(new Error('El alias no puede llevar correos.'));
     fireEvent.click(within(ranking).getByRole('button', { name: 'Guardar alias' }));
@@ -387,27 +402,28 @@ describe('Crypto console: ranking of the month', () => {
     setup();
     const intro = (
       await screen.findByRole('heading', {
-        name: 'Apareces en el ranking del mes como «Ana»',
+        name: 'En el ranking del mes saldrás como «Ana»',
       })
     ).closest('aside')!;
+    expect(
+      within(intro).getByText(/Para entrar necesitas al menos 5 operaciones cerradas/)
+    ).toBeInTheDocument();
     expect(within(intro).getByText(/Puedes cambiarlo cuando quieras/)).toBeInTheDocument();
     fireEvent.click(within(intro).getByRole('button', { name: 'Cambiar mi alias' }));
     expect(screen.getByLabelText('Tu alias')).toHaveFocus();
-    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /saldrás como/ })).toBeNull();
     expect(localStorage.getItem(RANKING_INTRO_KEY)).toBe('1');
   });
 
   it('closes the first notice with «Entendido» and does not show it again', async () => {
     const { unmount } = setup();
-    const intro = (await screen.findByRole('heading', { name: /Apareces en el ranking/ })).closest(
-      'aside'
-    )!;
+    const intro = (await screen.findByRole('heading', { name: /saldrás como/ })).closest('aside')!;
     fireEvent.click(within(intro).getByRole('button', { name: 'Entendido' }));
-    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /saldrás como/ })).toBeNull();
     unmount();
     setup();
     await card();
-    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /saldrás como/ })).toBeNull();
   });
 
   it('shows last month’s winners, an empty month, the last day and one missing of each', async () => {
@@ -421,27 +437,58 @@ describe('Crypto console: ranking of the month', () => {
       })
     );
     const ranking = await card();
-    expect(within(ranking).getByText(/todavía no hay nadie con los mínimos/)).toBeInTheDocument();
+    expect(
+      within(ranking).getByText(
+        'Este mes todavía nadie ha llegado a las 5 operaciones cerradas que hacen falta para entrar.'
+      )
+    ).toBeInTheDocument();
     expect(within(ranking).getByRole('timer')).toHaveTextContent('Termina hoy');
     expect(
       within(ranking).getByRole('heading', { name: 'Ganadores de febrero' })
     ).toBeInTheDocument();
     expect(
-      within(ranking).getByText('Para puntuar te falta 1 operación cerrada.')
+      within(ranking).getByText('Te falta 1 operación para entrar al ranking.')
     ).toBeInTheDocument();
     unmount();
+    // Five operations (in a single day) but no place yet: it says why, without a progress.
     setup(
       rankingWith({
         season: { month: '2026-03', endsAt: '', daysLeft: 1 },
         settings: { optIn: true, alias: 'Ana', suggestedAlias: 'Ana' },
-        me: { ...fx.ranking().me, missing: { trades: 0, days: 1 } },
+        me: {
+          ...fx.ranking().me,
+          percent: null,
+          trades: 5,
+          activeDays: 1,
+          qualified: true,
+          missing: { trades: 0, days: 0 },
+        },
       })
     );
     const next = await card();
     expect(within(next).getByRole('timer')).toHaveTextContent('Termina en 1 día');
     expect(
-      within(next).getByText('Para puntuar te falta 1 día con actividad.')
+      within(next).getByText(/Ya tienes las 5 operaciones cerradas que hacen falta/)
     ).toBeInTheDocument();
+    expect(within(next).queryByText(/Te faltan?/)).toBeNull();
+    expect(within(next).queryByRole('progressbar')).toBeNull();
+  });
+
+  it('shows the progress and ignores the days an older server may still send', async () => {
+    setup(
+      rankingWith({
+        me: { ...fx.ranking().me, trades: 4, missing: { trades: 1, days: 2 } },
+        rules: { ...fx.ranking().rules, minDays: 3 },
+      })
+    );
+    const ranking = await card();
+    expect(
+      within(ranking).getByText('Te falta 1 operación para entrar al ranking.')
+    ).toBeInTheDocument();
+    expect(
+      within(ranking).getByRole('progressbar', { name: '4 de 5 operaciones cerradas' })
+    ).toBeInTheDocument();
+    expect(ranking.textContent).not.toMatch(/días? con actividad/);
   });
 
   it('says when the ranking cannot be loaded, and waits for it before showing the console', async () => {
@@ -459,7 +506,10 @@ describe('Crypto console: ranking of the month', () => {
   it('builds the sentence of what is missing', () => {
     const me = fx.ranking().me;
     expect(missingText({ ...me, missing: { trades: 2, days: 1 } }, t)).toBe(
-      'Para puntuar te falta 2 operaciones cerradas y 1 día con actividad.'
+      'Te faltan 2 operaciones para entrar al ranking.'
+    );
+    expect(missingText({ ...me, missing: { trades: 1, days: 0 } }, t)).toBe(
+      'Te falta 1 operación para entrar al ranking.'
     );
     expect(counted(t, 'app.crypto.ranking.trades', 1)).toBe('1 operación');
     expect([1, 2, 3, 4].map(medal)).toEqual(['gold', 'silver', 'bronze', 'plain']);

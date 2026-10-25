@@ -330,11 +330,12 @@ describe('Crypto console seasons, practice and ranking', () => {
       expect(body.top).toEqual([]);
       expect(body.previous).toBeNull();
       expect(body.me).toMatchObject({ place: null, trades: 0, qualified: false });
-      expect(body.me.missing).toEqual({ trades: 5, days: 3 });
+      // No minimum of days any more: `days` and `minDays` stay at 0 for older versions of the app.
+      expect(body.me.missing).toEqual({ trades: 5, days: 0 });
       expect(body.rules).toEqual({
         size: 5,
         minTrades: 5,
-        minDays: 3,
+        minDays: 0,
         prizeDays: 30,
         initial: 10_000,
         aliasMin: 3,
@@ -399,7 +400,7 @@ describe('Crypto console seasons, practice and ranking', () => {
       await alias(ana, 'Alfa');
       await alias(bea, 'Beta');
       await alias(cris, 'Gamma');
-      // Ana: +10 % twice (5 trades, 3 days). Bea: the same result, one day later. Cris: 4 trades.
+      // Ana: +10 % twice (5 trades). Bea: the same result, one day later. Cris: 4 trades.
       // Dani gains most and never chose an alias: he appears with his first name.
       for (const [u, days] of [
         [ana, [2, 2, 3, 4, 4]],
@@ -435,6 +436,57 @@ describe('Crypto console seasons, practice and ranking', () => {
       // Cached for a minute; a new alias shows at once.
       await alias(ana, 'Alfa Dos');
       expect((await as(bea).get('/crypto/ranking').expect(200)).body.top[1].alias).toBe('Alfa Dos');
+    });
+
+    it('lets in five operations closed in a single day; four are not enough', async () => {
+      const [five, four] = [user, await createUser(ctx)];
+      for (let i = 0; i < 5; i++) await trade(five, 2, 51_000);
+      for (let i = 0; i < 4; i++) await trade(four, 2, 60_000);
+      ctx.clock.set('2026-03-02T12:00:00Z');
+      ctx.market.prices.set('BTC', 50_000);
+      const { body } = await as(four).get('/crypto/ranking').expect(200);
+      expect(body.top.map((r: { trades: number }) => r.trades)).toEqual([5]);
+      expect(body.participants).toBe(1);
+      expect(body.me).toMatchObject({
+        place: null,
+        trades: 4,
+        activeDays: 1,
+        qualified: false,
+        missing: { trades: 1, days: 0 },
+      });
+      const mine = (await as(five).get('/crypto/ranking').expect(200)).body.me;
+      expect(mine).toMatchObject({ place: 1, trades: 5, activeDays: 1, qualified: true });
+      expect(mine.missing).toEqual({ trades: 0, days: 0 });
+    });
+
+    it('shows the place at once to whoever has just closed the fifth operation', async () => {
+      for (let i = 0; i < 4; i++) await trade(user, 2, 51_000);
+      expect((await me().get('/crypto/ranking').expect(200)).body.me.place).toBeNull();
+      // Within the minute of the cache: the fifth operation gets the person in straight away.
+      await trade(user, 2, 51_000);
+      const { body } = await me().get('/crypto/ranking').expect(200);
+      expect(body.me).toMatchObject({ place: 1, qualified: true });
+      expect(body.top).toHaveLength(1);
+    });
+
+    it('on the 1st freezes a top 5 of five operations in one day, without counting days', async () => {
+      const [oneDay, short] = [user, await createUser(ctx)];
+      await as(oneDay).put('/crypto/ranking/settings', { alias: 'Un Día' }).expect(200);
+      await as(short).put('/crypto/ranking/settings', { alias: 'Corto' }).expect(200);
+      for (let i = 0; i < 5; i++) await trade(oneDay, 9, 51_000);
+      // More gain, but only four operations (on four days): it does not count.
+      for (const day of [2, 3, 4, 5]) await trade(short, day, 70_000);
+      ctx.market.prices.set('BTC', 50_000);
+      ctx.clock.set(APRIL_FIRST);
+      expect((await ctx.container.cryptoRanking.run()).rankings).toBe(1);
+      const placed = results().filter((r) => r.place !== null);
+      expect(placed.map((r) => [r.alias, r.place, r.active_days, r.prize_days])).toEqual([
+        ['Un Día', 1, 1, 30],
+      ]);
+      const history = async (u: TestUser) =>
+        (await as(u).get('/crypto/sim').expect(200)).body.season.history[0];
+      expect(await history(oneDay)).toMatchObject({ place: 1, qualified: true, activeDays: 1 });
+      expect(await history(short)).toMatchObject({ place: null, qualified: false, trades: 4 });
     });
 
     it('on the 1st freezes the top 5 and gives the winner one month of Premium, once', async () => {

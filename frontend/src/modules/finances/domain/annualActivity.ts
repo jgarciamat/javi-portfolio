@@ -1,3 +1,4 @@
+import { hardToJustifyRate, instalmentRates, type ActivityTerritory } from './activityTerritory';
 import { agrarianModules, type AgrarianModulesResult } from './agrarianModules';
 import { depreciationYear, type DepreciationYear, type Modality } from './depreciation';
 import { incomeOf, irpfDeductible } from './importChecks';
@@ -149,11 +150,9 @@ const sum = (list: number[]) => round2(list.reduce((s, v) => s + v, 0));
 
 // The modelo 130 as the server works it out (backend autonomo.ts draft130), to estimate what was
 // paid when the filed results are not given.
-const ADVANCE = 0.2;
-const AGRARIAN_ADVANCE = 0.02;
 const HARD_RATE = 0.05;
 const HARD_MAX = 2000;
-/** 7 % in 2023 only (DA 56.ª LIRPF), 5 % the other years (art. 30.2.4.ª LIRPF). */
+/** 7 % in 2023 only (DA 56.ª LIRPF), 5 % the other years (art. 30.2.ª RIRPF; cap: art. 30.2.4.ª LIRPF). */
 export const hardRateOf = (year: number) => (year === 2023 ? 0.07 : HARD_RATE);
 const LOW_INCOME = [
   { upTo: 9000, amount: 100 },
@@ -173,8 +172,17 @@ export interface QuarterFigures {
 /** Box 19 of the four modelos 130 of the year, from the figures of each quarter. */
 export function estimate130(
   quarters: QuarterFigures[],
-  /** hardRate: 5 % (7 % in 2023) in the simplified modality with the option on; 0 otherwise. */
-  options: { hardRate: number; agrarian: boolean; priorYearNet: number | null }
+  /**
+   * hardToJustify: the simplified modality with the option on (5 %, 7 % in 2023, 10 % in the 4T of
+   * 2026 in Ceuta); territory: 8 % instead of 20 % where art. 110.2 RIRPF applies (activityTerritory.ts).
+   */
+  options: {
+    year: number;
+    hardToJustify: boolean;
+    agrarian: boolean;
+    priorYearNet: number | null;
+    territory?: ActivityTerritory;
+  }
 ): number[] {
   const reduction =
     options.priorYearNet === null
@@ -186,15 +194,19 @@ export function estimate130(
   for (let n = 1; n <= 4; n++) {
     let box07 = 0;
     let box11 = 0;
+    const rates = instalmentRates(options.territory, options.year, n);
     if (options.agrarian) {
       const q = quarters[n - 1];
-      box11 = round2(round2(q.agrarianIncome * AGRARIAN_ADVANCE) - q.withheld);
+      box11 = round2(round2(q.agrarianIncome * rates.agrarian) - q.withheld);
     } else {
       const sel = quarters.slice(0, n);
       const income = sum(sel.map((q) => q.income));
       const pre = round2(income - sum(sel.map((q) => q.expenses)));
-      const hard = Math.min(round2(Math.max(0, pre) * options.hardRate), HARD_MAX);
-      const fourth = round2(Math.max(0, round2(pre - hard)) * ADVANCE);
+      const hardRate = options.hardToJustify
+        ? hardToJustifyRate(options.territory, options.year, n)
+        : 0;
+      const hard = Math.min(round2(Math.max(0, pre) * hardRate), HARD_MAX);
+      const fourth = round2(Math.max(0, round2(pre - hard)) * rates.direct);
       box07 = round2(fourth - previous - sum(sel.map((q) => q.withheld)));
       previous = round2(previous + Math.max(0, box07));
     }
@@ -338,7 +350,7 @@ function expensesOfYear(
       retaFix.refunded
   );
   const difference = round2(income - box0218);
-  // In the Renta the 5 % is part of the simplified modality, not an option (art. 30.2.4.ª RIRPF;
+  // In the Renta the 5 % is part of the simplified modality, not an option (art. 30.2.ª RIRPF;
   // Manual Renta 2025, cap. 7): the option of the screen is only for the modelo 130.
   const hard =
     activity.method === 'simplified'
@@ -378,6 +390,7 @@ function estimate131(
     // Not typed: no reduction of box 09, as in the 130 (estimate130).
     lastYearNet: inputs.priorYearNet ?? Number.POSITIVE_INFINITY,
     depreciationAtStart: depreciationYear(atStart, year, 'modules').total,
+    territory: inputs.territory,
   });
   return r ? r.quarters.map((q) => q.result.due) : [0, 0, 0, 0];
 }
@@ -398,9 +411,11 @@ function paymentsOf(
     : none
       ? [0, 0, 0, 0]
       : estimate130(figures, {
-          hardRate: activity.method === 'simplified' && inputs.hardToJustify ? hardRateOf(year) : 0,
+          year,
+          hardToJustify: activity.method === 'simplified' && inputs.hardToJustify,
           agrarian: activity.agrarian,
           priorYearNet: inputs.priorYearNet,
+          territory: inputs.territory,
         });
   const source = activity.paid130.map((p, i): 'filed' | 'estimated' | 'none' => {
     if (p !== null) return 'filed';

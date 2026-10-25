@@ -142,6 +142,25 @@ describe('non-farming modules: the modelo 131', () => {
     expect(box(2, '15')).toBe(263.97);
   });
 
+  it('cuts the rate by 60 % in the 3T and 4T of 2026 in La Palma (DA 57.ª LIRPF)', () => {
+    // No data: 2 % of 10,000 = 200 in the 1T and 2T; × 0.4 = 0.8 % = 80 in the 3T and 4T.
+    const r = instalments131(
+      { ...taxi, noData: true },
+      {
+        year: 2026,
+        quarter: 4,
+        withheld: [0, 0, 0, 0],
+        income: [10000, 10000, 10000, 10000],
+        lastYearNet: null,
+        depreciationAtStart: 0,
+        territory: 'laPalma',
+      }
+    )!;
+    expect(r.quarters.map((q) => q.result.boxes.find((b) => b.box === '04')!.amount)).toEqual([
+      200, 200, 80, 80,
+    ]);
+  });
+
   it('is 2 % of the income of the quarter when no data can be known, and null without figures', () => {
     const r = instalments131(
       { ...taxi, noData: true },

@@ -6,6 +6,7 @@ import type { AutonomoCloudCopy, ExpenseKind } from '@modules/finances/domain/ty
 import { missingOf, reviewOf, type KindPreferences } from '../../domain/invoiceLedger';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
 import { withholdingsOf } from './withholdingForm';
+import { territoryOf } from './autonomoInputs';
 import { activityOf, isEmptyActivity, type ActivityForm } from './activityForm';
 import { NO_VAT_EXTRAS, isEmptyVat, vatExtrasOf, vatOfForm } from './vatForm';
 import { reviveProgress, type WizardProgress } from '@modules/wizard/domain/wizard';
@@ -222,6 +223,8 @@ export function toSaved(
       exempt: options.exempt,
       priorNet: options.priorNet,
       ...(options.noPriorActivity ? { noPriorActivity: true } : {}),
+      // Only away from the general territory, so a copy without it stays the same.
+      ...territoryOf(options),
       toOffset: options.toOffset,
       ...(JSON.stringify(vatExtrasOf(options.vat)) === JSON.stringify(NO_VAT_EXTRAS)
         ? {}

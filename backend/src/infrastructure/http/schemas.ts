@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
+import { ACTIVITY_TERRITORIES } from '@domain/services/autonomo-territory';
 import {
   DEDUCTION_USES,
   KEYS_349,
@@ -10,7 +11,7 @@ import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
-import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
+import { CLIENT_FUNNEL_DETAILS, CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
 export const money = z
@@ -499,6 +500,8 @@ export const autonomoDraftBody = z.object({
     agrarian: z.boolean().optional(),
     priorYearNet: z.number().finite().min(-100_000_000).max(100_000_000).nullable().default(null),
     exempt130: z.boolean().default(false),
+    /** Where the activity is carried out (8 % in Ceuta, Melilla and some quarters of La Palma). */
+    territory: z.enum(ACTIVITY_TERRITORIES).optional(),
     vatToOffset: euroAmount.default(0),
     /** Income and expenses typed by hand instead of the movements. */
     manual: manualData.nullish(),
@@ -833,6 +836,8 @@ const autonomoSaved = z
         priorNet: formText,
         /** No activity last year: box 13 of the 130 takes 0 € (frontend AutonomoManual.tsx, Extras). */
         noPriorActivity: z.boolean().optional(),
+        /** Where the activity is carried out (frontend AutonomoDraftCard.tsx, ExtrasPanel). */
+        territory: z.enum(ACTIVITY_TERRITORIES).optional(),
         toOffset: formText,
         /** The VAT of the year (frontend vatForm.ts, VatExtras). */
         vat: z
@@ -958,7 +963,20 @@ export const funnelBody = funnelOrigin
       .string()
       .regex(/^[a-z0-9-]{1,80}$/)
       .optional(),
+    /** From the closed list of its event (CLIENT_FUNNEL_DETAILS). */
+    detail: z.string().max(20).optional(),
   })
+  .strict()
+  .refine((b) => !b.detail || (CLIENT_FUNNEL_DETAILS[b.event] ?? []).includes(b.detail), {
+    message: 'Detalle no permitido para este evento',
+    path: ['detail'],
+  });
+
+export const leakParams = z.object({ id: z.string().regex(/^[0-9a-f]{16}$/) });
+/** Other screens that show a figure of the section (goals, monthly summary, import result). */
+export const leakQuery = z.object({ from: z.enum(['goal', 'summary', 'import']).optional() });
+export const leakDecisionBody = z
+  .object({ status: z.enum(['keep', 'cancel', 'dismissed', 'not_mine']) })
   .strict();
 
 export const clientErrorBody = z.object({

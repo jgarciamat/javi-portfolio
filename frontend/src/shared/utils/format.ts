@@ -46,6 +46,13 @@ export function monthLabel(year: number, month: number, locale: string): string 
   return `${monthName(month, locale)} ${year}`;
 }
 
+/** "febrero de 2028" / "February 2028": a month in words, for estimates and «since». */
+export function formatMonthYear(year: number, month: number, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', year: 'numeric' }).format(
+    new Date(year, month - 1, 15)
+  );
+}
+
 /** Local Date (at noon, safe from DST and time zones) for a calendar date YYYY-MM-DD. */
 export function parseDateOnly(value: string): Date {
   const [y, m, d] = value.slice(0, 10).split('-').map(Number);
@@ -64,6 +71,13 @@ export function todayDateOnly(): string {
 }
 
 /** "4 mar 2026" */
+/** "12 de septiembre" / "12 September": a day in words, without the year. */
+export function formatDayMonth(value: string, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { day: 'numeric', month: 'long' }).format(
+    parseDateOnly(value)
+  );
+}
+
 export function formatDate(value: string, locale: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), {
     day: 'numeric',

@@ -93,6 +93,7 @@
 
 .challenge-list li {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -106,4 +107,30 @@
 .challenge-active {
   display: grid;
   gap: 0.5rem;
+}
+
+.challenge-detail {
+  flex-basis: 100%;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.challenge-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid currentcolor;
+  color: var(--slate-400);
+}
+
+.challenge-done .challenge-badge {
+  color: var(--green-400);
+}
+
+.challenge-badge-active {
+  color: var(--slate-200);
 }

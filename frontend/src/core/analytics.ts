@@ -5,7 +5,7 @@ import { isNativeApp } from '@shared/utils/platform';
  * First-party, cookieless funnel analytics (docs/analitica.md).
  *
  * Nothing is stored on the device and nothing identifies the visitor: each call sends one
- * event name, at most a guide slug, and the origin of the landing (kept in memory only for
+ * event name, at most a guide slug or a detail from a closed list, and the origin of the landing (kept in memory only for
  * this page load). The server adds it to a daily counter. Every failure is swallowed:
  * blockers, offline, a down API or a missing `fetch` never reach the UI.
  */
@@ -22,6 +22,13 @@ export const TRACK_EVENTS = [
   'cons_invite_view',
   'cons_invite_copy',
   'cons_invite_share',
+  // «Tu dinero perdido»: section seen (by coverage) and «Import my statement» from it.
+  'dp_view',
+  'dp_import_cta',
+  // «La fecha de tu meta»: date seen, first change of the simulator, «use what you cancel».
+  'goal_date_view',
+  'goal_sim_change',
+  'goal_dp_apply',
 ] as const;
 
 export type TrackEvent = (typeof TRACK_EVENTS)[number];
@@ -29,6 +36,8 @@ export type TrackEvent = (typeof TRACK_EVENTS)[number];
 export interface TrackProps {
   /** Slug of the guide (`guide_view`, `guide_cta_click`): `[a-z0-9-]`, up to 80 characters. */
   guide?: string;
+  /** One value of the closed list of the event (the server rejects any other). */
+  detail?: string;
 }
 
 /** Where this page load came from. Raw values: the server normalises them. */
@@ -98,6 +107,7 @@ export function track(event: TrackEvent, props?: TrackProps): void {
     const body = JSON.stringify({
       event,
       ...(props?.guide ? { guide: props.guide } : {}),
+      ...(props?.detail ? { detail: props.detail } : {}),
       ...landingOrigin(),
       ...(isNativeApp() ? { app: true } : {}),
     });

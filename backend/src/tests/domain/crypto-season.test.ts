@@ -67,11 +67,24 @@ describe('crypto seasons (Spanish calendar months)', () => {
 });
 
 describe('crypto ranking', () => {
-  it('asks for 5 operations closed and 3 days with activity', () => {
-    expect(qualifies({ trades: 5, activeDays: 3 })).toBe(true);
-    expect(qualifies({ trades: 4, activeDays: 9 })).toBe(false);
-    expect(qualifies({ trades: 9, activeDays: 2 })).toBe(false);
-    expect(missing({ trades: 2, activeDays: 1 })).toEqual({ trades: 3, days: 2 });
+  it('asks only for 5 operations closed: the days with activity no longer matter', () => {
+    expect(qualifies({ trades: 5 })).toBe(true);
+    expect(qualifies({ trades: 9 })).toBe(true);
+    expect(qualifies({ trades: 4 })).toBe(false);
+    // Five operations in a single day are enough; four are not, however many days.
+    expect(qualifies(entry('one-day', { trades: 5, activeDays: 1 }))).toBe(true);
+    expect(qualifies(entry('many-days', { trades: 4, activeDays: 20 }))).toBe(false);
+    expect(missing({ trades: 2 })).toEqual({ trades: 3, days: 0 });
+    expect(missing({ trades: 4 })).toEqual({ trades: 1, days: 0 });
+    expect(missing({ trades: 7 })).toEqual({ trades: 0, days: 0 });
+  });
+
+  it('breaks ties without the days: more operations, then who reached it first', () => {
+    const fewDays = entry('a', { trades: 6, activeDays: 1 });
+    const manyDays = entry('b', { trades: 5, activeDays: 20 });
+    const first = entry('c', { trades: 5, activeDays: 1, reachedAt: '2026-03-03T10:00:00.000Z' });
+    expect(rank([manyDays, fewDays, first]).map((e) => e.key)).toEqual(['a', 'c', 'b']);
+    expect(compareEntries(entry('x', { activeDays: 1 }), entry('y', { activeDays: 9 }))).toBe(-1);
   });
 
   it('orders by return, then operations, then who reached it first, then a stable key', () => {

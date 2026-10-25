@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { track } from '@core/analytics';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { recordPositiveMoment } from '@core/review/review';
-import { useFormat } from '@core/settings/SettingsContext';
+import { useFormat, useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
@@ -12,13 +13,22 @@ import '../css/Sections.css';
 import { EmojiPickerButton } from '../components/EmojiPickerButton';
 import { Icon } from '@shared/components/Icon';
 import { ExportButtons } from '../components/ExportButtons';
+import { GoalDateLine, type LeaksForGoal } from '../components/GoalDateSheet';
+import type { YearMonth } from '../../domain/goalDate';
+import type { DashboardTab } from '../navigation';
 
 function GoalCard({
   goal,
+  current,
+  leaks,
+  onOpenTab,
   onToggleArchive,
   onDelete,
 }: {
   goal: Goal;
+  current: YearMonth;
+  leaks: LeaksForGoal | null;
+  onOpenTab: (tab: DashboardTab) => void;
   onToggleArchive: () => void;
   onDelete: () => void;
 }) {
@@ -61,6 +71,9 @@ function GoalCard({
           <span>{t('app.goals.monthlyNeeded', { amount: money(progress.monthlyNeeded) })}</span>
         )}
       </div>
+      {!goal.archived && !progress.completed && (
+        <GoalDateLine goal={goal} current={current} leaks={leaks} onOpenTab={onOpenTab} />
+      )}
       <div className="entity-actions">
         <button
           className="icon-btn"
@@ -182,12 +195,30 @@ function GoalForm({
   );
 }
 
+/** How a goal's date was shown, for the anonymous count (docs/analitica.md). */
+function dateDetail(goals: Goal[]): 'real' | 'asked' | 'done' | null {
+  const open = goals.filter((g) => !g.archived);
+  if (open.some((g) => !g.progress.completed && g.progress.averageMonthly !== null)) return 'real';
+  if (open.some((g) => !g.progress.completed)) return 'asked';
+  return open.length > 0 ? 'done' : null;
+}
+
+/** The current period of the user (their month may start on another day), or this month. */
+function useCurrentPeriod(): YearMonth {
+  const period = useOptionalSettings()?.settings?.currentPeriod;
+  const now = new Date();
+  return period
+    ? { year: period.year, month: period.month }
+    : { year: now.getFullYear(), month: now.getMonth() + 1 };
+}
+
 /**
  * Savings goals. Progress comes from SAVING movements recorded in the goal's
- * category, so saving towards a goal is just recording a saving in that category.
+ * category, so saving towards a goal is just recording a saving in that category. Each goal
+ * says when it is reached at the real pace (or the one the user gives), with a «what if…».
  */
-export function GoalsView() {
-  const { goalApi } = useApi();
+export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
+  const { goalApi, insightsApi } = useApi();
   const { t, tCategory } = useI18n();
   const { currency } = useFormat();
   const { categories, refreshCategories } = useFinances();
@@ -197,6 +228,28 @@ export function GoalsView() {
   const all = goals.data;
   const visible = all.filter((g) => showArchived || !g.archived);
   const reached = all.some((g) => g.progress.completed);
+  const current = useCurrentPeriod();
+  // What the user decided to cancel in «Tu dinero perdido» can go to a goal (never the rest).
+  const leakData = useResource(() => insightsApi.moneyLeaks('goal'), [insightsApi]).data;
+  const leaks = useMemo<LeaksForGoal | null>(
+    () =>
+      leakData
+        ? {
+            decidedMonthly:
+              leakData.reviewed.cancelMonthly + leakData.reviewed.recoveredAnnual / 12,
+            pendingMonthly: leakData.total.annual / 12,
+          }
+        : null,
+    [leakData]
+  );
+  // The date of the goals, seen once per opening of the screen.
+  const detail = goals.loading ? null : dateDetail(all);
+  const counted = useRef(false);
+  useEffect(() => {
+    if (!detail || counted.current) return;
+    counted.current = true;
+    track('goal_date_view', { detail });
+  }, [detail]);
   // Reaching a goal is a good moment to ask for a review.
   useEffect(() => {
     if (reached) recordPositiveMoment();
@@ -263,6 +316,9 @@ export function GoalsView() {
             <GoalCard
               key={g.id}
               goal={g}
+              current={current}
+              leaks={leaks}
+              onOpenTab={onOpenTab}
               onToggleArchive={() => run(() => goalApi.update(g.id, { archived: !g.archived }))}
               onDelete={() => run(() => goalApi.delete(g.id))}
             />
@@ -274,7 +330,8 @@ export function GoalsView() {
           </button>
         )}
       </div>
-      <div className="card">
+      {/* The tour's «when will you reach your goal?» points at the first goal's date, or here. */}
+      <div className="card" data-tour="goal-date">
         <h3 className="subsection-title">
           <Icon name="plus" /> {t('app.goals.new')}
         </h3>

@@ -258,6 +258,38 @@ export const GUIDES: Guide[] = [
     related: ['como-hacer-un-presupuesto-mensual', 'suscripciones-que-no-usas'],
   },
   {
+    slug: 'tu-dinero-perdido',
+    updated: '2026-10-25',
+    title: 'Tu dinero perdido: revisa los cobros que se repiten',
+    description:
+      'Revisa en Finanverso los cobros que se repiten, las subidas de precio, los cobros dobles y los gastos hormiga, y decide qué hacer con cada uno.',
+    intro:
+      'Importa el extracto de tu banco y Finanverso te dice cuánto te cuestan al año los cobros que conviene revisar. Tú decides qué hacer con cada uno.',
+    sections: [
+      {
+        heading: 'Qué revisa',
+        paragraphs: [
+          'Los cobros que se repiten cada semana, mes, dos meses, tres meses o año; las subidas de precio; los cobros dobles del mismo importe en uno o dos días, y los gastos hormiga: pequeños gastos que se repiten en el mismo sitio y suman al año.',
+          'Lo calcula con tus movimientos, en nuestro servidor y sin inteligencia artificial. La luz, la vivienda, los préstamos, los seguros y los Bizum no cuentan en la cifra; sus subidas sí se avisan.',
+        ],
+      },
+      {
+        heading: 'Cómo usarlo',
+        paragraphs: [
+          'Descarga de tu banco los últimos 12 meses en un solo archivo e impórtalo. Abre «Tu dinero perdido» en el menú. En cada cobro elige «Lo sigo usando» o «Quiero darlo de baja»; en «Más opciones» puedes decir que no es una suscripción o que no reconoces el cobro.',
+          'Lo que decidas dar de baja puede ir a una de tus metas: en «¿Y si aparto más?» verás cuántos meses antes llegarías.',
+        ],
+      },
+      {
+        heading: 'Lo que no hace',
+        paragraphs: [
+          'No sabe si usas un servicio ni lo cancela por ti: para darte de baja, entra en la web o la app del servicio. Si no reconoces un cobro, llama a tu banco cuanto antes. Las cifras son estimaciones orientativas, no asesoramiento financiero.',
+        ],
+      },
+    ],
+    related: ['suscripciones-que-no-usas', 'gastos-hormiga'],
+  },
+  {
     slug: 'suscripciones-que-no-usas',
     updated: '2026-10-11',
     title: 'Suscripciones que no usas: cómo encontrarlas y cancelarlas',

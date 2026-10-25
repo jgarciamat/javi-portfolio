@@ -5,6 +5,7 @@ import { AnalysisView } from '@modules/finances/ui/views/AnalysisView';
 import { AssetsView } from '@modules/finances/ui/views/AssetsView';
 import { BudgetsView } from '@modules/finances/ui/views/BudgetsView';
 import { GoalsView } from '@modules/finances/ui/views/GoalsView';
+import { MoneyLeaksView } from '@modules/finances/ui/views/MoneyLeaksView';
 import { SearchView } from '@modules/finances/ui/views/SearchView';
 import { SplitView } from '@modules/finances/ui/views/SplitView';
 import { CategoryManager } from '@modules/finances/ui/components/CategoryManager';
@@ -301,7 +302,7 @@ describe.each(LOCALES)('exports in %s', (locale) => {
         progress: { ...f.goal().progress, monthlyNeeded: null },
       }),
     ]);
-    render(<GoalsView />, api);
+    render(<GoalsView onOpenTab={jest.fn()} />, api);
     const button = await csvButton(locale, 'app.goals.title');
     await waitFor(() => expect(button).toBeEnabled());
     const file = await download(button);
@@ -337,7 +338,7 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(pdf.body).toHaveLength(2);
   });
 
-  it('Analysis: trends, net worth and subscriptions', async () => {
+  it('Analysis: trends and net worth', async () => {
     const api = createFakeApi();
     api.insightsApi.trends.mockResolvedValue({
       year: 2026,
@@ -357,7 +358,7 @@ describe.each(LOCALES)('exports in %s', (locale) => {
       { year: 2026, month: 2, available: 100, saved: 50, assets: 0, debts: 0, netWorth: 150 },
       { year: 2026, month: 3, available: 200, saved: 60, assets: 0, debts: 0, netWorth: 260 },
     ]);
-    render(<AnalysisView />, api);
+    render(<AnalysisView onOpenTab={jest.fn()} />, api);
     const trends = await download(await csvButton(locale, 'app.analysis.trendsName'));
     expect(trends.name).toBe(`finanverso_tendencias_2026-03_${TODAY}.csv`);
     expect(trends.head).toBe(
@@ -376,28 +377,52 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(worth.head.startsWith(header(locale, ['app.analysis.month']))).toBe(true);
     expect(worth.rows[0].startsWith('"2026-02"')).toBe(true);
     expect(worth.rows).toHaveLength(2);
-    const subs = await download(await csvButton(locale, 'app.subscriptions.title'));
-    expect(subs.name).toBe(`finanverso_suscripciones_${TODAY}.csv`);
-    expect(subs.head).toBe(
-      header(locale, [
-        'app.subscriptions.col.name',
-        'app.subscriptions.col.cadence',
-        money(locale, 'app.subscriptions.col.amount'),
-        money(locale, 'app.subscriptions.col.perYear'),
-        'app.subscriptions.col.next',
-      ])
-    );
-    expect(subs.rows).toHaveLength(2);
     const trendsPdf = await downloadPdf(await pdfButton(locale, 'app.analysis.trendsName'));
     expect(trendsPdf.name).toBe(`finanverso_tendencias_2026-03_${TODAY}.pdf`);
     expect(trendsPdf.body).toHaveLength(1);
     const worthPdf = await downloadPdf(await pdfButton(locale, 'app.analysis.netWorthTitle'));
     expect(worthPdf.name).toBe(`finanverso_patrimonio_evolucion_${TODAY}.pdf`);
     expect(worthPdf.body).toHaveLength(2);
-    const subsPdf = await downloadPdf(await pdfButton(locale, 'app.subscriptions.title'));
-    expect(subsPdf.name).toBe(`finanverso_suscripciones_${TODAY}.pdf`);
-    expect(subsPdf.text.startsWith('%PDF-')).toBe(true);
-    expect(subsPdf.body).toHaveLength(2);
+  });
+
+  it('Money leaks: the findings still to check that the plan shows', async () => {
+    const api = createFakeApi();
+    api.insightsApi.moneyLeaks.mockResolvedValue(
+      f.moneyLeaks({
+        findings: [
+          f.leakFinding(),
+          f.leakFinding({
+            kind: 'duplicate',
+            label: 'ELECTRO MARKET',
+            cadence: null,
+            amount: 89,
+            annual: 0,
+            oneOff: 89,
+            lastDate: '2026-09-12',
+          }),
+          f.leakFinding({ label: 'VIEJO', status: 'keep' }),
+        ],
+      })
+    );
+    render(<MoneyLeaksView onImport={jest.fn()} onOpenTab={jest.fn()} />, api);
+    const file = await download(await csvButton(locale, 'app.leaks.exportWhat'));
+    expect(file.name).toBe(`finanverso_dinero-perdido_${TODAY}.csv`);
+    expect(file.head).toBe(
+      header(locale, [
+        'app.leaks.col.label',
+        'app.leaks.col.kind',
+        'app.leaks.col.cadence',
+        money(locale, 'app.leaks.col.amount'),
+        money(locale, 'app.leaks.col.annual'),
+        money(locale, 'app.leaks.col.oneOff'),
+        'app.leaks.col.last',
+      ])
+    );
+    expect(file.rows).toHaveLength(2);
+    expect(file.rows[0]).toContain(`"FITBOX";"${translate(locale, 'app.leaks.tag.recurring')}"`);
+    expect(file.rows[1]).toContain(`"${translate(locale, 'app.leaks.tag.duplicate')}";""`);
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.leaks.exportWhat'));
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Net worth: investments, goods and debts', async () => {

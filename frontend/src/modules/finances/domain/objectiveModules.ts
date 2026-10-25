@@ -7,6 +7,7 @@ import {
 import { modules2025 } from '@modules/tools/data/renta/modulos-2025';
 import { figuresFor } from './fiscalFigures';
 import { form131, staffRate, type Result131 } from './module131';
+import { reducedInstalment, type ActivityTerritory } from './activityTerritory';
 
 /**
  * Non-farming activities in módulos (estimación objetiva, annex II of the order of each year): the
@@ -287,6 +288,8 @@ export interface Instalment131Inputs {
   lastYearNet: number | null;
   /** Depreciation at the maximum rate of the assets in use at 1 January. */
   depreciationAtStart: number;
+  /** Where the activity is carried out: some quarters of La Palma also take the 60 % cut. */
+  territory?: ActivityTerritory;
 }
 
 /**
@@ -307,15 +310,13 @@ export function instalments131(
   let pending = 0;
   for (let q = 1 as 1 | 2 | 3 | 4; q <= args.quarter; q = (q + 1) as 1 | 2 | 3 | 4) {
     const share = quarterShare(input, args.year, q);
+    // Art. 110.2 RIRPF: ticked by hand, or by the territory of the activity in that quarter.
+    const ceutaMelilla = input.ceutaMelilla || reducedInstalment(args.territory, args.year, q);
     const result = form131({
       year: args.year,
       quarter: q,
-      activities: input.noData
-        ? []
-        : [{ net: net.net, staffUnits: staff, share, ceutaMelilla: input.ceutaMelilla }],
-      ...(input.noData
-        ? { noData: { income: round2(args.income[q - 1]), ceutaMelilla: input.ceutaMelilla } }
-        : {}),
+      activities: input.noData ? [] : [{ net: net.net, staffUnits: staff, share, ceutaMelilla }],
+      ...(input.noData ? { noData: { income: round2(args.income[q - 1]), ceutaMelilla } } : {}),
       withheld: round2(args.withheld[q - 1]),
       lastYearNet: args.lastYearNet,
       pendingNegative: pending,

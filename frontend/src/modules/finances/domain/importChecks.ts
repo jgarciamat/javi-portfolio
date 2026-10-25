@@ -1,3 +1,4 @@
+import { hardToJustifyRate, type ActivityTerritory } from './activityTerritory';
 import { needsCheck, supplierKey, type ImportedInvoice } from './invoiceLedger';
 import type { ManualData, ManualExpense } from './types';
 import { isEuVatId } from './vatBook';
@@ -54,6 +55,8 @@ export interface CheckInput {
   /** The figures of an imported modelo 130 (boxes 01 and 02). */
   model130: { year: number; quarter: number; income: number; expenses: number } | null;
   hardToJustify: boolean;
+  /** Where the activity is carried out: the hard-to-justify rate depends on it (and on the year). */
+  territory?: ActivityTerritory;
 }
 
 /** Share of all expenses that «Other» may reach before it is worth a look. */
@@ -67,7 +70,6 @@ const MEALS_DAILY_LIMIT = 26.67;
 const HEALTH_PER_PERSON = 500;
 const HEALTH_DISABILITY = 1500;
 const SUPPLIES_RATE = 0.3;
-const HARD_TO_JUSTIFY_RATE = 0.05;
 const HARD_TO_JUSTIFY_MAX = 2000;
 /** Kinds that never carry VAT: a 0 % rate on them is expected. */
 const NO_VAT: ManualExpense['kind'][] = ['quota', 'staff', 'health', 'fines'];
@@ -212,7 +214,8 @@ function model130(input: CheckInput): ImportCheck[] {
   );
   if (input.hardToJustify) {
     expenses += Math.min(
-      Math.max(0, income - expenses) * HARD_TO_JUSTIFY_RATE,
+      Math.max(0, income - expenses) *
+        hardToJustifyRate(input.territory, input.year, filed.quarter),
       HARD_TO_JUSTIFY_MAX
     );
   }

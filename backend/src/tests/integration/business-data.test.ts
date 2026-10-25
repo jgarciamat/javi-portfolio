@@ -146,7 +146,13 @@ describe('The self-employed form saved in the account', () => {
     // «No activity last year» is kept apart from an empty field (box 13 of the 130).
     const next = {
       ...form(),
-      extras: { ...form().extras, priorNet: '-300', noPriorActivity: true },
+      extras: {
+        ...form().extras,
+        priorNet: '-300',
+        noPriorActivity: true,
+        // Where the activity is carried out (8 % of the 130 in Ceuta, Melilla and La Palma).
+        territory: 'laPalma',
+      },
     };
     expect((await put(ana, { data: next, baseVersion: 1 }).expect(200)).body).toEqual({
       version: 2,

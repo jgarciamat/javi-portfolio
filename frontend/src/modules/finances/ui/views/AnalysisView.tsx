@@ -4,15 +4,11 @@ import { useResource } from '@shared/hooks/useResource';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
-import type {
-  CategoryTrend,
-  DetectedSubscription,
-  NetWorthPoint,
-} from '@modules/finances/domain/types';
-import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import type { CategoryTrend, NetWorthPoint } from '@modules/finances/domain/types';
 import { PremiumOnly } from '@modules/billing/ui/PremiumOnly';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
+import type { DashboardTab } from '../navigation';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { ExportButtons } from '../components/ExportButtons';
@@ -133,13 +129,13 @@ function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
 }
 
 /**
- * The analysis tab: the subscriptions found are for everyone (the free plan sees the most
- * expensive ones); the trends and the net worth evolution are Premium.
+ * The analysis tab: a way to «Tu dinero perdido» for everyone; the trends and the net worth
+ * evolution are Premium.
  */
-export function AnalysisView() {
+export function AnalysisView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
   return (
     <div className="section-view">
-      <SubscriptionsCard />
+      <LeaksLine onOpenTab={onOpenTab} />
       <PremiumOnly
         icon="trend"
         titleKey="app.analysis.trendsName"
@@ -298,126 +294,21 @@ function NetWorthCard() {
   );
 }
 
-function SubscriptionRow({ item }: { item: DetectedSubscription }) {
+/**
+ * The detected subscriptions now live in «Tu dinero perdido», with the price rises, double
+ * charges and small spending: here only the way there (the old /stats/subscriptions answer
+ * stays on the server for the app versions already installed).
+ */
+function LeaksLine({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
   const { t } = useI18n();
-  const { money, date } = useFormat();
   return (
-    <tr>
-      <td>
-        {item.description}
-        {item.priceIncrease && (
-          <span className="trend trend--up">
-            {' '}
-            ▲{' '}
-            {t('app.subscriptions.increase', {
-              from: money(item.priceIncrease.from),
-              to: money(item.priceIncrease.to),
-            })}
-          </span>
-        )}
-      </td>
-      <td>{t(`app.subscriptions.${item.cadence}`)}</td>
-      <td>{money(item.amount)}</td>
-      <td>{money(item.annualCost)}</td>
-      <td>{date(item.nextDate)}</td>
-    </tr>
-  );
-}
-
-/** Charges that repeat like a subscription, to review what is being paid for. */
-function SubscriptionsCard() {
-  const { insightsApi } = useApi();
-  const { t } = useI18n();
-  const { money, currency } = useFormat();
-  const { data, error } = useResource(() => insightsApi.subscriptions(), [insightsApi]);
-  const columns = ['name', 'cadence', 'amount', 'perYear', 'next'];
-  const table = () => ({
-    head: columns.map((c) =>
-      c === 'amount' || c === 'perYear'
-        ? `${t(`app.subscriptions.col.${c}`)} (${currency})`
-        : t(`app.subscriptions.col.${c}`)
-    ),
-    rows: data!.subscriptions.map((item) => [
-      item.description,
-      t(`app.subscriptions.${item.cadence}`),
-      item.amount,
-      item.annualCost,
-      item.nextDate.slice(0, 10),
-    ]),
-  });
-
-  return (
-    <div className="card">
-      <h2 className="section-title">
-        <Icon name="repeat" /> {t('app.subscriptions.title')}
-      </h2>
-      <p className="section-hint">{t('app.subscriptions.hint')}</p>
-      <ExportButtons
-        name="suscripciones"
-        what={t('app.subscriptions.title')}
-        count={data?.subscriptions.length ?? 0}
-        table={table}
-        pdf
-      />
-      {error && <p className="form-error">{error}</p>}
-      {data?.subscriptions.length === 0 && (
-        <p className="empty-state">{t('app.subscriptions.none')}</p>
-      )}
-      {data && data.subscriptions.length > 0 && (
-        <>
-          <p className="section-total-line">
-            {t('app.subscriptions.total', {
-              monthly: money(data.monthly),
-              annual: money(data.annual),
-            })}
-          </p>
-          {data.locked && (
-            <p className="section-hint">{t('app.subscriptions.found', { count: data.count })}</p>
-          )}
-          <ScrollRegion className="table-scroll" label={t('app.subscriptions.title')}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  {columns.map((c) => (
-                    <th key={c}>{t(`app.subscriptions.col.${c}`)}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.subscriptions.map((item) => (
-                  <SubscriptionRow key={item.key} item={item} />
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
-          {data.locked && <MoreSubscriptions hidden={data.count - data.subscriptions.length} />}
-        </>
-      )}
-    </div>
-  );
-}
-
-/** Free plan: the full list is Premium. */
-function MoreSubscriptions({ hidden }: { hidden: number }) {
-  const { t } = useI18n();
-  const plan = useOptionalPlan();
-  return (
-    <div className="plan-upsell">
-      <p className="section-hint">
-        <Icon name="lock" />{' '}
-        {hidden > 0
-          ? t('app.subscriptions.moreLocked', { count: hidden })
-          : t('app.subscriptions.fullLocked')}{' '}
-        <span className="premium-chip">Premium</span>
+    <div className="card leaks-analysis-line">
+      <p>
+        <Icon name="coins" /> {t('app.leaks.analysisLine')}
       </p>
-      {plan && (
-        <button
-          className="btn-primary"
-          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'insights' })}
-        >
-          {t('billing.seePlans')}
-        </button>
-      )}
+      <button type="button" className="btn-secondary" onClick={() => onOpenTab('leaks')}>
+        {t('app.leaks.analysisCta')}
+      </button>
     </div>
   );
 }

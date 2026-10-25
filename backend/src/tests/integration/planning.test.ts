@@ -189,6 +189,10 @@ describe('Categories, budgets, alerts and goals', () => {
         monthsLeft: 10,
         monthlyNeeded: 240,
         completed: false,
+        // Saved this month only: no pace yet.
+        averageMonthly: null,
+        historyMonths: 0,
+        savedThisMonth: 600,
       });
     });
 

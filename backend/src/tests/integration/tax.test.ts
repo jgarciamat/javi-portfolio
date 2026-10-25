@@ -293,6 +293,15 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       );
     });
 
+    it('takes 8 % in Melilla (art. 110.2 RIRPF) and refuses an unknown territory', async () => {
+      // Net income of the 1T: 1,100 − 200 = 900; 8 % = 72 (20 % would be 180).
+      const { body } = await draft(1, { territory: 'melilla' }).expect(201);
+      expect(box(body.irpf.boxes, '04')).toBe(72);
+      expect(body.irpf.rate).toBe(0.08);
+      expect((await draft(1).expect(201)).body.irpf.rate).toBe(0.2);
+      await draft(1, { territory: 'madrid' }).expect(400);
+    });
+
     describe('with the income and expenses typed by hand', () => {
       const profile = {
         workArea: 20,
@@ -567,13 +576,14 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       await draft(2).expect(402);
       const billing = async () => (await request(ctx.app).get('/api/billing').set(user.auth)).body;
       expect((await billing()).usage.autonomoDrafts).toBe(1);
+      const spent = { used: 1, territory: 'general', territoryExtraUsed: false };
       expect((await billing()).autonomoQuarters).toEqual([
-        { year: 2026, quarter: 3, used: 1 },
-        { year: 2026, quarter: 2, used: 1 },
+        { year: 2026, quarter: 3, ...spent },
+        { year: 2026, quarter: 2, ...spent },
       ]);
       // The filing window of the second quarter closes on 20 July.
       ctx.clock.set('2026-07-21T10:00:00Z');
-      expect((await billing()).autonomoQuarters).toEqual([{ year: 2026, quarter: 3, used: 1 }]);
+      expect((await billing()).autonomoQuarters).toEqual([{ year: 2026, quarter: 3, ...spent }]);
       expect((await draft(2).expect(402)).body.code).toBe('AUTONOMO_QUARTER_LOCKED');
       // A new quarter brings a new free draft.
       ctx.clock.set('2026-10-02T10:00:00Z');
@@ -584,6 +594,82 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       ctx.container.entitlements.grantDays(user.id, 30);
       for (let i = 2; i <= 3; i++) expect((await draft(4).expect(201)).body.used).toBe(i);
       expect((await draft(1).expect(201)).body.used).toBe(1);
+    });
+
+    describe('the extra free draft after changing where the activity is carried out', () => {
+      const billing = async () =>
+        (await request(ctx.app).get('/api/billing').set(user.auth)).body.autonomoQuarters;
+      const third = async () => (await billing()).find((q: { quarter: number }) => q.quarter === 3);
+
+      it('redoes the spent draft once with the new territory, and not again', async () => {
+        expireTrial(ctx, user);
+        expect((await billing())[0]).toEqual({
+          year: 2026,
+          quarter: 3,
+          used: 0,
+          territory: null,
+          territoryExtraUsed: false,
+        });
+        expect((await draft(3).expect(201)).body.irpf.rate).toBe(0.2);
+        expect((await draft(3).expect(402)).body.code).toBe('PLAN_LIMIT');
+        // Ceuta: the 130 at 8 % (art. 110.2 RIRPF). The extra does not count as one more.
+        const redone = (await draft(3, { territory: 'ceuta' }).expect(201)).body;
+        expect(redone.irpf.rate).toBe(0.08);
+        expect(redone.used).toBe(1);
+        expect(await third()).toMatchObject({
+          used: 1,
+          territory: 'ceuta',
+          territoryExtraUsed: true,
+        });
+        // A second change gives nothing more, nor going back.
+        for (const territory of ['melilla', 'general', 'ceuta']) {
+          expect((await draft(3, { territory }).expect(402)).body.code).toBe('PLAN_LIMIT');
+        }
+        expect((await draft(3).expect(402)).body.code).toBe('PLAN_LIMIT');
+      });
+
+      it('is one per quarter: the quarter just ended has its own, a new one starts free', async () => {
+        expireTrial(ctx, user);
+        await draft(3).expect(201);
+        await draft(2).expect(201);
+        await draft(3, { territory: 'laPalma' }).expect(201);
+        await draft(3, { territory: 'melilla' }).expect(402);
+        // The 2T keeps its own extra (in La Palma at 20 %: the DA 57.ª starts with the 3T of 2026).
+        expect((await draft(2, { territory: 'laPalma' }).expect(201)).body.irpf.rate).toBe(0.2);
+        await draft(2, { territory: 'ceuta' }).expect(402);
+        // A quarter that cannot be drafted for free stays locked, whatever the territory.
+        const locked = await draft(1, { territory: 'ceuta' }).expect(402);
+        expect(locked.body.code).toBe('AUTONOMO_QUARTER_LOCKED');
+        // In the 4T the first draft is the plan's, made in Ceuta: the same again is refused, and
+        // the extra is for a change (back to the general territory here).
+        ctx.clock.set('2026-10-02T10:00:00Z');
+        expect((await draft(4, { territory: 'ceuta' }).expect(201)).body.used).toBe(1);
+        await draft(4, { territory: 'ceuta' }).expect(402);
+        expect((await draft(4).expect(201)).body.used).toBe(1);
+        await draft(4, { territory: 'melilla' }).expect(402);
+      });
+
+      it('does not touch Premium, and reads older rows as the general territory', async () => {
+        // In the trial every draft counts and the territory is only kept.
+        expect((await draft(3).expect(201)).body.used).toBe(1);
+        expect((await draft(3, { territory: 'ceuta' }).expect(201)).body.used).toBe(2);
+        expect(await third()).toMatchObject({
+          used: 2,
+          territory: 'ceuta',
+          territoryExtraUsed: false,
+        });
+        // A quarter drafted before territories were kept (null): it was the general territory.
+        ctx.container.db
+          .prepare(
+            `INSERT INTO autonomo_quarter_drafts (user_id, year, quarter, uses) VALUES (?, 2026, 2, 1)`
+          )
+          .run(user.id);
+        expireTrial(ctx, user);
+        expect((await billing())[1]).toMatchObject({ quarter: 2, territory: 'general' });
+        await draft(2).expect(402);
+        expect((await draft(2, { territory: 'melilla' }).expect(201)).body.used).toBe(1);
+        await draft(2, { territory: 'general' }).expect(402);
+      });
     });
 
     it('lets the free plan download one PDF only, and Premium as many as it wants', async () => {

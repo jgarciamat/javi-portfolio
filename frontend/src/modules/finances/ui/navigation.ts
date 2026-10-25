@@ -3,6 +3,7 @@ export type DashboardTab =
   | 'monthly'
   | 'annual'
   | 'analysis'
+  | 'leaks'
   | 'health'
   | 'search'
   | 'accounts'
@@ -59,6 +60,13 @@ const SECTIONS: Omit<DashboardSection, 'color'>[] = [
     id: 'analysis',
     icon: 'trend',
     labelKey: 'app.tabs.analysis',
+    group: 'overview',
+  },
+  {
+    id: 'leaks',
+    icon: 'coins',
+    labelKey: 'app.tabs.leaks',
+    menuKey: 'app.menu.short.leaks',
     group: 'overview',
   },
   { id: 'health', icon: 'heart', labelKey: 'app.tabs.health', group: 'overview' },

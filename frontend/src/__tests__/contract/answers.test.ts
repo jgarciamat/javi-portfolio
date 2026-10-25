@@ -21,6 +21,8 @@ import type {
   CategoryBudget,
   Goal,
   ImportResult,
+  LeakFinding,
+  MoneyLeaks,
   MonthOverview,
   Transaction,
   TransactionSearchResult,
@@ -56,6 +58,8 @@ import { budgets } from './fixtures/budgets';
 import { businessCategories } from './fixtures/businessCategories';
 import { categories } from './fixtures/categories';
 import { goals } from './fixtures/goals';
+import { leakDecision } from './fixtures/leakDecision';
+import { moneyLeaks } from './fixtures/moneyLeaks';
 import { importResult } from './fixtures/importResult';
 import { monthOverview } from './fixtures/monthOverview';
 import { nameChange } from './fixtures/nameChange';
@@ -82,6 +86,8 @@ describe('API answers fit the types of the app', () => {
     contract<UserSettings>()(settings);
     contract<{ accounts: Account[]; total: number }>()(accounts);
     contract<Goal[]>()(goals);
+    contract<MoneyLeaks>()(moneyLeaks);
+    contract<LeakFinding>()(leakDecision);
     contract<ImportResult>()(importResult);
     expect(monthOverview.transactions.length).toBeGreaterThan(0);
   });

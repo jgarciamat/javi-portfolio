@@ -89,7 +89,7 @@ function setup(options: Partial<BillingOptions> = {}) {
     gateway,
     email,
     () => usage,
-    () => [{ year: 2026, quarter: 1, used: 1 }],
+    () => [{ year: 2026, quarter: 1, used: 1, territory: 'general', territoryExtraUsed: false }],
     () => 'es',
     { run: (work) => work() },
     clock,
@@ -164,7 +164,7 @@ describe('BillingService', () => {
   describe('catalog and overview', () => {
     it('includes the self-employed drafts of each quarter that can be drafted', () => {
       expect(setup().service.overview('u1').autonomoQuarters).toEqual([
-        { year: 2026, quarter: 1, used: 1 },
+        { year: 2026, quarter: 1, used: 1, territory: 'general', territoryExtraUsed: false },
       ]);
     });
 

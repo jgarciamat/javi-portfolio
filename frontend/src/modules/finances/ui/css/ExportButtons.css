@@ -29,3 +29,51 @@
   flex-basis: 100%;
   margin: 0;
 }
+
+/* With `tooltip`: no loose line of text; why they are off shows on hover or focus. */
+.export-buttons--tip {
+  position: relative;
+  flex-wrap: nowrap;
+  margin: 0;
+  border-radius: 10px;
+}
+
+.export-buttons--tip:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 3px;
+}
+
+.export-tip {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 5;
+  width: max-content;
+  max-width: 16rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  background: var(--slate-100);
+  color: var(--slate-900);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 8px 20px -8px rgba(2, 6, 23, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.export-buttons--tip:hover .export-tip,
+.export-buttons--tip:focus .export-tip,
+.export-buttons--tip:focus-within .export-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 720px) {
+  .export-tip {
+    right: auto;
+    left: 0;
+  }
+}

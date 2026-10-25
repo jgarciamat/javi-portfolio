@@ -14,22 +14,22 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 ### 1.º trimestre de 2026
 
 - 303: no presenta. En Ceuta no se aplica el IVA (art. 3 LIVA); el IPSI es un impuesto local fuera de Finanverso.
-- 130 (acumulado): ingresos 9.000,00 − gastos 2.451,63 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 327,42 = 6.220,95; 8 % = 497,68 − pagos anteriores 0,00 − retenciones 0,00 → **497,68** (art. 110.1 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
+- 130 (acumulado): ingresos 9.000,00 − gastos 2.451,63 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 327,42 = 6.220,95; 8 % = 497,68 − pagos anteriores 0,00 − retenciones 0,00 → **497,68** (art. 110.2 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
 
 ### 2.º trimestre de 2026
 
 - 303: no presenta. En Ceuta no se aplica el IVA (art. 3 LIVA); el IPSI es un impuesto local fuera de Finanverso.
-- 130 (acumulado): ingresos 20.000,00 − gastos 4.903,26 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 754,84 = 14.341,90; 8 % = 1.147,35 − pagos anteriores 497,68 − retenciones 0,00 → **649,67** (art. 110.1 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
+- 130 (acumulado): ingresos 20.000,00 − gastos 4.903,26 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 754,84 = 14.341,90; 8 % = 1.147,35 − pagos anteriores 497,68 − retenciones 0,00 → **649,67** (art. 110.2 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
 
 ### 3.º trimestre de 2026
 
 - 303: no presenta. En Ceuta no se aplica el IVA (art. 3 LIVA); el IPSI es un impuesto local fuera de Finanverso.
-- 130 (acumulado): ingresos 28.000,00 − gastos 7.354,89 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 1.032,26 = 19.612,85; 8 % = 1.569,03 − pagos anteriores 1.147,35 − retenciones 0,00 → **421,68** (art. 110.1 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
+- 130 (acumulado): ingresos 28.000,00 − gastos 7.354,89 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 1.032,26 = 19.612,85; 8 % = 1.569,03 − pagos anteriores 1.147,35 − retenciones 0,00 → **421,68** (art. 110.2 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
 
 ### 4.º trimestre de 2026
 
 - 303: no presenta. En Ceuta no se aplica el IVA (art. 3 LIVA); el IPSI es un impuesto local fuera de Finanverso.
-- 130 (acumulado): ingresos 40.000,00 − gastos 9.806,52 (incluye la cuota de autónomo 1.281,63 del trimestre) − 5 % de difícil justificación 1.509,67 = 28.683,81; 8 % = 2.294,70 − pagos anteriores 1.569,03 − retenciones 0,00 → **725,67** (art. 110.1 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
+- 130 (acumulado): ingresos 40.000,00 − gastos 9.806,52 (incluye la cuota de autónomo 1.281,63 del trimestre) − 10 % de difícil justificación 2.000,00 (DA 64.ª LIRPF: 10 % en Ceuta desde el 4T de 2026; máximo 2.000 €) = 28.193,48; 8 % = 2.255,48 − pagos anteriores 1.569,03 − retenciones 0,00 → **686,45** (art. 110.2 RIRPF: 8 % con derecho a la deducción de Ceuta y Melilla)
 
 ### RETA
 

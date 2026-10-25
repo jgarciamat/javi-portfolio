@@ -284,6 +284,7 @@ export interface CryptoRanking {
     trades: number;
     activeDays: number;
     qualified: boolean;
+    /** `days` is always 0 (there is no minimum of days): only older versions of the app read it. */
     missing: { trades: number; days: number };
   };
   /**
@@ -296,6 +297,7 @@ export interface CryptoRanking {
   rules: {
     size: number;
     minTrades: number;
+    /** Always 0 (there is no minimum of days): only older versions of the app read it. */
     minDays: number;
     prizeDays: number;
     initial: number;

@@ -2,7 +2,15 @@ import { readFileSync } from 'node:fs';
 import { expect, openSection, signIn, test } from './fixtures';
 import { walkWizard } from './wizard';
 
-test.beforeEach(async ({ page }) => signIn(page));
+// The page's calendar is pinned to a day of the 3rd quarter's filing window (15 October 2026), so
+// the years offered (last, this and next) and the warnings of past quarters do not depend on the
+// day the suite runs. The clock keeps running from there; the server keeps its own.
+const TODAY = new Date('2026-10-15T10:00:00+02:00');
+
+test.beforeEach(async ({ page }) => {
+  await page.clock.install({ time: TODAY });
+  await signIn(page);
+});
 
 // An invented issued-invoices book (semicolon CSV, as a Spanish Excel saves it): three invoices of
 // the 3rd quarter of 2026. VAT: 3000 at 21 % + 500 at 10 % = 680. IRPF: 20 % of 3500, minus the

@@ -77,6 +77,13 @@ describe('the self-employed screen step by step: persona 24 (VAT, first quarter)
     next();
     pick('regime', 'general');
     next();
+    // Ceuta: the 130 at 8 % (art. 110.2 RIRPF); the persona goes back to the general territory.
+    pick('territory', 'ceuta');
+    expect(JSON.parse(localStorage.getItem('mm_autonomo_extras') as string).territory).toBe(
+      'ceuta'
+    );
+    pick('territory', 'general');
+    next();
     pick('retained', 'no');
     next();
     pick('simplified', 'yes');

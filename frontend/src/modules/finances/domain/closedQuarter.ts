@@ -1,17 +1,13 @@
 import { parseDecimal } from '@shared/utils/numbers';
+import { filingDeadline } from './workingDays';
 
 /**
  * Whether a quarter is closed: its modelo 130 and 303 can no longer be filed in time. The last day is
- * the 20th of the month after the quarter (30 January for the fourth), a weekend moving to the
- * Monday (instructions of the modelos 130 and 303, AEAT, checked 2026-10-21; the same rule as the
- * deadlines of the server draft). Public holidays are not known here.
+ * the 20th of the month after the quarter (30 January for the fourth), moved past weekends and
+ * national holidays (instructions of the modelos 130 and 303, AEAT, checked 2026-10-25; the same rule
+ * as the deadlines of the server draft: workingDays.ts).
  */
-export function filingDeadline(year: number, quarter: 1 | 2 | 3 | 4): string {
-  const d =
-    quarter === 4 ? new Date(Date.UTC(year + 1, 0, 30)) : new Date(Date.UTC(year, quarter * 3, 20));
-  while (d.getUTCDay() === 6 || d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
+export { filingDeadline };
 
 /** `today` as YYYY-MM-DD. */
 export const isClosedQuarter = (year: number, quarter: 1 | 2 | 3 | 4, today: string): boolean =>

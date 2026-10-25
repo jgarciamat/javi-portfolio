@@ -8,6 +8,7 @@ import {
   TransactionSort,
   TransactionView,
 } from '@domain/ports/repositories';
+import { LeakMovement } from '@domain/services/money-leaks';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
@@ -303,6 +304,31 @@ export class SqliteTransactionRepository implements TransactionRepository {
       )
       .all(userId) as { id: string; cents: number }[];
     return Object.fromEntries(rows.map((r) => [r.id, r.cents]));
+  }
+
+  savingByCategoryAndPeriod(
+    userId: string
+  ): { categoryId: string; year: number; month: number; cents: Cents }[] {
+    return this.db
+      .prepare(
+        `SELECT category_id AS categoryId, year, month, SUM(amount_cents) AS cents
+           FROM transactions WHERE user_id = ? AND type = 'SAVING'
+          GROUP BY category_id, year, month`
+      )
+      .all(userId) as { categoryId: string; year: number; month: number; cents: Cents }[];
+  }
+
+  listSince(userId: string, fromDate: string, limit: number): LeakMovement[] {
+    const rows = this.db
+      .prepare(
+        `SELECT t.description, t.amount_cents AS amountCents, t.date, t.type,
+                c.name AS categoryName, t.recurring_rule_id AS recurringRuleId
+           FROM transactions t JOIN categories c ON c.id = t.category_id
+          WHERE t.user_id = ? AND t.date >= ?
+          ORDER BY t.date DESC, t.created_at DESC LIMIT ?`
+      )
+      .all(userId, fromDate, limit) as LeakMovement[];
+    return rows;
   }
 
   existingImportHashes(userId: string, hashes: string[]): Set<string> {

@@ -392,7 +392,8 @@ largos y cortos; sin comisión por mantener):
   horaria antes de medianoche** (el mismo precio para todos), si no al último precio y, si no hay
   ningún precio, se **espera hasta 24 h**; pasado ese plazo se usa el precio de entrada (solo
   pierde las comisiones).
-- Se congela el **resultado** (patrimonio final, operaciones, aciertos, días con actividad,
+- Se congela el **resultado** (patrimonio final, operaciones, aciertos, días con actividad (solo
+  informativos),
   alias en ese momento, insignia Premium; desde octubre de 2026 todos los resultados entran en el
   ranking). Una cartera sin ninguna
   operación se cierra sin generar resultado.
@@ -419,7 +420,7 @@ largos y cortos; sin comisión por mantener):
 ## Ranking mensual (participan todos)
 
 - **Sin interruptor** (decisión del dueño, octubre de 2026): participan **todas las carteras
-  oficiales** del mes que cumplan los mínimos, cada una con su alias. Antes era voluntario y
+  oficiales** del mes con al menos 5 operaciones cerradas, cada una con su alias. Antes era voluntario y
   apagado por defecto; la columna `crypto_sim_profiles.ranking_opt_in` se conserva en la tabla
   (compatibilidad con servidores anteriores) pero **ya no se lee ni se escribe**, y no sale en la
   exportación.
@@ -431,11 +432,11 @@ largos y cortos; sin comisión por mantener):
 - La persona solo puede **cambiar el alias**. Validación: 3 a 20 caracteres, letras, números,
   espacios, puntos y guiones; sin correos, enlaces, teléfonos ni palabras ofensivas básicas
   (`CRYPTO_ALIAS_INVALID`).
-- **Aviso** junto al alias: «Tu alias aparece en el ranking del mes con tu rentabilidad y tu
-  número de operaciones. Puedes cambiarlo cuando quieras; nunca se muestra tu correo ni tu nombre
-  completo». La primera vez que se entra en la consola sale además un aviso descartable arriba
-  («Apareces en el ranking del mes como «…»», con «Cambiar mi alias» y «Entendido»; se recuerda en
-  el dispositivo con `mm_crypto_ranking_intro`).
+- **Aviso** junto al alias: «Si estás en el ranking del mes, se ve tu alias con tu
+  rentabilidad y tu número de operaciones. Puedes cambiarlo cuando quieras; nunca se muestra tu
+  correo ni tu nombre completo». La primera vez que se entra en la consola sale además un aviso
+  descartable arriba («En el ranking del mes saldrás como «…»», con lo que hace falta para entrar,
+  «Cambiar mi alias» y «Entendido»; se recuerda en el dispositivo con `mm_crypto_ranking_intro`).
 - La API del ranking solo devuelve **alias, rentabilidad, nº de operaciones e insignia Premium**:
   nunca correo, nombre completo ni identificadores. Tu posición y lo que te falta solo te los
   devuelve a ti.
@@ -444,8 +445,23 @@ largos y cortos; sin comisión por mantener):
   encendido).
 - **Métrica**: rentabilidad = patrimonio final / saldo inicial − 1 (10.000 €; las posiciones
   abiertas se valoran a mercado).
-- **Mínimos para puntuar**: 5 operaciones cerradas (sin contar las cerradas por el fin de la
-  temporada) y 3 días distintos con actividad (abrir o cerrar).
+- **Único requisito para entrar** (decisión del dueño, 25 de octubre de 2026): **5 operaciones
+  cerradas** en el mes en la cartera oficial (sin contar las cerradas por el fin de la temporada;
+  las carteras de prácticas no cuentan). Valen las cinco en un mismo día: ya **no hay mínimo de
+  días con actividad** (antes eran 3). Los días se siguen contando y guardando (`activeDays`,
+  `active_days` del resultado) pero no deciden nada, tampoco en los desempates.
+- **Textos**: la tarjeta dice «Para entrar necesitas al menos 5 operaciones cerradas este mes en
+  tu cartera oficial. Las carteras de prácticas no cuentan.» y, mientras falten, «Te faltan N
+  operaciones para entrar al ranking» («Te falta 1 operación…» con una) con una barra «3 de 5
+  operaciones cerradas». Quien ya tiene las 5 y aún no sale (no hay precio de mercado de lo que
+  tiene abierto) lee por qué en lugar de lo que le falta. Al cerrar la quinta, la tabla en vivo se
+  recalcula aunque la caché tenga menos de 60 s, para que el puesto salga a la primera.
+- **Compatibilidad con apps instaladas**: la respuesta de `GET /crypto/ranking` mantiene
+  `me.activeDays` (real), `me.missing.days` (siempre **0**) y `rules.minDays` (siempre **0**).
+  Las apps antiguas solo añaden «N días con actividad» a lo que falta cuando `missing.days` no es
+  0, así que nunca dicen «te faltan 0 días»; en sus bases (texto antiguo, empaquetado en la app)
+  se lee «… y 0 días con actividad en el mes», que no exige nada. La app nueva no lee ninguno de
+  los dos campos.
 - **Desempates**: más operaciones; después, quien cerró antes su última operación (llegó antes a
   ese resultado); por último, una clave estable interna (nunca se muestra).
 - La tabla en vivo del mes se calcula con los precios actuales y se guarda en caché **60 s**
@@ -730,8 +746,8 @@ Texto en lenguaje claro para mostrar en la app cuando un abogado lo revise. Los 
 7. **Cómo se mide**: rentabilidad = patrimonio final / 10.000 € − 1. Lo que siga abierto al final
    del mes se cierra al último precio de la última hora del mes, el mismo para todos. Las
    carteras de prácticas no cuentan.
-8. **Mínimos**: para aparecer hay que cerrar al menos 5 operaciones y operar al menos 3 días
-   distintos en el mes.
+8. **Requisito para entrar**: al menos 5 operaciones cerradas este mes en tu cartera oficial (valen
+   en un mismo día; no se piden días con actividad). Las carteras de prácticas no cuentan.
 9. **Empates**: gana quien hizo más operaciones; si sigue el empate, quien cerró antes su última
    operación.
 10. **Premio**: quien queda primero recibe **1 mes de Premium**. No se puede cambiar por dinero

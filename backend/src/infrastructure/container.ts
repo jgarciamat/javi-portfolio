@@ -34,6 +34,7 @@ import { CategoryRuleService } from '@application/categories/CategoryRuleService
 import { CategoryService } from '@application/categories/CategoryService';
 import { ExportService, ImportService } from '@application/data/DataServices';
 import { AdviceService, StatsService } from '@application/insights/InsightsServices';
+import { MoneyLeakService } from '@application/insights/MoneyLeakService';
 import {
   BudgetService,
   CustomAlertService,
@@ -103,6 +104,7 @@ import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestReposi
 import { SqliteTrialNoticeRepository } from './sqlite/repositories/SqliteTrialNoticeRepository';
 import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
+import { SqliteLeakDecisionRepository } from './sqlite/repositories/SqliteLeakDecisionRepository';
 import { SqlitePersonalDataReader } from './sqlite/repositories/SqlitePersonalDataReader';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
 import { SqliteFunnelRepository } from './sqlite/repositories/SqliteFunnelRepository';
@@ -195,6 +197,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     referrals: new SqliteReferralRepository(db),
     creators: new SqliteCreatorRepository(db),
     household: new SqliteHouseholdRepository(db),
+    leakDecisions: new SqliteLeakDecisionRepository(db),
   };
 
   const tokens = new JwtTokenService(
@@ -452,7 +455,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       categoryResolver,
       entitlements,
       uow,
-      clock
+      clock,
+      repos.settings
     ),
     stats: new StatsService(
       repos.transactions,
@@ -463,6 +467,15 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.rules,
       clock,
       repos.assets
+    ),
+    moneyLeaks: new MoneyLeakService(
+      repos.transactions,
+      repos.rules,
+      repos.categoryRules,
+      repos.leakDecisions,
+      entitlements,
+      funnel,
+      clock
     ),
     weeklyDigest,
     push: pushService,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -14,6 +14,7 @@ import {
   healthScore,
   noSpendDays,
   type ChallengeId,
+  type ChallengeProgress,
   type Health,
 } from '../../domain/health';
 import '../css/Sections.css';
@@ -21,6 +22,7 @@ import '../css/Health.css';
 
 const CHALLENGES: ChallengeId[] = ['noSpend', 'save20', 'budgets'];
 const STORAGE_KEY = 'mm_challenge';
+const DONE_KEY = 'mm_challenge_done';
 
 const RING = 2 * Math.PI * 52;
 
@@ -72,6 +74,108 @@ function Pillars({ health }: { health: Health }) {
   );
 }
 
+/** The challenges completed in a month; they stay completed whatever is chosen next. */
+function readDone(period: string): ChallengeId[] {
+  const saved = storage.getJSON<{ period: string; ids: ChallengeId[] } | null>(DONE_KEY, null);
+  return saved?.period === period && Array.isArray(saved.ids) ? saved.ids : [];
+}
+
+/** Completed challenges of the month: a challenge that is done now is saved right away. */
+function useCompleted(period: string, doneNow: ChallengeId | null): ChallengeId[] {
+  const [stored, setStored] = useState<ChallengeId[]>(() => readDone(period));
+  useEffect(() => {
+    if (doneNow && !stored.includes(doneNow)) {
+      const ids = [...stored, doneNow];
+      storage.setJSON(DONE_KEY, { period, ids });
+      setStored(ids);
+    }
+  }, [doneNow, stored, period]);
+  return doneNow && !stored.includes(doneNow) ? [...stored, doneNow] : stored;
+}
+
+const barWidth = (p: { current: number; target: number }) =>
+  p.target > 0 ? Math.min(100, (p.current / p.target) * 100) : 0;
+
+function ChallengeDetail({
+  id,
+  shown,
+  isDone,
+  isActive,
+  streak,
+  onChange,
+}: {
+  id: ChallengeId;
+  shown: ChallengeProgress;
+  isDone: boolean;
+  isActive: boolean;
+  streak: number;
+  onChange: () => void;
+}) {
+  const { t } = useI18n();
+  const current = Math.min(shown.current, shown.target);
+  return (
+    <div className="challenge-detail">
+      <div
+        className="health-bar"
+        role="progressbar"
+        aria-label={t(`app.challenge.${id}`)}
+        aria-valuemin={0}
+        aria-valuemax={shown.target}
+        aria-valuenow={current}
+      >
+        <span style={{ width: `${isDone ? 100 : barWidth(shown)}%` }} />
+      </div>
+      <p>{t('app.challenge.progress', { current, target: shown.target })}</p>
+      {shown.done && (
+        <p className="section-success">
+          <Icon name="checkCircle" /> {t('app.challenge.done')}
+        </p>
+      )}
+      {id === 'noSpend' && (
+        <p className="section-hint">{t('app.challenge.streak', { days: streak })}</p>
+      )}
+      {isActive && (
+        <button className="btn-secondary" onClick={onChange}>
+          {t('app.challenge.change')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ChallengeStatus({
+  isDone,
+  isActive,
+  disabled,
+  onPick,
+}: {
+  isDone: boolean;
+  isActive: boolean;
+  disabled: boolean;
+  onPick: () => void;
+}) {
+  const { t } = useI18n();
+  if (isDone) {
+    return (
+      <span className="challenge-badge">
+        <Icon name="checkCircle" /> {t('app.challenge.doneBadge')}
+      </span>
+    );
+  }
+  if (isActive) {
+    return (
+      <span className="challenge-badge challenge-badge-active">
+        {t('app.challenge.inProgress')}
+      </span>
+    );
+  }
+  return (
+    <button className="btn-secondary" disabled={disabled} onClick={onPick}>
+      {t('app.challenge.choose')}
+    </button>
+  );
+}
+
 function Challenges({
   period,
   noSpend,
@@ -99,6 +203,8 @@ function Challenges({
         budgets: f.budgets,
       })
     : null;
+  const completed = useCompleted(period, chosen && progress?.done ? chosen : null);
+  const allDone = CHALLENGES.every((id) => completed.includes(id));
 
   return (
     <div className="card">
@@ -107,66 +213,44 @@ function Challenges({
       </h2>
       {!f.isCurrentPeriod ? (
         <p className="section-hint">{t('app.challenge.currentOnly')}</p>
-      ) : chosen && progress ? (
-        <div className="challenge-active">
-          <strong>{t(`app.challenge.${chosen}`)}</strong>
-          <p className="section-hint">
-            {t(`app.challenge.${chosen}.desc`, { target: NO_SPEND_TARGET })}
-          </p>
-          <div
-            className="health-bar"
-            role="progressbar"
-            aria-label={t(`app.challenge.${chosen}`)}
-            aria-valuemin={0}
-            aria-valuemax={progress.target}
-            aria-valuenow={Math.min(progress.current, progress.target)}
-          >
-            <span
-              style={{
-                width: `${
-                  progress.target > 0
-                    ? Math.min(100, (progress.current / progress.target) * 100)
-                    : 0
-                }%`,
-              }}
-            />
-          </div>
-          <p>
-            {t('app.challenge.progress', { current: progress.current, target: progress.target })}
-          </p>
-          {progress.done && (
-            <p className="section-success">
-              <Icon name="checkCircle" /> {t('app.challenge.done')}
-            </p>
-          )}
-          {chosen === 'noSpend' && (
-            <p className="section-hint">{t('app.challenge.streak', { days: noSpend.streak })}</p>
-          )}
-          <button className="btn-secondary" onClick={() => pick(null)}>
-            {t('app.challenge.change')}
-          </button>
-        </div>
       ) : (
         <>
-          <p className="section-hint">{t('app.challenge.hint')}</p>
+          <p className="section-hint">
+            {allDone ? t('app.challenge.allDone') : t('app.challenge.hint')}
+          </p>
           <ul className="challenge-list">
-            {CHALLENGES.map((id) => (
-              <li key={id}>
-                <span>
-                  <strong>{t(`app.challenge.${id}`)}</strong>
-                  <small>{t(`app.challenge.${id}.desc`, { target: NO_SPEND_TARGET })}</small>
-                </span>
-                <button
-                  className="btn-secondary"
-                  disabled={id === 'budgets' && f.budgets.length === 0}
-                  onClick={() => pick(id)}
-                >
-                  {t('app.challenge.choose')}
-                </button>
-              </li>
-            ))}
+            {CHALLENGES.map((id) => {
+              const isDone = completed.includes(id);
+              const isActive = id === chosen && !isDone;
+              return (
+                <li key={id} className={isDone ? 'challenge-done' : undefined}>
+                  <span>
+                    <strong>{t(`app.challenge.${id}`)}</strong>
+                    <small>{t(`app.challenge.${id}.desc`, { target: NO_SPEND_TARGET })}</small>
+                  </span>
+                  <ChallengeStatus
+                    isDone={isDone}
+                    isActive={isActive}
+                    disabled={id === 'budgets' && f.budgets.length === 0}
+                    onPick={() => pick(id)}
+                  />
+                  {id === chosen && progress && (
+                    <ChallengeDetail
+                      id={id}
+                      shown={progress}
+                      isDone={isDone}
+                      isActive={isActive}
+                      streak={noSpend.streak}
+                      onChange={() => pick(null)}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ul>
-          {f.budgets.length === 0 && <p className="section-hint">{t('app.challenge.noBudgets')}</p>}
+          {f.budgets.length === 0 && !completed.includes('budgets') && (
+            <p className="section-hint">{t('app.challenge.noBudgets')}</p>
+          )}
         </>
       )}
     </div>

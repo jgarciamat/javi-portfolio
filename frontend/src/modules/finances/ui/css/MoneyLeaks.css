@@ -1,0 +1,839 @@
+/* ─── Tu dinero perdido ───
+   Built for everyone, older people included: 16 px text, the figure at 2rem, decision buttons
+   of 48 px with words (never only an icon), the kind of each finding told with an icon and a
+   word (never only a colour). One column on phones; on a wide screen the title with the export
+   bar on its right, then two columns: the figure, the filters and «Reviewed» on the left, the
+   findings on the right. Titles at 600, the rest at 400/500; cards of 14 px radius and 16–20 px
+   of padding, as in the goal sheet. */
+
+.leaks-view {
+  max-width: 72rem;
+}
+
+.leaks-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.leaks-head-text {
+  flex: 1 1 24rem;
+  min-width: 0;
+}
+
+.leaks-head .section-hint {
+  margin: 0;
+  max-width: 46rem;
+}
+
+.leaks-head .export-buttons {
+  flex-shrink: 0;
+}
+
+.leaks {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .leaks {
+    grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .leaks-side {
+    position: sticky;
+    top: calc(var(--sticky-height, 0px) + 1rem);
+  }
+
+  .leaks.leaks--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .leaks--single .leaks-side {
+    position: static;
+  }
+}
+
+.leaks-side,
+.leaks-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.leaks-main:empty {
+  display: none;
+}
+
+.leaks .card,
+.leaks-view > .card {
+  margin-bottom: 0;
+  border-radius: 14px;
+}
+
+/* ─── The figure and the filters ─── */
+
+.leaks-hero {
+  font-size: 1rem;
+}
+
+.leaks-hero-lead {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--slate-400);
+}
+
+.leaks-figure {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--red-400);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.leaks-count,
+.leaks-oneoff {
+  margin: 0.2rem 0 0;
+  color: var(--slate-300);
+  line-height: 1.45;
+}
+
+/* «All in order» and «Find out how much slips away»: a big round icon over the words. */
+.leaks-status,
+.leaks-none {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.leaks-status {
+  padding: 1rem 0.5rem;
+}
+
+.leaks-none {
+  max-width: 40rem;
+  padding: 2rem 1.5rem;
+}
+
+.leaks-none .leak-line {
+  max-width: 32rem;
+  color: var(--slate-300);
+}
+
+.leaks-none .leaks-note {
+  max-width: 32rem;
+  text-align: left;
+}
+
+.leaks-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 0.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green-400) 14%, transparent);
+  color: var(--green-400);
+}
+
+.leaks-status-icon--accent {
+  background: color-mix(in srgb, var(--accent-400) 14%, transparent);
+  color: var(--accent-400);
+}
+
+.leaks-status-icon .icon {
+  margin: 0;
+}
+
+.leaks-status-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--slate-50);
+}
+
+.leaks-status .leaks-count {
+  max-width: 28rem;
+  margin: 0;
+}
+
+.leaks-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--slate-800);
+}
+
+@media (min-width: 900px) {
+  .leaks-chips {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.leaks-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--slate-200);
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.leaks-chip .icon {
+  margin: 0;
+  color: var(--slate-400);
+}
+
+.leaks-chip:hover {
+  border-color: var(--accent-400);
+}
+
+.leaks-chip[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-400) 14%, transparent);
+  color: var(--slate-50);
+  font-weight: 600;
+}
+
+.leaks-chip[aria-pressed='true'] .icon {
+  color: var(--accent-400);
+}
+
+.leaks-chip-label {
+  flex: 1 1 auto;
+}
+
+.leaks-chip-count {
+  min-width: 1.6rem;
+  margin-left: auto;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--slate-800);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Each finding ─── */
+
+.leaks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.leak-card {
+  border: 1px solid var(--slate-800);
+  border-radius: 14px;
+  padding: 1rem 1.25rem 0.75rem;
+  background: var(--slate-900);
+  color: var(--slate-200);
+}
+
+.leak-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.leak-card-heading {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.leak-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.4rem;
+}
+
+.leak-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--slate-50);
+  overflow-wrap: anywhere;
+}
+
+/* The yearly cost, big on the right (under the name on a phone). */
+.leak-figure {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--slate-50);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The kind: a coloured pill with its icon and its word. */
+.leak-tag {
+  --tag: var(--accent-400);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem 0.15rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--tag) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tag) 12%, transparent);
+  color: var(--tag);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.leak-tag .icon {
+  margin: 0;
+}
+
+.leak-tag--increase {
+  --tag: var(--amber-400);
+}
+
+.leak-tag--duplicate {
+  --tag: var(--red-400);
+}
+
+.leak-tag--small {
+  --tag: var(--violet-400);
+}
+
+.leak-tag--medium {
+  --tag: var(--slate-400);
+  padding-left: 0.6rem;
+  font-weight: 500;
+}
+
+.leak-line {
+  margin: 0.2rem 0;
+  line-height: 1.5;
+}
+
+.leak-line > .icon {
+  margin-right: 0.35rem;
+}
+
+.leak-strong {
+  font-weight: 600;
+  color: var(--slate-50);
+}
+
+.leak-muted {
+  color: var(--slate-400);
+}
+
+/* Two decisions side by side, always the same size. */
+.leak-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.leak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 3rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+}
+
+.leak-btn:hover:not(:disabled) {
+  border-color: var(--accent-400);
+}
+
+.leak-btn--primary {
+  border-color: var(--accent-600);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.leak-btn--primary:hover:not(:disabled) {
+  border-color: var(--accent-700);
+  background: var(--accent-700);
+}
+
+.leak-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.leak-btn:focus-visible,
+.leaks-chip:focus-visible,
+.leak-link:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.leak-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.35rem;
+}
+
+/* Text buttons: accent, never underlined (underlined in «Contraste»). */
+.leak-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--accent-400);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.leak-link:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.leak-link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.leak-help {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--accent-400);
+  border-radius: 6px;
+  background: var(--slate-800);
+  color: var(--slate-200);
+  font-size: 0.95rem;
+}
+
+.leak-evidence {
+  width: 100%;
+  margin: 0.25rem 0 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.leak-evidence caption {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.leak-evidence th,
+.leak-evidence td {
+  padding: 0.4rem 0.25rem;
+  border-bottom: 1px solid var(--slate-800);
+  text-align: left;
+}
+
+.leak-evidence th {
+  font-weight: 500;
+  color: var(--slate-400);
+}
+
+.leak-evidence td:last-child,
+.leak-evidence th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ─── The other cards: little data, error, free plan, reviewed ─── */
+
+.leaks-partial .leak-btn,
+.leaks-locked .leak-btn,
+.leaks-none .leak-btn--primary {
+  margin-top: 0.75rem;
+}
+
+.leaks-none .leak-btn--primary {
+  min-width: 14rem;
+}
+
+.leaks-error {
+  border-color: color-mix(in srgb, var(--red-400) 45%, transparent);
+}
+
+.leaks-error .leak-line > .icon {
+  color: var(--red-400);
+}
+
+.leaks-error .leak-btn {
+  margin-top: 0.5rem;
+}
+
+.leaks-locked {
+  border-style: dashed;
+  border-color: var(--slate-700);
+}
+
+.leaks-locked .leak-line > .icon {
+  color: var(--accent-400);
+}
+
+.leaks-progress {
+  height: 0.6rem;
+  margin: 0.6rem 0 0.75rem;
+  border-radius: 999px;
+  background: var(--slate-800);
+  overflow: hidden;
+}
+
+.leaks-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-400);
+}
+
+.leaks-reviewed-toggle {
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+}
+
+.leaks-reviewed-toggle .icon {
+  margin: 0;
+  color: var(--slate-400);
+}
+
+.leaks-saving {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+  color: var(--green-400);
+}
+
+/* A quiet notice with its icon: yearly charges, the import tip, offline. */
+.leaks-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 10px;
+  background: var(--slate-900);
+  color: var(--slate-400);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.leaks-note > .icon {
+  margin: 0.15em 0 0;
+  color: var(--accent-400);
+}
+
+.leaks-note--warn {
+  border-color: color-mix(in srgb, var(--amber-400) 45%, transparent);
+  background: color-mix(in srgb, var(--amber-400) 8%, transparent);
+  color: var(--slate-200);
+}
+
+.leaks-note--warn > .icon {
+  color: var(--amber-400);
+}
+
+.leaks-toast {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--slate-100);
+  color: var(--slate-900);
+  box-shadow: 0 12px 28px -12px rgba(2, 6, 23, 0.5);
+}
+
+.leaks-toast p {
+  margin: 0;
+  flex: 1 1 14rem;
+}
+
+.leaks-toast .leak-btn {
+  border-color: var(--slate-900);
+  background: transparent;
+  color: var(--slate-900);
+}
+
+/* The legal notice: a faint band at the foot of the section. */
+.leaks-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--slate-800) 55%, transparent);
+  color: var(--slate-400);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.leaks-disclaimer > .icon {
+  margin: 0.15em 0 0;
+}
+
+/* ─── The line of Analysis ─── */
+
+.leaks-analysis-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.leaks-analysis-line p {
+  margin: 0;
+  flex: 1 1 16rem;
+}
+
+@media (max-width: 600px) {
+  .leak-card {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .leaks-none {
+    padding: 1.5rem 1rem;
+  }
+
+  .leaks-none .leak-btn--primary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .leaks-figure {
+    font-size: 1.75rem;
+  }
+}
+
+/* High contrast (the «Contraste» option): solid borders and the strongest text. */
+html.wiz-contrast .leak-card,
+html.wiz-contrast .leaks .card,
+html.wiz-contrast .leaks-view > .card,
+html.wiz-contrast .leak-btn,
+html.wiz-contrast .leaks-chip,
+html.wiz-contrast .leaks-note,
+html.wiz-contrast .leak-tag {
+  border-width: 2px;
+  border-color: var(--slate-200);
+}
+
+html.wiz-contrast .leak-card,
+html.wiz-contrast .leak-muted,
+html.wiz-contrast .leaks-disclaimer,
+html.wiz-contrast .leaks-hero-lead,
+html.wiz-contrast .leaks-note,
+html.wiz-contrast .leaks-count,
+html.wiz-contrast .leak-tag {
+  color: var(--slate-50);
+}
+
+html.wiz-contrast .leak-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ─── Loading: the silhouette of the screen in thin blue outlines, as in the crypto console ─── */
+
+.leaks-skel {
+  --sk: color-mix(in srgb, var(--accent-400) 75%, transparent);
+  --sk-faint: color-mix(in srgb, var(--accent-400) 40%, transparent);
+  user-select: none;
+  pointer-events: none;
+}
+
+.leaks-skel .card,
+.leaks-skel .leak-card {
+  border-color: var(--sk-faint);
+  background: transparent;
+}
+
+.leaks-skel-bar,
+.leaks-skel-box {
+  display: block;
+  border: 1px solid var(--sk-faint);
+  animation: leaks-skel-glow 1.8s ease-in-out infinite;
+}
+
+.leaks-skel-bar {
+  width: var(--w);
+  max-width: 100%;
+  height: 0.6rem;
+  margin: 0.45rem 0;
+  border-radius: 999px;
+}
+
+.leaks-skel-bar--big {
+  height: 1.6rem;
+  border-radius: 10px;
+}
+
+.leaks-skel-box {
+  height: 3rem;
+  border-radius: 10px;
+}
+
+.leaks-skel-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+@keyframes leaks-skel-glow {
+  0%,
+  100% {
+    border-color: var(--sk-faint);
+    box-shadow: none;
+  }
+
+  50% {
+    border-color: var(--sk);
+    box-shadow: 0 0 6px -1px var(--sk-faint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaks-skel-bar,
+  .leaks-skel-box {
+    animation: none;
+  }
+}
+
+/* ─── The notice in the monthly summary and after an import ─── */
+
+.leaks-teaser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-left: 4px solid var(--accent-400);
+  border-radius: 14px;
+}
+
+.leaks-teaser-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-400) 14%, transparent);
+  color: var(--accent-400);
+}
+
+.leaks-teaser-icon .icon {
+  margin: 0;
+}
+
+.leaks-teaser p {
+  margin: 0;
+  flex: 1 1 14rem;
+  color: var(--slate-100);
+  line-height: 1.45;
+}
+
+.leaks-teaser .leak-btn {
+  min-height: 2.5rem;
+  font-size: 0.9rem;
+}
+
+.leaks-teaser-close {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--slate-400);
+}
+
+.leaks-teaser-close .icon {
+  margin: 0;
+}
+
+.leaks-after-import {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--accent-400) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-400) 8%, transparent);
+  color: var(--slate-100);
+}
+
+.leaks-after-import > .icon {
+  margin: 0;
+  color: var(--accent-400);
+}
+
+.leaks-after-import .leak-link {
+  min-height: 2.5rem;
+}
+
+@media (max-width: 600px) {
+  .leaks-teaser .leak-btn,
+  .leaks-teaser-close {
+    min-height: 2.75rem;
+  }
+
+  .leaks-teaser-close {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}

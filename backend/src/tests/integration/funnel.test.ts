@@ -120,6 +120,30 @@ describe('POST /api/funnel', () => {
     expect(rows(ctx)).toEqual([]);
   });
 
+  it('takes a detail only from the closed list of its event', async () => {
+    const ctx = createTestApp();
+    await send(ctx, { event: 'dp_view', detail: 'complete' }).expect(204);
+    await send(ctx, { event: 'dp_import_cta', detail: 'none' }).expect(204);
+    await send(ctx, { event: 'paywall_view', detail: 'dp' }).expect(204);
+    await send(ctx, { event: 'goal_date_view', detail: 'real' }).expect(204);
+    await send(ctx, { event: 'goal_sim_change', detail: 'slider' }).expect(204);
+    await send(ctx, { event: 'goal_dp_apply' }).expect(204);
+    await send(ctx, { event: 'dp_view', detail: 'other' }).expect(400);
+    await send(ctx, { event: 'dp_import_cta', detail: 'complete' }).expect(400);
+    await send(ctx, { event: 'goal_dp_apply', detail: 'dp' }).expect(400);
+    await send(ctx, { event: 'visit', detail: 'none' }).expect(400);
+    await send(ctx, { event: 'dp_view', detail: 'x'.repeat(21) }).expect(400);
+    await send(ctx, { event: 'dp_found', detail: '1-2' }).expect(400);
+    expect(rows(ctx).map((r) => `${r.event}:${r.detail}`)).toEqual([
+      'dp_import_cta:none',
+      'dp_view:complete',
+      'goal_date_view:real',
+      'goal_dp_apply:',
+      'goal_sim_change:slider',
+      'paywall_view:dp',
+    ]);
+  });
+
   it('answers but does not count crawlers and headless browsers', async () => {
     const ctx = createTestApp();
     await send(ctx, { event: 'visit' }, 'Googlebot/2.1').expect(204);

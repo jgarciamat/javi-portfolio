@@ -186,7 +186,7 @@ Estado comprobado en el código de `develop` el 19-10-2026 por la tarde: **D01, 
 | Imputación 2 % / 1,1 % | `inmuebles.ts` | ✅ para 2025 | LIRPF art. 85 y DA 55.ª |
 | RETA 2026: tramos y 31,50 % | `autonomo-data.ts`, `reta2026.ts` | ✅ | Orden PJC/297/2026, arts. 18 y 37 |
 | 130: 20 %, minoración 100/75/50/25, exoneración del 70 % | `autonomo-data.ts` | ✅ | [Instrucciones del 130](https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/impuesto-sobre-renta-personas-fisicas/modelo-130-irpf______esionales-estimacion-directa-fraccionado_/instrucciones.html) |
-| Difícil justificación: 5 %, máximo 2.000 € | `autonomo-data.ts` | ✅ (el 7 % fue solo para 2023: DA 56.ª) | LIRPF DA 56.ª |
+| Difícil justificación: 5 %, máximo 2.000 € (7 % en 2023) | `autonomo-data.ts`, `autonomo-territory.ts` | ✅ (el 7 % del período 2023, DA 56.ª, también en el servidor desde el 25-10-2026) | RIRPF art. 30.2.ª; LIRPF art. 30.2.4.ª y DA 56.ª (Ley 31/2022, BOE-A-2022-22128) |
 | Retenciones del 19 % (alquiler) y del 15/7 % (profesionales) | `withholdings.ts` | ✅ | LIRPF art. 101 |
 | Campaña de Renta 2025 (8-4 a 30-6; domiciliación hasta el 25-6) | `rentaCampaign.ts` | ✅ | Orden HAC/277/2026 art. 7; calendario AEAT |
 | Plazos trimestrales y anuales (303/130 día 20 y 30-1; 111/115 día 20; 390 30-1; 190 2-2; 347 2-3) | `autonomo.ts` | ✅ (sin festivos) | Calendario AEAT 2026 |

@@ -267,7 +267,7 @@ describe('GoalsView', () => {
     const api = createFakeApi();
     api.goalApi.getAll.mockResolvedValue(goals);
     api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ahorro' })]);
-    return renderWithProviders(<GoalsView />, { api });
+    return renderWithProviders(<GoalsView onOpenTab={jest.fn()} />, { api });
   }
 
   it('shows progress and toggles archived goals', async () => {
@@ -553,7 +553,7 @@ describe('AnalysisView', () => {
       { year: 2026, month: 2, available: 100, saved: 50, assets: 0, debts: 0, netWorth: 150 },
       { year: 2026, month: 3, available: 200, saved: 60, assets: 0, debts: 0, netWorth: 260 },
     ]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText(tr('app.categories.Ocio'))).toBeInTheDocument();
     expect(screen.getByText(/▲ 50%/)).toBeInTheDocument();
     expect(screen.getByText(/▼ 10%/)).toBeInTheDocument();
@@ -575,65 +575,19 @@ describe('AnalysisView', () => {
     await waitFor(() => expect(api.insightsApi.netWorth).toHaveBeenLastCalledWith(24));
   });
 
-  it('lists the detected subscriptions with the yearly cost and price increases', async () => {
-    const api = createFakeApi();
-    renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
-    const rows = screen
-      .getAllByRole('row')
-      .filter((r) => /Netflix|Seguro coche/.test(r.textContent ?? ''));
-    expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByText(/subió de .*12,99.* a .*13,99/)).toBeInTheDocument();
-    expect(within(rows[0]).getByText(tr('app.subscriptions.monthly'))).toBeInTheDocument();
-    expect(within(rows[1]).getByText(tr('app.subscriptions.yearly'))).toBeInTheDocument();
-    expect(within(rows[1]).queryByText(/subió/)).toBeNull();
-  });
-
-  it('shows the free plan the total and the most expensive ones, and the rest with Premium', async () => {
-    const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(
-      f.billing({ plan: 'free', trialDaysLeft: 0, limits: f.catalog().limits.free })
-    );
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 5 }));
-    renderWithProviders(<AnalysisView />, { api, plan: true });
-    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
-    expect(screen.getByText(tr('app.subscriptions.found', { count: 5 }))).toBeInTheDocument();
-    expect(
-      screen.getByText(tr('app.subscriptions.moreLocked', { count: 3 }), { exact: false })
-    ).toBeInTheDocument();
-    const buttons = await screen.findAllByRole('button', { name: tr('billing.seePlans') });
-    fireEvent.click(buttons[0]);
-    expect(
-      await screen.findByText(
-        tr('billing.reason.feature', { feature: tr('billing.feature.insights') })
-      )
-    ).toBeInTheDocument();
-  });
-
-  it('says the full list is Premium when every subscription found is shown', async () => {
-    const api = createFakeApi();
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 2 }));
-    renderWithProviders(<AnalysisView />, { api });
-    expect(
-      await screen.findByText(tr('app.subscriptions.fullLocked'), { exact: false })
-    ).toBeInTheDocument();
-  });
-
-  it('says so when there are no subscriptions or they cannot be loaded', async () => {
-    const api = createFakeApi();
-    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ subscriptions: [] }));
-    const { unmount } = renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText(tr('app.subscriptions.none'))).toBeInTheDocument();
-    unmount();
-    api.insightsApi.subscriptions.mockRejectedValue(new Error('Sin suscripciones'));
-    renderWithProviders(<AnalysisView />, { api });
-    expect(await screen.findByText('Sin suscripciones')).toBeInTheDocument();
+  it('sends to «Tu dinero perdido», where the detected subscriptions are now', async () => {
+    const onOpenTab = jest.fn();
+    renderWithProviders(<AnalysisView onOpenTab={onOpenTab} />);
+    expect(screen.getByText(tr('app.leaks.analysisLine'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.leaks.analysisCta') }));
+    expect(onOpenTab).toHaveBeenCalledWith('leaks');
+    await screen.findByText(tr('app.analysis.noData'));
   });
 
   it('handles empty data and errors', async () => {
     const api = createFakeApi();
     api.insightsApi.netWorth.mockRejectedValue(new Error('Sin patrimonio'));
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText(tr('app.analysis.noData'))).toBeInTheDocument();
     expect(await screen.findByText('Sin patrimonio')).toBeInTheDocument();
   });
@@ -643,7 +597,7 @@ describe('AnalysisView', () => {
     api.insightsApi.netWorth.mockResolvedValue([
       { year: 2026, month: 3, available: 0, saved: 0, assets: 0, debts: 0, netWorth: 0 },
     ]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(
       await screen.findByRole('img', { name: tr('app.analysis.netWorthTitle') })
     ).toBeInTheDocument();
@@ -830,6 +784,10 @@ describe('the self-employed draft', () => {
     fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.toOffset'))), {
       target: { value: '40' },
     });
+    // An activity in Melilla: the 130 at 8 % (art. 110.2 RIRPF).
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'melilla' },
+    });
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
 
     await waitFor(() =>
@@ -843,6 +801,7 @@ describe('the self-employed draft', () => {
         hardToJustify: true,
         priorYearNet: 9500,
         exempt130: true,
+        territory: 'melilla',
         // What was left to offset at the start of the year: the quarters carry it on.
         vatToOffset: 0,
         vat: { offsetStart: 40 },
@@ -1000,6 +959,26 @@ describe('the self-employed draft', () => {
     expect(await screen.findByLabelText(tr('app.autonomo.workArea'))).toHaveValue('15');
   });
 
+  it('writes in the PDF the hard-to-justify rate of the year of the draft', async () => {
+    const api = open();
+    // A draft of 2023: 7 % (DA 56.ª LIRPF), not the 5 % of the other years.
+    api.businessApi.draft.mockResolvedValue(f.autonomoDraft({ year: 2023 }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.pdf.download') }));
+    await waitFor(() =>
+      expect(buildAutonomoPdf).toHaveBeenCalledWith(
+        expect.objectContaining({ year: 2023 }),
+        expect.anything(),
+        expect.objectContaining({
+          flags: expect.objectContaining({
+            hardToJustify: tr('app.autonomo.pdf.hardToJustify', { rate: 7 }),
+          }),
+        }),
+        expect.any(Function)
+      )
+    );
+  });
+
   it('downloads the draft as a PDF, and reports when it cannot', async () => {
     open();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
@@ -1145,6 +1124,54 @@ describe('the self-employed draft', () => {
     expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
     fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
     expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();
+  });
+
+  it('gives one extra free draft of a quarter after changing where the activity is', async () => {
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
+    const spent = { year: 2026, quarter: 1, used: 1, territory: 'general' } as const;
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      autonomoQuarters: [{ ...spent, territoryExtraUsed: false }],
+    });
+    open(api);
+    // Spent with the general territory: the gate says how to get the extra.
+    const left = `${tr('app.autonomo.usedFree')} ${tr('app.autonomo.territoryExtraLeft')}`;
+    expect(await screen.findByText(left)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'ceuta' },
+    });
+    expect(screen.getByText(tr('app.autonomo.territoryExtra'))).toBeInTheDocument();
+    expect(screen.queryByText(tr('app.autonomo.freeOne'))).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        2026,
+        1,
+        expect.objectContaining({ territory: 'ceuta' })
+      )
+    );
+  });
+
+  it('gives no second extra draft, nor one to a server that does not keep the territory', async () => {
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      autonomoQuarters: [
+        { year: 2026, quarter: 1, used: 1, territory: 'ceuta', territoryExtraUsed: true },
+        { year: 2026, quarter: 2, used: 1 },
+      ],
+    });
+    open(api);
+    expect(await screen.findByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'melilla' },
+    });
+    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
+    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
   });
 
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {

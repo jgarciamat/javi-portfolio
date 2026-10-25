@@ -7,7 +7,9 @@ import { useAuth } from '@shared/hooks/useAuth';
 import type { SettingsChanges, UserSettings } from '@modules/finances/domain/types';
 import {
   formatDate,
+  formatDayMonth,
   formatMoney,
+  formatMonthYear,
   formatPercent,
   formatRange,
   monthLabel,
@@ -115,6 +117,10 @@ export function useFormat() {
       monthName: (month: number, style?: 'long' | 'short') => monthName(month, locale, style),
       monthLabel: (year: number, month: number) => monthLabel(year, month, locale),
       date: (value: string) => formatDate(value, locale),
+      /** "febrero de 2028" */
+      monthYear: (year: number, month: number) => formatMonthYear(year, month, locale),
+      /** "12 de septiembre" */
+      dayMonth: (value: string) => formatDayMonth(value, locale),
       range: (start: string, end: string) => formatRange(start, end, locale),
     }),
     [locale, currency]

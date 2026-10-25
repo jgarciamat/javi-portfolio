@@ -25,3 +25,27 @@ describe('The words the app uses for the person who can help with taxes', () => 
     expect(JSON.stringify(GUIDES)).not.toMatch(ADVISER);
   });
 });
+
+/**
+ * «Tu dinero perdido» and «La fecha de tu meta» never promise savings nor give orders, and never
+ * call a charge «forgotten»: the app cannot know whether a service is used
+ * (docs/disenos/dinero-perdido-y-fecha-meta.md, C.8).
+ */
+const SECTION = /^(app\.leaks|app\.goals\.date|app\.tour\.(leaks|goalDate))\./;
+const PROMISES =
+  /deberías|te recomendamos|ahorrarás|olvidad|gestor|garantizad|you should|we recommend|you will save|forgotten|guarantee/i;
+
+describe('The words of «Tu dinero perdido» and the date of a goal', () => {
+  it('ask and estimate, never promise or order', () => {
+    const wrong = (texts: Record<string, string>) =>
+      Object.entries(texts)
+        .filter(([key, text]) => SECTION.test(key) && PROMISES.test(text))
+        .map(([key]) => key);
+    expect(wrong(es)).toEqual([]);
+    expect(wrong(en)).toEqual([]);
+    // The figures are always «about» and the saving a conditional.
+    expect(es['app.leaks.headlineFigure']).toMatch(/^unos /);
+    expect(es['app.leaks.ifCancel']).toMatch(/te ahorrarías aprox\./);
+    expect(en['app.leaks.ifCancel']).toMatch(/you'd save about/);
+  });
+});

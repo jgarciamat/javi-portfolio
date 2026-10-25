@@ -19,6 +19,10 @@ export interface QuarterDraftUsage {
   year: number;
   quarter: 1 | 2 | 3 | 4;
   used: number;
+  /** Territory of the last draft (null before any): a draft for another one may be the extra. */
+  territory: string | null;
+  /** The extra free draft for a change of territory has been used. */
+  territoryExtraUsed: boolean;
 }
 
 export interface BusinessCategoryView {
@@ -67,7 +71,8 @@ export class TaxService {
   /**
    * The draft of a quarter (modelo 303, modelo 130 and the contribution): the free plan can prepare
    * one per quarter, of the current one or of the one just ended while it can be filed; Premium as
-   * many as it wants, of any quarter.
+   * many as it wants, of any quarter. A free draft spent with one territory gives one extra draft of
+   * that quarter for another (the 130 goes from 20 % to 8 % in Ceuta, Melilla and La Palma), once.
    */
   draft(
     userId: string,
@@ -85,17 +90,24 @@ export class TaxService {
         );
       }
     }
-    this.entitlements.assertCanCreate(
-      userId,
-      'autonomoDrafts',
-      this.drafts.count(userId, year, quarter)
-    );
+    const record = this.drafts.record(userId, year, quarter);
+    const territory = inputs.territory ?? 'general';
+    let extra = false;
+    try {
+      this.entitlements.assertCanCreate(userId, 'autonomoDrafts', record.uses);
+    } catch (limit) {
+      // Rows from before territories were kept were made for the general one.
+      if (record.territoryExtra || (record.territory ?? 'general') === territory) throw limit;
+      extra = true;
+    }
     const manual = inputs.manual ? manualMovements(year, inputs.manual) : null;
     const result = prepareDraft(year, quarter, manual?.movements ?? this.movements(userId), inputs);
+    if (extra) this.drafts.useTerritoryExtra(userId, year, quarter, territory);
     return {
       ...result,
       expenses: manual ? manual.lines.filter((l) => l.quarter <= quarter) : null,
-      used: this.drafts.increment(userId, year, quarter),
+      // The extra draft does not count as one more of the plan: it redoes the one spent.
+      used: extra ? record.uses : this.drafts.increment(userId, year, quarter, territory),
     };
   }
 
@@ -112,10 +124,15 @@ export class TaxService {
    * it can be filed, the one just ended), so the plan screen knows which of them is used up.
    */
   draftQuarters(userId: string): QuarterDraftUsage[] {
-    return freeDraftQuarters(this.clock.now()).map((q) => ({
-      ...q,
-      used: this.drafts.count(userId, q.year, q.quarter),
-    }));
+    return freeDraftQuarters(this.clock.now()).map((q) => {
+      const record = this.drafts.record(userId, q.year, q.quarter);
+      return {
+        ...q,
+        used: record.uses,
+        territory: record.uses > 0 ? (record.territory ?? 'general') : null,
+        territoryExtraUsed: record.territoryExtra,
+      };
+    });
   }
 
   /** A draft downloaded as a PDF: the free plan can download one, Premium as many as it wants. */

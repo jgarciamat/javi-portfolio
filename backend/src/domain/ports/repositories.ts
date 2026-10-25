@@ -11,6 +11,7 @@ import { User } from '@domain/model/User';
 import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
+import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
@@ -236,6 +237,15 @@ export interface TransactionRepository {
   ): CategoryPeriodTotal[];
   /** All-time SAVING per category id (used by goals). */
   savedByCategory(userId: string): Record<string, Cents>;
+  /** SAVING per category and period, all time (the saving pace of goals). */
+  savingByCategoryAndPeriod(
+    userId: string
+  ): { categoryId: string; year: number; month: number; cents: Cents }[];
+  /**
+   * Movements dated from `fromDate` on, the most recent `limit` of them, with their category
+   * name (what «Tu dinero perdido» looks at).
+   */
+  listSince(userId: string, fromDate: string, limit: number): LeakMovement[];
   existingImportHashes(userId: string, hashes: string[]): Set<string>;
   /** Most recent category used for each normalised description. */
   lastCategoryByDescription(userId: string, descriptionKeys: string[]): Map<string, string>;
@@ -281,6 +291,16 @@ export interface CategoryBudgetRepository {
   delete(userId: string, id: string): void;
 }
 
+/** What each user decided about the findings of «Tu dinero perdido» (never the findings). */
+export interface LeakDecisionRepository {
+  listByUser(userId: string): LeakDecision[];
+  /** Creates or replaces the decision on a finding; keeps the newest `max` of the user. */
+  save(userId: string, decision: LeakDecision, max: number): void;
+  delete(userId: string, findingId: string): boolean;
+  /** Forgets decisions on findings that are gone (lazy clean-up). */
+  deleteMany(userId: string, findingIds: string[]): void;
+}
+
 export interface GoalRepository {
   listByUser(userId: string): Goal[];
   findById(userId: string, id: string): Goal | null;
@@ -311,10 +331,22 @@ export interface RentaPassRepository {
 }
 
 /** How many self-employed tax drafts a user has prepared for each quarter. */
+/** The drafts of one quarter: how many, the territory of the last one and its extra draft. */
+export interface QuarterDraftRecord {
+  uses: number;
+  /** Territory of the last draft (null before any, or from before territories were kept). */
+  territory: string | null;
+  /** The one extra free draft for a change of territory has been used. */
+  territoryExtra: boolean;
+}
+
 export interface AutonomoUsageRepository {
   count(userId: string, year: number, quarter: number): number;
-  /** One more draft of that quarter; returns how many there are now. */
-  increment(userId: string, year: number, quarter: number): number;
+  record(userId: string, year: number, quarter: number): QuarterDraftRecord;
+  /** One more draft of that quarter, made for `territory`; returns how many there are now. */
+  increment(userId: string, year: number, quarter: number, territory?: string): number;
+  /** The extra draft for a change of territory: it is spent, and `territory` becomes the last. */
+  useTerritoryExtra(userId: string, year: number, quarter: number, territory: string): void;
 }
 
 /** How many bank statements a user has imported (previews do not count). */

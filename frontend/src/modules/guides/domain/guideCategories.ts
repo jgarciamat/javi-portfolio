@@ -23,6 +23,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
       'como-hacer-un-presupuesto-mensual',
       'gastos-hormiga',
       'suscripciones-que-no-usas',
+      'tu-dinero-perdido',
       'presupuesto-en-pareja',
       'como-ahorrar-para-un-viaje',
     ],

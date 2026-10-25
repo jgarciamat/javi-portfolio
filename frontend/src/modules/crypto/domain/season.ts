@@ -99,14 +99,9 @@ export const counted = (t: Translate, key: string, count: number): string =>
 export const medal = (place: number): string =>
   place === 1 ? 'gold' : place === 2 ? 'silver' : place === 3 ? 'bronze' : 'plain';
 
-/** What is missing to be ranked, as one sentence. */
-export function missingText(me: CryptoRanking['me'], t: Translate): string {
-  const parts: string[] = [];
-  if (me.missing.trades)
-    parts.push(counted(t, 'app.crypto.ranking.missingTrades', me.missing.trades));
-  if (me.missing.days) parts.push(counted(t, 'app.crypto.ranking.missingDays', me.missing.days));
-  return t('app.crypto.ranking.missing', { what: parts.join(t('app.crypto.ranking.and')) });
-}
+/** What is missing to be ranked: only closed operations (there is no minimum of days). */
+export const missingText = (me: CryptoRanking['me'], t: Translate): string =>
+  counted(t, 'app.crypto.ranking.missing', me.missing.trades);
 
 /** The season report as one table (Premium): a summary and then every operation closed. */
 export function reportTable(

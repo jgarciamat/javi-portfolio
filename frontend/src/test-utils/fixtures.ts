@@ -7,6 +7,8 @@ import type {
   Asset,
   Forecast,
   SubscriptionReport,
+  LeakFinding,
+  MoneyLeaks,
   BudgetLine,
   Category,
   CategoryBudget,
@@ -30,6 +32,8 @@ import type {
 
 let seq = 0;
 const nextId = (prefix: string) => `${prefix}${++seq}`;
+/** 16 hex characters, like the ids of «Tu dinero perdido». */
+const nextHex = () => (++seq).toString(16).padStart(16, '0');
 
 export const user = (over: Partial<AuthUser> = {}): AuthUser => ({
   id: 'u1',
@@ -196,6 +200,9 @@ export const goal = (over: Partial<Goal> = {}): Goal => ({
     monthsLeft: 9,
     monthlyNeeded: 266.67,
     completed: false,
+    averageMonthly: null,
+    historyMonths: 0,
+    savedThisMonth: 0,
   },
   ...over,
 });
@@ -314,6 +321,54 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
   ],
   count: 2,
   locked: false,
+  ...over,
+});
+
+/** A finding of «Tu dinero perdido» (made-up merchant and amounts). */
+export const leakFinding = (over: Partial<LeakFinding> = {}): LeakFinding => ({
+  id: nextHex(),
+  kind: 'recurring',
+  confidence: 'high',
+  status: 'new',
+  label: 'FITBOX',
+  essential: false,
+  cadence: 'monthly',
+  amount: 39.9,
+  previousAmount: null,
+  annual: 478.8,
+  oneOff: 0,
+  count: 15,
+  firstDate: '2025-08-03',
+  lastDate: '2026-10-03',
+  nextDate: '2026-11-02',
+  perMonth: null,
+  evidence: [
+    { date: '2026-10-03', amount: 39.9 },
+    { date: '2026-09-03', amount: 39.9 },
+  ],
+  ...over,
+});
+
+export const moneyLeaks = (over: Partial<MoneyLeaks> = {}): MoneyLeaks => ({
+  coverage: {
+    level: 'complete',
+    from: '2025-08-03',
+    to: '2026-10-20',
+    days: 444,
+    movements: 160,
+    yearlyReady: true,
+  },
+  total: { annual: 470, oneOff: 0, count: 1 },
+  byKind: {
+    recurring: { count: 1, annual: 478.8 },
+    increase: { count: 0, annual: 0 },
+    duplicate: { count: 0, annual: 0 },
+    small: { count: 0, annual: 0 },
+  },
+  findings: [leakFinding({ id: '0000000000000001' })],
+  count: 1,
+  locked: false,
+  reviewed: { count: 0, cancelMonthly: 0, recoveredAnnual: 0 },
   ...over,
 });
 

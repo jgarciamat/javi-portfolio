@@ -1,3 +1,4 @@
+import { reducedInstalment } from '@modules/finances/domain/activityTerritory';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { ModuleActivity } from '@modules/tools/domain/rentaActivity';
 import type { Modules131, Simplified303 } from '../../application/aeatFiles/modules';
@@ -216,6 +217,7 @@ export function modulesView(
         income: data.quarters.map(incomeOf),
         lastYearNet: lastYearOf(extras),
         depreciationAtStart: depreciationYear(atStart, year, 'modules').total,
+        territory: extras.territory,
       })
     : null;
   if (!act || !instalments) return null;
@@ -240,7 +242,8 @@ export function modulesView(
       investment: net.investment,
       indices: indicesOf(input, act, net),
       seasonLastYear: input.seasonLastYear,
-      ceutaMelilla: input.ceutaMelilla,
+      // The mark of the reduced rate (art. 110.2 RIRPF), also in the quarters of La Palma.
+      ceutaMelilla: input.ceutaMelilla || reducedInstalment(extras.territory, year, quarter),
       quarterDays: quarterDays(input, year, quarter),
       lastYearNet: priorNetOf(extras),
     },

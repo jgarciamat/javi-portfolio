@@ -35,7 +35,8 @@ function ReasonText({ reason }: { reason: UpgradeReason }) {
 export function UpgradeModal({ reason }: { reason: UpgradeReason }) {
   const { t } = useI18n();
   const { overview, closeUpgrade, checkout } = usePlan();
-  useEffect(() => track('paywall_view'), []);
+  const from = reason.kind === 'feature' ? reason.from : undefined;
+  useEffect(() => track('paywall_view', from ? { detail: from } : undefined), [from]);
 
   const subscribed =
     !!overview && overview.plan === 'premium' && overview.subscription.source !== 'trial';

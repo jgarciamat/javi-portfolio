@@ -78,6 +78,10 @@ export interface QuarterDraftUsage {
   year: number;
   quarter: 1 | 2 | 3 | 4;
   used: number;
+  /** Territory of the last draft (null before any; absent from older servers). */
+  territory?: string | null;
+  /** The extra free draft for a change of territory has been used. */
+  territoryExtraUsed?: boolean;
 }
 
 /** The terms of sale in force and whether the user has to accept them again. */
@@ -156,7 +160,8 @@ export interface InviteeStatus {
 /** Why the paywall was opened. */
 export type UpgradeReason =
   | { kind: 'limit'; resource: LimitedResource; limit: number }
-  | { kind: 'feature'; feature: PremiumFeature }
+  /** `from`: the screen it was opened from, counted with the paywall (only «Tu dinero perdido»). */
+  | { kind: 'feature'; feature: PremiumFeature; from?: 'dp' }
   | { kind: 'generic' };
 
 export interface LocalizedText {

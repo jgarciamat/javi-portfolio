@@ -15,7 +15,7 @@ export interface TourStep {
  * Version of the tour. Raise it when the tour changes a lot: whoever turned the tour off is then
  * offered the new one once (discreetly), and the «seen» mark is kept per version.
  */
-export const TOUR_VERSION = 3;
+export const TOUR_VERSION = 4;
 
 const SECTION = '[data-tour="section"]';
 const WIZARD_ROUTE = '[data-tour="wizard-route"]';
@@ -34,6 +34,8 @@ const STEPS: TourStep[] = [
   { id: 'selection', tab: 'monthly', target: '[data-tour="movements"]' },
   { id: 'budgets', tab: 'budgets', target: SECTION },
   { id: 'goals', tab: 'goals', target: SECTION },
+  { id: 'goalDate', tab: 'goals', target: '[data-tour="goal-date"]' },
+  { id: 'leaks', tab: 'leaks', target: SECTION },
   { id: 'split', tab: 'split', target: '[data-tour="split-new"]' },
   { id: 'splitSettle', tab: 'split' },
   { id: 'automations', tab: 'automations', target: SECTION },

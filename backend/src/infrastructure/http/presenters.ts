@@ -15,6 +15,8 @@ import {
   NetWorthPoint,
   SubscriptionsView,
 } from '@application/insights/InsightsServices';
+import { MoneyLeaksView } from '@application/insights/MoneyLeakService';
+import { LeakFinding } from '@domain/services/money-leaks';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
 import { AnnualOverview, MonthOverview } from '@application/transactions/TransactionService';
@@ -221,6 +223,10 @@ export function presentGoal(g: GoalView) {
       monthlyNeeded:
         g.progress.monthlyNeededCents === null ? null : m(g.progress.monthlyNeededCents),
       completed: g.progress.completed,
+      averageMonthly:
+        g.progress.averageMonthlyCents === null ? null : m(g.progress.averageMonthlyCents),
+      historyMonths: g.progress.historyMonths,
+      savedThisMonth: m(g.progress.savedThisPeriodCents),
     },
   };
 }
@@ -301,6 +307,57 @@ export function presentSubscriptions(r: SubscriptionsView) {
         ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
         : null,
     })),
+  };
+}
+
+export function presentLeakFinding(f: LeakFinding) {
+  return {
+    id: f.id,
+    kind: f.kind,
+    confidence: f.confidence as 'high' | 'medium',
+    status: f.status,
+    label: f.label,
+    essential: f.essential,
+    cadence: f.cadence,
+    amount: m(f.amountCents),
+    previousAmount: f.previousAmountCents === null ? null : m(f.previousAmountCents),
+    annual: m(f.annualCents),
+    oneOff: m(f.oneOffCents),
+    count: f.count,
+    firstDate: f.firstDate,
+    lastDate: f.lastDate,
+    nextDate: f.nextDate,
+    perMonth: f.perMonth,
+    evidence: f.evidence.map((e) => ({ date: e.date, amount: m(e.amountCents) })),
+  };
+}
+
+export function presentMoneyLeaks(v: MoneyLeaksView) {
+  const kind = (k: keyof MoneyLeaksView['byKind']) => ({
+    count: v.byKind[k].count,
+    annual: m(v.byKind[k].annualCents),
+  });
+  return {
+    coverage: v.coverage,
+    total: {
+      annual: m(v.total.annualCents),
+      oneOff: m(v.total.oneOffCents),
+      count: v.total.count,
+    },
+    byKind: {
+      recurring: kind('recurring'),
+      increase: kind('increase'),
+      duplicate: kind('duplicate'),
+      small: kind('small'),
+    },
+    findings: v.findings.map(presentLeakFinding),
+    count: v.count,
+    locked: v.locked,
+    reviewed: {
+      count: v.reviewed.count,
+      cancelMonthly: m(v.reviewed.cancelMonthlyCents),
+      recoveredAnnual: m(v.reviewed.recoveredAnnualCents),
+    },
   };
 }
 

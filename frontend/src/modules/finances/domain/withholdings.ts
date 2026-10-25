@@ -1,6 +1,7 @@
 import { supplierKey, type ImportedInvoice } from './invoiceLedger';
 import { FIGURE_YEARS, figuresFor, type FiscalFigures } from './fiscalFigures';
 import type { TaxBox } from './types';
+import { businessDay } from './workingDays';
 
 /**
  * The withholdings the person made as a payer, quarter by quarter: the modelo 111 (employees and
@@ -368,11 +369,7 @@ export function withholdingsFor({
 
 /**
  * The last day to file the 111 and the 115 of a quarter: the 20th of the month after it (of January
- * for the fourth), a weekend moving to the Monday. The same rule as the deadlines of the draft.
+ * for the fourth), moved past weekends and national holidays. The same rule as the draft's deadlines.
  */
-export function withholdingDeadline(year: number, quarter: 1 | 2 | 3 | 4): string {
-  const d =
-    quarter === 4 ? new Date(Date.UTC(year + 1, 0, 20)) : new Date(Date.UTC(year, quarter * 3, 20));
-  while (d.getUTCDay() === 6 || d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
+export const withholdingDeadline = (year: number, quarter: 1 | 2 | 3 | 4): string =>
+  quarter === 4 ? businessDay(year + 1, 1, 20) : businessDay(year, quarter * 3 + 1, 20);

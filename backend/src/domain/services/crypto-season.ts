@@ -23,9 +23,11 @@ export const ALERTS_MAX = 10;
 export const PRACTICE_ACTIONS_PER_DAY = 5;
 /** Places of the ranking shown (and kept every month). */
 export const RANKING_SIZE = 5;
-/** To be ranked: at least this many operations closed and days with activity in the month. */
+/**
+ * To be ranked: at least this many operations closed in the month in the official portfolio (no
+ * minimum of days: five in a single day count). Practice portfolios never count.
+ */
 export const RANKING_MIN_TRADES = 5;
-export const RANKING_MIN_DAYS = 3;
 /** The prize of the winner: Premium days (one month), never money. */
 export const PRIZE_DAYS = 30;
 /** Operations of a finished season are kept this many months, then deleted. */
@@ -118,27 +120,22 @@ export interface SeasonEntry {
   initialCents: number;
   /** Operations closed in the season (not the ones closed by its end). */
   trades: number;
-  /** Days (Madrid) with an operation opened or closed. */
+  /** Days (Madrid) with an operation opened or closed: kept and shown, it no longer decides. */
   activeDays: number;
   /** When the last operation was closed: the earliest reached the result first. */
   reachedAt: string | null;
 }
 
-/** What is still missing to be ranked (zeros when it qualifies). */
-export function missing(entry: Pick<SeasonEntry, 'trades' | 'activeDays'>): {
-  trades: number;
-  days: number;
-} {
-  return {
-    trades: Math.max(0, RANKING_MIN_TRADES - entry.trades),
-    days: Math.max(0, RANKING_MIN_DAYS - entry.activeDays),
-  };
+/**
+ * What is still missing to be ranked (zeros when it qualifies). `days` is always 0: there is no
+ * minimum of days any more, but older versions of the app still read it (and say nothing on a 0).
+ */
+export function missing(entry: Pick<SeasonEntry, 'trades'>): { trades: number; days: 0 } {
+  return { trades: Math.max(0, RANKING_MIN_TRADES - entry.trades), days: 0 };
 }
 
-export const qualifies = (entry: Pick<SeasonEntry, 'trades' | 'activeDays'>): boolean => {
-  const m = missing(entry);
-  return m.trades === 0 && m.days === 0;
-};
+export const qualifies = (entry: Pick<SeasonEntry, 'trades'>): boolean =>
+  entry.trades >= RANKING_MIN_TRADES;
 
 /**
  * Order of the ranking: higher return; on a tie, more operations; then whoever reached it first

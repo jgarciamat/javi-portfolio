@@ -468,8 +468,8 @@
       "modelo": "130",
       "periodo": "4T",
       "casilla": "02",
-      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
-      "importe": 11316.19,
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 10 % de difícil justificación)",
+      "importe": 11806.52,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.02"
@@ -479,7 +479,7 @@
       "periodo": "4T",
       "casilla": "03",
       "concepto": "Rendimiento neto (01 − 02)",
-      "importe": 28683.81,
+      "importe": 28193.48,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.03"
@@ -489,7 +489,7 @@
       "periodo": "4T",
       "casilla": "04",
       "concepto": "8 % de la casilla 03",
-      "importe": 2294.7,
+      "importe": 2255.48,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.04"
@@ -519,7 +519,7 @@
       "periodo": "4T",
       "casilla": "07",
       "concepto": "Pago fraccionado previo (04 − 05 − 06)",
-      "importe": 725.67,
+      "importe": 686.45,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.07"
@@ -529,7 +529,7 @@
       "periodo": "4T",
       "casilla": "12",
       "concepto": "Suma (07 + 11), mínimo 0",
-      "importe": 725.67,
+      "importe": 686.45,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.12"
@@ -549,7 +549,7 @@
       "periodo": "4T",
       "casilla": "14",
       "concepto": "Diferencia (12 − 13)",
-      "importe": 725.67,
+      "importe": 686.45,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.14"
@@ -569,7 +569,7 @@
       "periodo": "4T",
       "casilla": "17",
       "concepto": "Total (14 − 15 − 16)",
-      "importe": 725.67,
+      "importe": 686.45,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.17"
@@ -579,7 +579,7 @@
       "periodo": "4T",
       "casilla": "19",
       "concepto": "Resultado de la autoliquidación",
-      "importe": 725.67,
+      "importe": 686.45,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.19"
@@ -603,8 +603,8 @@
       "modelo": "100",
       "periodo": "2026",
       "casilla": null,
-      "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 5 %)",
-      "importe": 28683.81,
+      "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 10 % de la DA 64.ª)",
+      "importe": 28193.48,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#resúmenes-anuales",
       "campo": null,
@@ -620,5 +620,8 @@
       "motivo": "El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.",
       "campo": null
     }
+  ],
+  "notas": [
+    "4T de 2026: en Ceuta los gastos de difícil justificación son el 10 % del rendimiento neto, con el tope de 2.000 € al año (DA 64.ª LIRPF, RDL 22/2026). Resultado del 130: 686,45 € (con el 5 % general, 725,67 €)."
   ]
 }

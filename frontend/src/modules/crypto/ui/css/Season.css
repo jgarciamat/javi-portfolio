@@ -528,6 +528,35 @@
   font-weight: 600;
 }
 
+/* «3 de 5 operaciones cerradas»: a thin bar of the minimum and the same in words. */
+.cc-ranking-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.35rem 0 0.1rem;
+}
+
+.cc-ranking-bar {
+  flex: 1;
+  max-width: 12rem;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--cc-line);
+  overflow: hidden;
+}
+
+.cc-ranking-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-400);
+}
+
+.cc-ranking-progress .cc-hint {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The alias: the field and its button on one row, and what others see, in plain words. */
 .cc-ranking-settings {
   display: grid;
@@ -703,6 +732,14 @@
 
 .cc-invite-nudge p {
   margin: 0;
+}
+
+html.wiz-contrast .cc-ranking-bar {
+  outline: 1px solid var(--slate-100);
+}
+
+html.wiz-contrast .cc-ranking-bar span {
+  background: var(--slate-50);
 }
 
 html.wiz-contrast .cc-podium-row,
