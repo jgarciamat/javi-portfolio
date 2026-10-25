@@ -109,6 +109,8 @@ function pagesIn(lang) {
     return `${isTranslated(path) ? pathIn(path, lang) : path}${query ? `?${query}` : ''}`;
   };
   const link = (to, text) => `<a href="${esc(href(to))}">${esc(text)}</a>`;
+  // Sign-in links that carry `next=`: one per page, never worth crawling (the login page is noindex).
+  const gate = (to, text) => `<a href="${esc(href(to))}" rel="nofollow">${esc(text)}</a>`;
   const external = (to, text) => `<a href="${esc(to)}" rel="noopener">${esc(text)}</a>`;
   const home = [t('app.header.title'), urlOf('/', lang)];
   const videoDescription = (v) =>
@@ -140,10 +142,10 @@ function pagesIn(lang) {
       kicker ? `<p>${esc(kicker)}</p>` : ''
     }<h2 id="signup-wall-title">${esc(t(soft ? 'wall.soft.title' : 'wall.title'))}</h2><p>${esc(
       t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
-    )}</p><p>${link(
+    )}</p><p>${(back ? gate : link)(
       back ? wall.registerHref(path) : '/login?mode=register',
       t('wall.register')
-    )} ${link(back ? wall.loginHref(path) : '/login', t('wall.login'))}</p><p>${esc(
+    )} ${(back ? gate : link)(back ? wall.loginHref(path) : '/login', t('wall.login'))}</p><p>${esc(
       t('wall.note')
     )}</p>${
       soft

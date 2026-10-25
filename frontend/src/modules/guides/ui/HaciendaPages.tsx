@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { SiteLink } from '@shared/components/SiteLink';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
@@ -80,9 +81,9 @@ export function HaciendaIndexPage() {
       <PublicHeader />
       <main className="pricing-main tools-main guide-main">
         <p className="guide-back">
-          <Link className="back-btn" to="/guias">
+          <SiteLink className="back-btn" to="/guias">
             ← {t('landing.learn.guides')}
-          </Link>
+          </SiteLink>
         </p>
         <h1 className="pricing-title">{t('hacienda.title')}</h1>
         <p className="pricing-subtitle">{t('hacienda.hint')}</p>

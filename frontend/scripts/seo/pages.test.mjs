@@ -195,3 +195,11 @@ test('the pricing page already has the plans and the comparison, without calling
     assert.match(body, /\/login\?mode=register/);
   }
 });
+
+test('the sign-in links that carry `next` are nofollow; the rest are normal links', () => {
+  const { body } = pageOf('/guias/fondo-de-emergencia');
+  assert.match(body, /<a href="\/login\?next=[^"]*" rel="nofollow">/);
+  assert.match(body, /<a href="\/login\?mode=register&amp;next=[^"]*" rel="nofollow">/);
+  const home = pageOf('/').body;
+  assert.ok(!/rel="nofollow"/.test(home));
+});

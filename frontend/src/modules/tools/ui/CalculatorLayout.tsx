@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { SiteLink } from '@shared/components/SiteLink';
 import { useGoBack } from '@shared/hooks/useGoBack';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
@@ -112,7 +113,7 @@ export function CalculatorLayout({
           <ul>
             {guidesOfTool(path).map((g) => (
               <li key={g.slug}>
-                <Link to={`/guias/${g.slug}`}>{g.title}</Link>
+                <SiteLink to={`/guias/${g.slug}`}>{g.title}</SiteLink>
               </li>
             ))}
           </ul>
@@ -123,7 +124,7 @@ export function CalculatorLayout({
               <Link to={tool.path}>{t(`tools.${tool.key}.nav`)}</Link> ·{' '}
             </span>
           ))}
-          <Link to="/guias">{t('tools.guides.nav')}</Link> ·{' '}
+          <SiteLink to="/guias">{t('tools.guides.nav')}</SiteLink> ·{' '}
           <Link to={HACIENDA_PATH}>{t('hacienda.title')}</Link> ·{' '}
           <Link to={VIDEOS_PATH}>{t('videos.title')}</Link> ·{' '}
           <Link to="/pricing">{t('pricing.link')}</Link>

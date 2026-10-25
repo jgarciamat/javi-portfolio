@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SiteLink } from '@shared/components/SiteLink';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useResource } from '@shared/hooks/useResource';
@@ -119,7 +120,7 @@ export function LandingPage() {
           <h2>{t('landing.learn.title')}</h2>
           <ul className="landing-links">
             <li>
-              <Link to="/guias">{t('landing.learn.guides')}</Link>
+              <SiteLink to="/guias">{t('landing.learn.guides')}</SiteLink>
             </li>
             <li>
               <Link to="/calculadora-50-30-20">{t('tools.rule.nav')}</Link>
@@ -134,7 +135,7 @@ export function LandingPage() {
         <Link to="/privacy">{t('app.privacy.link')}</Link>
         <Link to="/terms">{t('billing.terms')}</Link>
         <Link to="/pricing">{t('pricing.link')}</Link>
-        <Link to="/guias">{t('landing.learn.guides')}</Link>
+        <SiteLink to="/guias">{t('landing.learn.guides')}</SiteLink>
       </footer>
       <IosInstallHint />
     </div>

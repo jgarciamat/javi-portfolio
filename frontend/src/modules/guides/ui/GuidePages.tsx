@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { SiteLink } from '@shared/components/SiteLink';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { brandTitle } from '@shared/utils/pageTitle';
@@ -73,9 +74,9 @@ export function GuidesIndexPage() {
         </p>
         <GuideCatalog
           renderLink={(g, className, children) => (
-            <Link className={className} to={`/guias/${g.slug}`}>
+            <SiteLink className={className} to={`/guias/${g.slug}`}>
               {children}
-            </Link>
+            </SiteLink>
           )}
         />
         <SignupWall variant="cta" />
@@ -111,9 +112,9 @@ export function GuidePage() {
       <PublicHeader />
       <main className="pricing-main tools-main guide-main">
         <p className="guide-back">
-          <Link className="back-btn" to="/guias">
+          <SiteLink className="back-btn" to="/guias">
             ← Todas las guías
-          </Link>
+          </SiteLink>
         </p>
         {whole ? (
           <>
@@ -176,7 +177,7 @@ export function GuidePage() {
               return (
                 related && (
                   <li key={slugOfRelated}>
-                    <Link to={`/guias/${slugOfRelated}`}>{related.title}</Link>
+                    <SiteLink to={`/guias/${slugOfRelated}`}>{related.title}</SiteLink>
                   </li>
                 )
               );

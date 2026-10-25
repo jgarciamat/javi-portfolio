@@ -4,5 +4,8 @@ Disallow: /verify-email
 Disallow: /reset-password
 Disallow: /en/verify-email
 Disallow: /en/reset-password
+# Sign-in links that come back to a guide or a calculator: one per page, nothing to index.
+Disallow: /*?next=
+Disallow: /*&next=
 
 Sitemap: https://finanverso.app/sitemap.xml
