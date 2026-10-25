@@ -2879,6 +2879,8 @@
   "app.autonomo.preparing": "Preparing…",
   "app.autonomo.freeOne": "Your free account includes 1 draft per quarter: the current quarter and, while its filing window is open (1–20 April, July and October, and 1–30 January), the quarter that has just ended. With Premium, as many as you want and for any quarter.",
   "app.autonomo.usedFree": "You have already prepared this quarter's free draft (you can see it below). With Premium you prepare as many as you want, for other quarters too.",
+  "app.autonomo.territoryExtra": "You changed «Where do you carry out your activity?» after preparing this quarter’s free draft: you have one more draft of this quarter to redo it with the right percentage. It is only one, and only for the change of territory.",
+  "app.autonomo.territoryExtraLeft": "If you gave the wrong answer to «Where do you carry out your activity?» when you prepared it, correct it: you will have one more draft of this quarter to redo it with the right percentage (only once).",
   "app.autonomo.goPremium": "See Premium",
   "app.autonomo.draftOf": "Draft of {year}, quarter {n}",
   "app.autonomo.model": "Modelo {model}",

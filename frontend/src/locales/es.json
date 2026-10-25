@@ -2879,6 +2879,8 @@
   "app.autonomo.preparing": "Preparando…",
   "app.autonomo.freeOne": "Tu cuenta gratuita incluye 1 borrador por trimestre: el del trimestre actual y, mientras está abierto su plazo (del 1 al 20 de abril, julio y octubre, y del 1 al 30 de enero), el del trimestre que acaba de terminar. Con Premium, los que quieras y de cualquier trimestre.",
   "app.autonomo.usedFree": "Ya has preparado el borrador gratuito de este trimestre (lo ves aquí abajo). Con Premium preparas todos los que quieras, también de otros trimestres.",
+  "app.autonomo.territoryExtra": "Has cambiado «¿Dónde realizas la actividad?» después de preparar el borrador gratuito de este trimestre: tienes un borrador más de este trimestre para rehacerlo con el porcentaje correcto. Es solo uno, y solo por el cambio de territorio.",
+  "app.autonomo.territoryExtraLeft": "Si al prepararlo elegiste mal «¿Dónde realizas la actividad?», corrígelo: tendrás un borrador más de este trimestre para rehacerlo con el porcentaje correcto (solo una vez).",
   "app.autonomo.goPremium": "Ver Premium",
   "app.autonomo.draftOf": "Borrador de {year}, {n}.º trimestre",
   "app.autonomo.model": "Modelo {model}",

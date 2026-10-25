@@ -154,7 +154,7 @@ export function useAutonomoDraft() {
   };
 
   const checks = checksFor(manual, extras, year, quarter);
-  const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
+  const access = quarterDraftAccess(plan, year, quarter, extras.territory);
   const prepare = () =>
     action.run(async () => {
       const inputs = buildInputs(manual, extras, year, quarter);
@@ -196,7 +196,7 @@ export function useAutonomoDraft() {
     wipe,
     wipeNow,
     checks,
-    access: { limit, locked, otherQuarter },
+    access,
     prepare,
     action,
   };

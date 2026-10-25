@@ -17,21 +17,36 @@ export function usageLimit(
 /**
  * Whether the self-employed draft of a quarter can be prepared. The free plan prepares the current
  * quarter and the one just ended while it can be filed (`otherQuarter` is any other), one draft
- * each: what counts is the use of that quarter.
+ * each: what counts is the use of that quarter. A draft spent with another territory than
+ * `territory` (where the activity is carried out) gives one extra draft of that quarter (`extra`),
+ * once (`extraLeft`: it has not been used yet). The server checks the same.
  */
 export function quarterDraftAccess(
   plan: ReturnType<typeof useOptionalPlan>,
   year: number,
-  quarter: number
-): { limit: number | null | undefined; locked: boolean; otherQuarter: boolean } {
+  quarter: number,
+  territory = 'general'
+): {
+  limit: number | null | undefined;
+  locked: boolean;
+  otherQuarter: boolean;
+  extra: boolean;
+  extraLeft: boolean;
+} {
   const { limit } = usageLimit(plan, 'autonomoDrafts');
   const same = (q: { year: number; quarter: number }) => q.year === year && q.quarter === quarter;
   const quarterUse = plan?.overview?.autonomoQuarters.find(same);
   const used = quarterUse?.used ?? plan?.overview?.usage.autonomoDrafts ?? 0;
+  const spent = limit !== null && limit !== undefined && used >= limit;
+  // Only a server that keeps the territory of the spent draft gives the extra.
+  const extraLeft = spent && !!quarterUse?.territory && !quarterUse.territoryExtraUsed;
+  const extra = extraLeft && quarterUse!.territory !== territory;
   return {
     limit,
-    locked: limit !== null && limit !== undefined && used >= limit,
+    locked: spent && !extra,
     otherQuarter: !!plan?.isFree && !freeDraftQuarters(new Date()).some(same),
+    extra,
+    extraLeft,
   };
 }
 

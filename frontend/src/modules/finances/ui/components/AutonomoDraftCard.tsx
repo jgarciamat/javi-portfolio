@@ -167,7 +167,7 @@ export function ExtrasPanel({
 
 /** Prepare the draft, or the plans when the free plan cannot prepare this one. */
 export function PrepareGate({
-  access: { limit, locked, otherQuarter },
+  access: { limit, locked, otherQuarter, extra, extraLeft },
   pending,
   onPrepare,
 }: {
@@ -191,9 +191,11 @@ export function PrepareGate({
     );
   }
   if (locked) {
+    // While the extra of the quarter is there, say how to get it: by changing the territory.
+    const text = t('app.autonomo.usedFree');
     return (
       <UsedFreeGate
-        text={t('app.autonomo.usedFree')}
+        text={extraLeft ? `${text} ${t('app.autonomo.territoryExtraLeft')}` : text}
         resource="autonomoDrafts"
         limit={limit as number}
       />
@@ -204,7 +206,11 @@ export function PrepareGate({
       <button className="btn-primary" disabled={pending} onClick={onPrepare}>
         {pending ? t('app.autonomo.preparing') : t('app.autonomo.prepare')}
       </button>
-      {limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>}
+      {extra ? (
+        <small className="section-hint">{t('app.autonomo.territoryExtra')}</small>
+      ) : (
+        limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>
+      )}
     </div>
   );
 }
@@ -225,7 +231,6 @@ export function AutonomoDraftCard({
   const s = useAutonomoDraft();
   const { year, setYear, quarter, setQuarter, extras, setExtras, wipes, manual, changeManual } = s;
   const { focus, setFocus, snapshot, cloud, hasManual, hasData, wipe, checks, action, prepare } = s;
-  const { limit, locked, otherQuarter } = s.access;
 
   const root = useRef<HTMLDivElement>(null);
   // The summary stays right under the header of the app.
@@ -315,7 +320,7 @@ export function AutonomoDraftCard({
           <>
             {action.error && <p className="form-error">{action.error}</p>}
             <PrepareGate
-              access={{ limit, locked, otherQuarter }}
+              access={s.access}
               pending={action.pending}
               onPrepare={() => void prepare()}
             />

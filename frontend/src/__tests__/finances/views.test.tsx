@@ -1106,6 +1106,54 @@ describe('the self-employed draft', () => {
     expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();
   });
 
+  it('gives one extra free draft of a quarter after changing where the activity is', async () => {
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
+    const spent = { year: 2026, quarter: 1, used: 1, territory: 'general' } as const;
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      autonomoQuarters: [{ ...spent, territoryExtraUsed: false }],
+    });
+    open(api);
+    // Spent with the general territory: the gate says how to get the extra.
+    const left = `${tr('app.autonomo.usedFree')} ${tr('app.autonomo.territoryExtraLeft')}`;
+    expect(await screen.findByText(left)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'ceuta' },
+    });
+    expect(screen.getByText(tr('app.autonomo.territoryExtra'))).toBeInTheDocument();
+    expect(screen.queryByText(tr('app.autonomo.freeOne'))).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        2026,
+        1,
+        expect.objectContaining({ territory: 'ceuta' })
+      )
+    );
+  });
+
+  it('gives no second extra draft, nor one to a server that does not keep the territory', async () => {
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      autonomoQuarters: [
+        { year: 2026, quarter: 1, used: 1, territory: 'ceuta', territoryExtraUsed: true },
+        { year: 2026, quarter: 2, used: 1 },
+      ],
+    });
+    open(api);
+    expect(await screen.findByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.territory'))), {
+      target: { value: 'melilla' },
+    });
+    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
+    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
+  });
+
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {
     localStorage.setItem(
       'mm_autonomo_draft2',

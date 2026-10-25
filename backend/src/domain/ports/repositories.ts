@@ -331,10 +331,22 @@ export interface RentaPassRepository {
 }
 
 /** How many self-employed tax drafts a user has prepared for each quarter. */
+/** The drafts of one quarter: how many, the territory of the last one and its extra draft. */
+export interface QuarterDraftRecord {
+  uses: number;
+  /** Territory of the last draft (null before any, or from before territories were kept). */
+  territory: string | null;
+  /** The one extra free draft for a change of territory has been used. */
+  territoryExtra: boolean;
+}
+
 export interface AutonomoUsageRepository {
   count(userId: string, year: number, quarter: number): number;
-  /** One more draft of that quarter; returns how many there are now. */
-  increment(userId: string, year: number, quarter: number): number;
+  record(userId: string, year: number, quarter: number): QuarterDraftRecord;
+  /** One more draft of that quarter, made for `territory`; returns how many there are now. */
+  increment(userId: string, year: number, quarter: number, territory?: string): number;
+  /** The extra draft for a change of territory: it is spent, and `territory` becomes the last. */
+  useTerritoryExtra(userId: string, year: number, quarter: number, territory: string): void;
 }
 
 /** How many bank statements a user has imported (previews do not count). */

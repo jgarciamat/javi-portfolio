@@ -50,7 +50,9 @@ export const billingOverview = {
     imports: 0,
     movements: 0,
   },
-  autonomoQuarters: [{ year: 2026, quarter: 1, used: 0 }],
+  autonomoQuarters: [
+    { year: 2026, quarter: 1, used: 0, territory: null, territoryExtraUsed: false },
+  ],
   ai: { used: 0, quota: 10 },
   catalog: {
     currency: 'EUR',

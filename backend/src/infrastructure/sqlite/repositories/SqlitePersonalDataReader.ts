@@ -77,8 +77,8 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         ),
         autonomoDrafts: this.uses('autonomo_drafts', userId),
         autonomoDraftsByQuarter: this.all(
-          `SELECT year, quarter, uses FROM autonomo_quarter_drafts
-           WHERE user_id = ? ORDER BY year, quarter`,
+          `SELECT year, quarter, uses, territory, territory_extra AS territoryExtra
+           FROM autonomo_quarter_drafts WHERE user_id = ? ORDER BY year, quarter`,
           userId
         ),
         autonomoPdfs: this.uses('autonomo_pdfs', userId),

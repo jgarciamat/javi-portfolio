@@ -39,6 +39,7 @@ import { cryptoShorts } from './038-crypto-shorts';
 import { cryptoSeasons } from './039-crypto-seasons';
 import { cryptoSlots } from './040-crypto-slots';
 import { moneyLeakDecisions } from './041-money-leak-decisions';
+import { autonomoTerritoryExtra } from './042-autonomo-territory-extra';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -84,4 +85,5 @@ export const migrations: Migration[] = [
   cryptoSeasons,
   cryptoSlots,
   moneyLeakDecisions,
+  autonomoTerritoryExtra,
 ];
