@@ -184,7 +184,46 @@ describe('the rules by territory, year and quarter', () => {
     expect(hardToJustifyRate('melilla', 2026, 4)).toBe(0.05);
   });
 
+  it('takes 7 % in 2023 (DA 56.ª LIRPF) and 5 % in 2022, 2024, 2025 and 2026', () => {
+    expect([2022, 2023, 2024, 2025, 2026].map((y) => hardToJustifyRate('general', y, 1))).toEqual([
+      0.05, 0.07, 0.05, 0.05, 0.05,
+    ]);
+    // Without the territory (older apps) and in Melilla, the same; Ceuta keeps its 4T of 2026.
+    expect(hardToJustifyRate(undefined, 2023, 4)).toBe(0.07);
+    expect(hardToJustifyRate('melilla', 2023, 2)).toBe(0.07);
+    expect(hardToJustifyRate('ceuta', 2026, 4)).toBe(0.1);
+  });
+
   it('writes the rates as the boxes do', () => {
     expect([0.2, 0.08, 0.02, 0.008].map(percentLabel)).toEqual(['20 %', '8 %', '2 %', '0,8 %']);
+  });
+});
+
+/**
+ * The same books (persona 49's figures) in the general territory, at 20 %, by year:
+ *   1T: 9,000 − 2,451.63 = 6,548.37
+ *       5 % = 327.42; 03 = 6,220.95; 20 % = 1,244.19 (2022, 2024, 2025, 2026)
+ *       7 % = 458.39; 03 = 6,089.98; 20 % = 1,218.00 (2023, DA 56.ª)
+ *   2023 to the 4T: 2T 15,096.74 × 7 % = 1,056.77; 03 = 14,039.97; 20 % = 2,807.99 − 1,218.00 = 1,589.99
+ *                   3T 20,645.11 × 7 % = 1,445.16; 03 = 19,199.95; 20 % = 3,839.99 − 2,807.99 = 1,032.00
+ *                   4T 30,193.48 × 7 % = 2,113.54, capped at 2,000 (art. 30.2.4.ª LIRPF);
+ *                      03 = 28,193.48; 20 % = 5,638.70 − 3,839.99 = 1,798.71
+ */
+describe('Hard-to-justify expenses by year (art. 30.2.ª RIRPF; DA 56.ª LIRPF)', () => {
+  const general = (year: number, quarter: 1 | 2 | 3 | 4) =>
+    draftOf(year, quarter, P49_INCOME, P49_EXPENSES, { hardToJustify: true });
+
+  it('gives 5 % in 2022, 2024, 2025 and 2026 and 7 % in 2023', () => {
+    expect([2022, 2023, 2024, 2025, 2026].map((y) => general(y, 1).irpf.amountDue)).toEqual([
+      1244.19, 1218, 1244.19, 1244.19, 1244.19,
+    ]);
+    expect(box(general(2023, 1), '03')).toBe(6089.98);
+  });
+
+  it('keeps the 2,000 € cap with the 7 % of 2023', () => {
+    expect([1, 2, 3, 4].map((q) => general(2023, q as 1 | 2 | 3 | 4).irpf.amountDue)).toEqual([
+      1218, 1589.99, 1032, 1798.71,
+    ]);
+    expect(box(general(2023, 4), '02')).toBe(11806.52);
   });
 });

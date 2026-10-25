@@ -76,6 +76,7 @@ const checksFor = (manual: ManualForm, extras: Extras, year: number, quarter: Qu
     upTo: quarter,
     model130: manual.model130,
     hardToJustify: extras.hardToJustify,
+    territory: extras.territory,
   });
 
 /** The manual form, kept on the device between visits. */

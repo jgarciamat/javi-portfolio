@@ -253,6 +253,24 @@ describe('Checks of the imported invoices before the draft', () => {
       ).toBe(2000);
     });
 
+    it('takes the hard-to-justify rate of the year and the territory, as the server', () => {
+      // 10,000 of income and no expenses: 7 % = 700 in 2023 (DA 56.ª), 5 % = 500 in 2022 and 2024.
+      const year = (y: number, territory?: CheckInput['territory'], q = 1) =>
+        checkImport(
+          input({
+            year: y,
+            hardToJustify: true,
+            territory,
+            manual: manual(...(q === 4 ? [quarter(), quarter(), quarter()] : []), quarter(10000)),
+            invoices: book('received', entry(`${y}-${q === 4 ? '11' : '02'}-01`, 'Alquiler', 1)),
+            model130: { year: y, quarter: q, income: 10000, expenses: 0 },
+          })
+        )[0].amounts.books;
+      expect([2022, 2023, 2024, 2025, 2026].map((y) => year(y))).toEqual([500, 700, 500, 500, 500]);
+      // Ceuta, 4T of 2026: 10 % (DA 64.ª); Melilla stays at 5 %.
+      expect([year(2026, 'ceuta', 4), year(2026, 'melilla', 4)]).toEqual([1000, 500]);
+    });
+
     it('only compares a book that was imported for those quarters, and the same year', () => {
       const late = book('issued', entry('2026-08-01', 'Cliente', 1));
       const filed = { year: 2026, quarter: 2 as const, income: 1, expenses: 1 };

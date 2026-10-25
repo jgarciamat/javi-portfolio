@@ -39,8 +39,9 @@ export const instalmentRates = (
     : { direct: 0.2, agrarian: 0.02 };
 
 /**
- * Hard-to-justify expenses of the 130 in the simplified modality: 7 % in 2023 (DA 56.ª LIRPF), 10 %
- * in the 4T of 2026 in Ceuta (DA 64.ª), 5 % otherwise (art. 30.2.4.ª RIRPF).
+ * Hard-to-justify expenses of the 130 in the simplified modality: 7 % in 2023 (DA 56.ª LIRPF, Ley
+ * 31/2022, BOE-A-2022-22128), 10 % in the 4T of 2026 in Ceuta (DA 64.ª), 5 % otherwise (art. 30.2.ª
+ * RIRPF); 2,000 € a year at most (art. 30.2.4.ª LIRPF). The same as the server (autonomo-territory.ts).
  */
 export function hardToJustifyRate(
   territory: ActivityTerritory | undefined,

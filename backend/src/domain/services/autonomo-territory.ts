@@ -1,4 +1,9 @@
-import { AGRARIAN_ADVANCE, HARD_TO_JUSTIFY_RATE, IRPF_ADVANCE } from './autonomo-data';
+import {
+  AGRARIAN_ADVANCE,
+  HARD_TO_JUSTIFY_RATE,
+  HARD_TO_JUSTIFY_RATE_2023,
+  IRPF_ADVANCE,
+} from './autonomo-data';
 
 /**
  * Where the activity is carried out, for the instalments of the modelo 130 (sources checked on
@@ -54,15 +59,19 @@ export function instalmentRates(
     : { direct: IRPF_ADVANCE, agrarian: AGRARIAN_ADVANCE };
 }
 
-/** The hard-to-justify rate of the instalment of a quarter (simplified modality). */
-export const hardToJustifyRate = (
+/**
+ * The hard-to-justify rate of the instalment of a quarter (simplified modality): 10 % in the 4T of
+ * 2026 in Ceuta (DA 64.ª), 7 % in 2023 (DA 56.ª), 5 % otherwise. The same as the device
+ * (frontend activityTerritory.ts).
+ */
+export function hardToJustifyRate(
   territory: ActivityTerritory | undefined,
   year: number,
   quarter: number
-): number =>
-  territory === 'ceuta' && year === 2026 && quarter === 4
-    ? CEUTA_HARD_TO_JUSTIFY_2026
-    : HARD_TO_JUSTIFY_RATE;
+): number {
+  if (territory === 'ceuta' && year === 2026 && quarter === 4) return CEUTA_HARD_TO_JUSTIFY_2026;
+  return year === 2023 ? HARD_TO_JUSTIFY_RATE_2023 : HARD_TO_JUSTIFY_RATE;
+}
 
 /** «8 %», «0,8 %»: a rate as the labels of the boxes write it. */
 export const percentLabel = (rate: number): string =>

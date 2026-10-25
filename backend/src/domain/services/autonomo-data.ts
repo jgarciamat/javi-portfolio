@@ -137,6 +137,16 @@ export const LOW_INCOME_REDUCTIONS: { upTo: number; amount: number }[] = [
 export const IRPF_ADVANCE = 0.2;
 /** Section II of the 130, farming, livestock, forestry and fishing: 2 % of the quarter's income (art. 110.1.c RIRPF). */
 export const AGRARIAN_ADVANCE = 0.02;
-/** Hard-to-justify expenses of the simplified direct estimation: 5 % of the net income, up to 2,000 euros a year. */
+/**
+ * Hard-to-justify expenses of the simplified direct estimation: 5 % of the net income (art. 30.2.ª
+ * RIRPF, version of RD 633/2015), up to 2,000 euros a year (art. 30.2.4.ª LIRPF).
+ */
 export const HARD_TO_JUSTIFY_RATE = 0.05;
+/**
+ * 7 % in the tax period 2023 only (DA 56.ª LIRPF, added by art. 60.2 of Ley 31/2022, BOE-A-2022-22128,
+ * in force on 1-1-2023; checked in the consolidated BOE on 25-10-2026). It has no rule on the
+ * instalments, so it also applies to the 130 of 2023 (art. 110.1.a RIRPF takes the net income of
+ * direct estimation). The 2,000 € cap stays.
+ */
+export const HARD_TO_JUSTIFY_RATE_2023 = 0.07;
 export const HARD_TO_JUSTIFY_MAX = 2000;

@@ -152,7 +152,7 @@ const sum = (list: number[]) => round2(list.reduce((s, v) => s + v, 0));
 // paid when the filed results are not given.
 const HARD_RATE = 0.05;
 const HARD_MAX = 2000;
-/** 7 % in 2023 only (DA 56.ª LIRPF), 5 % the other years (art. 30.2.4.ª LIRPF). */
+/** 7 % in 2023 only (DA 56.ª LIRPF), 5 % the other years (art. 30.2.ª RIRPF; cap: art. 30.2.4.ª LIRPF). */
 export const hardRateOf = (year: number) => (year === 2023 ? 0.07 : HARD_RATE);
 const LOW_INCOME = [
   { upTo: 9000, amount: 100 },
@@ -350,7 +350,7 @@ function expensesOfYear(
       retaFix.refunded
   );
   const difference = round2(income - box0218);
-  // In the Renta the 5 % is part of the simplified modality, not an option (art. 30.2.4.ª RIRPF;
+  // In the Renta the 5 % is part of the simplified modality, not an option (art. 30.2.ª RIRPF;
   // Manual Renta 2025, cap. 7): the option of the screen is only for the modelo 130.
   const hard =
     activity.method === 'simplified'
