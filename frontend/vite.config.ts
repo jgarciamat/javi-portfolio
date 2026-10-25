@@ -1,4 +1,5 @@
-import { defineConfig, type Plugin } from 'vite';
+import { realpathSync } from 'fs';
+import { defineConfig, searchForWorkspaceRoot, type Plugin } from 'vite';
 import type { OutputBundle, OutputChunk } from 'rollup';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -136,6 +137,14 @@ export default defineConfig({
   },
   server: {
     port: 5176,
+    // A worktree may link node_modules to another checkout: its real folder must be servable too,
+    // or the PDF reader's worker (pdf.js, loaded by URL) gets a 403 and the previews never open.
+    fs: {
+      allow: [
+        searchForWorkspaceRoot(process.cwd()),
+        realpathSync(path.resolve(__dirname, 'node_modules')),
+      ],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
