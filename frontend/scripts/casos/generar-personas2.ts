@@ -7,7 +7,8 @@
  * the owner in ~/Downloads/pruebas finanverso/personas/NN - <name>/ (names from the private
  * nombres-p2.json there; «Persona Ficticia NN» otherwise). It does not touch personas 01-28.
  *
- *   node scripts/casos/run-personas2.mjs      (from frontend/)
+ *   node scripts/casos/run-personas2.mjs                  (from frontend/)
+ *   CASOS_PERSONA=49 node scripts/casos/run-personas2.mjs (one persona only)
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
@@ -265,7 +266,11 @@ async function draftPdf(p: Persona): Promise<{ bytes: Uint8Array; lines: string[
   return { bytes: await d.doc.save(), lines };
 }
 
-async function summaryPdf(p: Persona, figures: Figure[]): Promise<Uint8Array> {
+async function summaryPdf(
+  p: Persona,
+  figures: Figure[],
+  notes: string[] = []
+): Promise<Uint8Array> {
   const title = `Resumen de casillas · ${p.nombre}`;
   const d = await start(title, `${p.titulo} · NIF ficticio ${p.nif}`);
   if (p.alcance === 'fuera') para(d, `Fuera de alcance: ${p.motivoFueraDeAlcance}`, title);
@@ -296,8 +301,8 @@ async function summaryPdf(p: Persona, figures: Figure[]): Promise<Uint8Array> {
         f.origen === 'pendiente'
           ? 'pendiente'
           : f.importe === null
-          ? (f.valor as string)
-          : money(f.importe);
+            ? (f.valor as string)
+            : money(f.importe);
       d.page.drawText(f.casilla ?? '—', { x: 44, y: d.y, size: 8, font: d.bold, color: INK });
       d.page.drawText(fit(d.font, f.concepto, 8, 340), {
         x: 80,
@@ -325,6 +330,9 @@ async function summaryPdf(p: Persona, figures: Figure[]): Promise<Uint8Array> {
     }
     d.y -= 8;
   }
+  // What a rule of the year changes (esperado.json «notas»), before the legend.
+  for (const note of notes) para(d, `Nota: ${note}`, title, 8);
+  if (notes.length) d.y -= 6;
   room(d, 30, title);
   d.page.drawText('Origen: M = cálculo a mano (calculo.md), O = caso oficial, P = pendiente.', {
     x: 40,
@@ -497,8 +505,8 @@ function issuedBook(list: Invoice[]): Uint8Array {
         i.kind === 'exempt'
           ? 'Exenta art. 20 LIVA'
           : i.tax === 'IGIC'
-          ? 'IGIC (Canarias), no IVA'
-          : '';
+            ? 'IGIC (Canarias), no IVA'
+            : '';
       return [
         { date: i.date },
         i.number,
@@ -539,10 +547,10 @@ function receivedBook(list: Invoice[]): Uint8Array {
         i.isp === 'eu'
           ? 'Inversión del sujeto pasivo (UE)'
           : i.isp === 'noneu'
-          ? 'Inversión del sujeto pasivo (fuera de la UE)'
-          : i.tax === 'IGIC'
-          ? 'IGIC (Canarias)'
-          : '';
+            ? 'Inversión del sujeto pasivo (fuera de la UE)'
+            : i.tax === 'IGIC'
+              ? 'IGIC (Canarias)'
+              : '';
       return [
         { date: i.date },
         i.number,
@@ -716,8 +724,13 @@ async function main() {
   const names: Record<string, string> = existsSync(join(PRIVATE, `nombres-${prefix}.json`))
     ? JSON.parse(readFileSync(join(PRIVATE, `nombres-${prefix}.json`), 'utf8'))
     : {};
+  // CASOS_PERSONA=49 rebuilds the documents of that persona only (the owner's index is kept).
+  const only = process.env.CASOS_PERSONA ? Number(process.env.CASOS_PERSONA) : null;
   const slugs = readdirSync(PEOPLE).filter(
-    (s) => s.startsWith(`${prefix}-`) && existsSync(join(PEOPLE, s, 'persona.json'))
+    (s) =>
+      s.startsWith(`${prefix}-`) &&
+      existsSync(join(PEOPLE, s, 'persona.json')) &&
+      (only === null || numberOf(s) === only)
   );
   const problems: string[] = [];
   const index: string[] = [];
@@ -725,9 +738,11 @@ async function main() {
   for (const slug of slugs.sort((a, b) => numberOf(a) - numberOf(b))) {
     const dir = join(PEOPLE, slug);
     const p = JSON.parse(readFileSync(join(dir, 'persona.json'), 'utf8')) as Persona;
-    const figures = (
-      JSON.parse(readFileSync(join(dir, 'esperado.json'), 'utf8')) as { cifras: Figure[] }
-    ).cifras;
+    const expected = JSON.parse(readFileSync(join(dir, 'esperado.json'), 'utf8')) as {
+      cifras: Figure[];
+      notas?: string[];
+    };
+    const figures = expected.cifras;
     const docs = join(dir, 'documentos');
     mkdirSync(docs, { recursive: true });
     const out: Record<string, Uint8Array> = {};
@@ -786,7 +801,7 @@ async function main() {
           );
       }
     }
-    out['resumen-casillas.pdf'] = await summaryPdf(p, figures);
+    out['resumen-casillas.pdf'] = await summaryPdf(p, figures, expected.notas);
     const n = String(numberOf(slug));
     const shown = names[String(Number(n))] ?? p.nombre;
     const copy = join(PRIVATE, `${n} - ${shown}`);
@@ -805,7 +820,7 @@ async function main() {
   }
   // The owner's index of every persona: each batch has its own block, replaced on every run.
   const all = join(PRIVATE, 'INDICE.txt');
-  if (existsSync(all)) {
+  if (only === null && existsSync(all)) {
     const marker = prefix === 'p2' ? '--- Segunda tanda (p2) ---' : `--- Tanda ${prefix} ---`;
     const blocks = readFileSync(all, 'utf8').split(/\n(?=--- )/);
     const kept = blocks.filter((b) => !b.startsWith(marker)).map((b) => b.replace(/\s+$/, ''));

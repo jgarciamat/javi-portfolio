@@ -620,5 +620,8 @@
       "motivo": "El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.",
       "campo": null
     }
+  ],
+  "notas": [
+    "4T de 2026: en Ceuta los gastos de difícil justificación son el 10 % del rendimiento neto, con el tope de 2.000 € al año (DA 64.ª LIRPF, RDL 22/2026). Resultado del 130: 686,45 € (con el 5 % general, 725,67 €)."
   ]
 }

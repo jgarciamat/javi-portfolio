@@ -18,6 +18,9 @@ La verdad de referencia y las pruebas de regresión de la Renta (modelo 100) y d
 ```sh
 python3 -I frontend/scripts/casos/construir_casos.py   # personas, esperado y cálculo a mano
 python3 -I frontend/scripts/casos/construir_personas5.py  # p5: riesgos P0 (alquileres por inmueble, residencia, donativos)
+python3 -I frontend/scripts/casos/construir_personas2.py  # p2: personas, esperado (y sus «notas») y cálculo a mano
+cd frontend && node scripts/casos/run-personas2.mjs     # p2: documentos (y copia en ~/Downloads)
+cd frontend && CASOS_PERSONA=49 node scripts/casos/run-personas2.mjs  # solo la persona 49 (no toca el índice privado)
 cd frontend && npm run casos                           # documentos, copia en ~/Downloads y 130/303 contra el backend
 CASOS_INFORME=1 npx jest src/__tests__/casos            # Renta contra el motor del frontend
 python3 -I scripts/casos/informe.py                    # oficiales.md y resultados.md
@@ -26,3 +29,5 @@ python3 -I scripts/casos/informe.py                    # oficiales.md y resultad
 Los tests de `frontend/src/__tests__/casos/` cargan cada persona, ejecutan el motor actual y comparan al céntimo. Lo que el motor no calcula queda como `todo` con su motivo; una discrepancia conocida pasa mientras el motor siga dando lo registrado (o ya lo correcto); cualquier diferencia nueva falla.
 
 Reglas: Ley 35/2006 del IRPF y Manual práctico de Renta 2025 de la AEAT; modelos 130, 303, 111 y 115 de la sede de la AEAT; Orden PJC/297/2026 (RETA). Las escalas y mínimos autonómicos se toman de `frontend/src/modules/tools/data/renta/ccaa/`, que citan su fuente. Comprobado el 19-10-2026.
+
+Las «notas» de `esperado.json` se imprimen al final de `resumen-casillas.pdf` (p. ej., la persona 49: 10 % de gastos de difícil justificación en el 4T de 2026 en Ceuta, DA 64.ª LIRPF; 130 del 4T, 686,45 €). Al rehacer una sola persona, el resto de sus documentos solo cambia en la fecha interna del PDF o del Excel: se dejan como estaban.

@@ -812,6 +812,8 @@ def build_autonomo2(a):
     figs = []
     issued, received, bank, movements = [], [], [], []
     m303s, m130s, m111s, m115s = [], [], [], []
+    # Notes printed at the end of resumen-casillas.pdf (generar-personas2.ts).
+    notes = []
     start = a.get('start', 1)
     vat = a['vat']
     rate130 = a.get('irpfRate', 20)
@@ -1043,6 +1045,12 @@ def build_autonomo2(a):
                     ('13', 'Minoración (art. 110.3.c RIRPF)', 0.0), ('14', 'Diferencia (12 − 13)', b12), ('15', 'Resultados negativos de trimestres anteriores', 0.0),
                     ('17', 'Total (14 − 15 − 16)', b12), ('19', 'Resultado de la autoliquidación', b12)]
             m130s.append(rows)
+            if hard_pct == 10:
+                # The same quarter with the general 5 %, so the summary shows what the DA 64.ª changes.
+                net5 = r2(cum_income - r2(cum_exp + r2(min(max(0.0, prenet) * 5 / 100, 2000))))
+                b12_5 = max(0.0, r2(r2(max(0.0, net5) * rate130 / 100) - paid130 - cum_withheld))
+                notes.append(f'{q}T de 2026: en Ceuta los gastos de difícil justificación son el 10 % del rendimiento neto, con el tope de '
+                             f'2.000 € al año (DA 64.ª LIRPF, RDL 22/2026). Resultado del 130: {eur(b12)} € (con el 5 % general, {eur(b12_5)} €).')
             for box, label, amount in rows:
                 fig('130', f'{q}T', box, label, amount, campo=f'm130.{box}')
             steps.s(f'130 (acumulado): ingresos {eur(cum_income)}' + (' (con el IVA que cobra: recargo de equivalencia)' if vat == 'recargo' else '')
@@ -1149,7 +1157,7 @@ def build_autonomo2(a):
     # Where the activity is carried out: 8 % of the 130 in Ceuta and Melilla (art. 110.2 RIRPF).
     if a['ccaa'] in ('ceuta', 'melilla'):
         inputs['territory'] = a['ccaa']
-    data = dict(movements=movements, inputs=inputs, issued=issued, received=received, bank=bank, m303=m303s, m130=m130s, m111=m111s, m115=m115s)
+    data = dict(movements=movements, inputs=inputs, issued=issued, received=received, bank=bank, m303=m303s, m130=m130s, m111=m111s, m115=m115s, notes=notes)
     return figs, steps, data
 
 
@@ -1357,6 +1365,8 @@ def main():
         persona['documentos'] = dict(emitidas=data['issued'], recibidas=data['received'], banco=data['bank'], m303=data['m303'], m130=data['m130'],
                                      m111=data['m111'], m115=data['m115'])
         esperado = dict(slug=a['slug'], ejercicio=2026, comprobado=CHECKED, cifras=figs)
+        if data['notes']:
+            esperado['notas'] = data['notes']
         write(os.path.join(OUT, a['slug']), persona, esperado, a['title'], a['story'], steps)
         index.append(dict(slug=a['slug'], titulo=a['title'], comunidad=a['ccaa'], modelos=a['models'], prueba=a['tests'], alcance='parcial'))
     for o in FUERA:
