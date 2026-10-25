@@ -1,4 +1,5 @@
 import { PlanId } from '@domain/model/Subscription';
+import { filingDeadline, spanishDays } from './working-days';
 
 /** Things a user creates that the free plan limits. */
 export type LimitedResource =
@@ -124,28 +125,36 @@ export function rentaCampaignOf(now: Date): number {
   return now.getUTCMonth() >= 3 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
 }
 
-/** The calendar quarter a date belongs to. */
-export function quarterOf(now: Date): { year: number; quarter: 1 | 2 | 3 | 4 } {
-  return {
-    year: now.getUTCFullYear(),
-    quarter: (Math.floor(now.getUTCMonth() / 3) + 1) as 1 | 2 | 3 | 4,
-  };
-}
+/** The calendar quarter of a day (YYYY-MM-DD). */
+const quarterOfDay = (day: string): { year: number; quarter: 1 | 2 | 3 | 4 } => ({
+  year: Number(day.slice(0, 4)),
+  quarter: (Math.floor((Number(day.slice(5, 7)) - 1) / 3) + 1) as 1 | 2 | 3 | 4,
+});
 
-/** Last day (of the month after a quarter) to file that quarter's forms: 20th, or 30 January. */
-const FILING_LAST_DAY: Record<1 | 2 | 3 | 4, number> = { 1: 20, 2: 20, 3: 20, 4: 30 };
+/** The calendar quarter a date belongs to, by the day in mainland Spain. */
+export const quarterOf = (now: Date): { year: number; quarter: 1 | 2 | 3 | 4 } =>
+  quarterOfDay(spanishDays(now)[0]);
 
-/**
- * The quarters the free plan can draft on a date: the current one and, while its filing window
- * is open (1–20 April, July and October; 1–30 January), the one that has just ended.
- */
-export function freeDraftQuarters(now: Date): { year: number; quarter: 1 | 2 | 3 | 4 }[] {
-  const current = quarterOf(now);
-  const month = now.getUTCMonth();
-  if (month % 3 !== 0) return [current];
+/** The current quarter and, while it can still be filed on that day, the one just ended. */
+function draftableOn(day: string): { year: number; quarter: 1 | 2 | 3 | 4 }[] {
+  const current = quarterOfDay(day);
   const ended =
     current.quarter === 1
       ? { year: current.year - 1, quarter: 4 as const }
       : { year: current.year, quarter: (current.quarter - 1) as 1 | 2 | 3 };
-  return now.getUTCDate() <= FILING_LAST_DAY[ended.quarter] ? [current, ended] : [current];
+  return day <= filingDeadline(ended.year, ended.quarter) ? [current, ended] : [current];
+}
+
+/**
+ * The quarters the free plan can draft on a date: the current one and, while its filing window is
+ * open, the one that has just ended. The window ends on the real last day (20 April, July and
+ * October, 30 January, moved past weekends and holidays: 1 February 2027 for the fourth quarter of
+ * 2026), on the day of mainland Spain or of the Canary Islands, whichever is still in time.
+ */
+export function freeDraftQuarters(now: Date): { year: number; quarter: 1 | 2 | 3 | 4 }[] {
+  const out: { year: number; quarter: 1 | 2 | 3 | 4 }[] = [];
+  for (const q of spanishDays(now).flatMap(draftableOn)) {
+    if (!out.some((o) => o.year === q.year && o.quarter === q.quarter)) out.push(q);
+  }
+  return out;
 }

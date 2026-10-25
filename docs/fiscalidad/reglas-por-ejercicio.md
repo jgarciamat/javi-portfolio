@@ -94,6 +94,18 @@ Una Renta guardada en el dispositivo sin año se carga como 2025 (`loadProgress`
 
 Un año sin orden de cotización toma la última tabla y lo dice en el borrador; un año anterior a la primera tabla de módulos no estima el 131.
 
+### Plazos (comprobado el 25-10-2026)
+
+Un plazo que acaba en sábado, domingo o festivo pasa al primer día hábil siguiente (Ley 39/2015, art. 30.2 y 30.5, [BOE-A-2015-10565](https://www.boe.es/buscar/act.php?id=BOE-A-2015-10565); instrucciones del 130 y del 303 de la sede). La app conoce los festivos de todas las comunidades: los nacionales no sustituibles (RD 2001/1983, art. 45.1, [BOE-A-1983-20906](https://www.boe.es/buscar/act.php?id=BOE-A-1983-20906)), el Viernes Santo y el 6 de enero, que todas mantienen (fiestas de 2027: [BOE-A-2026-21254](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-21254)). No conoce los autonómicos ni los locales (art. 30.6), que pueden alargar el plazo un día más. Código: `backend/src/domain/services/working-days.ts` y `frontend/src/modules/finances/domain/workingDays.ts`.
+
+| Plazo | 2026 | 2027 |
+|---|---|---|
+| 303 y 130 del 1T, 2T y 3T (día 20) | 20-04, 20-07, 20-10 | 20-04, 20-07, 20-10 |
+| 303, 130 y 390 del 4T del año anterior (30 de enero) | 30-01-2026 (viernes) | **1-02-2027** (el 30 es sábado) |
+| 111 y 115 del 4T (20 de enero) | 20-01-2026 | 20-01-2027 |
+
+El plan gratis deja preparar el trimestre recién terminado hasta ese último día real, con el día de la península o el de Canarias (el que aún esté en plazo).
+
 ## Pendiente
 
 - **Comunidades de 2026.** Esperar al Manual 2026 (abril de 2027) y hacer lo mismo que con 2024 (`regionOfYear` con su tabla de cambios).

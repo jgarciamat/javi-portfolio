@@ -21,6 +21,7 @@ import {
   vatYear,
 } from './autonomo-vat';
 import type { QuarterVat, VatOptions } from './autonomo-vat-data';
+import { businessDay, filingDeadline } from './working-days';
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const euros = (cents: number): number => round2(cents / 100);
@@ -127,7 +128,7 @@ export interface RetaEstimate {
 export interface Deadline {
   model: string;
   label: string;
-  /** ISO date of the last day (moved to the next working day when it falls on a weekend). */
+  /** ISO date of the last day (moved past weekends and national holidays: working-days.ts). */
   date: string;
 }
 
@@ -399,23 +400,14 @@ function retaEstimate(
   return retaFor(monthly, year);
 }
 
-const iso = (d: Date): string => d.toISOString().slice(0, 10);
-
-/** A deadline date; a weekend moves to the next Monday (public holidays are not known here). */
-export function businessDay(year: number, month: number, day: number): string {
-  const d = new Date(Date.UTC(year, month - 1, day));
-  while (d.getUTCDay() === 6 || d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1);
-  return iso(d);
-}
-
 /** The deadlines of the quarter and, at the year end, the annual summaries. */
 export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4, intraEU = false): Deadline[] {
-  const [y, month, day] = quarter === 4 ? [year + 1, 1, 30] : [year, quarter * 3 + 1, 20];
+  const quarterly = filingDeadline(year, quarter);
   const retention =
     quarter === 4 ? businessDay(year + 1, 1, 20) : businessDay(year, quarter * 3 + 1, 20);
   const list: Deadline[] = [
-    { model: '303', label: 'IVA trimestral', date: businessDay(y, month, day) },
-    { model: '130', label: 'Pago fraccionado del IRPF', date: businessDay(y, month, day) },
+    { model: '303', label: 'IVA trimestral', date: quarterly },
+    { model: '130', label: 'Pago fraccionado del IRPF', date: quarterly },
     {
       model: '111',
       label: 'Retenciones de trabajadores o profesionales (si has pagado alguna)',
@@ -428,7 +420,7 @@ export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4, intraEU = fal
     list.push({
       model: '349',
       label: 'Operaciones intracomunitarias',
-      date: businessDay(y, month, day),
+      date: quarterly,
     });
   }
   if (quarter === 4) {
