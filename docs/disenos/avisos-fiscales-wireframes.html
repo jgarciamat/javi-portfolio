@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maquetas Avisos fiscales</title>
+    <!--
+  Maquetas estáticas del diseño docs/disenos/avisos-fiscales-con-importe.md.
+  Sin dependencias externas. Todos los importes, fechas y direcciones son inventados.
+-->
+    <style>
+      :root {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --border: #cbd5e1;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #4f46e5;
+        --accent-ink: #ffffff;
+        --ok: #047857;
+        --warn: #b45309;
+        --danger: #b91c1c;
+        --skeleton: #e2e8f0;
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #0b1120;
+          --surface: #111827;
+          --surface-2: #1e293b;
+          --border: #334155;
+          --text: #f1f5f9;
+          --muted: #cbd5e1;
+          --accent: #818cf8;
+          --accent-ink: #0b1120;
+          --ok: #34d399;
+          --warn: #fbbf24;
+          --danger: #f87171;
+          --skeleton: #1e293b;
+        }
+      }
+      :root[data-theme='dark'] {
+        --bg: #0b1120;
+        --surface: #111827;
+        --surface-2: #1e293b;
+        --border: #334155;
+        --text: #f1f5f9;
+        --muted: #cbd5e1;
+        --accent: #818cf8;
+        --accent-ink: #0b1120;
+        --ok: #34d399;
+        --warn: #fbbf24;
+        --danger: #f87171;
+        --skeleton: #1e293b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          18px/1.5 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 4px;
+      }
+      h2.sec {
+        font-size: 1.2rem;
+        margin: 40px 0 12px;
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+      }
+      .note {
+        color: var(--muted);
+        margin: 0 0 16px;
+        max-width: 70ch;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .frame-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin: 0 0 6px;
+      }
+      .phone {
+        width: 390px;
+        max-width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 16px;
+        overflow: hidden;
+      }
+      .desktop {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+      }
+      @media (max-width: 860px) {
+        .desktop {
+          grid-template-columns: 1fr;
+        }
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+      }
+      .burger {
+        width: 48px;
+        height: 48px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--warn);
+      }
+      .deadlines {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-2);
+        padding: 14px;
+      }
+      .deadlines > h3 {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+      .deadlines > .k {
+        margin: 0 0 10px;
+        color: var(--muted);
+      }
+      .item {
+        border-top: 1px solid var(--border);
+        padding: 12px 0;
+      }
+      .item h4 {
+        margin: 0;
+        font-size: 1rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .when {
+        font-weight: 700;
+      }
+      .when.soon {
+        color: var(--warn);
+      }
+      .amount {
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin: 2px 0;
+      }
+      .line {
+        margin: 2px 0;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .info {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin: 6px 0 0;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .btn {
+        min-height: 48px;
+        padding: 0 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-size: 1rem;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .btn.link {
+        border: none;
+        background: none;
+        color: var(--accent);
+        text-decoration: underline;
+        padding: 0 4px;
+      }
+      .band {
+        border-left: 4px solid var(--warn);
+        background: var(--surface);
+        padding: 8px 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      .ok {
+        color: var(--ok);
+        font-weight: 700;
+      }
+      .disclaimer {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .skeleton {
+        height: 18px;
+        border-radius: 6px;
+        background: var(--skeleton);
+        margin: 8px 0;
+      }
+      .assistant {
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        color: var(--muted);
+        min-height: 360px;
+      }
+      .sheet fieldset {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 10px 0;
+        padding: 8px 12px;
+      }
+      .sheet label {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        min-height: 48px;
+      }
+      .sheet input {
+        width: 22px;
+        height: 22px;
+      }
+      .notif {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface-2);
+        padding: 12px 14px;
+        margin-bottom: 10px;
+      }
+      .notif b {
+        display: block;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.95rem;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      .scroll {
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Avisos fiscales con importe: maquetas</h1>
+      <p class="note">
+        Diseño en <code>docs/disenos/avisos-fiscales-con-importe.md</code> (secciones E y F).
+        Importes de los casos A3 y B del diseño (inventados y pasados por el motor). Letra base de
+        18 px y botones de 48 px como mínimo.
+      </p>
+
+      <h2 class="sec">1. Tarjeta «Próximos plazos», móvil 390 px</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Con importe (caso A3), T-12</p>
+          <div class="phone">
+            <div class="bar">
+              <span class="burger" aria-label="Menú, 1 plazo en 7 días o menos"
+                >☰<span class="dot"></span
+              ></span>
+              Autónomos
+            </div>
+            <section class="deadlines" aria-labelledby="t1">
+              <h3 id="t1">Próximos plazos</h3>
+              <p class="k">3.er trimestre de 2026</p>
+              <article class="item" aria-labelledby="i303">
+                <h4 id="i303">303 · IVA <span class="when">en 12 días</span></h4>
+                <p class="line">Sale a pagar</p>
+                <p class="amount">unos 1.370 €</p>
+                <p class="line">Vence el <time datetime="2026-10-20">martes 20 de octubre</time></p>
+                <p class="line muted">Si lo domicilias: hasta el 15 de octubre</p>
+                <div class="actions">
+                  <button class="btn primary">Ver borrador</button>
+                  <button class="btn">Ya lo he presentado</button>
+                </div>
+                <p class="info">Revisa: no hay gastos en el 3.er trimestre.</p>
+              </article>
+              <article class="item" aria-labelledby="i130">
+                <h4 id="i130">130 · IRPF <span class="when">en 12 días</span></h4>
+                <p class="line">Sale a pagar <b>unos 640 €</b></p>
+                <div class="actions">
+                  <button class="btn primary">Ver borrador</button>
+                  <button class="btn">Ya lo he presentado</button>
+                </div>
+              </article>
+              <article class="item" aria-labelledby="i111">
+                <h4 id="i111">111 · Retenciones <span class="when">en 12 días</span></h4>
+                <p class="line">
+                  Faltan datos para estimar tu 111: añade las facturas con retención del 3.er
+                  trimestre.
+                </p>
+                <div class="actions"><button class="btn primary">Añadir facturas</button></div>
+              </article>
+              <p class="disclaimer">
+                Estimación orientativa a partir de tus datos en la app (borrador del 8 de octubre).
+                Revisa el borrador antes de presentarlo; si tienes dudas, consulta a un profesional
+                o a la Agencia Tributaria.<br />
+                Avisos: en la app · <button class="btn link">Activar avisos</button>
+              </p>
+            </section>
+          </div>
+        </div>
+
+        <div>
+          <p class="frame-label">T-2, uno presentado y resultado a compensar (caso B)</p>
+          <div class="phone">
+            <section class="deadlines" aria-labelledby="t2">
+              <h3 id="t2">Próximos plazos</h3>
+              <p class="k">3.er trimestre de 2026</p>
+              <p class="band" role="status">Quedan 2 días para tu 130.</p>
+              <article class="item">
+                <h4>303 · IVA <span class="ok">Presentado</span></h4>
+                <p class="line muted">
+                  Lo marcaste el 14 de octubre ·
+                  <button class="btn link">Deshacer</button>
+                </p>
+              </article>
+              <article class="item">
+                <h4>130 · IRPF <span class="when soon">en 2 días</span></h4>
+                <p class="line">Sale negativo: no pagas este trimestre; preséntalo igualmente.</p>
+                <div class="actions">
+                  <button class="btn primary">Ver borrador</button>
+                  <button class="btn">Ya lo he presentado</button>
+                </div>
+              </article>
+              <p class="disclaimer">
+                Estimación orientativa a partir de tus datos en la app (borrador del 8 de octubre).
+                Revisa el borrador antes de presentarlo; si tienes dudas, consulta a un profesional
+                o a la Agencia Tributaria.
+              </p>
+            </section>
+            <p class="frame-label" style="margin-top: 12px">Si el 303 no estuviera presentado:</p>
+            <p class="line">
+              Sale a compensar: no pagas; quedan unos 110 € para los próximos trimestres.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec">2. Estados sin importe</h2>
+      <div class="row">
+        <div>
+          <p class="frame-label">Datos cambiados, sin borrador, caso no cubierto</p>
+          <div class="phone">
+            <section class="deadlines">
+              <h3>Próximos plazos</h3>
+              <p class="k">3.er trimestre de 2026</p>
+              <article class="item">
+                <h4>303 · IVA <span class="when">en 9 días</span></h4>
+                <p class="line">
+                  Has cambiado datos después del borrador del 8 de octubre: vuelve a prepararlo para
+                  ver el importe.
+                </p>
+                <div class="actions"><button class="btn primary">Preparar borrador</button></div>
+              </article>
+              <article class="item">
+                <h4>130 · IRPF <span class="when">en 9 días</span></h4>
+                <p class="line">Prepara el borrador para ver cuánto sale.</p>
+                <div class="actions"><button class="btn primary">Preparar borrador</button></div>
+              </article>
+              <article class="item">
+                <h4>303 · IVA (otra actividad) <span class="when">en 9 días</span></h4>
+                <p class="line">
+                  La app no estima este caso (régimen simplificado del IVA). Revisa tus cifras con
+                  un profesional o con la Agencia Tributaria.
+                </p>
+                <div class="actions"><button class="btn">Ver borrador</button></div>
+              </article>
+            </section>
+          </div>
+        </div>
+        <div>
+          <p class="frame-label">Sin actividad (pregunta), fecha sin confirmar, plazo pasado</p>
+          <div class="phone">
+            <section class="deadlines">
+              <h3>Próximos plazos</h3>
+              <p class="k">4.º trimestre de 2026</p>
+              <article class="item">
+                <h4>303 · IVA <span class="when">en 30 días</span></h4>
+                <p class="line">
+                  ¿No facturaste nada este trimestre? Si es así, tu 303 se presenta «sin actividad».
+                </p>
+                <div class="actions">
+                  <button class="btn primary">Sí, sin actividad</button>
+                  <button class="btn">Importar facturas</button>
+                </div>
+                <p class="line">Vence el <time datetime="2027-02-01">lunes 1 de febrero</time></p>
+                <p class="info">
+                  Fecha calculada con la regla habitual; compruébala en el calendario de la Agencia
+                  Tributaria.
+                </p>
+              </article>
+              <article class="item">
+                <h4>111 · Retenciones (3T) <span class="muted">plazo pasado</span></h4>
+                <p class="line">
+                  El plazo terminó el 20 de octubre. Si aún no lo has presentado, puedes hacerlo
+                  fuera de plazo; la Agencia Tributaria puede aplicar un recargo.
+                </p>
+                <div class="actions">
+                  <button class="btn">Ver borrador</button>
+                  <button class="btn">Ya lo he presentado</button>
+                </div>
+              </article>
+            </section>
+          </div>
+        </div>
+        <div>
+          <p class="frame-label">Cargando, error y vacía</p>
+          <div class="phone">
+            <section class="deadlines" aria-busy="true">
+              <h3>Próximos plazos</h3>
+              <div class="skeleton"></div>
+              <div class="skeleton" style="width: 70%"></div>
+              <div class="skeleton" style="width: 85%"></div>
+            </section>
+            <br />
+            <section class="deadlines">
+              <h3>Próximos plazos</h3>
+              <p class="line" role="alert">
+                No hemos podido cargar tus plazos. Inténtalo de nuevo.
+              </p>
+              <div class="actions"><button class="btn primary">Reintentar</button></div>
+            </section>
+            <br />
+            <section class="deadlines">
+              <h3>Próximos plazos</h3>
+              <p class="line">
+                Aquí verás cada plazo de tus modelos con lo que sale, en cuanto prepares tu primer
+                borrador.
+              </p>
+              <div class="actions"><button class="btn primary">Empezar</button></div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec">3. Escritorio (≥ 1024 px)</h2>
+      <p class="note">
+        La tarjeta va en una columna de 360 px a la derecha del asistente y se queda fija al hacer
+        scroll.
+      </p>
+      <div class="desktop">
+        <div class="assistant">
+          Asistente de Autónomos (<code>AutonomoAssistant</code>): paso «Trimestre», sin cambios.
+        </div>
+        <section class="deadlines" aria-labelledby="t3">
+          <h3 id="t3">Próximos plazos</h3>
+          <p class="k">3.er trimestre de 2026</p>
+          <article class="item">
+            <h4>303 · IVA <span class="when">en 12 días</span></h4>
+            <p class="amount">unos 1.370 €</p>
+            <p class="line">a pagar · vence el martes 20 de octubre</p>
+            <div class="actions">
+              <button class="btn primary">Ver borrador</button>
+              <button class="btn">Ya lo he presentado</button>
+            </div>
+          </article>
+          <article class="item">
+            <h4>130 · IRPF <span class="when">en 12 días</span></h4>
+            <p class="amount">unos 640 €</p>
+            <p class="line">a pagar · vence el martes 20 de octubre</p>
+            <div class="actions">
+              <button class="btn primary">Ver borrador</button>
+              <button class="btn">Ya lo he presentado</button>
+            </div>
+          </article>
+          <p class="disclaimer">
+            Estimación orientativa a partir de tus datos en la app (borrador del 8 de octubre).
+            Revisa el borrador antes de presentarlo; si tienes dudas, consulta a un profesional o a
+            la Agencia Tributaria.
+          </p>
+        </section>
+      </div>
+
+      <h2 class="sec">4. Activar avisos (hoja inferior)</h2>
+      <div class="row">
+        <div class="phone sheet">
+          <div class="bar">Avisos de Hacienda</div>
+          <p class="line">
+            Te avisamos 7 días antes de cada plazo de tus modelos. Nunca presentamos nada por ti.
+          </p>
+          <fieldset>
+            <legend>Dónde</legend>
+            <label><input type="checkbox" checked /> Notificaciones en este navegador</label>
+            <label><input type="checkbox" /> Correo a a•••@ejemplo.es</label>
+          </fieldset>
+          <fieldset>
+            <legend>
+              ¿Mostrar el importe en la notificación? Se verá en la pantalla bloqueada.
+            </legend>
+            <label><input type="radio" name="amt" /> Sí, mostrar el importe</label>
+            <label><input type="radio" name="amt" /> No, solo la fecha</label>
+          </fieldset>
+          <label><input type="checkbox" /> Avisarme también 2 días antes</label>
+          <label><input type="checkbox" /> Mi actividad está en Ceuta, Melilla o La Palma</label>
+          <p class="info">En la app de Android, el aviso llega sin importe.</p>
+          <div class="actions"><button class="btn primary" disabled>Guardar</button></div>
+          <p class="info">«Guardar» se activa al elegir una opción de importe.</p>
+        </div>
+
+        <div style="max-width: 420px">
+          <p class="frame-label">Así llega el aviso de T-7 (martes 13 de octubre)</p>
+          <div class="notif">
+            <b>Tu 303 y tu 130 del 3.er trimestre</b>
+            Salen unos 1.370 € y 640 €. Vencen el martes 20 de octubre (en 7 días). Estimación
+            orientativa: revisa el borrador.
+          </div>
+          <p class="frame-label">Sin importe (plan gratis, sin permiso o datos sin comprobar)</p>
+          <div class="notif">
+            <b>En 7 días vencen tu 303 y tu 130 del 3.er trimestre</b>
+            Plazo hasta el martes 20 de octubre. Abre la app para ver cuánto sale.
+          </div>
+          <p class="frame-label">T-14 con datos que faltan</p>
+          <div class="notif">
+            <b>Prepara tu 303 del 3.er trimestre</b>
+            Faltan datos para estimarlo: importa las facturas del 3.er trimestre. Vence el martes 20
+            de octubre.
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec">5. Calendario de avisos de un plazo</h2>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Etapa</th>
+              <th>Fecha (3T 2026)</th>
+              <th>En la app</th>
+              <th>Push / correo (opt-in)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>T-14</td>
+              <td>martes 6-10</td>
+              <td>Tarjeta con cuenta atrás</td>
+              <td>Solo si faltan datos</td>
+            </tr>
+            <tr>
+              <td>T-7</td>
+              <td>martes 13-10</td>
+              <td>Insignia en el menú</td>
+              <td>El aviso del plazo (uno por plazo y modelo, agrupados)</td>
+            </tr>
+            <tr>
+              <td>T-2</td>
+              <td>domingo 18-10</td>
+              <td>Banda arriba</td>
+              <td>Solo con «Avisarme también 2 días antes» y si no está presentado</td>
+            </tr>
+            <tr>
+              <td>T-0</td>
+              <td>martes 20-10</td>
+              <td>«Hoy es el último día»</td>
+              <td>Nada</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>
