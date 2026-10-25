@@ -89,3 +89,25 @@ Borrador de trabajo del agente `seo` (sin datos personales ni claves). Fecha: 18
 - **Hecho:** las guías (`/guias/*`), Hacienda paso a paso (`/hacienda-paso-a-paso/*`) y las calculadoras solo se ven enteras con cuenta. Sin cuenta, la app y el HTML pre-renderizado muestran lo mismo: el H1, la introducción, el principio de la primera sección (2 párrafos), los títulos de lo que sigue y el panel de registro con el vídeo 1. En las calculadoras, qué hacen y sus preguntas (sin respuestas ni formulario). Las listas (`/guias`, `/hacienda-paso-a-paso`), la Videoteca, la portada, precios y páginas legales siguen públicas.
 - **Datos estructurados:** fuera `HowTo`, `FAQPage` de las calculadoras y `VideoObject` de las guías (ya no está en lo que se ve); quedan `Article` (también en Hacienda), `WebApplication` y `BreadcrumbList`. El sitemap ya no declara vídeos en las guías; la Videoteca los conserva. `npm run test:seo` (también en el build) comprueba que el HTML no lleva el texto bloqueado y que los datos estructurados cuadran.
 - **Medir:** impresiones, posición media y CTR de las guías y calculadoras (pueden bajar: hay menos texto indexable), avisos de «HowTo»/«Preguntas frecuentes» que desaparecen en Mejoras, y registros que llegan con `next` a una guía.
+
+## Indexación 25-10-2026
+
+Informe «Indexación de páginas» de Search Console (última actualización 19-10-2026): 78 indexadas y 152 sin indexar. No hay que indexarlo todo.
+
+| Motivo | URLs | Qué son | Veredicto |
+|---|---|---|---|
+| Excluida por «noindex» | 121 | Todas son `/login?next=…` y `/login?mode=register&next=…` (es y `/en`), una pareja por guía, calculadora y paso de Hacienda | Intencional: `/login` lleva `noindex, follow` a propósito. Corregido el origen del ruido (ver abajo) |
+| Página con redirección | 27 | `http://` y `www.` a `https://finanverso.app/` (3) y `/en/guias` y `/en/guias/<slug>` (24, 301 a `/guias…`; las guías no están traducidas) | Intencional (HTTP, www). Los `/en/guias…` salían de enlaces del SPA en inglés: corregido |
+| Descubierta, sin indexar | 2 | `/login` (noindex a propósito) y `/en/hacienda-paso-a-paso/modelo-130` (pública, en el sitemap, `index, follow`, canonical y hreflang correctos) | La primera, intencional; la segunda solo necesita tiempo y señales |
+| Rastreada, sin indexar | 2 | `/pricing` y `/en/videoteca` (públicas, en el sitemap, bien etiquetadas) | Calidad/antigüedad: Google las rastreó y aún no las ha indexado. Sin error técnico |
+
+Comprobado en el sitio real el 25-10-2026: título y description únicos, `meta robots` `index, follow`, canonical y hreflang es/en/x-default en `/pricing`, `/en/videoteca` y `/en/hacienda-paso-a-paso/modelo-130`; los tres están en `sitemap.xml`. No hay cabeceras `X-Robots-Tag` en el servidor: el único `noindex` es el de `/login` y `/404` del pre-renderizado (`frontend/scripts/seo/pages.mjs`). Las rutas privadas de la app no llevan URL propia (pantallas dentro de `/` con sesión).
+
+Corregido en el repo (pendiente de desplegar con la release en curso):
+
+- Los enlaces «Crea tu cuenta» y «Entra» del muro de registro de las guías, calculadoras y pasos de Hacienda llevan `rel="nofollow"` en el HTML pre-renderizado (`scripts/seo/pages.mjs`): Google ya no descubre una URL de login por cada página.
+- `robots.txt`: `Disallow: /*?next=` y `/*&next=` para no gastar rastreo en esas URL. Las ya conocidas irán desapareciendo del informe solas.
+- Nuevo `SiteLink` (`src/shared/components/SiteLink.tsx`): en las páginas `/en`, los enlaces a `/guias…` van directos a la URL final en español, sin pasar por la redirección `/en/guias…`.
+- `sitemap.xml`: sin cambios de URL (78, ninguna redirige); solo se actualizan los `lastmod` de las páginas cuyo HTML cambia.
+
+Qué hacer en Search Console: no validar el grupo «noindex» ni las redirecciones de HTTP/www. Tras desplegar, validar «Página con redirección» (`/en/guias…`) y vigilar las 2 sin indexar entre 2 y 6 semanas. Si siguen igual, mejorar el texto de `/pricing` (preguntas frecuentes reales) y enlazar `/en/videoteca` desde más páginas en inglés.
