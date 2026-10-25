@@ -481,6 +481,7 @@ function Analysis({
   const pending = data.findings.filter((f) => f.status === 'new');
   const reviewed = data.findings.filter((f) => f.status !== 'new');
   const shown = pending.filter((f) => filter === 'all' || f.kind === filter);
+  const firstSmallId = shown.find((f) => f.kind === 'small')?.id;
   const locked = data.locked && data.count > pending.length;
   const quiet =
     data.coverage.level === 'complete' && pending.length + reviewed.length === 0 && !locked;
@@ -504,6 +505,7 @@ function Analysis({
               <li key={f.id}>
                 <LeakCard
                   finding={f}
+                  explain={f.id === firstSmallId}
                   disabled={disabled}
                   onAction={(status) => onAction(f, status)}
                 />

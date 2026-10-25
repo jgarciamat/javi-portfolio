@@ -137,6 +137,8 @@ describe('Tu dinero perdido', () => {
     expect(within(shop).getByText(/89,00 € cobrados dos veces el 12 de septiembre/)).toBeVisible();
     const cafe = card('CAFETERÍA LA PLAZA');
     expect(within(cafe).getByText(/Unos 7 gastos al mes de menos de 12 €/)).toBeVisible();
+    expect(within(cafe).getByText(tr('app.leaks.small.help'))).toBeVisible();
+    expect(within(cafe).getByText('Gasto hormiga')).toBeVisible();
     expect(within(cafe).getByText(tr('app.leaks.small.half', { amount: '80 €' }))).toBeVisible();
     expect(screen.getByText(tr('app.leaks.disclaimer'))).toBeInTheDocument();
   });

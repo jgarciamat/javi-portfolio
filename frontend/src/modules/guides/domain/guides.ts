@@ -269,7 +269,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Qué revisa',
         paragraphs: [
-          'Los cobros que se repiten cada semana, mes, dos meses, tres meses o año; las subidas de precio; los posibles cobros dobles del mismo importe en uno o dos días, y los pequeños gastos muy frecuentes en el mismo sitio («gastos hormiga»).',
+          'Los cobros que se repiten cada semana, mes, dos meses, tres meses o año; las subidas de precio; los cobros dobles del mismo importe en uno o dos días, y los gastos hormiga: pequeños gastos que se repiten en el mismo sitio y suman al año.',
           'Lo calcula con tus movimientos, en nuestro servidor y sin inteligencia artificial. La luz, la vivienda, los préstamos, los seguros y los Bizum no cuentan en la cifra; sus subidas sí se avisan.',
         ],
       },

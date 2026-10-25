@@ -66,7 +66,7 @@ existen:
 
 1. **Tu dinero perdido.** Revisa los movimientos del usuario (importados o a mano) y le dice
    cuánto le cuestan al año los cobros que conviene revisar: cobros que se repiten, subidas de
-   precio, posibles cobros dobles y pequeños gastos muy frecuentes («gastos hormiga»). Cálculo
+   precio, cobros dobles y gastos hormiga (pequeños gastos muy frecuentes). Cálculo
    **determinista en el servidor, sin IA**. El usuario decide en cada hallazgo («Lo sigo usando»,
    «Quiero darlo de baja», «No es una suscripción», «No reconozco este cobro»), y la app recuerda
    esas decisiones.
@@ -423,7 +423,7 @@ Maquetas completas (móvil 390 px y escritorio, estados) en
 │  y 89 € de un posible cobro doble     │
 │                                       │
 │  [Cobros que se repiten 3] [Subidas 1]│  ← filtros, botones ≥48 px
-│  [Cobros dobles 1] [Pequeños gastos 1]│
+│  [Cobros dobles 1] [Gastos hormiga 1]│
 ├──────────────────────────────────────┤
 │ ↻ FITBOX                              │
 │   Se cobra cada mes desde agosto 2025 │
@@ -496,8 +496,8 @@ Claves nuevas con prefijo `app.leaks.*` y `app.goals.date.*`. Se mantienen las d
 | `app.leaks.oneOff`                                                            | y {amount} de un posible cobro doble                                                                                                              | plus {amount} from a possible double charge                                                                                            |
 | `app.leaks.kind.recurring`                                                    | Cobros que se repiten                                                                                                                             | Repeating charges                                                                                                                      |
 | `app.leaks.kind.increase`                                                     | Subidas de precio                                                                                                                                 | Price rises                                                                                                                            |
-| `app.leaks.kind.duplicate`                                                    | Posibles cobros dobles                                                                                                                            | Possible double charges                                                                                                                |
-| `app.leaks.kind.small`                                                        | Pequeños gastos frecuentes                                                                                                                        | Small, frequent spending                                                                                                               |
+| `app.leaks.kind.duplicate`                                                    | Cobros dobles                                                                                                                                     | Possible double charges                                                                                                                |
+| `app.leaks.kind.small`                                                        | Gastos hormiga                                                                                                                                    | Small, frequent spending                                                                                                               |
 | `app.leaks.recurring.since`                                                   | Se cobra {cadence} desde {month} ({count} cobros)                                                                                                 | Charged {cadence} since {month} ({count} charges)                                                                                      |
 | `app.leaks.cadence.weekly` / `monthly` / `bimonthly` / `quarterly` / `yearly` | cada semana / cada mes / cada dos meses / cada tres meses / cada año                                                                              | every week / every month / every two months / every three months / every year                                                          |
 | `app.leaks.perYear`                                                           | {amount} al {period} · unos {annual} al año                                                                                                       | {amount} per {period} · about {annual} a year                                                                                          |
@@ -582,7 +582,7 @@ el i18n actual no soporta `plural` ICU, se usan dos claves `…One` / `…Other`
   principales por tarjeta como mucho; el resto en «Más opciones».
 - Contraste ≥ **4.5:1** en texto y ≥ 7:1 en la cifra principal, en claro y en oscuro (tokens de
   `frontend/src/index.css`). El tipo de hallazgo nunca se indica solo por color: icono + palabra
-  («Subida», «Cobro doble»).
+  («Subida de precio», «Cobro doble», «Gasto hormiga»).
 - Lector de pantalla: cada hallazgo es un `<article aria-labelledby>` cuyo título lee «FITBOX,
   cobro que se repite cada mes, unos 479 euros al año». Las decisiones y el deslizador se anuncian
   con `aria-live="polite"`. El deslizador es un `<input type="range">` con `aria-valuetext` («50
@@ -629,7 +629,7 @@ y vigilancia continua, no información que haga falta para no perder dinero.
 | Análisis completo (todos los tipos)                                | Sí, en el servidor                                                                     | Sí                                                              |
 | Cifra total al año y recuento por tipo                             | Sí                                                                                     | Sí                                                              |
 | Hallazgos con detalle y decisiones                                 | Los **3 de mayor coste anual** (lo mismo que hoy, `FREE_SUBSCRIPTIONS_SHOWN = 3`)      | Todos                                                           |
-| Posibles cobros dobles y «No reconozco este cobro»                 | **Siempre visibles**, aunque pasen de 3 (un cargo indebido no se esconde tras un pago) | Sí                                                              |
+| Cobros dobles y «No reconozco este cobro»                          | **Siempre visibles**, aunque pasen de 3 (un cargo indebido no se esconde tras un pago) | Sí                                                              |
 | Pruebas («Ver los 15 cobros»)                                      | Sí, en los visibles                                                                    | Sí                                                              |
 | Lista «Revisados» y «Ya no se cobra»                               | Sí                                                                                     | Sí                                                              |
 | Avisos de subidas y cobros dobles nuevos (push / correo del lunes) | No                                                                                     | Sí (fase 2, con el consentimiento ya existente de push/resumen) |
@@ -842,7 +842,7 @@ compartible se genera en el dispositivo y, por defecto, sin importes ni nombre.
 - Aviso de la fecha de meta: `app.goals.date.disclaimer`, y `tools.goal.disclaimer` cuando se usa
   rentabilidad.
 - Política (`app.privacy.s3.item1`): añadir «la revisión de tus movimientos para detectar cobros
-  repetidos, subidas de precio y posibles cobros dobles, y las decisiones que tomas sobre ellos».
+  repetidos, subidas de precio y cobros dobles, y las decisiones que tomas sobre ellos».
   En `app.privacy.s5`: «las decisiones sobre esos avisos, mientras tengas la cuenta».
   Esto debe pasar por la misma revisión de abogado pendiente según
   `docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md`.

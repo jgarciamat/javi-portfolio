@@ -70,7 +70,7 @@ function statusKey(finding: LeakFinding): string {
   return `app.leaks.status.${finding.status}`;
 }
 
-function FindingBody({ finding }: { finding: LeakFinding }) {
+function FindingBody({ finding, explain }: { finding: LeakFinding; explain?: boolean }) {
   const { t } = useI18n();
   const { money, monthYear, dayMonth } = useFormat();
   const whole = (amount: number) => money(floorEuros(amount), { decimals: false });
@@ -149,6 +149,7 @@ function FindingBody({ finding }: { finding: LeakFinding }) {
     default:
       return (
         <>
+          {explain && <p className="leak-line">{t('app.leaks.small.help')}</p>}
           <p className="leak-line">
             {t('app.leaks.small.line', {
               perMonth: finding.perMonth as number,
@@ -308,8 +309,11 @@ export function LeakCard({
   finding,
   disabled,
   onAction,
+  explain,
 }: {
   finding: LeakFinding;
+  /** First «ant spending» card of the list: adds a short explanation. */
+  explain?: boolean;
   /** Offline or saving: the decisions wait. */
   disabled: boolean;
   /** A decision, or null to take it back («Check it again»). */
@@ -365,7 +369,7 @@ export function LeakCard({
       </div>
       {pending ? (
         <>
-          <FindingBody finding={finding} />
+          <FindingBody finding={finding} explain={explain} />
           <PendingActions finding={finding} disabled={disabled} onAction={onAction} />
         </>
       ) : (
