@@ -21,10 +21,39 @@ interface ExportButtonsProps {
    * rows are about, printed under the title.
    */
   pdf?: boolean | { range?: string };
+  /**
+   * Why the buttons are off as a tooltip of the group (on hover, or on focus: the group can be
+   * reached with the keyboard while they are off) instead of a line of text beside them.
+   */
+  tooltip?: boolean;
+}
+
+/** Why the buttons are off: a line of text, or the tooltip of the group. */
+function EmptyHint({ id, tooltip }: { id: string; tooltip?: boolean }) {
+  const { t } = useI18n();
+  return tooltip ? (
+    <span id={id} className="export-tip" role="tooltip">
+      {t('app.exportButtons.empty')}
+    </span>
+  ) : (
+    <span id={id} className="export-empty">
+      {t('app.exportButtons.empty')}
+    </span>
+  );
+}
+
+/**
+ * The class of the group and, with the tooltip and nothing to export, the focus and the
+ * description that say why the buttons are off.
+ */
+function groupProps(tooltip: boolean | undefined, empty: boolean, emptyId: string) {
+  if (!tooltip) return { className: 'export-buttons' };
+  const why = empty ? { tabIndex: 0, 'aria-describedby': emptyId } : {};
+  return { className: 'export-buttons export-buttons--tip', ...why };
 }
 
 /** The same export buttons on every screen with a table: CSV, and PDF where it reads as a table. */
-export function ExportButtons({ name, what, count, table, pdf }: ExportButtonsProps) {
+export function ExportButtons({ name, what, count, table, pdf, tooltip }: ExportButtonsProps) {
   const { t, locale } = useI18n();
   const action = useAction(t('app.exportButtons.error'));
   const { downloadTablePdf } = useTablePdf();
@@ -38,7 +67,11 @@ export function ExportButtons({ name, what, count, table, pdf }: ExportButtonsPr
     action.run(async () => downloadTablePdf(name, await table(), what, range));
 
   return (
-    <div className="export-buttons" role="group" aria-label={t('app.exportButtons.group')}>
+    <div
+      role="group"
+      aria-label={t('app.exportButtons.group')}
+      {...groupProps(tooltip, empty, emptyId)}
+    >
       <button
         type="button"
         className="btn-secondary export-button"
@@ -61,11 +94,7 @@ export function ExportButtons({ name, what, count, table, pdf }: ExportButtonsPr
           <Icon name="file" /> {t('app.exportButtons.pdf')}
         </button>
       )}
-      {empty && (
-        <span id={emptyId} className="export-empty">
-          {t('app.exportButtons.empty')}
-        </span>
-      )}
+      {empty && <EmptyHint id={emptyId} tooltip={tooltip} />}
       {action.error && (
         <p className="form-error" role="alert">
           {action.error}

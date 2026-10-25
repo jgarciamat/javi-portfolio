@@ -1,18 +1,51 @@
 /* ─── La fecha de tu meta ───
-   The month in words at 1.25rem, buttons of at least 48 px with words, and the «what if…»
-   sheet as a bottom sheet on phones (a centred dialog on wide screens). */
+   The month in words at 1.25rem under each goal, and the «what if…» sheet: a centred dialog on
+   wide screens and a full-width bottom sheet on phones. Titles at 600, the rest at 400/500; the
+   same spacing (16–20 px), radii (10–14 px) and touch targets (40 px, 44 px on phones) as «Tu
+   dinero perdido». */
 
 .goal-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--slate-800);
 }
 
+.goal-date-lead {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+  line-height: 1.45;
+}
+
 .goal-date-big {
-  margin: 0.15rem 0 0.35rem;
+  margin: 0;
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--slate-50);
+}
+
+.goal-date-gap {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--slate-300);
+}
+
+.goal-date-gap--good {
+  color: var(--green-400);
+}
+
+.goal-date-gap--late {
+  color: var(--amber-400);
+}
+
+.goal-date-muted {
+  font-size: 0.85rem;
+  color: var(--slate-400);
 }
 
 .goal-date-actions {
@@ -23,96 +56,454 @@
   margin-top: 0.5rem;
 }
 
+/* The «¿Y si aparto más?» and «Calcular» buttons: secondary, 40 px high (44 px on phones). */
+.goal-date-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.goal-date-btn:hover {
+  border-color: var(--accent-400);
+}
+
+.goal-date-btn .icon {
+  margin: 0;
+  color: var(--accent-400);
+}
+
 .goal-sheet-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.4rem 0 0.75rem;
+  margin-top: 0.4rem;
 }
 
-.goal-sheet-input {
-  width: 8rem;
-  min-height: 3rem;
-  font-size: 1.1rem;
-  font-weight: 700;
+/* A number with its unit inside the box. */
+.goal-unit-input {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 9rem;
+  max-width: 100%;
 }
+
+.goal-unit-input .tx-input {
+  min-height: 2.75rem;
+  padding-right: 2.25rem;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-unit {
+  position: absolute;
+  right: 0.85rem;
+  color: var(--slate-400);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* ─── The sheet ─── */
 
 .goal-sheet {
-  width: min(32rem, 100%);
+  width: min(30rem, 100%);
+  max-height: min(90vh, 46rem);
+  overflow: hidden;
+  box-shadow: 0 24px 48px -12px rgba(2, 6, 23, 0.5);
 }
 
 .goal-sheet-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+.goal-sheet-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--slate-50);
+}
+
+.goal-sheet-close.icon-btn {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--slate-300);
+}
+
+.goal-sheet-close.icon-btn:hover {
+  background: var(--slate-800);
+}
+
+.goal-sheet-close .icon {
+  margin: 0;
+}
+
+.goal-sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.25rem;
+  overflow-y: auto;
+}
+
+/* The goal, as a pill: its icon whole and the name cut with «…» when it is long. */
+.goal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  align-self: flex-start;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.3rem 0.8rem 0.3rem 0.55rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: var(--slate-800);
+  color: var(--slate-200);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.goal-pill-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.goal-pill-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goal-sheet-group {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.goal-sheet-head .icon-btn {
-  min-width: 3rem;
-  min-height: 3rem;
+.goal-sheet-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--slate-300);
 }
 
+.goal-extra-label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.goal-extra-label strong {
+  font-weight: 600;
+  color: var(--accent-300);
+  font-variant-numeric: tabular-nums;
+}
+
+/* −10 · slider · +10, and the quick amounts as chips of one size. */
 .goal-sheet-slider {
   display: grid;
-  grid-template-columns: 3rem 1fr 3rem;
+  grid-template-columns: 2.5rem 1fr 2.5rem;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.4rem 0;
+  gap: 0.75rem;
 }
 
-.goal-sheet-slider .leak-btn {
+.goal-step {
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
 
 .goal-sheet-slider input[type='range'] {
   width: 100%;
-  min-height: 3rem;
+  min-height: 2.5rem;
+  margin: 0;
   accent-color: var(--accent-400);
+  cursor: pointer;
 }
 
 .goal-sheet-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
-  margin: 0.5rem 0;
 }
 
-.goal-sheet-chips .leak-btn[aria-pressed='true'] {
-  outline: 2px solid var(--accent-400);
-  outline-offset: -2px;
+.goal-chip {
+  min-height: 2.5rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--slate-200);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
 
+.goal-step:hover,
+.goal-chip:hover {
+  border-color: var(--accent-400);
+}
+
+.goal-chip[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-400) 16%, transparent);
+  color: var(--slate-50);
+  font-weight: 600;
+}
+
+/* «Use what you're cancelling»: a soft accent button, so the result stays the main thing. */
 .goal-sheet-leaks {
-  width: 100%;
-  margin: 0.25rem 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent-400) 45%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-400) 10%, transparent);
+  color: var(--accent-300);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
 }
 
+.goal-sheet-leaks .icon {
+  margin: 0;
+}
+
+.goal-sheet-note {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--slate-400);
+}
+
+/* The answer: the month big, how much sooner in green with its arrow. */
 .goal-sheet-result {
-  margin: 0.75rem 0;
-  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--slate-700);
   border-radius: 12px;
   background: var(--slate-800);
 }
 
-.goal-sheet-result .goal-date-big {
+.goal-result-line {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+  line-height: 1.4;
+}
+
+.goal-result-date {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--slate-50);
+}
+
+.goal-result-gain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  margin: 0.15rem 0 0;
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green-400) 14%, transparent);
+  color: var(--green-400);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.goal-result-gain .icon {
   margin: 0;
 }
 
+/* «Add an estimated return» and «Change the amount»: quiet text buttons, never underlined. */
+.goal-sheet-more,
+.goal-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.5rem;
+  padding: 0 0.25rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--accent-400);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.goal-sheet-more .icon {
+  margin: 0;
+}
+
+.goal-inline-link {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+.goal-sheet-more:hover,
+.goal-inline-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.goal-sheet-rate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: -0.5rem;
+}
+
+.goal-sheet-rate > .goal-sheet-more {
+  align-self: flex-start;
+}
+
+.goal-sheet-legal {
+  margin: 0;
+  padding: 0.75rem 1.25rem 1rem;
+  border-top: 1px solid var(--slate-800);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--slate-400);
+}
+
+/* Focus always visible, also on the inputs (the base input only changes its border). */
+.goal-date-btn:focus-visible,
+.goal-step:focus-visible,
+.goal-chip:focus-visible,
+.goal-sheet-leaks:focus-visible,
+.goal-sheet-more:focus-visible,
+.goal-inline-link:focus-visible,
+.goal-sheet-close:focus-visible,
+.goal-unit-input .tx-input:focus-visible,
+.goal-sheet-slider input[type='range']:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
 @media (max-width: 600px) {
+  .goal-date-btn,
+  .goal-sheet-more {
+    min-height: 2.75rem;
+  }
+
+  /* A bottom sheet across the whole width, its body scrolling under a fixed title. */
   .modal-overlay:has(> .goal-sheet) {
     align-items: flex-end;
+    padding: 0;
   }
 
   .goal-sheet {
-    max-height: 92vh;
-    overflow-y: auto;
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    border-width: 1px 0 0;
     border-radius: 18px 18px 0 0;
+  }
+
+  .goal-sheet-head {
+    padding: 0.6rem 0.6rem 0.6rem 1rem;
+  }
+
+  .goal-sheet-body {
+    padding: 1rem;
+  }
+
+  .goal-sheet-legal {
+    padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  }
+
+  .goal-sheet-slider {
+    grid-template-columns: 2.75rem 1fr 2.75rem;
+  }
+
+  .goal-step,
+  .goal-sheet-close.icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .goal-chip {
+    min-height: 2.75rem;
   }
 }
 
-html.wiz-contrast .goal-date,
-html.wiz-contrast .goal-sheet-result {
+/* High contrast (the «Contraste» option): solid borders and the strongest text. */
+html.wiz-contrast .goal-date {
+  border-top: 2px solid var(--slate-200);
+}
+
+html.wiz-contrast .goal-sheet-result,
+html.wiz-contrast .goal-pill,
+html.wiz-contrast .goal-step,
+html.wiz-contrast .goal-chip,
+html.wiz-contrast .goal-date-btn,
+html.wiz-contrast .goal-sheet-leaks,
+html.wiz-contrast .goal-unit-input .tx-input {
   border: 2px solid var(--slate-200);
+}
+
+html.wiz-contrast .goal-sheet-label,
+html.wiz-contrast .goal-sheet-note,
+html.wiz-contrast .goal-sheet-legal,
+html.wiz-contrast .goal-result-line,
+html.wiz-contrast .goal-date-lead,
+html.wiz-contrast .goal-date-gap,
+html.wiz-contrast .goal-unit {
+  color: var(--slate-50);
+}
+
+html.wiz-contrast .goal-sheet-more,
+html.wiz-contrast .goal-inline-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

@@ -333,19 +333,36 @@ export function LeakCard({
     }
   );
 
+  // The yearly cost (or the one charge seen twice), big at the top right of the card.
+  const figure = finding.kind === 'duplicate' ? amount : t('app.leaks.headlineFigure', { amount });
+
   return (
-    <article className="leak-card" aria-labelledby={titleId}>
-      <h3 className="leak-title" id={titleId}>
-        <Icon name={finding.status === 'recovered' ? 'check' : LEAK_ICONS[finding.kind]} />
-        <span aria-hidden="true">{finding.label}</span>
-        <span className="sr-only">{summary}</span>
-        <span className={`leak-tag leak-tag--${finding.kind}`} aria-hidden="true">
-          {kind}
-        </span>
-        {finding.confidence === 'medium' && pending && (
-          <span className="leak-tag leak-tag--medium">{t('app.leaks.medium')}</span>
+    <article className={`leak-card leak-card--${finding.kind}`} aria-labelledby={titleId}>
+      <div className="leak-card-head">
+        <div className="leak-card-heading">
+          <p className="leak-tags">
+            <span className={`leak-tag leak-tag--${finding.kind}`} aria-hidden="true">
+              <Icon
+                name={finding.status === 'recovered' ? 'check' : LEAK_ICONS[finding.kind]}
+                size={14}
+              />
+              {kind}
+            </span>
+            {finding.confidence === 'medium' && pending && (
+              <span className="leak-tag leak-tag--medium">{t('app.leaks.medium')}</span>
+            )}
+          </p>
+          <h3 className="leak-title" id={titleId}>
+            <span aria-hidden="true">{finding.label}</span>
+            <span className="sr-only">{summary}</span>
+          </h3>
+        </div>
+        {pending && (
+          <p className="leak-figure" aria-hidden="true">
+            {figure}
+          </p>
         )}
-      </h3>
+      </div>
       {pending ? (
         <>
           <FindingBody finding={finding} />

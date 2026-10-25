@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { track } from '@core/analytics';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
@@ -25,6 +25,22 @@ const KINDS: LeakKind[] = ['recurring', 'increase', 'duplicate', 'small'];
 const FULL_DAYS = 90;
 /** The «Done. Undo» notice stays this long (it can also be reached with the keyboard). */
 export const UNDO_MS = 8000;
+
+/** The title with its icon and what the section does; the export bar on its right. */
+function LeaksHead({ children }: { children?: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <header className="leaks-head">
+      <div className="leaks-head-text">
+        <h2 className="section-title">
+          <Icon name="coins" /> {t('app.leaks.title')}
+        </h2>
+        <p className="section-hint">{t('app.leaks.hint')}</p>
+      </div>
+      {children}
+    </header>
+  );
+}
 
 /** While it loads: the silhouette of the screen in thin blue outlines, without any figure. */
 function LeaksSkeleton() {
@@ -108,7 +124,13 @@ function Hero({
           {t('app.leaks.oneOffOnly', { amount: euros(total.oneOff) })}
         </p>
       ) : (
-        <p className="leaks-count">{t('app.leaks.empty')}</p>
+        <div className="leaks-status">
+          <span className="leaks-status-icon" aria-hidden="true">
+            <Icon name="checkCircle" size={30} />
+          </span>
+          <p className="leaks-status-title">{t('app.leaks.emptyTitle')}</p>
+          <p className="leaks-count">{t('app.leaks.empty')}</p>
+        </div>
       )}
       {kinds.length > 1 && (
         <div className="leaks-chips" role="group" aria-label={t('app.leaks.filter')}>
@@ -118,7 +140,8 @@ function Hero({
             aria-pressed={filter === 'all'}
             onClick={() => onFilter('all')}
           >
-            {t('app.leaks.all')} <span className="leaks-chip-count">{data.count}</span>
+            <span className="leaks-chip-label">{t('app.leaks.all')}</span>{' '}
+            <span className="leaks-chip-count">{data.count}</span>
           </button>
           {kinds.map((kind) => (
             <button
@@ -128,7 +151,8 @@ function Hero({
               aria-pressed={filter === kind}
               onClick={() => onFilter(kind)}
             >
-              <Icon name={LEAK_ICONS[kind]} /> {t(`app.leaks.kind.${kind}`)}{' '}
+              <Icon name={LEAK_ICONS[kind]} />{' '}
+              <span className="leaks-chip-label">{t(`app.leaks.kind.${kind}`)}</span>{' '}
               <span className="leaks-chip-count">{data.byKind[kind].count}</span>
             </button>
           ))}
@@ -149,6 +173,7 @@ function LeaksExport({ findings }: { findings: LeakFinding[] }) {
       what={t('app.leaks.exportWhat')}
       count={findings.length}
       pdf
+      tooltip
       table={() => ({
         head: [
           t('app.leaks.col.label'),
@@ -178,12 +203,16 @@ function Coverage({ data, onImport }: { data: MoneyLeaks; onImport: () => void }
   const { t } = useI18n();
   const { level, days, yearlyReady } = data.coverage;
   if (level === 'complete') {
-    return yearlyReady ? null : <p className="section-hint">{t('app.leaks.yearlyNote')}</p>;
+    return yearlyReady ? null : (
+      <p className="leaks-note">
+        <Icon name="info" /> {t('app.leaks.yearlyNote')}
+      </p>
+    );
   }
   const shown = Math.min(days, FULL_DAYS);
   return (
-    <section className="card">
-      <p className="leak-line">{t('app.leaks.partial', { days: shown })}</p>
+    <section className="card leaks-partial">
+      <p className="leak-line leak-strong">{t('app.leaks.partial', { days: shown })}</p>
       <div
         className="leaks-progress"
         role="progressbar"
@@ -194,7 +223,9 @@ function Coverage({ data, onImport }: { data: MoneyLeaks; onImport: () => void }
       >
         <span style={{ width: `${(shown / FULL_DAYS) * 100}%` }} />
       </div>
-      <p className="section-hint">{t('app.leaks.importTip')}</p>
+      <p className="leaks-note">
+        <Icon name="info" /> {t('app.leaks.importTip')}
+      </p>
       <button
         type="button"
         className="leak-btn leak-btn--primary"
@@ -220,10 +251,10 @@ function NoMovements({
   const { t } = useI18n();
   return (
     <section className="card leaks-none">
-      <p className="leaks-empty-icon" aria-hidden="true">
-        🔍
-      </p>
-      <h2 className="section-title">{t('app.leaks.none.title')}</h2>
+      <span className="leaks-status-icon leaks-status-icon--accent" aria-hidden="true">
+        <Icon name="search" size={30} />
+      </span>
+      <h3 className="leaks-status-title">{t('app.leaks.none.title')}</h3>
       <p className="leak-line">{t('app.leaks.none.body')}</p>
       <button
         type="button"
@@ -235,7 +266,9 @@ function NoMovements({
       >
         {t('app.leaks.none.cta')}
       </button>
-      <p className="section-hint">{t('app.leaks.importTip')}</p>
+      <p className="leaks-note">
+        <Icon name="info" /> {t('app.leaks.importTip')}
+      </p>
       <button type="button" className="leak-link" onClick={() => onOpenTab('videos')}>
         {t('app.leaks.none.howTo')}
       </button>
@@ -269,7 +302,7 @@ function Reviewed({
         onClick={() => setOpen((v) => !v)}
       >
         <span>{t('app.leaks.reviewed', { count: list.length })}</span>
-        <span aria-hidden="true">{open ? '▴' : '▸'}</span>
+        <Icon name={open ? 'chevronDown' : 'chevronRight'} />
       </button>
       {cancelMonthly > 0 && (
         <p className="leaks-saving">
@@ -306,8 +339,10 @@ function Reviewed({
 function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void }) {
   const { t } = useI18n();
   return (
-    <section className="card" role="alert">
-      <p className="leak-line">{message}</p>
+    <section className="card leaks-error" role="alert">
+      <p className="leak-line">
+        <Icon name="alert" /> {message}
+      </p>
       <button type="button" className="leak-btn" onClick={onRetry}>
         {t('app.leaks.retry')}
       </button>
@@ -321,7 +356,7 @@ function Locked({ hidden }: { hidden: number }) {
   const plan = useOptionalPlan();
   return (
     <section className="card leaks-locked">
-      <p className="leak-line">
+      <p className="leak-line leak-strong">
         <Icon name="lock" /> {plural(t, 'app.leaks.locked', hidden)}{' '}
         <span className="premium-chip">Premium</span>
       </p>
@@ -421,6 +456,68 @@ function useLeakDecisions(reload: () => Promise<void>) {
 }
 
 /**
+ * The two columns: the figure, the filters and «Reviewed» on the left, the notices and the
+ * findings on the right. With nothing at all to look at, the «all in order» card on its own.
+ */
+function Analysis({
+  data,
+  disabled,
+  failed,
+  online,
+  onImport,
+  onRetry,
+  onAction,
+}: {
+  data: MoneyLeaks;
+  disabled: boolean;
+  failed: string | null;
+  online: boolean;
+  onImport: () => void;
+  onRetry: () => void;
+  onAction: (finding: LeakFinding, status: LeakDecision | null) => void;
+}) {
+  const { t } = useI18n();
+  const [filter, setFilter] = useState<LeakKind | 'all'>('all');
+  const pending = data.findings.filter((f) => f.status === 'new');
+  const reviewed = data.findings.filter((f) => f.status !== 'new');
+  const shown = pending.filter((f) => filter === 'all' || f.kind === filter);
+  const locked = data.locked && data.count > pending.length;
+  const quiet =
+    data.coverage.level === 'complete' && pending.length + reviewed.length === 0 && !locked;
+  return (
+    <div className={`leaks${quiet ? ' leaks--single' : ''}`}>
+      <div className="leaks-side">
+        <Hero data={data} filter={filter} onFilter={setFilter} />
+        <Reviewed data={data} list={reviewed} disabled={disabled} onAction={onAction} />
+      </div>
+      <div className="leaks-main">
+        {failed && <ErrorCard message={failed} onRetry={onRetry} />}
+        {!online && (
+          <p className="leaks-note leaks-note--warn">
+            <Icon name="wifiOff" /> {t('app.leaks.offline')}
+          </p>
+        )}
+        <Coverage data={data} onImport={onImport} />
+        {shown.length > 0 && (
+          <ul className="leaks-list">
+            {shown.map((f) => (
+              <li key={f.id}>
+                <LeakCard
+                  finding={f}
+                  disabled={disabled}
+                  onAction={(status) => onAction(f, status)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+        {locked && <Locked hidden={data.count - pending.length} />}
+      </div>
+    </div>
+  );
+}
+
+/**
  * «Tu dinero perdido»: what the user's movements show that is worth checking (charges that
  * repeat, price rises, possible double charges and small purchases made very often), what it
  * costs a year and what the user decided. Computed on the server, without AI; the app never
@@ -439,7 +536,6 @@ export function MoneyLeaksView({
   const online = useOnlineStatus();
   const leaks = useResource(() => insightsApi.moneyLeaks(), [insightsApi]);
   const decisions = useLeakDecisions(leaks.reload);
-  const [filter, setFilter] = useState<LeakKind | 'all'>('all');
   const data = leaks.data;
 
   // Seen once per opening, by how much there is to look at.
@@ -456,60 +552,42 @@ export function MoneyLeaksView({
     void leaks.reload();
   };
   if (!data) {
-    return leaks.error ? (
-      <div className="section-view">
-        <ErrorCard message={t('app.leaks.error')} onRetry={retry} />
+    return (
+      <div className="section-view leaks-view">
+        <LeaksHead />
+        {leaks.error ? (
+          <ErrorCard message={t('app.leaks.error')} onRetry={retry} />
+        ) : (
+          <LeaksSkeleton />
+        )}
       </div>
-    ) : (
-      <LeaksSkeleton />
     );
   }
 
   const pending = data.findings.filter((f) => f.status === 'new');
-  const reviewed = data.findings.filter((f) => f.status !== 'new');
-  const shown = pending.filter((f) => filter === 'all' || f.kind === filter);
-  const hidden = data.count - pending.length;
   const disabled = !online || decisions.saving;
-  const failed = decisions.error ?? (leaks.error ? t('app.leaks.error') : null);
+  const none = data.coverage.level === 'none';
 
   return (
-    <div className="section-view">
-      <h2 className="section-title">
-        <Icon name="coins" /> {t('app.leaks.title')}
-      </h2>
-      <p className="section-hint">{t('app.leaks.hint')}</p>
-      {data.coverage.level === 'none' ? (
+    <div className="section-view leaks-view">
+      <LeaksHead>{!none && <LeaksExport findings={pending} />}</LeaksHead>
+      {none ? (
         <NoMovements onImport={onImport} onOpenTab={onOpenTab} />
       ) : (
-        <div className="leaks">
-          <div className="leaks-side">
-            <Hero data={data} filter={filter} onFilter={setFilter} />
-            <LeaksExport findings={pending} />
-            <Reviewed data={data} list={reviewed} disabled={disabled} onAction={decisions.act} />
-          </div>
-          <div className="leaks-main">
-            {failed && <ErrorCard message={failed} onRetry={retry} />}
-            {!online && <p className="section-hint">{t('app.leaks.offline')}</p>}
-            <Coverage data={data} onImport={onImport} />
-            {shown.length > 0 && (
-              <ul className="leaks-list">
-                {shown.map((f) => (
-                  <li key={f.id}>
-                    <LeakCard
-                      finding={f}
-                      disabled={disabled}
-                      onAction={(status) => decisions.act(f, status)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-            {data.locked && hidden > 0 && <Locked hidden={hidden} />}
-            <p className="leaks-disclaimer">
-              <Icon name="alert" /> {t('app.leaks.disclaimer')}
-            </p>
-          </div>
-        </div>
+        <>
+          <Analysis
+            data={data}
+            disabled={disabled}
+            failed={decisions.error ?? (leaks.error ? t('app.leaks.error') : null)}
+            online={online}
+            onImport={onImport}
+            onRetry={retry}
+            onAction={decisions.act}
+          />
+          <p className="leaks-disclaimer">
+            <Icon name="info" /> {t('app.leaks.disclaimer')}
+          </p>
+        </>
       )}
       <UndoNotice undo={decisions.undo} disabled={disabled} onUndo={decisions.revert} />
     </div>

@@ -39,7 +39,9 @@ export function LeaksTeaser({ onOpen }: { onOpen: () => void }) {
   };
   return (
     <aside className="card leaks-teaser" aria-label={t('app.tabs.leaks')}>
-      <Icon name="coins" />
+      <span className="leaks-teaser-icon" aria-hidden="true">
+        <Icon name="coins" />
+      </span>
       <p>
         {t(data.total.count === 1 ? 'app.leaks.teaserOne' : 'app.leaks.teaser', {
           amount: yearly(data),

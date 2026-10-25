@@ -3887,6 +3887,7 @@
   "app.leaks.evidenceTitle": "Cobros de {label}",
   "app.leaks.evidenceDate": "Fecha",
   "app.leaks.evidenceAmount": "Importe",
+  "app.leaks.emptyTitle": "Todo en orden por ahora",
   "app.leaks.empty": "No hemos encontrado nada que revisar. ¡Bien hecho!",
   "app.leaks.none.title": "Descubre cuánto se te escapa al año",
   "app.leaks.none.body": "Importa el extracto de tu banco y buscamos cobros que se repiten, subidas de precio, cobros dobles y pequeños gastos frecuentes.",

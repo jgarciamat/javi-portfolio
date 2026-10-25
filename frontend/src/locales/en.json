@@ -3887,6 +3887,7 @@
   "app.leaks.evidenceTitle": "Charges from {label}",
   "app.leaks.evidenceDate": "Date",
   "app.leaks.evidenceAmount": "Amount",
+  "app.leaks.emptyTitle": "All in order for now",
   "app.leaks.empty": "We haven't found anything to check. Well done!",
   "app.leaks.none.title": "Find out how much slips away each year",
   "app.leaks.none.body": "Import your bank statement and we'll look for repeating charges, price rises, double charges and small, frequent spending.",

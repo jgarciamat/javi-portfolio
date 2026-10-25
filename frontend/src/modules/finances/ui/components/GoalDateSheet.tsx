@@ -1,4 +1,5 @@
 import { useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { track } from '@core/analytics';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -40,6 +41,40 @@ export function useGoalDateText() {
   };
 }
 
+/** A number with its unit inside the same box («120 €», «4 %»). */
+function UnitInput({
+  id,
+  value,
+  unit,
+  onChange,
+  ...rest
+}: {
+  id: string;
+  value: string;
+  unit: string;
+  onChange: (value: string) => void;
+  min?: string;
+  max?: string;
+  step?: string;
+}) {
+  return (
+    <span className="goal-unit-input">
+      <input
+        id={id}
+        className="tx-input"
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...rest}
+      />
+      <span className="goal-unit" aria-hidden="true">
+        {unit}
+      </span>
+    </span>
+  );
+}
+
 /** −10, the slider and +10, then the quick +25 / +50 / +100. */
 function ExtraControls({
   extra,
@@ -56,14 +91,14 @@ function ExtraControls({
   const whole = (amount: number) => money(amount, { decimals: false });
   const extraText = t('app.goals.date.extra', { amount: whole(Math.round(extra)) });
   return (
-    <>
-      <label className="field-label" htmlFor={id}>
-        {t('app.goals.date.extraLabel')}: <strong>{extraText}</strong>
+    <div className="goal-sheet-group">
+      <label className="goal-sheet-label goal-extra-label" htmlFor={id}>
+        <span>{t('app.goals.date.extraLabel')}:</span> <strong>{extraText}</strong>
       </label>
       <div className="goal-sheet-slider">
         <button
           type="button"
-          className="leak-btn"
+          className="goal-step"
           aria-label={t('app.goals.date.minus', { amount: whole(STEP) })}
           onClick={() => onChange('slider', extra - STEP)}
         >
@@ -81,7 +116,7 @@ function ExtraControls({
         />
         <button
           type="button"
-          className="leak-btn"
+          className="goal-step"
           aria-label={t('app.goals.date.plus', { amount: whole(STEP) })}
           onClick={() => onChange('slider', extra + STEP)}
         >
@@ -93,7 +128,7 @@ function ExtraControls({
           <button
             key={amount}
             type="button"
-            className="leak-btn"
+            className="goal-chip"
             aria-pressed={extra === amount}
             onClick={() => onChange('chip', amount)}
           >
@@ -101,7 +136,7 @@ function ExtraControls({
           </button>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -125,23 +160,24 @@ function LeaksOffer({
     return (
       <button
         type="button"
-        className="leak-btn leak-btn--primary goal-sheet-leaks"
+        className="goal-sheet-leaks"
         onClick={() => {
           track('goal_dp_apply');
           onApply(leaks.decidedMonthly);
         }}
       >
+        <Icon name="coins" />
         {t('app.goals.date.useLeaks', { amount: money(leaks.decidedMonthly) })}
       </button>
     );
   }
   if (leaks.pendingMonthly <= 0) return null;
   return (
-    <p className="leak-line">
+    <p className="goal-sheet-note">
       {t('app.goals.date.leaksHint', {
         amount: money(Math.floor(leaks.pendingMonthly), { decimals: false }),
       })}{' '}
-      <button type="button" className="leak-link" onClick={() => onOpenTab('leaks')}>
+      <button type="button" className="goal-inline-link" onClick={() => onOpenTab('leaks')}>
         {t('app.leaks.analysisCta')}
       </button>
     </p>
@@ -153,36 +189,37 @@ function RateField({ rate, onChange }: { rate: string; onChange: (rate: string) 
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const id = useId();
+  const inputId = useId();
   return (
-    <>
+    <div className="goal-sheet-rate">
       <button
         type="button"
-        className="leak-link"
+        className="goal-sheet-more"
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? '▾' : '▸'} {t('app.goals.date.rate')}
+        <Icon name={open ? 'chevronDown' : 'chevronRight'} size={16} />
+        {t('app.goals.date.rate')}
       </button>
       {open && (
-        <div id={id}>
-          <label className="field">
-            <span className="field-label">{t('app.goals.date.rateLabel')}</span>
-            <input
-              className="tx-input goal-sheet-input"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              max="10"
-              step="0.5"
-              value={rate}
-              onChange={(e) => onChange(e.target.value)}
-            />
+        <div id={id} className="goal-sheet-group">
+          <label className="goal-sheet-label" htmlFor={inputId}>
+            {t('app.goals.date.rateLabel')}
           </label>
-          <p className="section-hint">{t('tools.goal.disclaimer')}</p>
+          <UnitInput
+            id={inputId}
+            unit="%"
+            min="0"
+            max="10"
+            step="0.5"
+            value={rate}
+            onChange={onChange}
+          />
+          <p className="goal-sheet-note">{t('tools.goal.disclaimer')}</p>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -207,11 +244,24 @@ function SheetResult({
   const extraText = t('app.goals.date.extra', {
     amount: money(Math.round(extra), { decimals: false }),
   });
+  // «Llegarías en» small and the month big, from the same sentence.
+  const [lead, tail] = t('app.goals.date.result').split('{date}');
   return (
     <div className="goal-sheet-result" aria-live="polite" aria-atomic="true">
-      <p className="goal-date-big">{result}</p>
+      {after.kind === 'date' ? (
+        <p className="goal-result-line" aria-hidden="true">
+          {lead}
+          <strong className="goal-result-date">{monthYear(after.year, after.month)}</strong>
+          {tail}
+        </p>
+      ) : (
+        <p className="goal-result-line" aria-hidden="true">
+          {result}
+        </p>
+      )}
       {sooner > 0 && (
-        <p className="leak-line leak-strong">
+        <p className="goal-result-gain">
+          <Icon name="trend" size={16} />
           {t(sooner === 1 ? 'app.goals.date.soonerOne' : 'app.goals.date.soonerOther', {
             count: sooner,
           })}
@@ -281,60 +331,64 @@ export function GoalDateSheet({
     setExtra(Math.max(0, value));
   };
 
-  return (
+  // On <body>, so that it covers the header too and sits at the bottom of a phone.
+  return createPortal(
     <Modal
       label={t('app.goals.date.sheetTitle')}
       onClose={onClose}
       className="modal-panel goal-sheet"
     >
       <div className="goal-sheet-head">
-        <h2 className="section-title">{t('app.goals.date.sheetTitle')}</h2>
+        <h2 className="goal-sheet-title">{t('app.goals.date.sheetTitle')}</h2>
         <button
           type="button"
-          className="icon-btn"
+          className="icon-btn goal-sheet-close"
           onClick={onClose}
           aria-label={t('app.common.close')}
         >
           <Icon name="close" />
         </button>
       </div>
-      <p className="section-hint">
-        {goal.icon} {goal.name}
-      </p>
-      <label className="field-label" htmlFor={baseId}>
-        {t('app.goals.date.monthly')}
-      </label>
-      <div className="goal-sheet-row">
-        <input
-          id={baseId}
-          className="tx-input goal-sheet-input"
-          type="number"
-          inputMode="decimal"
-          min="0"
-          step="1"
-          value={base}
-          onChange={(e) => {
-            count('input');
-            setBase(e.target.value);
-          }}
+      <div className="goal-sheet-body">
+        <p className="goal-pill" title={goal.name}>
+          <span className="goal-pill-icon" aria-hidden="true">
+            {goal.icon}
+          </span>
+          <span className="goal-pill-name">{goal.name}</span>
+        </p>
+        <div className="goal-sheet-group">
+          <label className="goal-sheet-label" htmlFor={baseId}>
+            {t('app.goals.date.monthly')}
+          </label>
+          <UnitInput
+            id={baseId}
+            unit="€"
+            min="0"
+            step="1"
+            value={base}
+            onChange={(value) => {
+              count('input');
+              setBase(value);
+            }}
+          />
+        </div>
+        <ExtraControls
+          extra={extra}
+          max={Math.max(300, Math.ceil((2 * monthly) / STEP) * STEP)}
+          onChange={change}
         />
-        <span className="leak-muted">€</span>
+        <LeaksOffer
+          leaks={leaks}
+          onApply={(amount) => change('chip', amount)}
+          onOpenTab={onOpenTab}
+        />
+        {/* «N months sooner» than at the pace the sheet opened with. */}
+        <SheetResult before={at(pace)} after={at(monthly + extra)} extra={extra} />
+        <RateField rate={rate} onChange={setRate} />
       </div>
-      <ExtraControls
-        extra={extra}
-        max={Math.max(300, Math.ceil((2 * monthly) / STEP) * STEP)}
-        onChange={change}
-      />
-      <LeaksOffer
-        leaks={leaks}
-        onApply={(amount) => change('chip', amount)}
-        onOpenTab={onOpenTab}
-      />
-      {/* «N months sooner» than at the pace the sheet opened with. */}
-      <SheetResult before={at(pace)} after={at(monthly + extra)} extra={extra} />
-      <RateField rate={rate} onChange={setRate} />
-      <p className="leaks-disclaimer">{t('app.goals.date.disclaimer')}</p>
-    </Modal>
+      <p className="goal-sheet-legal">{t('app.goals.date.disclaimer')}</p>
+    </Modal>,
+    document.body
   );
 }
 
@@ -352,22 +406,12 @@ function AskPace({ onAnswer }: { onAnswer: (monthly: number) => void }) {
         onAnswer(parseDecimal(typed) || 0);
       }}
     >
-      <label className="leak-line" htmlFor={id}>
+      <label className="goal-date-lead" htmlFor={id}>
         {t('app.goals.date.askPace')}
       </label>
       <div className="goal-sheet-row">
-        <input
-          id={id}
-          className="tx-input goal-sheet-input"
-          type="number"
-          inputMode="decimal"
-          min="0"
-          step="1"
-          value={typed}
-          onChange={(e) => setTyped(e.target.value)}
-        />
-        <span className="leak-muted">€</span>
-        <button type="submit" className="leak-btn">
+        <UnitInput id={id} unit="€" min="0" step="1" value={typed} onChange={setTyped} />
+        <button type="submit" className="goal-date-btn">
           {t('app.goals.date.calc')}
         </button>
       </div>
@@ -382,16 +426,16 @@ function TargetGap({ goal, result }: { goal: Goal; result: GoalDate }) {
   if (!goal.targetDate || result.kind !== 'date') return null;
   const deadline = targetMonth(goal.targetDate);
   const gap = monthsBetween(deadline, result);
-  if (gap === 0) return <p className="leak-line">{t('app.goals.date.onTime')}</p>;
+  if (gap === 0) return <p className="goal-date-gap">{t('app.goals.date.onTime')}</p>;
   if (gap < 0) {
     return (
-      <p className="leak-line">
+      <p className="goal-date-gap goal-date-gap--good">
         {t(gap === -1 ? 'app.goals.date.earlyOne' : 'app.goals.date.early', { count: -gap })}
       </p>
     );
   }
   return (
-    <p className="leak-line">
+    <p className="goal-date-gap goal-date-gap--late">
       {t(gap === 1 ? 'app.goals.date.lateOne' : 'app.goals.date.late', {
         date: monthYear(deadline.year, deadline.month),
         count: gap,
@@ -436,24 +480,25 @@ export function GoalDateLine({
   });
   return (
     <div className="goal-date" data-tour="goal-date">
-      <p className="leak-line">
+      <p className="goal-date-lead">
         {averageMonthly !== null
           ? t('app.goals.date.atPace', { amount })
           : t('app.goals.date.atAmount', { amount })}
       </p>
       <p className="goal-date-big">{dateText(result)}</p>
       {averageMonthly !== null && historyMonths < 4 && (
-        <p className="leak-line leak-muted">
+        <p className="goal-date-gap goal-date-muted">
           {t('app.goals.date.fewMonths', { count: historyMonths })}
         </p>
       )}
       <TargetGap goal={goal} result={result} />
       <div className="goal-date-actions">
-        <button type="button" className="leak-btn" onClick={() => setOpen(true)}>
-          {t('app.goals.date.whatIf')} ▸
+        <button type="button" className="goal-date-btn" onClick={() => setOpen(true)}>
+          {t('app.goals.date.whatIf')}
+          <Icon name="chevronRight" size={16} />
         </button>
         {averageMonthly === null && (
-          <button type="button" className="leak-link" onClick={() => setAsked(null)}>
+          <button type="button" className="goal-sheet-more" onClick={() => setAsked(null)}>
             {t('app.goals.date.change')}
           </button>
         )}

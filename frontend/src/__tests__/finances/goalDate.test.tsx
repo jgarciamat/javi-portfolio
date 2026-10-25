@@ -9,6 +9,14 @@ import * as f from '@test-utils/fixtures';
 import { formatMoney } from '@shared/utils/format';
 import { renderWithProviders, tr } from '@test-utils/render';
 
+/** «Llegarías en» small and the month big in the sheet, read as one sentence. */
+const result = (dialog: HTMLElement, date: string) =>
+  within(dialog).getByText(
+    (_, el) =>
+      !!el?.classList.contains('goal-result-line') &&
+      el.textContent === tr('app.goals.date.result', { date })
+  );
+
 jest.mock('@core/analytics', () => ({
   ...jest.requireActual('@core/analytics'),
   track: jest.fn(),
@@ -184,9 +192,7 @@ describe('La fecha de tu meta', () => {
       'aria-valuetext',
       tr('app.goals.date.extra', { amount: eur(0) })
     );
-    expect(
-      within(dialog).getByText(tr('app.goals.date.result', { date: 'febrero de 2028' }))
-    ).toBeVisible();
+    expect(result(dialog, 'febrero de 2028')).toBeVisible();
 
     fireEvent.click(within(dialog).getByRole('button', { name: `+${eur(50)}` }));
     expect(track).toHaveBeenCalledWith('goal_sim_change', { detail: 'chip' });
@@ -194,9 +200,7 @@ describe('La fecha de tu meta', () => {
       'aria-pressed',
       'true'
     );
-    expect(
-      within(dialog).getByText(tr('app.goals.date.result', { date: 'septiembre de 2027' }))
-    ).toBeVisible();
+    expect(result(dialog, 'septiembre de 2027')).toBeVisible();
     expect(within(dialog).getByText(tr('app.goals.date.soonerOther', { count: 5 }))).toBeVisible();
     expect(
       within(dialog).getByText(
@@ -290,9 +294,7 @@ describe('La fecha de tu meta', () => {
     });
     fireEvent.click(apply);
     expect(track).toHaveBeenCalledWith('goal_dp_apply');
-    expect(
-      within(sheet()).getByText(tr('app.goals.date.result', { date: 'octubre de 2027' }))
-    ).toBeVisible();
+    expect(result(sheet(), 'octubre de 2027')).toBeVisible();
     expect(within(sheet()).getByText(tr('app.goals.date.soonerOther', { count: 4 }))).toBeVisible();
   });
 

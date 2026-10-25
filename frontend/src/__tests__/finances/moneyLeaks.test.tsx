@@ -432,8 +432,16 @@ describe('Tu dinero perdido', () => {
       })
     );
     expect(await screen.findByText(tr('app.leaks.empty'))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.leaks.emptyTitle'))).toBeInTheDocument();
     expect(screen.getByText(tr('app.leaks.yearlyNote'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Revisados/ })).toBeNull();
+    // The export bar is off and says why as a tooltip, reachable with the keyboard.
+    const bar = screen.getByRole('group', { name: tr('app.exportButtons.group') });
+    expect(bar).toHaveAttribute('tabindex', '0');
+    expect(bar).toHaveAccessibleDescription(tr('app.exportButtons.empty'));
+    expect(within(bar).getByRole('tooltip', { hidden: true })).toHaveTextContent(
+      tr('app.exportButtons.empty')
+    );
   });
 
   it('a rise inside its card, two days apart and one thing to check', async () => {
