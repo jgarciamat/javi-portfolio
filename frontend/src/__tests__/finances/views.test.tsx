@@ -959,6 +959,26 @@ describe('the self-employed draft', () => {
     expect(await screen.findByLabelText(tr('app.autonomo.workArea'))).toHaveValue('15');
   });
 
+  it('writes in the PDF the hard-to-justify rate of the year of the draft', async () => {
+    const api = open();
+    // A draft of 2023: 7 % (DA 56.ª LIRPF), not the 5 % of the other years.
+    api.businessApi.draft.mockResolvedValue(f.autonomoDraft({ year: 2023 }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.pdf.download') }));
+    await waitFor(() =>
+      expect(buildAutonomoPdf).toHaveBeenCalledWith(
+        expect.objectContaining({ year: 2023 }),
+        expect.anything(),
+        expect.objectContaining({
+          flags: expect.objectContaining({
+            hardToJustify: tr('app.autonomo.pdf.hardToJustify', { rate: 7 }),
+          }),
+        }),
+        expect.any(Function)
+      )
+    );
+  });
+
   it('downloads the draft as a PDF, and reports when it cannot', async () => {
     open();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
