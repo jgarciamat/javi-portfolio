@@ -219,7 +219,8 @@ describe('import', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
+    // An empty month: its panel opens the importer.
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.emptyMonth.import')) }));
     expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
   });
 });

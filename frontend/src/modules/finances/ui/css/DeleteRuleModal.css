@@ -50,7 +50,9 @@
   border-radius: 8px;
   border: 1.5px solid var(--slate-700);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .delete-rule-option:hover {

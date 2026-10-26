@@ -351,9 +351,34 @@ describe('movements table', () => {
     restore();
   });
 
-  it('shows an empty state without movements', async () => {
+  it('shows how to start on a month without movements, and nothing that needs them', async () => {
     setup(f.overview({ transactions: [] }));
-    expect(await screen.findByText(tr('app.transaction.table.empty'))).toBeInTheDocument();
+    const panel = await screen.findByRole('region', { name: tr('app.emptyMonth.title') });
+    const option = (key: string) =>
+      within(panel).getByRole('button', { name: new RegExp(tr(key)) });
+    // No exports, recap, list or adviser yet.
+    expect(screen.queryByRole('button', { name: literal(tr('app.export.month')) })).toBeNull();
+    expect(screen.queryByRole('button', { name: literal(tr('app.recap.open')) })).toBeNull();
+    expect(screen.queryByText(tr('app.transaction.table.empty'))).toBeNull();
+    expect(screen.queryByRole('button', { name: /Analizar mes/ })).toBeNull();
+    // «Paste text or a screenshot» opens the importer on its tab.
+    fireEvent.click(option('app.emptyMonth.paste'));
+    const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    expect(
+      within(dialog).getByRole('tab', { name: new RegExp(tr('app.import.source.paste')) })
+    ).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
+    fireEvent.click(option('app.emptyMonth.import'));
+    const again = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    expect(
+      within(again).getByRole('tab', { name: new RegExp(tr('app.import.source.file')) })
+    ).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(within(again).getAllByRole('button', { name: tr('app.common.close') })[0]);
+    // «Note down an expense» opens the form.
+    const form = screen.getByRole('button', { name: new RegExp(tr('app.transaction.form.title')) });
+    expect(form).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(option('app.emptyMonth.add'));
+    await waitFor(() => expect(form).toHaveAttribute('aria-expanded', 'true'));
   });
 });
 
@@ -370,11 +395,11 @@ describe('week and calendar views', () => {
     expect(screen.queryByText('Hucha')).toBeNull();
   });
 
-  it('shows the empty week view', async () => {
+  it('shows no view tabs without movements', async () => {
     setup(f.overview({ transactions: [] }));
-    await screen.findByText(tr('app.transaction.table.empty'));
+    await screen.findByRole('region', { name: tr('app.emptyMonth.title') });
     // Without movements there are no view tabs; the week view itself handles empty lists.
-    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.queryByRole('tablist', { name: tr('app.transactions.viewMode') })).toBeNull();
   });
 
   it('opens the movements of a calendar day', async () => {

@@ -15,8 +15,8 @@ const setup = (status: { sample: number; movements: number }, onImport?: () => v
 describe('SampleDataCard', () => {
   it('offers the sample data before the first movement and loads it', async () => {
     const { api } = setup({ sample: 0, movements: 0 });
-    const load = await screen.findByRole('button', { name: tr('app.sample.load') });
-    expect(screen.getByText(tr('app.sample.body'))).toBeVisible();
+    const load = await screen.findByRole('button', { name: new RegExp(tr('app.sample.load')) });
+    expect(screen.getByText(tr('app.emptyMonth.sampleHint'))).toBeVisible();
     api.transactionApi.loadSample.mockResolvedValue({ sample: 81, movements: 81 });
     fireEvent.click(load);
     expect(await screen.findByText(tr('app.sample.active', { count: 81 }))).toBeVisible();
@@ -26,14 +26,14 @@ describe('SampleDataCard', () => {
   it('says so when loading fails', async () => {
     const { api } = setup({ sample: 0, movements: 0 });
     api.transactionApi.loadSample.mockRejectedValue(new Error('x'));
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.sample.load') }));
+    fireEvent.click(await screen.findByRole('button', { name: new RegExp(tr('app.sample.load')) }));
     expect(await screen.findByRole('alert')).toHaveTextContent('x');
   });
 
   it('is not shown to someone with movements of their own', async () => {
     const { api } = setup({ sample: 0, movements: 3 });
     await waitFor(() => expect(api.transactionApi.sampleStatus).toHaveBeenCalled());
-    expect(screen.queryByRole('button', { name: tr('app.sample.load') })).toBeNull();
+    expect(screen.queryByRole('button', { name: new RegExp(tr('app.sample.load')) })).toBeNull();
   });
 
   it('while the sample data is there, opens «Tu dinero perdido» and removes it after asking', async () => {

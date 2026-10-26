@@ -7,6 +7,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { todayDateOnly } from '@shared/utils/format';
 import { storage } from '@shared/utils/storage';
 import { useFinances } from '../../application/FinancesContext';
+import { useEnoughData } from '../../application/hooks/useEnoughData';
 import {
   NO_SPEND_TARGET,
   PILLAR_POINTS,
@@ -270,6 +271,7 @@ export function HealthView() {
   );
   // The debts come from a Premium section: without them that pillar is left out.
   const assets = useResource(() => assetApi.getAll(), [assetApi]);
+  const enough = useEnoughData();
 
   if (!f.summary) return <div className="card">{t('app.common.loading')}</div>;
   const income = f.summary.totalIncome;
@@ -297,16 +299,25 @@ export function HealthView() {
           <Icon name="heart" /> {t('app.health.title')}
         </h2>
         <p className="section-hint">{t('app.health.hint')}</p>
-        <div className="health-head">
-          <ScoreRing health={health} />
-          <div>
-            <p className="health-level">{t(`app.health.level.${health.level}`)}</p>
-            <p className="section-hint">{t('app.health.score', { score: health.score })}</p>
-          </div>
-        </div>
-        <Pillars health={health} />
-        {debt === null && <p className="section-hint">{t('app.health.noDebts')}</p>}
-        {f.budgets.length === 0 && <p className="section-hint">{t('app.health.noBudgets')}</p>}
+        {/* A new account would only get a low score for data it does not have yet. */}
+        {enough ? (
+          <>
+            <div className="health-head">
+              <ScoreRing health={health} />
+              <div>
+                <p className="health-level">{t(`app.health.level.${health.level}`)}</p>
+                <p className="section-hint">{t('app.health.score', { score: health.score })}</p>
+              </div>
+            </div>
+            <Pillars health={health} />
+            {debt === null && <p className="section-hint">{t('app.health.noDebts')}</p>}
+            {f.budgets.length === 0 && <p className="section-hint">{t('app.health.noBudgets')}</p>}
+          </>
+        ) : (
+          <p className="section-hint health-not-yet" role="status">
+            <Icon name="info" /> {t('app.health.notYet')}
+          </p>
+        )}
       </div>
       <Challenges
         period={`${f.year}-${f.month}`}

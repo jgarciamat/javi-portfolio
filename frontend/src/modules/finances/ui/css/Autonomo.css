@@ -184,7 +184,9 @@
   border: 2px dashed rgba(129, 140, 248, 0.45);
   border-radius: 12px;
   text-align: center;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .autonomo-drop.is-dragging {
   border-color: var(--accent-200);

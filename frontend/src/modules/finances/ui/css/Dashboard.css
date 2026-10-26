@@ -51,7 +51,9 @@ html {
   display: inline-flex;
   padding: 0.3rem;
   border-radius: 8px;
-  transition: transform 0.15s, background 0.15s;
+  transition:
+    transform 0.15s,
+    background 0.15s;
 }
 
 .header-socials a:hover,
@@ -103,7 +105,9 @@ html {
   cursor: pointer;
   white-space: nowrap;
   box-shadow: 0 2px 10px rgba(14, 116, 144, 0.35);
-  transition: filter 0.15s, box-shadow 0.15s;
+  transition:
+    filter 0.15s,
+    box-shadow 0.15s;
 }
 
 .header-learn-btn:hover {
@@ -112,7 +116,9 @@ html {
 }
 
 .header-learn-btn[aria-current='page'] {
-  box-shadow: 0 0 0 2px var(--slate-900), 0 0 0 4px #0e7490;
+  box-shadow:
+    0 0 0 2px var(--slate-900),
+    0 0 0 4px #0e7490;
 }
 
 .header-learn-short {
@@ -166,7 +172,9 @@ html {
   cursor: pointer;
   font-size: 0.8rem;
   white-space: nowrap;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .btn-logout:hover {
@@ -275,7 +283,9 @@ html {
   padding: 0.45rem 0.9rem;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   white-space: nowrap;
 }
 
@@ -358,7 +368,9 @@ html {
   padding: 0.4rem 0.8rem;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .btn-cancel:hover {
@@ -465,7 +477,9 @@ html {
   padding: 0.6rem 1rem;
   cursor: pointer;
   margin-bottom: -1px;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
 }

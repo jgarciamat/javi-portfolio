@@ -11,9 +11,13 @@ beforeEach(() => {
 });
 afterEach(restoreTime);
 
+/** Movements over two weeks: enough for the forecast to mean something. */
+const HISTORY = [f.transaction({ date: '2026-03-01' })];
+
 function setup(forecast = f.forecast(), options: { plan?: boolean } = {}) {
   const api = createFakeApi();
   api.insightsApi.forecast.mockResolvedValue(forecast);
+  api.monthApi.get.mockResolvedValue(f.overview({ transactions: HISTORY }));
   const view = renderWithProviders(<Dashboard />, { ...options, api });
   return { ...view, api };
 }
@@ -125,9 +129,30 @@ describe('Forecast panel', () => {
   it('reports a failed request', async () => {
     const api = createFakeApi();
     api.insightsApi.forecast.mockRejectedValue(new Error('sin conexión'));
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: HISTORY }));
     renderWithProviders(<Dashboard />, { api });
     const view = await panel();
     expect(await view.findByText('sin conexión')).toBeInTheDocument();
+  });
+
+  it('waits for a few days of movements, and says nothing on an empty month', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({ transactions: [f.transaction({ date: '2026-03-14' })] })
+    );
+    renderWithProviders(<Dashboard />, { api });
+    expect(await screen.findByText(tr('app.forecast.notYet'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', titleButton)).toBeNull();
+  });
+
+  it('shows up with five movements of the account, however recent', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({ transactions: [f.transaction({ date: '2026-03-14' })] })
+    );
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    expect(await screen.findByRole('button', titleButton)).toBeInTheDocument();
+    expect(screen.queryByText(tr('app.forecast.notYet'))).toBeNull();
   });
 
   it('only appears for the current month', async () => {

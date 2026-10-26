@@ -287,6 +287,18 @@ describe('billing edge cases', () => {
     expect(screen.getByRole('dialog', { name: tr('billing.upgradeTitle') })).toBeInTheDocument();
   });
 
+  it('analyses a month before the user is known (signing in still loading)', async () => {
+    const api = createFakeApi();
+    api.insightsApi.advice.mockResolvedValue(f.advice({ source: 'rules' }));
+    renderWithProviders(<AIAdvisor year={2026} month={3} onAnalyzed={jest.fn()} />, {
+      api,
+      authenticated: false,
+      finances: true,
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.ai.btn.analyze') }));
+    await waitFor(() => expect(api.insightsApi.advice).toHaveBeenCalled());
+  });
+
   it('shows offers while loading and hides the empty text on errors', async () => {
     const { OffersView } = await import('@modules/billing/ui/OffersView');
     const api = createFakeApi();

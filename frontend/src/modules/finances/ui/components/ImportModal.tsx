@@ -26,6 +26,8 @@ interface ImportModalProps {
   accounts: Account[];
   /** What another app shared with Finanverso: read as soon as the importer opens. */
   shared?: SharedContent | null;
+  /** The tab it opens on, when nothing was shared. */
+  initialSource?: ImportSource;
   onClose: () => void;
   onImported: () => void;
   /** Opens «Tu dinero perdido» (after an import it says what was found). */
@@ -163,14 +165,16 @@ function FileStep({
   imp,
   shared,
   onShared,
+  initialSource,
 }: {
   imp: ImportState;
   shared: SharedContent | null;
   /** The shared content was read: starting again does not read it again. */
   onShared: () => void;
+  initialSource: ImportSource;
 }) {
   const [source, setSource] = useState<ImportSource>(() =>
-    shared?.file && isImage(shared.file) ? 'screenshot' : shared?.text ? 'paste' : 'file'
+    shared?.file && isImage(shared.file) ? 'screenshot' : shared?.text ? 'paste' : initialSource
   );
   const { loadFile, loadText } = imp;
   // What was shared is read once, when the importer opens.
@@ -495,6 +499,7 @@ function StepBody({
   onOpenGoals,
   shared,
   onShared,
+  initialSource,
 }: {
   imp: ImportState;
   accounts: Account[];
@@ -502,19 +507,21 @@ function StepBody({
   onOpenGoals?: () => void;
   shared: SharedContent | null;
   onShared: () => void;
+  initialSource: ImportSource;
 }) {
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
   if (imp.step === 'done' && imp.result) {
     return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} onOpenGoals={onOpenGoals} />;
   }
-  return <FileStep imp={imp} shared={shared} onShared={onShared} />;
+  return <FileStep imp={imp} shared={shared} onShared={onShared} initialSource={initialSource} />;
 }
 
 /** Bank statement import: choose file → map columns → preview → import. */
 export function ImportModal({
   accounts,
   shared: sharedContent = null,
+  initialSource = 'file',
   onClose,
   onImported,
   onOpenLeaks,
@@ -547,6 +554,7 @@ export function ImportModal({
         onOpenGoals={onOpenGoals}
         shared={shared}
         onShared={() => setShared(null)}
+        initialSource={initialSource}
       />
       {imp.error && <p className="form-error">{t(imp.error)}</p>}
       {imp.step !== 'preview' && <Footer imp={imp} onClose={onClose} />}

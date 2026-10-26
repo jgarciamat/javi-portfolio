@@ -262,7 +262,9 @@
   gap: 0.15rem;
   background: var(--slate-900);
   border: 1px solid transparent;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .tx-calendar-cell--empty {
@@ -480,7 +482,9 @@
   padding: 0.2rem 0.4rem;
   border-radius: 6px;
   line-height: 1;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .cal-modal-close:hover {

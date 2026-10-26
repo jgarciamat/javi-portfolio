@@ -6,6 +6,7 @@ import { Modal } from '@shared/components/Modal';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { useFinances } from '../../application/FinancesContext';
+import { EmptyMonthOption } from './EmptyMonthPanel';
 import '../css/DeleteRuleModal.css';
 
 /** Asks before removing the invented movements (the person's own ones are not touched). */
@@ -38,8 +39,9 @@ function ConfirmRemove({
 }
 
 /**
- * «Pruébalo con datos de ejemplo»: before the first movement, four months of invented ones show
- * what the app does; while they are there, a line says so and removes them with one tap.
+ * «Probar con datos de ejemplo»: before the first movement (in the panel of the empty month),
+ * four months of invented ones show what the app does; while they are there, a line says so and
+ * removes them with one tap.
  */
 export function SampleDataCard({
   onOpenLeaks,
@@ -124,23 +126,18 @@ export function SampleDataCard({
     );
   }
 
+  // Only before the first movement: an option of the panel of the empty month.
   if (data.movements > 0) return null;
   return (
-    <section className="card sample-card" aria-labelledby="sample-card-title">
-      <h2 id="sample-card-title" className="section-title">
-        <Icon name="sparkles" /> {t('app.sample.title')}
-      </h2>
-      <p className="section-hint">{t('app.sample.body')}</p>
-      <button
-        type="button"
-        className="btn-primary"
-        disabled={action.pending}
-        aria-busy={action.pending}
+    <>
+      <EmptyMonthOption
+        icon="sparkles"
+        label={action.pending ? t('app.sample.loading') : t('app.sample.load')}
+        hint={t('app.emptyMonth.sampleHint')}
+        busy={action.pending}
         onClick={() => void load()}
-      >
-        {action.pending ? t('app.sample.loading') : t('app.sample.load')}
-      </button>
+      />
       {error}
-    </section>
+    </>
   );
 }

@@ -293,6 +293,7 @@ function DashboardModals({
         <ImportModal
           accounts={finances.accounts}
           shared={shared}
+          initialSource={dash.importSource}
           onClose={dash.closeImport}
           onImported={() => finances.refresh({ invalidate: true })}
           onOpenLeaks={() => {

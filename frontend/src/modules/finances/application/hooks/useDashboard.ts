@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Transaction, UpdateTransactionDTO } from '@modules/finances/domain/types';
 import { storage } from '@shared/utils/storage';
 import { isDashboardTab, type DashboardTab } from '../../ui/navigation';
+import type { ImportSource } from '../../ui/components/ImportSources';
 
 const TAB_KEY = 'mm_last_tab';
 
@@ -31,6 +32,8 @@ export function useDashboard({ navigateTo, updateTransaction }: Options) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  /** The tab the importer opens on (a file, pasted text or a screenshot). */
+  const [importSource, setImportSource] = useState<ImportSource>('file');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [editVersion, setEditVersion] = useState(0);
 
@@ -68,7 +71,12 @@ export function useDashboard({ navigateTo, updateTransaction }: Options) {
     openProfile: () => setShowProfile(true),
     closeProfile: () => setShowProfile(false),
     showImport,
-    openImport: () => setShowImport(true),
+    importSource,
+    /** Anything but a tab (a click event, nothing) opens it on the file. */
+    openImport: (source?: unknown) => {
+      setImportSource(source === 'paste' || source === 'screenshot' ? source : 'file');
+      setShowImport(true);
+    },
     closeImport: () => setShowImport(false),
     editingTransaction,
     setEditingTransaction,
