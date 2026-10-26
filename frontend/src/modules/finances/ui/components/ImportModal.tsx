@@ -20,6 +20,7 @@ import {
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { LeaksAfterImport } from './LeaksTeaser';
+import { FirstResult } from './FirstResult';
 
 interface ImportModalProps {
   accounts: Account[];
@@ -29,6 +30,8 @@ interface ImportModalProps {
   onImported: () => void;
   /** Opens «Tu dinero perdido» (after an import it says what was found). */
   onOpenLeaks?: () => void;
+  /** Opens the goals, to see when a goal is reached (after an import, if there are goals). */
+  onOpenGoals?: () => void;
 }
 
 type ImportState = ReturnType<typeof useImport>;
@@ -428,7 +431,15 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
   );
 }
 
-function DoneStep({ result, onOpenLeaks }: { result: ImportResult; onOpenLeaks?: () => void }) {
+function DoneStep({
+  result,
+  onOpenLeaks,
+  onOpenGoals,
+}: {
+  result: ImportResult;
+  onOpenLeaks?: () => void;
+  onOpenGoals?: () => void;
+}) {
   const { t } = useI18n();
   return (
     <div className="modal-body">
@@ -437,6 +448,7 @@ function DoneStep({ result, onOpenLeaks }: { result: ImportResult; onOpenLeaks?:
         {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
       </p>
       {onOpenLeaks && result.imported > 0 && <LeaksAfterImport onOpen={onOpenLeaks} />}
+      {result.imported > 0 && <FirstResult onOpenGoals={onOpenGoals} />}
     </div>
   );
 }
@@ -480,19 +492,21 @@ function StepBody({
   imp,
   accounts,
   onOpenLeaks,
+  onOpenGoals,
   shared,
   onShared,
 }: {
   imp: ImportState;
   accounts: Account[];
   onOpenLeaks?: () => void;
+  onOpenGoals?: () => void;
   shared: SharedContent | null;
   onShared: () => void;
 }) {
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
   if (imp.step === 'done' && imp.result) {
-    return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} />;
+    return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} onOpenGoals={onOpenGoals} />;
   }
   return <FileStep imp={imp} shared={shared} onShared={onShared} />;
 }
@@ -504,6 +518,7 @@ export function ImportModal({
   onClose,
   onImported,
   onOpenLeaks,
+  onOpenGoals,
 }: ImportModalProps) {
   const { t } = useI18n();
   const [shared, setShared] = useState(sharedContent);
@@ -529,6 +544,7 @@ export function ImportModal({
         imp={imp}
         accounts={activeAccounts}
         onOpenLeaks={onOpenLeaks}
+        onOpenGoals={onOpenGoals}
         shared={shared}
         onShared={() => setShared(null)}
       />

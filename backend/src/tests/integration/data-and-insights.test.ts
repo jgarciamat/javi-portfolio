@@ -378,8 +378,11 @@ describe('Subscriptions', () => {
         lastDate: '2026-04-05',
         nextDate: '2026-05-05',
         priceIncrease: { from: 12.99, to: 13.99 },
+        categoryName: 'Ocio',
+        essential: false,
       },
     ]);
+    expect(res.body.fixed).toBe(0);
   });
 
   it('leaves out what is already a recurring rule and keeps the view for Premium', async () => {
@@ -416,7 +419,7 @@ describe('Subscriptions', () => {
     expireTrial(ctx, user);
     const free = (await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200))
       .body;
-    expect(free).toMatchObject({ count: 5, locked: true, annual: premium.annual });
+    expect(free).toMatchObject({ count: 5, locked: true, annual: premium.annual, fixed: 0 });
     expect(free.subscriptions.map((s: { description: string }) => s.description)).toEqual([
       'Gimnasio',
       'Netflix',

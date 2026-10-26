@@ -1,5 +1,6 @@
 import { Cents } from '@domain/shared/money';
 import { normalizeText } from '@domain/shared/text';
+import { isEssential } from './money-leaks';
 
 export type SubscriptionCadence = 'monthly' | 'yearly';
 
@@ -10,6 +11,8 @@ export interface SubscriptionCandidate {
   date: string;
   type: string;
   recurringRuleId: string | null;
+  /** Category of the movement (tells a fixed charge, like the rent, from a subscription). */
+  categoryName?: string;
 }
 
 export interface DetectedSubscription {
@@ -27,6 +30,10 @@ export interface DetectedSubscription {
   nextDate: string;
   /** Set when the latest charge is higher than the one before. */
   priceIncrease: { fromCents: Cents; toCents: Cents } | null;
+  /** Category of the latest charge, when known. */
+  categoryName: string | null;
+  /** A fixed charge of life (rent, power, insurance, a loan…) rather than a subscription. */
+  essential: boolean;
 }
 
 export interface SubscriptionReport {
@@ -116,6 +123,8 @@ export function detectSubscriptions(
         latest.amountCents > previous.amountCents * INCREASE_THRESHOLD
           ? { fromCents: previous.amountCents, toCents: latest.amountCents }
           : null,
+      categoryName: latest.categoryName ?? null,
+      essential: isEssential(latest.description, latest.categoryName ?? ''),
     });
   }
 

@@ -291,7 +291,11 @@ export function merchantKey(description: string, aliases: readonly string[] = []
   return letters(key) >= 3 ? key : null;
 }
 
-function isEssential(description: string, categoryName: string): boolean {
+/**
+ * Rent, power, loans, insurance, taxes or a transfer: a fixed charge of life, not a subscription
+ * to check (also used to tell the two apart after an import).
+ */
+export function isEssential(description: string, categoryName: string): boolean {
   const text = normalizeText(description);
   const byCategory =
     ESSENTIAL_CATEGORIES.has(normalizeText(categoryName)) &&

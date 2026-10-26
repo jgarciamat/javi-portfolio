@@ -294,6 +294,7 @@ export function presentSubscriptions(r: SubscriptionsView) {
     annual: m(r.annualCents),
     count: r.count,
     locked: r.locked,
+    fixed: r.fixed,
     subscriptions: r.subscriptions.map((s) => ({
       key: s.key,
       description: s.description,
@@ -306,6 +307,8 @@ export function presentSubscriptions(r: SubscriptionsView) {
       priceIncrease: s.priceIncrease
         ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
         : null,
+      categoryName: s.categoryName,
+      essential: s.essential,
     })),
   };
 }

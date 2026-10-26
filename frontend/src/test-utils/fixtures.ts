@@ -306,6 +306,8 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       lastDate: '2026-03-05',
       nextDate: '2026-04-04',
       priceIncrease: { from: 12.99, to: 13.99 },
+      categoryName: 'Ocio',
+      essential: false,
     },
     {
       key: 'seguro coche',
@@ -317,10 +319,13 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       lastDate: '2026-03-02',
       nextDate: '2027-03-02',
       priceIncrease: null,
+      categoryName: null,
+      essential: true,
     },
   ],
   count: 2,
   locked: false,
+  fixed: 1,
   ...over,
 });
 

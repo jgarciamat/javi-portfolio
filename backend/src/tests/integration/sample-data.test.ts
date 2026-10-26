@@ -53,7 +53,9 @@ describe('Sample data', () => {
     expect(leaks.total.count).toBeGreaterThan(0);
     const subscriptions = (await request(ctx.app).get('/api/stats/subscriptions').set(user.auth))
       .body;
-    expect(subscriptions.count).toBeGreaterThan(0);
+    expect(subscriptions.count).toBeGreaterThan(subscriptions.fixed);
+    // The rent, the power bill and the home insurance.
+    expect(subscriptions.fixed).toBe(3);
 
     const removed = await request(ctx.app).delete('/api/sample-data').set(user.auth).expect(200);
     expect(removed.body).toEqual({ deleted: count });

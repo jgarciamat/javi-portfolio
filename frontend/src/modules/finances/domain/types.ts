@@ -537,6 +537,10 @@ export interface DetectedSubscription {
   lastDate: string;
   nextDate: string;
   priceIncrease: { from: number; to: number } | null;
+  /** Category of the latest charge (older API versions leave it out). */
+  categoryName?: string | null;
+  /** A fixed charge of life (rent, power, insurance…) rather than a subscription. */
+  essential?: boolean;
 }
 
 export interface SubscriptionReport {
@@ -548,6 +552,8 @@ export interface SubscriptionReport {
   count: number;
   /** Free plan: the list is cut to the first few; the full list is Premium. */
   locked: boolean;
+  /** How many are fixed charges, also those not listed (older API versions leave it out). */
+  fixed?: number;
 }
 
 // ─── Tu dinero perdido ───────────────────────────────────────────────────────

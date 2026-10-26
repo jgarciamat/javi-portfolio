@@ -467,7 +467,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       entitlements,
       repos.rules,
       clock,
-      repos.assets
+      repos.assets,
+      repos.categories
     ),
     moneyLeaks: new MoneyLeakService(
       repos.transactions,

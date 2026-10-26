@@ -6002,5 +6002,20 @@
   "app.sample.confirmBody": "The {count} invented movements are removed. Everything you added yourself stays.",
   "app.sample.removed": "Sample data removed. Now it is your turn: importing your bank is free and unlimited.",
   "app.sample.import": "Import my bank",
-  "app.sample.error": "That did not work. Please try again."
+  "app.sample.error": "That did not work. Please try again.",
+  "app.firstResult.title": "What repeats in your movements",
+  "app.firstResult.found": "We found {fixed} and {subscriptions} charged every month or every year.",
+  "app.firstResult.fixedOne": "1 fixed charge",
+  "app.firstResult.fixed": "{count} fixed charges",
+  "app.firstResult.subscriptionsOne": "1 subscription",
+  "app.firstResult.subscriptions": "{count} subscriptions",
+  "app.firstResult.cadence.monthly": "a month",
+  "app.firstResult.cadence.yearly": "a year",
+  "app.firstResult.locked": "Here you see the {shown} with the highest amount of the {count}; Premium shows the full list.",
+  "app.firstResult.hint": "As automatic operations, the forecast and the payment reminders take them into account. You can change or pause them whenever you like.",
+  "app.firstResult.add": "Add them as automatic operations",
+  "app.firstResult.adding": "Adding…",
+  "app.firstResult.added": "{count} automatic operations added. You will find them in «Automatic operations».",
+  "app.firstResult.error": "Not all of them could be added. Please try again.",
+  "app.firstResult.goal": "When will you reach your goal? See it in Goals"
 }

@@ -5991,5 +5991,20 @@
   "app.sample.confirmBody": "Se borran los {count} movimientos inventados. Lo que hayas añadido tú se queda.",
   "app.sample.removed": "Datos de ejemplo borrados. Ahora te toca a ti: importar tu banco es gratis e ilimitado.",
   "app.sample.import": "Importar mi banco",
-  "app.sample.error": "No se ha podido completar. Vuelve a probarlo."
+  "app.sample.error": "No se ha podido completar. Vuelve a probarlo.",
+  "app.firstResult.title": "Lo que se repite en tus movimientos",
+  "app.firstResult.found": "Hemos encontrado {fixed} y {subscriptions} que se cobran cada mes o cada año.",
+  "app.firstResult.fixedOne": "1 cargo fijo",
+  "app.firstResult.fixed": "{count} cargos fijos",
+  "app.firstResult.subscriptionsOne": "1 suscripción",
+  "app.firstResult.subscriptions": "{count} suscripciones",
+  "app.firstResult.cadence.monthly": "al mes",
+  "app.firstResult.cadence.yearly": "al año",
+  "app.firstResult.locked": "Aquí ves los {shown} de mayor importe de los {count}; con Premium, la lista completa.",
+  "app.firstResult.hint": "Como operaciones automáticas, la previsión y los avisos de cobro los tendrán en cuenta. Puedes cambiarlas o pausarlas cuando quieras.",
+  "app.firstResult.add": "Añadirlos como operaciones automáticas",
+  "app.firstResult.adding": "Añadiendo…",
+  "app.firstResult.added": "Añadidas {count} operaciones automáticas. Las tienes en «Operaciones automáticas».",
+  "app.firstResult.error": "No se han podido añadir todas. Vuelve a probarlo.",
+  "app.firstResult.goal": "¿Cuándo llegas a tu meta? Míralo en Metas"
 }

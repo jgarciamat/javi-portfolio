@@ -271,6 +271,10 @@ function DashboardModals({
             dash.closeImport();
             dash.setTab('leaks');
           }}
+          onOpenGoals={() => {
+            dash.closeImport();
+            dash.setTab('goals');
+          }}
         />
       )}
       {dash.editingTransaction && (

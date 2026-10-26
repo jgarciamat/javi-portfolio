@@ -7,6 +7,7 @@ import {
   AiUsageRepository,
   AssetRepository,
   CategoryBudgetRepository,
+  CategoryRepository,
   RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
@@ -84,6 +85,8 @@ export interface SubscriptionsView extends SubscriptionReport {
   count: number;
   /** True on the free plan: the list is cut to the first few and the rest needs Premium. */
   locked: boolean;
+  /** How many of them are fixed charges (rent, power, insurance…), also those not listed. */
+  fixed: number;
 }
 
 /** Past periods used to learn the usual non-recurring spending. */
@@ -115,7 +118,8 @@ export class StatsService {
     private readonly entitlements: EntitlementService,
     private readonly rules: RecurringRuleRepository,
     private readonly clock: Clock,
-    private readonly assets: AssetRepository
+    private readonly assets: AssetRepository,
+    private readonly categories: CategoryRepository
   ) {}
 
   /**
@@ -240,9 +244,14 @@ export class StatsService {
    * plan sees how many there are, what they cost and the most expensive ones; Premium, all.
    */
   subscriptions(userId: string): SubscriptionsView {
+    const categoryNames = new Map(
+      this.categories.listByUser(userId).map((c) => [c.id, c.name] as const)
+    );
     const movements = this.transactions.listAllByUser(userId).map((tx) => {
-      const { description, amountCents, date, type, recurringRuleId } = tx.toPrimitives();
-      return { description, amountCents, date, type, recurringRuleId };
+      const { description, amountCents, date, type, recurringRuleId, categoryId } =
+        tx.toPrimitives();
+      const categoryName = categoryNames.get(categoryId);
+      return { description, amountCents, date, type, recurringRuleId, categoryName };
     });
     const coveredKeys = new Set(
       this.rules
@@ -262,6 +271,7 @@ export class StatsService {
         : report.subscriptions,
       count: report.subscriptions.length,
       locked,
+      fixed: report.subscriptions.filter((s) => s.essential).length,
     };
   }
 
