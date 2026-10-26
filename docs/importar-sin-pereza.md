@@ -51,6 +51,37 @@ Límites conocidos: fotos de pantalla torcidas o con reflejos, capturas muy pequ
 Por eso las filas son siempre editables antes de importar, y si no se encuentra nada se sugiere pegar
 el texto.
 
-## Pendiente
+## 4. Compartir con Finanverso
 
-Se completa en los siguientes apartados de este documento.
+- Web y PWA instalada (Android con Chrome, escritorio con Chrome/Edge): `share_target` en
+  `frontend/public/site.webmanifest` (POST multipart a `/compartir` con `files`, `title`, `text` y
+  `url`; imágenes, PDF, CSV, Excel, texto y Norma 43).
+- `frontend/public/share-sw.js` (cargado por el service worker con `importScripts`) guarda lo
+  compartido en la caché `finanverso-share`, solo en el dispositivo, y redirige a
+  `/?importar=compartido`.
+- `useImportRequest` abre el importador; `takeShared()` lo saca de la caché una sola vez. Una
+  imagen va a la pestaña Captura, un fichero al importador de ficheros y un texto a «Pegar texto».
+- `/?importar=1` abre el importador sin más (lo usa el aviso de principio de mes).
+- Solo funciona con la web instalada como aplicación (el sistema solo ofrece como destino las PWA
+  instaladas) y con la sesión iniciada; si no hay sesión, lo compartido espera en la caché hasta el
+  siguiente «Compartir».
+
+### Pendiente para el siguiente AAB (app nativa, `frontend/android`, fuera de git)
+
+No se ha tocado `frontend/android` (no está en git y tiene secretos). Para que la app de Play
+aparezca en «Compartir»:
+
+1. `AndroidManifest.xml`, en la `MainActivity`: `intent-filter` con `android.intent.action.SEND` y
+   `SEND_MULTIPLE`, categoría `DEFAULT` y `mimeType` `image/*`, `application/pdf`, `text/csv`,
+   `text/plain`, `text/comma-separated-values` y
+   `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
+2. Leer el `Intent` (también en `onNewIntent`): `EXTRA_STREAM` (copiar el `content://` a la caché
+   de la app) y `EXTRA_TEXT`. Con un plugin de Capacitor propio (como `NotificationCapture`) o uno
+   de la comunidad para «share target».
+3. En JS, al recibirlo, crear el `File`/texto y abrir el importador con él: basta con llamar a la
+   misma ruta que la web (`ImportModal` con `shared`), por ejemplo guardándolo en la caché
+   `finanverso-share` con las claves de `src/core/share/sharedImport.ts` y navegando a
+   `/?importar=compartido`.
+4. Probar con Google Fotos (captura), Archivos (CSV/PDF) y la app del banco (texto).
+
+## Pendiente

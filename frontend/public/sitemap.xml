@@ -5,7 +5,7 @@
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://finanverso.app/</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/"/>
@@ -16,7 +16,7 @@
   </url>
   <url>
     <loc>https://finanverso.app/pricing</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/pricing"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/pricing"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/pricing"/>
@@ -30,7 +30,7 @@
   </url>
   <url>
     <loc>https://finanverso.app/terms</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/terms"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/terms"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/terms"/>
@@ -598,7 +598,7 @@
   </url>
   <url>
     <loc>https://finanverso.app/en</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/"/>
@@ -609,7 +609,7 @@
   </url>
   <url>
     <loc>https://finanverso.app/en/pricing</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/pricing"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/pricing"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/pricing"/>
@@ -623,7 +623,7 @@
   </url>
   <url>
     <loc>https://finanverso.app/en/terms</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/terms"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/terms"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/terms"/>

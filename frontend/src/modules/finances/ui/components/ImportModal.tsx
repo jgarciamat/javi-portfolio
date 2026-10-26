@@ -7,7 +7,8 @@ import type { Account, ImportResult, TransactionType } from '@modules/finances/d
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { SharedContent } from '@core/share/sharedImport';
 import { isImage, useImport } from '../../application/hooks/useImport';
 import {
   EditableRows,
@@ -22,6 +23,8 @@ import { LeaksAfterImport } from './LeaksTeaser';
 
 interface ImportModalProps {
   accounts: Account[];
+  /** What another app shared with Finanverso: read as soon as the importer opens. */
+  shared?: SharedContent | null;
   onClose: () => void;
   onImported: () => void;
   /** Opens «Tu dinero perdido» (after an import it says what was found). */
@@ -153,9 +156,29 @@ function FilePanel({ imp }: { imp: ImportState }) {
 }
 
 /** The first step: a statement file or the movements pasted from the bank's app. */
-function FileStep({ imp }: { imp: ImportState }) {
-  const [source, setSource] = useState<ImportSource>('file');
-  const { loadFile } = imp;
+function FileStep({
+  imp,
+  shared,
+  onShared,
+}: {
+  imp: ImportState;
+  shared: SharedContent | null;
+  /** The shared content was read: starting again does not read it again. */
+  onShared: () => void;
+}) {
+  const [source, setSource] = useState<ImportSource>(() =>
+    shared?.file && isImage(shared.file) ? 'screenshot' : shared?.text ? 'paste' : 'file'
+  );
+  const { loadFile, loadText } = imp;
+  // What was shared is read once, when the importer opens.
+  const sharedRead = useRef(false);
+  useEffect(() => {
+    if (!shared || sharedRead.current) return;
+    sharedRead.current = true;
+    onShared();
+    if (shared.file) void loadFile(shared.file);
+    else if (shared.text) loadText(shared.text);
+  }, [shared, loadFile, loadText, onShared]);
   usePastedImage((image) => {
     setSource('screenshot');
     void loadFile(image);
@@ -169,7 +192,9 @@ function FileStep({ imp }: { imp: ImportState }) {
     >
       <ImportSourceTabs source={source} onSource={setSource}>
         {source === 'file' && <FilePanel imp={imp} />}
-        {source === 'paste' && <PastePanel onRead={imp.loadText} />}
+        {source === 'paste' && (
+          <PastePanel onRead={imp.loadText} initialText={shared?.text ?? ''} />
+        )}
         {source === 'screenshot' && (
           <ScreenshotPanel reading={imp.reading} onImage={(image) => void imp.loadFile(image)} />
         )}
@@ -455,22 +480,33 @@ function StepBody({
   imp,
   accounts,
   onOpenLeaks,
+  shared,
+  onShared,
 }: {
   imp: ImportState;
   accounts: Account[];
   onOpenLeaks?: () => void;
+  shared: SharedContent | null;
+  onShared: () => void;
 }) {
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
   if (imp.step === 'done' && imp.result) {
     return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} />;
   }
-  return <FileStep imp={imp} />;
+  return <FileStep imp={imp} shared={shared} onShared={onShared} />;
 }
 
 /** Bank statement import: choose file → map columns → preview → import. */
-export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: ImportModalProps) {
+export function ImportModal({
+  accounts,
+  shared: sharedContent = null,
+  onClose,
+  onImported,
+  onOpenLeaks,
+}: ImportModalProps) {
   const { t } = useI18n();
+  const [shared, setShared] = useState(sharedContent);
   const activeAccounts = accounts.filter((a) => !a.archived);
   const imp = useImport(onImported, defaultAccountId(activeAccounts));
 
@@ -489,7 +525,13 @@ export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: Impo
           <Icon name="close" />
         </button>
       </div>
-      <StepBody imp={imp} accounts={activeAccounts} onOpenLeaks={onOpenLeaks} />
+      <StepBody
+        imp={imp}
+        accounts={activeAccounts}
+        onOpenLeaks={onOpenLeaks}
+        shared={shared}
+        onShared={() => setShared(null)}
+      />
       {imp.error && <p className="form-error">{t(imp.error)}</p>}
       {imp.step !== 'preview' && <Footer imp={imp} onClose={onClose} />}
     </Modal>

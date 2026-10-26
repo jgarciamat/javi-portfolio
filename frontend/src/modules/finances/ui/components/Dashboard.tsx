@@ -22,6 +22,8 @@ import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
 import { useBillReminders } from '../../application/hooks/useBillReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
+import { useImportRequest } from '../../application/hooks/useImportRequest';
+import type { SharedContent } from '@core/share/sharedImport';
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
@@ -226,7 +228,14 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
 }
 
 /** Dialogs opened from anywhere in the dashboard. */
-function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
+function DashboardModals({
+  dash,
+  shared,
+}: {
+  dash: UseDashboardReturn;
+  /** What another app shared with Finanverso, for the importer. */
+  shared: SharedContent | null;
+}) {
   const finances = useFinances();
   return (
     <>
@@ -255,6 +264,7 @@ function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
       {dash.showImport && (
         <ImportModal
           accounts={finances.accounts}
+          shared={shared}
           onClose={dash.closeImport}
           onImported={() => finances.refresh({ invalidate: true })}
           onOpenLeaks={() => {
@@ -309,6 +319,7 @@ export function Dashboard() {
   const section = SECTION_BY_ID[dash.tab];
   const sectionLabel = t(section.labelKey);
   const tour = useWelcomeTour(dash.tab, dash.setTab);
+  const shared = useImportRequest(dash.openImport);
   useBudgetAlertNotifications();
 
   // The browser tab names the open section: "Presupuestos · Finanverso".
@@ -390,7 +401,7 @@ export function Dashboard() {
       />
       {inviteOpen && <InviteDialog onClose={() => setInviteOpen(false)} />}
       <Suspense fallback={null}>
-        <DashboardModals dash={dash} />
+        <DashboardModals dash={dash} shared={shared} />
       </Suspense>
       <TourAndNotices
         tour={tour}

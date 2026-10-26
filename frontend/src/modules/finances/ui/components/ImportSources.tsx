@@ -77,9 +77,16 @@ export function ImportSourceTabs({
 }
 
 /** «Pega aquí tus movimientos»: what was copied from the bank's app or web. */
-export function PastePanel({ onRead }: { onRead: (text: string) => void }) {
+export function PastePanel({
+  onRead,
+  initialText,
+}: {
+  onRead: (text: string) => void;
+  /** Text shared from another app: shown here to correct if nothing could be read from it. */
+  initialText: string;
+}) {
   const { t } = useI18n();
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText);
   const fieldId = useId();
   return (
     <div className="import-paste">
