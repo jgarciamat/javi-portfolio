@@ -21,6 +21,7 @@ import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
 import { useBillReminders } from '../../application/hooks/useBillReminders';
+import { useImportReminders } from '../../application/hooks/useImportReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
 import { useImportRequest } from '../../application/hooks/useImportRequest';
 import type { SharedContent } from '@core/share/sharedImport';
@@ -310,6 +311,7 @@ function useBudgetAlertNotifications() {
     message: (alert) => monthAlertMessage(alert, t, tCategory),
   });
   useBillReminders(!!settings?.notificationsEnabled, settings?.currentPeriod ?? null);
+  useImportReminders(!!settings?.notificationsEnabled, settings?.monthStartDay ?? null);
 }
 
 export function Dashboard() {

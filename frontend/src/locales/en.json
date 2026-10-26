@@ -822,7 +822,7 @@
   "app.settings.dayN": "Day {day}",
   "app.settings.defaultAccount": "Default account",
   "app.settings.notifications": "Notifications",
-  "app.settings.notificationsHint": "Alerts when a budget is exceeded and a reminder when each month starts (mobile app).",
+  "app.settings.notificationsHint": "Alerts when a budget is exceeded and, when each month starts, a reminder to import the statement of the month before (mobile app).",
   "app.settings.notificationsDenied": "Permission to show notifications was not granted.",
   "app.settings.data": "Your data",
   "app.settings.dataHint": "Download a full copy of your information (GDPR data portability).",
@@ -885,8 +885,6 @@
   "app.apiError.TWO_FACTOR_ALREADY_ENABLED": "Two-step verification is already on.",
   "app.apiError.TWO_FACTOR_NOT_ENABLED": "Two-step verification is not on.",
   "app.apiError.TWO_FACTOR_PROOF_REQUIRED": "Enter your password or a verification code.",
-  "app.notifications.monthlyTitle": "A new month starts",
-  "app.notifications.monthlyBody": "Review your recurring movements and this month's budgets.",
   "app.category.manager.rename": "Rename",
   "app.category.manager.inUse.title": "This category has data",
   "app.category.manager.inUse.body": "“{name}” has {count} movements (and maybe rules, budgets or goals). Choose where to move them before deleting it.",
@@ -6017,5 +6015,7 @@
   "app.firstResult.adding": "Adding…",
   "app.firstResult.added": "{count} automatic operations added. You will find them in «Automatic operations».",
   "app.firstResult.error": "Not all of them could be added. Please try again.",
-  "app.firstResult.goal": "When will you reach your goal? See it in Goals"
+  "app.firstResult.goal": "When will you reach your goal? See it in Goals",
+  "app.notifications.statementTitle": "Your {month} statement is ready",
+  "app.notifications.statementBody": "It takes 30 seconds: import the bank file, the copied text or a screenshot."
 }

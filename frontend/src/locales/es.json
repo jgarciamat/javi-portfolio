@@ -822,7 +822,7 @@
   "app.settings.dayN": "Día {day}",
   "app.settings.defaultAccount": "Cuenta por defecto",
   "app.settings.notifications": "Notificaciones",
-  "app.settings.notificationsHint": "Avisos al superar un presupuesto y recordatorio al empezar cada mes (en la app móvil).",
+  "app.settings.notificationsHint": "Avisos al superar un presupuesto y, al empezar cada mes, recordatorio para importar el extracto del mes anterior (en la app móvil).",
   "app.settings.notificationsDenied": "No se ha concedido permiso para mostrar notificaciones.",
   "app.settings.data": "Tus datos",
   "app.settings.dataHint": "Descarga una copia completa de tu información (derecho de portabilidad del RGPD).",
@@ -885,8 +885,6 @@
   "app.apiError.TWO_FACTOR_ALREADY_ENABLED": "La verificación en dos pasos ya está activada.",
   "app.apiError.TWO_FACTOR_NOT_ENABLED": "La verificación en dos pasos no está activada.",
   "app.apiError.TWO_FACTOR_PROOF_REQUIRED": "Introduce tu contraseña o un código de verificación.",
-  "app.notifications.monthlyTitle": "Empieza un nuevo mes",
-  "app.notifications.monthlyBody": "Revisa tus movimientos recurrentes y tus presupuestos del mes.",
   "app.category.manager.rename": "Renombrar",
   "app.category.manager.inUse.title": "La categoría tiene datos",
   "app.category.manager.inUse.body": "«{name}» tiene {count} movimientos (y quizá reglas, presupuestos o metas). Elige a qué categoría moverlos antes de eliminarla.",
@@ -6006,5 +6004,7 @@
   "app.firstResult.adding": "Añadiendo…",
   "app.firstResult.added": "Añadidas {count} operaciones automáticas. Las tienes en «Operaciones automáticas».",
   "app.firstResult.error": "No se han podido añadir todas. Vuelve a probarlo.",
-  "app.firstResult.goal": "¿Cuándo llegas a tu meta? Míralo en Metas"
+  "app.firstResult.goal": "¿Cuándo llegas a tu meta? Míralo en Metas",
+  "app.notifications.statementTitle": "Ya tienes el extracto de {month}",
+  "app.notifications.statementBody": "Son 30 segundos: impórtalo con el archivo del banco, el texto copiado o una captura."
 }

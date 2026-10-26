@@ -9,7 +9,7 @@ import {
   cancelMonthlyReminder,
   notificationsSupported,
   requestNotificationPermission,
-  scheduleMonthlyReminder,
+  scheduleMonthlyReminders,
 } from '@core/notifications/notifications';
 import type {
   Account,
@@ -19,6 +19,7 @@ import type {
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { importReminders } from '../../application/hooks/useImportReminders';
 import { AppLockCard } from '../components/AppLockCard';
 import { PushSetting } from '../components/PushSetting';
 import { CategoryRulesCard } from '../components/CategoryRulesCard';
@@ -342,7 +343,7 @@ function SecurityCard({
 }
 
 export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { settings, updateSettings } = useSettings();
   const { accounts, refresh } = useFinances();
   const action = useAction();
@@ -353,12 +354,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
 
   if (!settings) return <div className="card">{t('app.common.loading')}</div>;
 
-  const reminder = (day: number) =>
-    scheduleMonthlyReminder(
-      day,
-      t('app.notifications.monthlyTitle'),
-      t('app.notifications.monthlyBody')
-    );
+  const reminder = (day: number) => scheduleMonthlyReminders(importReminders(day, t, locale));
 
   const save = async (changes: SettingsChanges): Promise<boolean> => {
     setSaved(false);

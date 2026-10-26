@@ -21,7 +21,7 @@ import { ApiError } from '@core/api/http';
 jest.mock('@core/notifications/notifications', () => ({
   notificationsSupported: jest.fn(() => true),
   requestNotificationPermission: jest.fn(),
-  scheduleMonthlyReminder: jest.fn().mockResolvedValue(undefined),
+  scheduleMonthlyReminders: jest.fn().mockResolvedValue(undefined),
   cancelMonthlyReminder: jest.fn().mockResolvedValue(undefined),
   hasNotificationPermission: jest.fn().mockResolvedValue(false),
   showNotification: jest.fn(),
@@ -1449,11 +1449,11 @@ describe('SettingsView', () => {
       { target: { value: '25' } }
     );
     await waitFor(() =>
-      expect(mocked.scheduleMonthlyReminder).toHaveBeenCalledWith(
-        25,
-        expect.any(String),
-        expect.any(String)
-      )
+      expect(mocked.scheduleMonthlyReminders).toHaveBeenCalledWith([
+        expect.objectContaining({ title: expect.stringMatching(/^Ya tienes el extracto de /) }),
+        expect.anything(),
+        expect.anything(),
+      ])
     );
     fireEvent.change(
       screen.getByRole('combobox', { name: new RegExp(tr('app.settings.language')) }),
@@ -1493,10 +1493,10 @@ describe('SettingsView', () => {
     mocked.requestNotificationPermission.mockResolvedValueOnce(true);
     fireEvent.click(toggle);
     await waitFor(() =>
-      expect(mocked.scheduleMonthlyReminder).toHaveBeenCalledWith(
-        1,
-        expect.any(String),
-        expect.any(String)
+      expect(mocked.scheduleMonthlyReminders).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ body: tr('app.notifications.statementBody') }),
+        ])
       )
     );
     api.settingsApi.update.mockResolvedValue(f.settings({ notificationsEnabled: false }));
@@ -1517,7 +1517,7 @@ describe('SettingsView', () => {
       await screen.findByRole('checkbox', { name: new RegExp(tr('app.settings.notifications')) })
     );
     expect(await screen.findByText('No guardado')).toBeInTheDocument();
-    expect(mocked.scheduleMonthlyReminder).not.toHaveBeenCalled();
+    expect(mocked.scheduleMonthlyReminders).not.toHaveBeenCalled();
   });
 
   it('exports data and handles export errors', async () => {
