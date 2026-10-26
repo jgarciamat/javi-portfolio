@@ -185,8 +185,13 @@ const cleanText = (text: string): string =>
     .replace(/^[\s,.\-–·:]+|[\s,\-–·:]+$/g, '')
     .trim();
 
+/** «… Saldo 1.204,10 €» at the end of a line is the balance, not part of the movement. */
+const BALANCE_TAIL = /\b(saldo|balance)\b.*$/;
+
 function splitLine(raw: string, today: string): LineParts {
-  const withoutNoise = raw.replace(NOISE, (s) => ' '.repeat(s.length));
+  const balanceAt = fold(raw).search(BALANCE_TAIL);
+  const movement = balanceAt > 0 ? raw.slice(0, balanceAt) : raw;
+  const withoutNoise = movement.replace(NOISE, (s) => ' '.repeat(s.length));
   const dated = takeDate(withoutNoise, today);
   const priced = takeAmounts(dated.line);
   const text = cleanText(priced.line);
@@ -215,26 +220,178 @@ const movementAmount = (amounts: FoundAmount[]): FoundAmount =>
 const waitingConcept = (parts: LineParts, concept: string | null): string | null =>
   parts.date ? parts.text || null : (concept ?? (parts.text || null));
 
-function readDrafts(text: string, today: string): { drafts: Draft[]; skipped: number[] } {
-  const drafts: Draft[] = [];
-  const skipped: number[] = [];
-  let day: string | null = null;
-  let concept: string | null = null;
-  const lines = text.normalize('NFC').split(/\r?\n/);
-  lines.forEach((raw, index) => {
-    if (!raw.trim() || NOT_A_MOVEMENT.test(fold(raw.trim()))) return;
-    const parts = splitLine(raw, today);
-    day = parts.date ?? day;
-    if (parts.amounts.length === 0) {
-      concept = waitingConcept(parts, concept);
-      return;
-    }
-    const description = parts.text || concept;
-    concept = null;
-    if (!description || !day) skipped.push(index + 1);
-    else drafts.push({ date: day, description, amount: movementAmount(parts.amounts) });
+interface ReadState {
+  drafts: Draft[];
+  skipped: number[];
+  /** The day of the block being read (the apps put it above its movements). */
+  day: string | null;
+  concept: string | null;
+  /**
+   * Some apps write the day under each movement («Glovo -18,40 €», then «24/10/2026»): a movement
+   * read before any day waits for the line under it, and from then on every one does.
+   */
+  dayBelow: boolean;
+  waiting: { description: string; amount: FoundAmount; line: number } | null;
+}
+
+/** A line without an amount: a day (maybe the one of the movement above) or a concept. */
+function readOtherLine(st: ReadState, parts: LineParts): void {
+  if (parts.date && !parts.text && st.waiting) {
+    const { description, amount } = st.waiting;
+    st.drafts.push({ date: parts.date, description, amount });
+    st.waiting = null;
+    st.dayBelow = true;
+    st.concept = null;
+    return;
+  }
+  st.day = parts.date ?? st.day;
+  st.concept = waitingConcept(parts, st.concept);
+}
+
+function readMovementLine(st: ReadState, parts: LineParts, line: number): void {
+  const description = parts.text || st.concept;
+  const amount = movementAmount(parts.amounts);
+  st.concept = null;
+  st.day = parts.date ?? st.day;
+  const date = parts.date ?? (st.dayBelow ? null : st.day);
+  if (!description) st.skipped.push(line);
+  else if (date) st.drafts.push({ date, description, amount });
+  else {
+    if (st.waiting) st.skipped.push(st.waiting.line);
+    st.waiting = { description, amount, line };
+  }
+}
+
+const MONTH_START = new RegExp(`^\\s*${MONTH}(?=\\s|$)`);
+
+/** «25» on one line and «OCT» under it (a day column like a calendar's): the day is put together. */
+function joinSplitDays(lines: string[]): string[] {
+  const out = [...lines];
+  for (let i = 0; i + 1 < out.length; i++) {
+    const day = /^\s*(\d{1,2})(?=\s)/.exec(out[i]);
+    const month = MONTH_START.exec(fold(out[i + 1]));
+    if (!day || !month) continue;
+    out[i] = `${day[1]} ${month[1]}${out[i].slice(day[0].length)}`;
+    out[i + 1] = out[i + 1].slice(month[0].length);
+  }
+  return out;
+}
+
+interface ReadLine {
+  parts: LineParts;
+  /** 1-based, in the text. */
+  line: number;
+}
+
+const near = (a: number, b: number): boolean => Math.abs(a - b) < 0.005;
+
+/** Whether `balances` follow from `amounts`, newest movement first or oldest first. */
+function isRunningBalance(amounts: number[], balances: number[]): boolean {
+  const pairs = balances.slice(1).map((next, k) => ({ prev: balances[k], next, k }));
+  return (
+    pairs.every(({ prev, next, k }) => near(prev, next + amounts[k])) ||
+    pairs.every(({ prev, next, k }) => near(next, prev + amounts[k + 1]))
+  );
+}
+
+/**
+ * Apps that print the balance under each amount: when every line with an amount is followed by one
+ * whose only amount has no sign and the balances add up with the movements, those lines are the
+ * balances. Their text is the end of the concept above («CARREFOUR» / «EXPRESS»).
+ */
+function withoutBalances(lines: ReadLine[]): ReadLine[] {
+  const priced = lines.filter((l) => l.parts.amounts.length > 0);
+  const pairs = Array.from({ length: Math.floor(priced.length / 2) }, (_, k) => ({
+    movement: priced[2 * k],
+    balance: priced[2 * k + 1],
+  }));
+  const fits =
+    pairs.length >= 2 &&
+    priced.length % 2 === 0 &&
+    pairs.every(
+      ({ movement, balance }) =>
+        lines.indexOf(balance) === lines.indexOf(movement) + 1 &&
+        !balance.parts.date &&
+        balance.parts.amounts.length === 1 &&
+        !balance.parts.amounts[0].signed
+    ) &&
+    isRunningBalance(
+      pairs.map((p) => movementAmount(p.movement.parts.amounts).value),
+      pairs.map((p) => p.balance.parts.amounts[0].value)
+    );
+  if (!fits) return lines;
+  const balances = new Set(pairs.map((p) => p.balance));
+  return lines.flatMap((l, i) => {
+    if (balances.has(l)) return [];
+    const below = lines[i + 1];
+    if (!below || !balances.has(below) || !below.parts.text) return [l];
+    return [{ ...l, parts: { ...l.parts, text: `${l.parts.text} ${below.parts.text}`.trim() } }];
   });
-  return { drafts, skipped };
+}
+
+function readDrafts(text: string, today: string): { drafts: Draft[]; skipped: number[] } {
+  const st: ReadState = {
+    drafts: [],
+    skipped: [],
+    day: null,
+    concept: null,
+    dayBelow: false,
+    waiting: null,
+  };
+  const lines = joinSplitDays(text.normalize('NFC').split(/\r?\n/)).flatMap((raw, index) =>
+    !raw.trim() || NOT_A_MOVEMENT.test(fold(raw.trim()))
+      ? []
+      : [{ parts: splitLine(raw, today), line: index + 1 }]
+  );
+  for (const { parts, line } of withoutBalances(lines)) {
+    if (parts.amounts.length === 0) readOtherLine(st, parts);
+    else readMovementLine(st, parts, line);
+  }
+  if (st.waiting) st.skipped.push(st.waiting.line);
+  return { drafts: st.drafts, skipped: st.skipped.sort((x, y) => x - y) };
+}
+
+/** A line read from an image, with its box in pixels. */
+export interface OcrLine {
+  text: string;
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
+
+/**
+ * The text of a screenshot as rows, the way they look: the OCR often reads the concepts and the
+ * amounts as two columns, so the pieces that sit side by side are put back on one line (an amount
+ * goes with the piece it overlaps most, if it overlaps it by a third of its height).
+ */
+export function textFromOcrLines(lines: OcrLine[]): string {
+  const rows: OcrLine[][] = [];
+  const overlap = (a: OcrLine, b: OcrLine): number =>
+    (Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0)) / Math.min(a.y1 - a.y0, b.y1 - b.y0);
+  const sideBySide = (row: OcrLine[], line: OcrLine): boolean =>
+    row.every((piece) => line.x0 >= piece.x1 || line.x1 <= piece.x0);
+  for (const line of [...lines].filter((l) => l.text.trim()).sort((a, b) => a.y0 - b.y0)) {
+    let best: OcrLine[] | null = null;
+    let bestOverlap = 1 / 3;
+    for (const row of rows) {
+      const shared = overlap(row[0], line);
+      if (shared >= bestOverlap && sideBySide(row, line)) {
+        best = row;
+        bestOverlap = shared;
+      }
+    }
+    if (best) best.push(line);
+    else rows.push([line]);
+  }
+  return rows
+    .map((row) =>
+      [...row]
+        .sort((a, b) => a.x0 - b.x0)
+        .map((piece) => piece.text.trim())
+        .join('  ')
+    )
+    .join('\n');
 }
 
 /**

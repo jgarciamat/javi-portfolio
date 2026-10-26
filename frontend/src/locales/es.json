@@ -5972,5 +5972,12 @@
   "app.import.paste.nothing": "No hemos encontrado movimientos en el texto. Cada uno necesita una fecha, un concepto y un importe con céntimos o con €, por ejemplo «12/10 Mercadona -45,30 €».",
   "app.import.editHint": "Revisa lo que hemos leído: puedes cambiar la fecha, el concepto, el tipo y el importe, o quitar una fila. En la vista previa verás cuáles ya tenías importados.",
   "app.import.removeRow": "Quitar {name}",
-  "app.import.otherSource": "Empezar de nuevo"
+  "app.import.otherSource": "Empezar de nuevo",
+  "app.import.source.screenshot": "Captura",
+  "app.import.screenshot.hint": "Haz una captura de la lista de movimientos de la app de tu banco y elígela aquí. En el ordenador también puedes arrastrarla aquí o pegarla con Ctrl+V (Cmd+V en Mac). Podrás revisar cada movimiento antes de importar.",
+  "app.import.screenshot.private": "La captura se lee en tu dispositivo: la imagen no sale de él ni se envía a ningún servidor.",
+  "app.import.screenshot.choose": "Elegir captura de pantalla",
+  "app.import.screenshot.reading": "Leyendo la captura en tu dispositivo… La primera vez tarda un poco más.",
+  "app.import.screenshot.nothing": "No hemos encontrado movimientos en la imagen. Prueba con una captura más nítida, solo de la lista de movimientos, o copia y pega el texto.",
+  "app.import.screenshot.error": "No se ha podido leer la imagen. Prueba con una captura en PNG o JPG, o copia y pega el texto."
 }

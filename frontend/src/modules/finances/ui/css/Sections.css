@@ -1403,3 +1403,12 @@ button.entity-item {
     width: 100%;
   }
 }
+
+.import-private {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--green-400, #4ade80);
+}

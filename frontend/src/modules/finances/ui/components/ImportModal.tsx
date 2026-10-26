@@ -7,9 +7,15 @@ import type { Account, ImportResult, TransactionType } from '@modules/finances/d
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
-import { useState } from 'react';
-import { useImport } from '../../application/hooks/useImport';
-import { EditableRows, type ImportSource, ImportSourceTabs, PastePanel } from './ImportSources';
+import { useEffect, useState } from 'react';
+import { isImage, useImport } from '../../application/hooks/useImport';
+import {
+  EditableRows,
+  type ImportSource,
+  ImportSourceTabs,
+  PastePanel,
+  ScreenshotPanel,
+} from './ImportSources';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { LeaksAfterImport } from './LeaksTeaser';
@@ -108,7 +114,21 @@ const FORMAT_NAMES: Record<ImportState['format'], string> = {
 const editable = (imp: ImportState): boolean => imp.format === 'text' || imp.format === 'image';
 
 const IMPORT_ACCEPT =
-  '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*';
+
+/** An image pasted with Ctrl/Cmd+V while the importer is open is read as a screenshot. */
+function usePastedImage(onImage: (image: File) => void) {
+  useEffect(() => {
+    const onPaste = (event: ClipboardEvent) => {
+      const image = Array.from(event.clipboardData?.files ?? []).find(isImage);
+      if (!image) return;
+      event.preventDefault();
+      onImage(image);
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [onImage]);
+}
 
 function FilePanel({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
@@ -135,6 +155,11 @@ function FilePanel({ imp }: { imp: ImportState }) {
 /** The first step: a statement file or the movements pasted from the bank's app. */
 function FileStep({ imp }: { imp: ImportState }) {
   const [source, setSource] = useState<ImportSource>('file');
+  const { loadFile } = imp;
+  usePastedImage((image) => {
+    setSource('screenshot');
+    void loadFile(image);
+  });
   // A file can be dropped on the whole step, whichever tab is open.
   return (
     <FileDropZone
@@ -143,7 +168,11 @@ function FileStep({ imp }: { imp: ImportState }) {
       onFiles={(list) => void imp.loadFile(list[0])}
     >
       <ImportSourceTabs source={source} onSource={setSource}>
-        {source === 'file' ? <FilePanel imp={imp} /> : <PastePanel onRead={imp.loadText} />}
+        {source === 'file' && <FilePanel imp={imp} />}
+        {source === 'paste' && <PastePanel onRead={imp.loadText} />}
+        {source === 'screenshot' && (
+          <ScreenshotPanel reading={imp.reading} onImage={(image) => void imp.loadFile(image)} />
+        )}
       </ImportSourceTabs>
     </FileDropZone>
   );
@@ -449,7 +478,7 @@ export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: Impo
     <Modal
       label={t('app.import.title')}
       onClose={onClose}
-      dismissible={!imp.busy}
+      dismissible={!imp.busy && !imp.reading}
       className="modal-panel modal-panel--wide"
     >
       <div className="modal-header">

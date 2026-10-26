@@ -75,3 +75,43 @@ test('pastes the movements copied from the bank app, corrects one and imports th
   await dialog.getByRole('button', { name: 'Importar 2' }).click();
   await expect(dialog.getByText(/Importados 2 movimientos/)).toBeVisible();
 });
+
+/** An invented screenshot of a bank app (light theme, a day above each block). */
+const bankApp = `<!doctype html><meta charset="utf-8"><style>
+body{font-family:Arial,sans-serif;margin:0;width:390px;color:#111}
+.day{background:#f4f4f4;color:#666;font-size:13px;padding:8px 16px}
+.row{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;font-size:15px}
+</style>
+<div class="day">5 MAR</div>
+<div class="row"><span>FRUTERIA INVENTADA ${run % 1000}</span><b>-7,35 €</b></div>
+<div class="row"><span>LIBRERIA FICTICIA</span><b>-12,90 €</b></div>
+<div class="day">6 MAR</div>
+<div class="row"><span>DEVOLUCION TIENDA</span><b>+19,99 €</b></div>`;
+
+test('reads a screenshot of the bank app on the device and imports its movements', async ({
+  page,
+  context,
+}) => {
+  const painter = await context.newPage();
+  await painter.setViewportSize({ width: 390, height: 600 });
+  await painter.setContent(bankApp);
+  const png = await painter.locator('body').screenshot();
+  await painter.close();
+
+  const uploads: string[] = [];
+  page.on('request', (r) => {
+    if (r.method() !== 'GET') uploads.push(r.url());
+  });
+  const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
+  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await dialog.getByRole('tab', { name: /Captura/ }).click();
+  await expect(dialog.getByText(/la imagen no sale de él/)).toBeVisible();
+  await dialog
+    .getByLabel('Elegir captura de pantalla')
+    .setInputFiles({ name: 'captura.png', mimeType: 'image/png', buffer: png });
+  await expect(dialog.getByText('3 movimientos leídos')).toBeVisible({ timeout: 60_000 });
+  // Nothing was sent while reading: the first request is the preview.
+  expect(uploads).toEqual([]);
+  await expect(dialog.getByLabel('Importe LIBRERIA FICTICIA')).toHaveValue('12,90');
+  await expect(dialog.getByLabel('Importe DEVOLUCION TIENDA')).toHaveValue('19,99');
+});

@@ -7,12 +7,13 @@ import { parseAmount, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
 import type { RowChanges } from '../../application/hooks/useImport';
 
-/** Where the movements come from: a statement file or pasted text. */
-export type ImportSource = 'file' | 'paste';
+/** Where the movements come from: a statement file, pasted text or a screenshot. */
+export type ImportSource = 'file' | 'paste' | 'screenshot';
 
-const SOURCES: { id: ImportSource; icon: 'file' | 'clipboard' }[] = [
+const SOURCES: { id: ImportSource; icon: 'file' | 'clipboard' | 'image' }[] = [
   { id: 'file', icon: 'file' },
   { id: 'paste', icon: 'clipboard' },
+  { id: 'screenshot', icon: 'image' },
 ];
 
 /** The ways in, as tabs (arrows, Home and End move between them). */
@@ -105,6 +106,47 @@ export function PastePanel({ onRead }: { onRead: (text: string) => void }) {
       >
         <Icon name="sparkles" /> {t('app.import.paste.read')}
       </button>
+    </div>
+  );
+}
+
+/**
+ * A screenshot of the bank's list of movements, read on the device. On a computer it can also be
+ * dropped on the importer or pasted with Ctrl/Cmd+V.
+ */
+export function ScreenshotPanel({
+  reading,
+  onImage,
+}: {
+  reading: boolean;
+  onImage: (image: File) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="import-paste">
+      <p className="section-hint">{t('app.import.screenshot.hint')}</p>
+      <p className="import-private">
+        <Icon name="shield" /> {t('app.import.screenshot.private')}
+      </p>
+      <label className="file-drop">
+        <input
+          type="file"
+          accept="image/*"
+          disabled={reading}
+          aria-label={t('app.import.screenshot.choose')}
+          onChange={(e) => {
+            const image = e.target.files?.[0];
+            if (image) onImage(image);
+            e.target.value = '';
+          }}
+        />
+        <span>{t('app.import.screenshot.choose')}</span>
+      </label>
+      {reading && (
+        <p className="section-hint" role="status">
+          {t('app.import.screenshot.reading')}
+        </p>
+      )}
     </div>
   );
 }

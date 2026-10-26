@@ -24,6 +24,7 @@ import {
 import { parsePastedMovements } from '@modules/finances/domain/pastedMovements';
 
 import { BankPdfError, readBankPdf } from '../bankPdf';
+import { readScreenshot } from '../ocr';
 import { readSpreadsheet, sheetAsText } from '../spreadsheet';
 
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
@@ -127,6 +128,28 @@ function useReadRows() {
 
 const NOTHING_READ: ParsedRows = { rows: [], skipped: [], review: [] };
 
+/** A picture (a screenshot of the bank's app), by its type or, without one, by its name. */
+export const isImage = (file: File): boolean =>
+  file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp|heic)$/i.test(file.name);
+
+/** A screenshot of the movements, read on the device: nothing is uploaded. */
+function useScreenshot(onRead: (parsed: ParsedRows) => void, onError: (key: string) => void) {
+  const [reading, setReading] = useState(false);
+  const load = async (image: File) => {
+    setReading(true);
+    try {
+      const parsed = parsePastedMovements(await readScreenshot(image), todayDateOnly());
+      if (parsed.rows.length === 0) onError('app.import.screenshot.nothing');
+      else onRead(parsed);
+    } catch {
+      onError('app.import.screenshot.error');
+    } finally {
+      setReading(false);
+    }
+  };
+  return { reading, load };
+}
+
 /**
  * Bank statement import: read the file (CSV, Excel, Norma 43 or PDF), the pasted text or the
  * screenshot, map the CSV columns, preview what the API would import and import it. `error` is an
@@ -203,9 +226,12 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     else loadRows(parsed, 'text');
   };
 
+  const screenshot = useScreenshot((parsed) => loadRows(parsed, 'image'), setError);
+
   const loadFile = async (file: File) => {
     setError(null);
     setFileName(file.name);
+    if (isImage(file)) return screenshot.load(file);
     try {
       if (/\.xlsx?$/i.test(file.name)) {
         // A spreadsheet export: its first sheet with data is the table, as a CSV would be.
@@ -283,6 +309,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     preview,
     result,
     busy,
+    reading: screenshot.reading,
     error,
     loadFile,
     loadText,

@@ -5983,5 +5983,12 @@
   "app.import.paste.nothing": "We found no movements in the text. Each one needs a date, a description and an amount with cents or a currency, for example «Oct 12 Supermarket -€45.30».",
   "app.import.editHint": "Check what we read: you can change the date, the description, the type and the amount, or remove a row. The preview shows which ones you had already imported.",
   "app.import.removeRow": "Remove {name}",
-  "app.import.otherSource": "Start again"
+  "app.import.otherSource": "Start again",
+  "app.import.source.screenshot": "Screenshot",
+  "app.import.screenshot.hint": "Take a screenshot of the list of movements in your bank's app and choose it here. On a computer you can also drag it here or paste it with Ctrl+V (Cmd+V on a Mac). You can check every movement before importing.",
+  "app.import.screenshot.private": "The screenshot is read on your device: the image never leaves it and is not sent to any server.",
+  "app.import.screenshot.choose": "Choose a screenshot",
+  "app.import.screenshot.reading": "Reading the screenshot on your device… The first time takes a little longer.",
+  "app.import.screenshot.nothing": "We found no movements in the image. Try a sharper screenshot of just the list of movements, or copy and paste the text.",
+  "app.import.screenshot.error": "The image could not be read. Try a PNG or JPG screenshot, or copy and paste the text."
 }

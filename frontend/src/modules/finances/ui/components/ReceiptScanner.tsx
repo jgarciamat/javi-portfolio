@@ -5,24 +5,11 @@ import { CameraCapture, liveCameraAvailable } from './CameraCapture';
 import { useI18n } from '@core/i18n/I18nContext';
 import { type ScannedReceipt, parseReceipt } from '@modules/finances/domain/receiptParser';
 import { Icon } from '@shared/components/Icon';
-
-/**
- * Where the scanner's files are served from (see scripts/copy-ocr.mjs): our own server, not a
- * CDN. The Android app does not carry them (they weigh 14 MB): it fetches them from the site.
- */
-const WEB_OCR_PATH = 'https://finanverso.app/ocr/';
-const ocrPath = (): string => (isNativeApp() ? WEB_OCR_PATH : '/ocr/');
+import { ocrWorker } from '../../application/ocr';
 
 /** Reads the text of a ticket photo on the device; nothing is uploaded. */
 export async function readReceipt(image: File): Promise<ScannedReceipt> {
-  const { createWorker } = await import('tesseract.js');
-  const path = ocrPath();
-  const worker = await createWorker('spa', 1, {
-    workerPath: `${path}worker.min.js`,
-    corePath: path,
-    langPath: path,
-    gzip: true,
-  });
+  const worker = await ocrWorker();
   try {
     const { data } = await worker.recognize(image);
     return parseReceipt(data.text);
