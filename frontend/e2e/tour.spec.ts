@@ -1,7 +1,8 @@
-import { expect, logIn, openSection, test, type Page } from './fixtures';
+import { expect, logIn, signIn, openSection, test, type Page } from './fixtures';
 
 /** Steps that talk about the screen as a whole: no element is highlighted. */
 const NO_ELEMENT = [
+  /Esto es Finanverso/,
   /Te enseñamos/,
   /La Renta, paso a paso/,
   /Qué hace y qué no hace/,
@@ -12,7 +13,19 @@ const NO_ELEMENT = [
   /¡Listo!/,
 ];
 
-/** What each new block says, so a missing step is noticed. */
+/** On phones «Your plan» is inside the menu: the card is centred. */
+const NO_ELEMENT_ON_PHONES = [/Tu plan/];
+
+/** The short tour of the sign-in: the five essentials. */
+const SHORT_TITLES = [
+  /Esto es Finanverso/,
+  /Mete tus movimientos/,
+  /El resumen del mes/,
+  /El menú/,
+  /Tu plan/,
+];
+
+/** What each new block of the full tour says, so a missing step is noticed. */
 const EXPECTED_TITLES = [
   /Elige el mes/,
   /Importa tu extracto/,
@@ -39,13 +52,24 @@ async function totalSteps(page: Page): Promise<number> {
   return Number(progress!.split(' de ')[1]);
 }
 
-/** Opens the tour: after signing in, or from Settings when it did not open by itself. */
+/** Opens the short tour: after signing in, or from Settings when it did not open by itself. */
 async function ensureTour(page: Page): Promise<void> {
   await logIn(page);
   if ((await page.getByRole('dialog').count()) === 0) {
     await openSection(page, 'Ajustes');
     await page.getByRole('button', { name: /Ver el tour ahora/ }).click();
   }
+  await expect(
+    page.getByRole('dialog').getByRole('heading', { name: /Esto es Finanverso/ })
+  ).toBeVisible();
+}
+
+/** Opens the full tour from Settings (the short one is closed first if it opened). */
+async function openFullTour(page: Page): Promise<void> {
+  await ensureTour(page);
+  await page.getByRole('dialog').getByRole('button', { name: 'Saltar el tour' }).click();
+  await openSection(page, 'Ajustes');
+  await page.getByRole('button', { name: 'Ver el recorrido completo' }).click();
   await expect(
     page.getByRole('dialog').getByRole('heading', { name: /Te enseñamos/ })
   ).toBeVisible();
@@ -61,7 +85,8 @@ async function walk(page: Page, phone: boolean): Promise<string[]> {
     const title = (await tour.getByRole('heading').textContent()) ?? '';
     titles.push(title);
     const spotlight = page.locator('.tour-spotlight');
-    if (NO_ELEMENT.some((pattern) => pattern.test(title))) {
+    const whole = [...NO_ELEMENT, ...(phone ? NO_ELEMENT_ON_PHONES : [])];
+    if (whole.some((pattern) => pattern.test(title))) {
       await expect(spotlight).toHaveCount(0);
     } else {
       await expect(spotlight, `«${title}» finds its element`).toBeVisible();
@@ -89,8 +114,8 @@ async function walk(page: Page, phone: boolean): Promise<string[]> {
   return titles;
 }
 
-function expectCovered(titles: string[]) {
-  for (const expected of EXPECTED_TITLES) {
+function expectCovered(titles: string[], expectedTitles = EXPECTED_TITLES) {
+  for (const expected of expectedTitles) {
     expect(
       titles.some((title) => expected.test(title)),
       `step ${expected}`
@@ -98,15 +123,17 @@ function expectCovered(titles: string[]) {
   }
 }
 
-test('the tour walks the whole app on a desktop screen and can be turned off and replayed', async ({
+test('the short tour shows the essentials on a desktop screen and can be turned off and replayed', async ({
   page,
 }) => {
   test.setTimeout(180_000);
   await page.setViewportSize({ width: 1280, height: 800 });
   await ensureTour(page);
-  expectCovered(await walk(page, false));
+  const titles = await walk(page, false);
+  expect(titles).toHaveLength(5);
+  expectCovered(titles, SHORT_TITLES);
   const tour = page.getByRole('dialog');
-  await expect(tour.getByRole('heading', { name: /Listo/ })).toBeVisible();
+  await expect(tour.getByRole('heading', { name: /Tu plan/ })).toBeVisible();
 
   await tour.getByRole('checkbox', { name: 'No volver a mostrar al iniciar sesión' }).check();
   await tour.getByRole('button', { name: 'Terminar' }).click();
@@ -137,15 +164,48 @@ test('the tour walks the whole app on a desktop screen and can be turned off and
   await expect(page.getByText('Ajustes guardados')).toBeVisible();
 });
 
-test('the tour walks the whole app on a phone screen without covering what it explains', async ({
+test('the full tour walks the whole app on a desktop screen', async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await openFullTour(page);
+  expectCovered(await walk(page, false));
+  await expect(page.getByRole('dialog').getByRole('heading', { name: /Listo/ })).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'Terminar' }).click();
+  await expect(page.getByRole('region', { name: 'Ajustes' })).toBeVisible();
+});
+
+test('the short and the full tour work on a phone screen without covering what they explain', async ({
   page,
 }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(240_000);
   await page.setViewportSize({ width: 390, height: 760 });
   await ensureTour(page);
+  expectCovered(await walk(page, true), SHORT_TITLES);
+  await page.getByRole('dialog').getByRole('button', { name: 'Terminar' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await openSection(page, 'Ajustes');
+  await page.getByRole('button', { name: 'Ver el recorrido completo' }).click();
   expectCovered(await walk(page, true));
   await page.getByRole('dialog').getByRole('button', { name: 'Terminar' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('each section has its own guide under «¿Cómo funciona?»', async ({ page }) => {
+  test.setTimeout(120_000);
+  await signIn(page);
+  for (const [section, first] of [
+    ['Gastos compartidos', /Gastos compartidos/],
+    ['Operaciones automáticas', /Operaciones automáticas/],
+    ['Consola crypto', /Consola crypto: un simulador/],
+  ] as const) {
+    await openSection(page, section);
+    await page.getByRole('button', { name: /¿Cómo funciona\?/ }).click();
+    const guide = page.getByRole('dialog');
+    await expect(guide.getByRole('heading', { name: first })).toBeVisible();
+    await expect(guide.getByRole('checkbox')).toHaveCount(0);
+    await guide.getByRole('button', { name: 'Cerrar la guía' }).click();
+    await expect(guide).toBeHidden();
+  }
 });
 
 test('whoever turned the tour off is offered the renewed one once, without blocking', async ({

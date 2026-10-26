@@ -1508,3 +1508,30 @@ button.entity-item {
 .first-result-list strong {
   white-space: nowrap;
 }
+
+/* «How does it work?»: the guide of the open section, small and out of the way. */
+.section-guide-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.5rem 0 0.5rem;
+}
+
+.section-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--slate-300);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.section-guide-btn:hover,
+.section-guide-btn:focus-visible {
+  color: var(--slate-100);
+  border-color: var(--section-color, var(--accent-400));
+}

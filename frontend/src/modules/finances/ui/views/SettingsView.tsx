@@ -45,6 +45,8 @@ const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
 interface SettingsViewProps {
   onOpenProfile: () => void;
   onStartTour: () => void;
+  /** Every section, step by step (the short tour only has the essentials). */
+  onStartFullTour?: () => void;
 }
 
 /** The look of the app on this device: follow the system, light or dark. */
@@ -234,11 +236,13 @@ function TourCard({
   saving,
   save,
   onStartTour,
+  onStartFullTour,
 }: {
   settings: UserSettings;
   saving: boolean;
   save: (changes: SettingsChanges) => Promise<boolean>;
   onStartTour: () => void;
+  onStartFullTour?: () => void;
 }) {
   const { t } = useI18n();
   return (
@@ -264,6 +268,9 @@ function TourCard({
       <div className="button-row">
         <button className="btn-secondary" onClick={onStartTour}>
           ▶️ {t('app.settings.startTour')}
+        </button>
+        <button className="btn-secondary" onClick={onStartFullTour ?? onStartTour}>
+          <Icon name="compass" /> {t('app.settings.startFullTour')}
         </button>
       </div>
     </div>
@@ -342,7 +349,7 @@ function SecurityCard({
   );
 }
 
-export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) {
+export function SettingsView({ onOpenProfile, onStartTour, onStartFullTour }: SettingsViewProps) {
   const { t, locale } = useI18n();
   const { settings, updateSettings } = useSettings();
   const { accounts, refresh } = useFinances();
@@ -402,7 +409,13 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
       <InboxCard />
       <CaptureCard />
       <HouseholdCard />
-      <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
+      <TourCard
+        settings={settings}
+        saving={action.pending}
+        save={save}
+        onStartTour={onStartTour}
+        onStartFullTour={onStartFullTour}
+      />
       <InstallGuideCard />
       <AppLockCard />
       <DataCard onError={action.setError} />

@@ -94,6 +94,7 @@ function TourAndNotices({
           onShowTab={onShowTab}
           onClose={tour.close}
           initialDontShowAgain={tour.dontShowAgain}
+          guide={tour.kind === 'guide'}
         />
       )}
       {!tour.offer && !tour.open && <IosInstallHint />}
@@ -137,13 +138,32 @@ function SectionLoading() {
   );
 }
 
+/** «How does it work?»: opens the steps of the tour about the open section, and only those. */
+function SectionGuideButton({ label, onStart }: { label: string; onStart: () => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="section-guide-row">
+      <button
+        type="button"
+        className="section-guide-btn"
+        onClick={onStart}
+        aria-label={t('app.tour.guide.aria', { section: label })}
+      >
+        <Icon name="compass" size={16} /> {t('app.tour.guide.open')}
+      </button>
+    </div>
+  );
+}
+
 function TabContent({
   dash,
   onStartTour,
+  onStartFullTour,
   onImport,
 }: {
   dash: UseDashboardReturn;
   onStartTour: () => void;
+  onStartFullTour: () => void;
   onImport: () => void;
 }) {
   const { year, categories } = useFinances();
@@ -165,7 +185,13 @@ function TabContent({
     case 'custom-alerts':
       return <CustomAlertsTab categories={categories} />;
     case 'settings':
-      return <SettingsView onOpenProfile={dash.openProfile} onStartTour={onStartTour} />;
+      return (
+        <SettingsView
+          onOpenProfile={dash.openProfile}
+          onStartTour={onStartTour}
+          onStartFullTour={onStartFullTour}
+        />
+      );
     default:
       return (
         <MonthlyView
@@ -187,6 +213,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
       <div className="header-brand">
         <button
           className="burger-btn"
+          data-tour="menu"
           onClick={() => dash.setMenuOpen(true)}
           aria-label={t('app.menu.open')}
           aria-expanded={dash.menuOpen}
@@ -388,10 +415,16 @@ export function Dashboard() {
           data-tour="section"
           style={{ '--section-color': section.color } as CSSProperties}
         >
+          {tour.hasGuide && <SectionGuideButton label={sectionLabel} onStart={tour.startGuide} />}
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
             <Suspense fallback={<SectionLoading />}>
-              <TabContent dash={dash} onStartTour={tour.start} onImport={dash.openImport} />
+              <TabContent
+                dash={dash}
+                onStartTour={tour.start}
+                onStartFullTour={tour.startFull}
+                onImport={dash.openImport}
+              />
             </Suspense>
           </ErrorBoundary>
         </div>

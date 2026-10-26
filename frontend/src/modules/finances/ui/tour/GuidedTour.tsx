@@ -132,9 +132,13 @@ function useTargetRect(
       });
     };
     const find = () => {
-      element = document.querySelector(selector);
-      const size = element?.getBoundingClientRect();
-      if (element && size && size.width > 0 && size.height > 0) {
+      // The first one on screen: the same target can be in the side bar and in the header.
+      element =
+        Array.from(document.querySelectorAll(selector)).find((node) => {
+          const size = node.getBoundingClientRect();
+          return size.width > 0 && size.height > 0;
+        }) ?? null;
+      if (element) {
         const found = element;
         bringIntoView(found);
         measure();
@@ -206,13 +210,21 @@ interface GuidedTourProps {
   /** `dontShowAgain`: whether "don't show again" is ticked when the tour ends. */
   onClose: (dontShowAgain: boolean) => void;
   initialDontShowAgain: boolean;
+  /** The guide of one section: no «don't show again» (it never opens by itself). */
+  guide?: boolean;
 }
 
 /**
  * Step-by-step walk through the app: dims the screen, highlights the part being
  * explained and opens each section on the way. Keyboard: arrows to move, Esc to leave.
  */
-export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: GuidedTourProps) {
+export function GuidedTour({
+  steps,
+  onShowTab,
+  onClose,
+  initialDontShowAgain,
+  guide = false,
+}: GuidedTourProps) {
   const { t } = useI18n();
   const [index, setIndex] = useState(0);
   const [dontShowAgain, setDontShowAgain] = useState(initialDontShowAgain);
@@ -287,18 +299,20 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
         <p id={bodyId} className="tour-body" aria-live="polite">
           {t(`app.tour.${step.id}.body`)}
         </p>
-        <label className="tour-dont-show">
-          <input
-            type="checkbox"
-            checked={dontShowAgain}
-            onChange={(e) => setDontShowAgain(e.target.checked)}
-          />
-          {t('app.tour.dontShowAgain')}
-        </label>
+        {!guide && (
+          <label className="tour-dont-show">
+            <input
+              type="checkbox"
+              checked={dontShowAgain}
+              onChange={(e) => setDontShowAgain(e.target.checked)}
+            />
+            {t('app.tour.dontShowAgain')}
+          </label>
+        )}
         <div className="tour-actions">
           {!last && (
             <button type="button" className="tour-skip tour-btn" onClick={close}>
-              {t('app.tour.skip')}
+              {t(guide ? 'app.tour.closeGuide' : 'app.tour.skip')}
             </button>
           )}
           <div className="tour-nav">

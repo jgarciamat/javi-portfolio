@@ -15,10 +15,23 @@ export interface TourStep {
  * Version of the tour. Raise it when the tour changes a lot: whoever turned the tour off is then
  * offered the new one once (discreetly), and the «seen» mark is kept per version.
  */
-export const TOUR_VERSION = 4;
+export const TOUR_VERSION = 5;
 
 const SECTION = '[data-tour="section"]';
 const WIZARD_ROUTE = '[data-tour="wizard-route"]';
+
+/**
+ * The tour that opens after signing in: five steps, the least a person needs to start. Everything
+ * else is in the full tour (Settings) and in the guide of each section («How does it work?»).
+ */
+const SHORT_STEPS: TourStep[] = [
+  { id: 'intro', tab: 'monthly' },
+  { id: 'addData', tab: 'monthly', target: '[data-tour="import"]' },
+  { id: 'monthSummary', tab: 'monthly', target: '[data-tour="summary"]' },
+  { id: 'menuWhere', tab: 'monthly', target: '[data-tour="menu"]' },
+  // On phones the plan is inside the menu: the card is centred there.
+  { id: 'planWhere', tab: 'monthly', target: '[data-tour="plan"]' },
+];
 
 /** What the app looks like today, in the order a person meets it. */
 const STEPS: TourStep[] = [
@@ -40,9 +53,9 @@ const STEPS: TourStep[] = [
   { id: 'splitSettle', tab: 'split' },
   { id: 'automations', tab: 'automations', target: SECTION },
   { id: 'automationsNew', tab: 'automations', target: '[data-tour="recurring-new"]' },
-  { id: 'menu', tab: 'monthly', target: '.burger-btn' },
-  { id: 'invite', tab: 'monthly', target: '.burger-btn' },
-  { id: 'profile', tab: 'monthly', target: '.burger-btn' },
+  { id: 'menu', tab: 'monthly', target: '[data-tour="menu"]' },
+  { id: 'invite', tab: 'monthly', target: '[data-tour="menu"]' },
+  { id: 'profile', tab: 'monthly', target: '[data-tour="menu"]' },
   { id: 'learn', tab: 'monthly', target: '[data-tour="learn-btn"]' },
   { id: 'rentaIntro', tab: 'renta' },
   { id: 'rentaSteps', tab: 'renta', target: WIZARD_ROUTE },
@@ -68,8 +81,28 @@ const STEPS: TourStep[] = [
 /** Steps whose text depends on the plan: `<id>Free` or `<id>Premium`. Nothing pushes to buy. */
 const BY_PLAN = new Set(['automationsNew', 'rentaPlan', 'autoPlan']);
 
-export function tourSteps(premium: boolean): TourStep[] {
-  return STEPS.map((step) =>
+/** Steps about the app as a whole (start, end, header and menu): in no section's guide. */
+const GENERAL = new Set(['welcome', 'done', 'menu', 'invite', 'profile', 'learn']);
+
+const byPlan = (steps: TourStep[], premium: boolean): TourStep[] =>
+  steps.map((step) =>
     BY_PLAN.has(step.id) ? { ...step, id: `${step.id}${premium ? 'Premium' : 'Free'}` } : step
+  );
+
+/** The full tour: every section, step by step (from Settings). */
+export function tourSteps(premium: boolean): TourStep[] {
+  return byPlan(STEPS, premium);
+}
+
+/** The short tour of the first sign-in. */
+export function shortTourSteps(): TourStep[] {
+  return SHORT_STEPS;
+}
+
+/** The steps of the full tour about one section: its own guide. Empty when it has none. */
+export function sectionGuideSteps(tab: DashboardTab, premium: boolean): TourStep[] {
+  return byPlan(
+    STEPS.filter((step) => step.tab === tab && !GENERAL.has(step.id)),
+    premium
   );
 }

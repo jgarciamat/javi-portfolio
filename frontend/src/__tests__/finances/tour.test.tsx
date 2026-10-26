@@ -3,7 +3,13 @@ import { authApi } from '@core/api/authApi';
 import { useAuth } from '@shared/hooks/useAuth';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
 import { GuidedTour } from '@modules/finances/ui/tour/GuidedTour';
-import { TOUR_VERSION, tourSteps, type TourStep } from '@modules/finances/ui/tour/tourSteps';
+import {
+  sectionGuideSteps,
+  shortTourSteps,
+  TOUR_VERSION,
+  tourSteps,
+  type TourStep,
+} from '@modules/finances/ui/tour/tourSteps';
 import { TOUR_SEEN_KEY } from '@modules/finances/application/hooks/useWelcomeTour';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
@@ -194,6 +200,24 @@ describe('GuidedTour', () => {
     expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '96px' });
   });
 
+  it('highlights the copy of the target that is on screen (side bar or header button)', () => {
+    const hidden = placeTarget('hidden', 0, 0, 0, 0).element;
+    hidden.className = 'menu';
+    const shown = placeTarget('shown', 200, 40).element;
+    shown.className = 'menu';
+    renderWithI18n(
+      <GuidedTour
+        steps={[{ id: 'menuWhere', target: '.menu' }]}
+        onShowTab={jest.fn()}
+        onClose={jest.fn()}
+        initialDontShowAgain={false}
+        guide
+      />
+    );
+    expect(document.querySelector('.tour-spotlight')).toHaveStyle({ top: '192px' });
+    expect(screen.queryByRole('checkbox')).toBeNull();
+  });
+
   it('on phones keeps the element clear of the card: scroll margins and a clipped highlight', () => {
     Object.defineProperty(window, 'innerWidth', { value: 500, configurable: true });
     Object.defineProperty(window, 'innerHeight', { value: 700, configurable: true });
@@ -362,13 +386,61 @@ describe('tour steps', () => {
     expect(byId.goalDate).toMatchObject({ tab: 'goals', target: '[data-tour="goal-date"]' });
     expect(byId.leaks).toMatchObject({ tab: 'leaks', target: '[data-tour="section"]' });
     // A renewed tour is offered again to whoever turned it off, telling what is new.
-    expect(TOUR_VERSION).toBe(4);
-    expect(tr('app.tour.offer.body')).toMatch(/Tu dinero perdido, la fecha de tus metas/);
+    expect(TOUR_VERSION).toBe(5);
+    expect(tr('app.tour.offer.body')).toMatch(/5 pasos/);
+  });
+
+  it('opens with five steps: what it is, adding data, the month, the menu and the plan', () => {
+    expect(shortTourSteps().map((s) => s.id)).toEqual([
+      'intro',
+      'addData',
+      'monthSummary',
+      'menuWhere',
+      'planWhere',
+    ]);
+    expect(tr('app.tour.addData.body')).toMatch(/pegar el texto/);
+    expect(tr('app.tour.addData.body')).toMatch(/captura/);
+    expect(tr('app.tour.addData.body')).toMatch(/«café 1,50»/);
+  });
+
+  it('keeps the rest as the guide of each section, without the general steps', () => {
+    expect(sectionGuideSteps('automations', false).map((s) => s.id)).toEqual([
+      'automations',
+      'automationsNewFree',
+    ]);
+    expect(sectionGuideSteps('automations', true).map((s) => s.id)).toContain(
+      'automationsNewPremium'
+    );
+    expect(sectionGuideSteps('split', false).map((s) => s.id)).toEqual(['split', 'splitSettle']);
+    expect(sectionGuideSteps('crypto', false).map((s) => s.id)).toEqual([
+      'cryptoIntro',
+      'cryptoChart',
+      'cryptoTrade',
+    ]);
+    const monthly = sectionGuideSteps('monthly', false).map((s) => s.id);
+    expect(monthly).toEqual(expect.arrayContaining(['monthNav', 'import', 'selection']));
+    expect(monthly).not.toEqual(expect.arrayContaining(['welcome']));
+    expect(monthly).not.toContain('menu');
+    expect(monthly).not.toContain('done');
+    expect(sectionGuideSteps('search', false)).toEqual([]);
+    // Every step of the full tour is still somewhere: its own section or the general ones.
+    const inGuides = new Set(
+      tourSteps(false).flatMap((s) => sectionGuideSteps(s.tab!, false).map((g) => g.id))
+    );
+    const left = tourSteps(false).filter((s) => !inGuides.has(s.id));
+    expect(left.map((s) => s.id)).toEqual([
+      'welcome',
+      'menu',
+      'invite',
+      'profile',
+      'learn',
+      'done',
+    ]);
   });
 
   it('has a text in every language for every step', () => {
     for (const premium of [false, true]) {
-      for (const step of tourSteps(premium)) {
+      for (const step of [...tourSteps(premium), ...shortTourSteps()]) {
         expect(tr(`app.tour.${step.id}.title`)).not.toBe(`app.tour.${step.id}.title`);
         expect(tr(`app.tour.${step.id}.body`)).not.toBe(`app.tour.${step.id}.body`);
       }
@@ -398,7 +470,7 @@ describe('Welcome tour in the dashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'entrar' }));
   };
 
-  it('opens after signing in and visits every section on the way', async () => {
+  it('opens the short tour after signing in, five steps on the month', async () => {
     const { api } = renderWithProviders(
       <>
         <SignInButton />
@@ -407,12 +479,15 @@ describe('Welcome tour in the dashboard', () => {
     );
     await screen.findByText(tr('app.nav.currentMonth'));
     signInAgain();
-    const total = tourSteps(false).length;
+    const total = shortTourSteps().length;
+    expect(total).toBe(5);
     expect(
-      await screen.findByRole('heading', { name: tr('app.tour.welcome.title') })
+      await screen.findByRole('heading', { name: tr('app.tour.intro.title') })
     ).toBeInTheDocument();
     for (let step = 1; step < total; step++) next();
-    expect(screen.getByRole('heading', { name: tr('app.tour.done.title') })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: tr('app.tour.planWhere.title') })
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.tour.finish') }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('region', { name: tr('app.tabs.monthly') })).toBeInTheDocument();
@@ -471,8 +546,11 @@ describe('Welcome tour in the dashboard', () => {
     await screen.findByText(tr('app.nav.currentMonth'));
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.tabs.settings')) }));
-    fireEvent.click(await screen.findByRole('button', { name: /Ver el tour ahora/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Ver el recorrido completo/ }));
     const dialog = await screen.findByRole('dialog');
+    expect(
+      within(dialog).getByRole('heading', { name: tr('app.tour.welcome.title') })
+    ).toBeInTheDocument();
     const ids = tourSteps(true).map((s) => s.id);
     const at = ids.indexOf('rentaPlanPremium');
     for (let step = 0; step < at; step++) next();
@@ -495,7 +573,7 @@ describe('Welcome tour in the dashboard', () => {
     signInAgain();
     await waitFor(() => expect(authApi.login).toHaveBeenCalled());
     await act(async () => undefined);
-    expect(screen.queryByRole('dialog', { name: tr('app.tour.welcome.title') })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: tr('app.tour.intro.title') })).toBeNull();
   });
 
   describe('the renewed tour is offered once to whoever turned it off', () => {
@@ -516,7 +594,7 @@ describe('Welcome tour in the dashboard', () => {
     it('shows a notice that does not block, and «not now» hides it for good', async () => {
       await signInWithTourOff();
       const notice = await screen.findByRole('region', { name: tr('app.tour.offer.title') });
-      expect(screen.queryByRole('dialog', { name: tr('app.tour.welcome.title') })).toBeNull();
+      expect(screen.queryByRole('dialog', { name: tr('app.tour.intro.title') })).toBeNull();
       fireEvent.click(within(notice).getByRole('button', { name: tr('app.tour.offer.dismiss') }));
       expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
       expect(localStorage.getItem(TOUR_SEEN_KEY)).toBe(String(TOUR_VERSION));
@@ -526,7 +604,7 @@ describe('Welcome tour in the dashboard', () => {
       await signInWithTourOff();
       fireEvent.click(await screen.findByRole('button', { name: tr('app.tour.offer.view') }));
       expect(
-        await screen.findByRole('heading', { name: tr('app.tour.welcome.title') })
+        await screen.findByRole('heading', { name: tr('app.tour.intro.title') })
       ).toBeInTheDocument();
       expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
     });
@@ -535,8 +613,8 @@ describe('Welcome tour in the dashboard', () => {
       localStorage.setItem(TOUR_SEEN_KEY, String(TOUR_VERSION - 1));
       await signInWithTourOff();
       const notice = await screen.findByRole('region', { name: tr('app.tour.offer.title') });
-      expect(notice).toHaveTextContent(/Autónomos/);
-      expect(notice).toHaveTextContent(/gastos compartidos y la consola crypto/);
+      expect(notice).toHaveTextContent(/5 pasos/);
+      expect(notice).toHaveTextContent(/¿Cómo funciona\?/);
     });
 
     it('is not offered again once this version was seen', async () => {
@@ -558,7 +636,7 @@ describe('Welcome tour in the dashboard', () => {
     const dialog = await screen.findByRole('dialog');
     expect(
       within(dialog).getByText(
-        tr('app.tour.progress', { current: 1, total: tourSteps(false).length })
+        tr('app.tour.progress', { current: 1, total: shortTourSteps().length })
       )
     ).toBeInTheDocument();
     const checkbox = within(dialog).getByRole('checkbox');
@@ -569,6 +647,40 @@ describe('Welcome tour in the dashboard', () => {
     expect(
       await screen.findByRole('region', { name: tr('app.tabs.settings') })
     ).toBeInTheDocument();
+  });
+
+  it('opens the guide of a section with «How does it work?» and returns to it', async () => {
+    const { api } = renderWithProviders(<Dashboard />);
+    await screen.findByText(tr('app.nav.currentMonth'));
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
+    fireEvent.click(within(menu).getByRole('button', { name: new RegExp(tr('app.tabs.split')) }));
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: tr('app.tour.guide.aria', { section: tr('app.tabs.split') }),
+      })
+    );
+    const dialog = await screen.findByRole('dialog');
+    expect(
+      within(dialog).getByText(tr('app.tour.progress', { current: 1, total: 2 }))
+    ).toBeVisible();
+    expect(within(dialog).getByRole('heading', { name: tr('app.tour.split.title') })).toBeVisible();
+    // A guide never opens by itself: nothing to turn off.
+    expect(within(dialog).queryByRole('checkbox')).toBeNull();
+    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.tour.closeGuide') }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('region', { name: tr('app.tabs.split') })).toBeInTheDocument();
+    expect(api.settingsApi.update).not.toHaveBeenCalled();
+    expect(localStorage.getItem(TOUR_SEEN_KEY)).toBeNull();
+    // Sections without a guide have no button.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') })).getByRole('button', {
+        name: new RegExp(tr('app.tabs.search')),
+      })
+    );
+    await screen.findByRole('region', { name: tr('app.tabs.search') });
+    expect(screen.queryByRole('button', { name: /¿Cómo funciona\?/ })).toBeNull();
   });
 
   it('switches the tour on and off from Settings', async () => {
