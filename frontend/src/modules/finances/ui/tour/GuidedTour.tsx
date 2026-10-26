@@ -115,8 +115,12 @@ function useTargetRect(
     };
     /** Scrolls it into the part of the screen the pinned bars and the card leave free. */
     const bringIntoView = (target: Element) => {
-      if (isPinned(target)) return;
       const html = target as HTMLElement;
+      // The page keeps it on screen; only the box it scrolls in (the side menu) may need moving.
+      if (isPinned(target)) {
+        html.scrollIntoView({ block: 'nearest', behavior: scrollBehavior() });
+        return;
+      }
       const top = pinnedTop() + TOP_GAP;
       const inset = bottomInset(card, target);
       const free = window.innerHeight - top - inset;

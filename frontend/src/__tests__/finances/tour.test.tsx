@@ -264,7 +264,7 @@ describe('GuidedTour', () => {
     const target = placeTarget('near-top', 300, 50).element;
     const scroll = jest.spyOn(target, 'scrollIntoView');
     const pinned = pin('near-bottom', 600, 640, 300, 'fixed');
-    const noScroll = jest.spyOn(pinned, 'scrollIntoView');
+    const nearest = jest.spyOn(pinned, 'scrollIntoView');
     renderTour();
     card().style.position = 'fixed'; // the tour's own elements never count as page bars
 
@@ -272,8 +272,9 @@ describe('GuidedTour', () => {
     expect(target.style.scrollMarginTop).toBe('132px'); // 120 + the gap
     expect(scroll).toHaveBeenCalled();
 
-    next(); // pinned: the page keeps it on screen, no scrolling, still highlighted
-    expect(noScroll).not.toHaveBeenCalled();
+    next(); // pinned: the page keeps it on screen; only its own box may scroll (the side menu)
+    expect(nearest).toHaveBeenCalledWith({ block: 'nearest', behavior: 'smooth' });
+    expect(pinned.style.scrollMarginTop).toBe('');
     expect(document.querySelector('.tour-spotlight')).not.toBeNull();
   });
 

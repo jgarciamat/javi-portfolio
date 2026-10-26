@@ -550,34 +550,72 @@ html {
   outline: none;
 }
 
-/* ─── Computers: the sections at the left, the content no wider than it reads well ─── */
+/* ─── Computers: one centred frame for the header, the month bar, the side menu and the content ───
+   The same width and side margins for all of them: the menu lines up with the logo, the cards
+   with the month bar. */
+.dashboard--wide {
+  --shell-max: 1440px;
+  --shell-pad: 1.5rem;
+  --side-width: 240px;
+  --side-gap: 1.5rem;
+}
+
+.dashboard--wide .header {
+  padding-inline: max(var(--shell-pad), calc((100% - var(--shell-max)) / 2 + var(--shell-pad)));
+}
+
+.dashboard--wide .sticky-nav-inner {
+  max-width: var(--shell-max);
+  padding: 0 var(--shell-pad) 0 calc(var(--shell-pad) + var(--side-width) + var(--side-gap));
+}
+
 .dashboard-body--side {
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
-  gap: 1.25rem;
-  max-width: 1420px;
+  grid-template-columns: var(--side-width) minmax(0, 1fr);
+  gap: var(--side-gap);
+  max-width: var(--shell-max);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1.5rem var(--shell-pad) 0;
 }
 
 .dashboard-body--side .main {
   width: 100%;
-  max-width: 1120px;
+  max-width: none;
   margin: 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0 0 1.5rem;
+}
+
+/* The guide button starts the column, level with the top of the menu. */
+.dashboard--wide .section-guide-row {
+  margin: 0 0 0.75rem;
 }
 
 .side-nav {
+  /* Always whole on screen, under the fixed bar: what does not fit scrolls inside it. */
   position: sticky;
-  top: calc(var(--sticky-bar-height, 0px) + 0.75rem);
+  top: calc(var(--sticky-bar-height, 0px) + 1.5rem);
   align-self: start;
-  max-height: calc(100vh - var(--sticky-bar-height, 0px) - 1.5rem);
+  max-height: calc(100vh - var(--sticky-bar-height, 0px) - 3rem);
+  max-height: calc(100dvh - var(--sticky-bar-height, 0px) - 3rem);
   overflow-y: auto;
-  margin-top: 1.5rem;
+  overscroll-behavior: contain;
   border: 1px solid var(--slate-800);
   border-radius: 14px;
   background: var(--slate-900);
+}
+
+.side-nav .burger-nav {
+  padding: 0.75rem 0.6rem;
+  gap: 0.35rem;
+}
+
+.side-nav .burger-nav-group + .burger-nav-group {
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+}
+
+.side-nav .burger-nav-group-title {
+  margin: 0.2rem 0.55rem 0.3rem;
 }
 
 /* A list, not the tiles of the phone menu: icon and name on one line. */
@@ -620,5 +658,7 @@ html {
 }
 
 .side-nav .burger-nav-item--active {
+  background: color-mix(in srgb, var(--section-color, var(--accent-400)) 16%, var(--slate-800));
+  color: var(--slate-100);
   box-shadow: inset 3px 0 0 var(--section-color, var(--accent-400));
 }

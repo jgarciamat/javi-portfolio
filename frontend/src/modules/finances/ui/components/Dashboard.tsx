@@ -393,7 +393,8 @@ export function Dashboard() {
   useScrollToStart(dash.tab, finances.year, finances.month);
   const [menuPicks, setMenuPicks] = useState(0);
   useEffect(() => {
-    if (menuPicks > 0) sectionRef.current!.focus();
+    // Without moving the page: the section starts at the top already (or stays where it was).
+    if (menuPicks > 0) sectionRef.current!.focus({ preventScroll: true });
   }, [menuPicks]);
   const [inviteOpen, setInviteOpen] = useState(false);
   const wide = useMediaQuery(WIDE_SCREEN);
@@ -403,7 +404,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard${wide ? ' dashboard--wide' : ''}`}>
       <div className="dashboard-sticky" ref={stickyRef}>
         <Header
           dash={dash}
@@ -463,14 +464,17 @@ export function Dashboard() {
         </main>
       </div>
 
-      <BurgerMenu
-        open={dash.menuOpen}
-        tab={dash.tab}
-        onSelectTab={selectFromMenu}
-        onOpenProfile={dash.openProfile}
-        onOpenInvite={() => setInviteOpen(true)}
-        onClose={() => dash.setMenuOpen(false)}
-      />
+      {/* On a computer the side bar has every section: no menu panel to keep behind the page. */}
+      {!wide && (
+        <BurgerMenu
+          open={dash.menuOpen}
+          tab={dash.tab}
+          onSelectTab={selectFromMenu}
+          onOpenProfile={dash.openProfile}
+          onOpenInvite={() => setInviteOpen(true)}
+          onClose={() => dash.setMenuOpen(false)}
+        />
+      )}
       {inviteOpen && <InviteDialog onClose={() => setInviteOpen(false)} />}
       <Suspense fallback={null}>
         <DashboardModals dash={dash} shared={shared} />

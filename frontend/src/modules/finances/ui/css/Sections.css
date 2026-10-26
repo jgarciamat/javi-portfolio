@@ -695,13 +695,16 @@
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s;
   padding-top: env(safe-area-inset-top);
 }
 
+/* The shadow only while open: closed, it would show as a grey line at the left of the page. */
 .burger-panel--open {
   transform: translateX(0);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
 .burger-panel-header {

@@ -36,8 +36,14 @@
   font-variant-numeric: tabular-nums;
   color: var(--accent);
   margin-bottom: 0.25rem;
-  /* Long amounts may break, but words («Sin ingresos registrados») only between them. */
+  /* Long amounts may break; a sentence takes a smaller size so its words stay whole. */
   overflow-wrap: anywhere;
+}
+
+.summary-card-value--text {
+  font-size: 1rem;
+  line-height: 1.3;
+  overflow-wrap: normal;
 }
 
 .summary-card-sub {
@@ -153,4 +159,15 @@
   margin: 0.6rem 0 0;
   font-size: 0.85rem;
   color: var(--slate-300);
+}
+
+/* Next to the side menu: 3 + 3 while the column is narrow, so «12.345,67 €» stays on one line. */
+.dashboard--wide .summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 1400px) {
+  .dashboard--wide .summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
