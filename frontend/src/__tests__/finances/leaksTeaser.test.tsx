@@ -177,9 +177,7 @@ describe('«Tu dinero perdido» from the dashboard', () => {
     fireEvent.click(
       await within(dialog).findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
     );
-    await within(dialog).findByText(tr('app.import.done', { imported: 1, duplicates: 0 }), {
-      exact: false,
-    });
+    await within(dialog).findByRole('heading', { name: tr('app.import.doneTitleOne') });
     await waitFor(() => expect(api.insightsApi.moneyLeaks).toHaveBeenCalledWith('import'));
     expect(within(dialog).queryByText(/Hemos revisado/)).toBeNull();
   });

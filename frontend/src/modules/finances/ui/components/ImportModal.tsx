@@ -3,7 +3,12 @@ import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
-import type { Account, ImportResult, TransactionType } from '@modules/finances/domain/types';
+import type {
+  Account,
+  Category,
+  ImportResult,
+  TransactionType,
+} from '@modules/finances/domain/types';
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
@@ -24,6 +29,8 @@ import { FirstResult } from './FirstResult';
 
 interface ImportModalProps {
   accounts: Account[];
+  /** After the import, a limit is offered for the category where most money went. */
+  categories?: Category[];
   /** What another app shared with Finanverso: read as soon as the importer opens. */
   shared?: SharedContent | null;
   /** The tab it opens on, when nothing was shared. */
@@ -34,6 +41,8 @@ interface ImportModalProps {
   onOpenLeaks?: () => void;
   /** Opens the goals, to see when a goal is reached (after an import, if there are goals). */
   onOpenGoals?: () => void;
+  /** Opens the budgets (after an import, next to the limit it suggests). */
+  onOpenBudgets?: () => void;
 }
 
 type ImportState = ReturnType<typeof useImport>;
@@ -138,12 +147,25 @@ function usePastedImage(onImage: (image: File) => void) {
   }, [onImage]);
 }
 
+/** The formats and how the category is chosen, for whoever wants the details. */
+function FormatsHelp() {
+  const { t } = useI18n();
+  return (
+    <details className="import-help">
+      <summary>{t('app.import.help.title')}</summary>
+      <p className="section-hint">{t('app.import.help.formats')}</p>
+      <p className="section-hint">{t('app.import.help.categories')}</p>
+    </details>
+  );
+}
+
 function FilePanel({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   return (
     <>
       <p className="section-hint">{t('app.import.hint')}</p>
       <p className="section-hint">{t('app.leaks.importTip')}</p>
+      <FormatsHelp />
       <TemplateLink />
       <label className="file-drop">
         <input
@@ -210,10 +232,45 @@ function FileStep({
   );
 }
 
+/** A column by its header, or by its place when it has none. */
+const columnName = (headers: string[], index: number): string => headers[index] || `#${index + 1}`;
+
+/** «Date: “Fecha valor” · Concept: “Concepto” · Amount: “Importe”»: what each column was taken as. */
+function understoodColumns(
+  imp: ImportState,
+  t: (key: string, vars?: Record<string, string | number>) => string
+): string {
+  return MAPPING_FIELDS.filter(({ key }) => imp.mapping[key] >= 0)
+    .map(({ key, labelKey }) => `${t(labelKey)}: «${columnName(imp.headers, imp.mapping[key])}»`)
+    .join(' · ');
+}
+
+/**
+ * The columns of a CSV. When they were found, a line says how they were understood and the
+ * selects wait folded under «Change columns»; when one is missing, they are open with the error.
+ */
 function ColumnMappingFields({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
+  const missing = missingColumns(imp.mapping);
+  return (
+    <>
+      {missing.length === 0 && (
+        <p className="section-success">
+          <Icon name="checkCircle" />{' '}
+          {t('app.import.columnsUnderstood', { columns: understoodColumns(imp, t) })}
+        </p>
+      )}
+      <details className="import-columns" open={missing.length > 0}>
+        <summary>{t('app.import.changeColumns')}</summary>
+        <ColumnSelects imp={imp} missing={missing} />
+      </details>
+    </>
+  );
+}
+
+function ColumnSelects({ imp, missing }: { imp: ImportState; missing: string[] }) {
+  const { t } = useI18n();
   const { mapping } = imp;
-  const missing = missingColumns(mapping);
   return (
     <>
       {missing.length > 0 && (
@@ -237,9 +294,9 @@ function ColumnMappingFields({ imp }: { imp: ImportState }) {
               onChange={(e) => imp.updateMapping(key, Number(e.target.value))}
             >
               {optional && <option value={-1}>—</option>}
-              {imp.headers.map((h, i) => (
+              {imp.headers.map((_, i) => (
                 <option key={i} value={i}>
-                  {h || `#${i + 1}`}
+                  {columnName(imp.headers, i)}
                 </option>
               ))}
             </select>
@@ -274,13 +331,13 @@ function ImportedRows({ imp }: { imp: ImportState }) {
   const { money, date } = useFormat();
   return (
     <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
-      <table className="data-table">
+      <table className="data-table import-cards">
         <tbody>
           {imp.rows.map((r, i) => (
             <tr key={i}>
-              <td>{date(r.date)}</td>
-              <td>{r.description}</td>
-              <td>
+              <td className="import-card-date">{date(r.date)}</td>
+              <td className="import-card-concept">{r.description}</td>
+              <td className="import-card-meta">
                 <select
                   className="tx-input import-type-select"
                   aria-label={`${t('app.import.col.type')} ${r.description}`}
@@ -297,7 +354,9 @@ function ImportedRows({ imp }: { imp: ImportState }) {
                   <small className="import-review"> {t('app.import.typeReview')}</small>
                 )}
               </td>
-              <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
+              <td className={`import-card-amount ${r.amount < 0 ? 'amount-neg' : 'amount-pos'}`}>
+                {money(r.amount)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -394,7 +453,8 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
         })}
       </p>
       <ScrollRegion className="table-scroll" label={t('app.import.preview')}>
-        <table className="data-table">
+        {/* On phones each row is a card: concept and amount whole, the category under them. */}
+        <table className="data-table import-cards">
           <thead>
             <tr>
               <th>{t('app.import.col.date')}</th>
@@ -407,11 +467,11 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           <tbody>
             {preview.rows.slice(0, 100).map((r) => (
               <tr key={r.index} className={r.status !== 'imported' ? 'row-muted' : undefined}>
-                <td>{r.date ? date(r.date) : '—'}</td>
-                <td>{r.description ?? r.error}</td>
-                <td>{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
-                <td>{amount(r)}</td>
-                <td>{category(r)}</td>
+                <td className="import-card-date">{r.date ? date(r.date) : '—'}</td>
+                <td className="import-card-concept">{r.description ?? r.error}</td>
+                <td className="import-card-type">{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
+                <td className="import-card-amount">{amount(r)}</td>
+                <td className="import-card-meta">{category(r)}</td>
               </tr>
             ))}
           </tbody>
@@ -435,24 +495,48 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
   );
 }
 
+/** What the import left, and the next steps: a limit for the biggest expense, the charges that repeat, the leaks. */
 function DoneStep({
   result,
+  rows,
+  categories,
   onOpenLeaks,
   onOpenGoals,
+  onOpenBudgets,
 }: {
   result: ImportResult;
+  categories: Category[];
+  /** The rows of the preview: what was imported, with its category. */
+  rows: ImportResult['rows'];
   onOpenLeaks?: () => void;
   onOpenGoals?: () => void;
+  onOpenBudgets?: () => void;
 }) {
   const { t } = useI18n();
+  const one = result.imported === 1;
   return (
-    <div className="modal-body">
-      <p className="section-success">
+    <div className="modal-body import-done">
+      <h3 className="import-done-title">
         <Icon name="checkCircle" />{' '}
-        {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
-      </p>
-      {onOpenLeaks && result.imported > 0 && <LeaksAfterImport onOpen={onOpenLeaks} />}
-      {result.imported > 0 && <FirstResult onOpenGoals={onOpenGoals} />}
+        {t(one ? 'app.import.doneTitleOne' : 'app.import.doneTitle', { count: result.imported })}
+      </h3>
+      {result.duplicates > 0 && (
+        <p className="section-hint">
+          {t('app.import.doneDuplicates', { count: result.duplicates })}
+        </p>
+      )}
+      {result.imported > 0 && (
+        <>
+          <p className="section-hint">{t('app.import.doneNext')}</p>
+          <FirstResult
+            rows={rows}
+            categories={categories}
+            onOpenGoals={onOpenGoals}
+            onOpenBudgets={onOpenBudgets}
+          />
+          {onOpenLeaks && <LeaksAfterImport onOpen={onOpenLeaks} />}
+        </>
+      )}
     </div>
   );
 }
@@ -500,11 +584,15 @@ function StepBody({
   shared,
   onShared,
   initialSource,
+  onOpenBudgets,
+  categories,
 }: {
   imp: ImportState;
   accounts: Account[];
+  categories: Category[];
   onOpenLeaks?: () => void;
   onOpenGoals?: () => void;
+  onOpenBudgets?: () => void;
   shared: SharedContent | null;
   onShared: () => void;
   initialSource: ImportSource;
@@ -512,7 +600,16 @@ function StepBody({
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
   if (imp.step === 'done' && imp.result) {
-    return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} onOpenGoals={onOpenGoals} />;
+    return (
+      <DoneStep
+        result={imp.result}
+        rows={(imp.preview as ImportResult).rows}
+        categories={categories}
+        onOpenLeaks={onOpenLeaks}
+        onOpenGoals={onOpenGoals}
+        onOpenBudgets={onOpenBudgets}
+      />
+    );
   }
   return <FileStep imp={imp} shared={shared} onShared={onShared} initialSource={initialSource} />;
 }
@@ -520,12 +617,14 @@ function StepBody({
 /** Bank statement import: choose file → map columns → preview → import. */
 export function ImportModal({
   accounts,
+  categories = [],
   shared: sharedContent = null,
   initialSource = 'file',
   onClose,
   onImported,
   onOpenLeaks,
   onOpenGoals,
+  onOpenBudgets,
 }: ImportModalProps) {
   const { t } = useI18n();
   const [shared, setShared] = useState(sharedContent);
@@ -552,6 +651,8 @@ export function ImportModal({
         accounts={activeAccounts}
         onOpenLeaks={onOpenLeaks}
         onOpenGoals={onOpenGoals}
+        onOpenBudgets={onOpenBudgets}
+        categories={categories}
         shared={shared}
         onShared={() => setShared(null)}
         initialSource={initialSource}

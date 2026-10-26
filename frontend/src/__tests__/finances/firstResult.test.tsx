@@ -12,6 +12,62 @@ const setup = (onOpenGoals?: () => void) => {
   return api;
 };
 
+describe('FirstResult: where most money went', () => {
+  const rows = [
+    {
+      index: 0,
+      status: 'imported' as const,
+      date: '2026-03-01',
+      description: 'Alquiler',
+      amount: 650,
+      type: 'EXPENSE' as const,
+      categoryName: 'Vivienda',
+    },
+    {
+      index: 1,
+      status: 'imported' as const,
+      date: '2026-03-04',
+      description: 'Bar',
+      amount: 50,
+      type: 'EXPENSE' as const,
+      categoryName: 'Ocio',
+    },
+  ];
+  const categories = [f.category({ id: 'c7', name: 'Vivienda' })];
+
+  it('says the biggest expense and sets a monthly limit for it with one tap', async () => {
+    const api = createFakeApi();
+    const onOpenBudgets = jest.fn();
+    renderWithProviders(
+      <FirstResult rows={rows} categories={categories} onOpenBudgets={onOpenBudgets} />,
+      { api }
+    );
+    expect(screen.getByText(/Tu mayor gasto es Vivienda: 650,00\s€, el 93\s?%/)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: /Poner un límite de 650,00\s€ al mes/ }));
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /Límite de 650,00\s€ al mes en Vivienda guardado/
+    );
+    expect(api.budgetApi.set).toHaveBeenCalledWith('c7', 650);
+    fireEvent.click(screen.getByRole('button', { name: tr('app.firstResult.seeBudgets') }));
+    expect(onOpenBudgets).toHaveBeenCalled();
+  });
+
+  it('says so when the limit cannot be saved, and offers none for an unknown category', async () => {
+    const api = createFakeApi();
+    api.budgetApi.set.mockRejectedValue(new Error('Límite del plan'));
+    const { unmount } = renderWithProviders(<FirstResult rows={rows} categories={categories} />, {
+      api,
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Poner un límite/ }));
+    expect(await screen.findByText('Límite del plan')).toBeVisible();
+    unmount();
+    renderWithProviders(<FirstResult rows={rows} />, { api });
+    expect(screen.getByText(/Tu mayor gasto es Vivienda/)).toBeVisible();
+    expect(screen.queryByRole('button', { name: /Poner un límite/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: tr('app.firstResult.seeBudgets') })).toBeNull();
+  });
+});
+
 describe('FirstResult', () => {
   it('says how many fixed charges and subscriptions there are and adds them as automatic movements', async () => {
     const api = setup();

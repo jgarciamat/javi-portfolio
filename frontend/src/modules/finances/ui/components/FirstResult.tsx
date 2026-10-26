@@ -5,7 +5,12 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
-import type { DetectedSubscription } from '@modules/finances/domain/types';
+import type {
+  Category,
+  DetectedSubscription,
+  ImportRowResult,
+} from '@modules/finances/domain/types';
+import { importHighlights } from '@modules/finances/domain/importHighlights';
 
 /** A detected charge as an automatic movement, from the month of its next charge. */
 const asRule = (s: DetectedSubscription) => ({
@@ -78,11 +83,109 @@ function GoalLink({ onOpen }: { onOpen: () => void }) {
 }
 
 /**
- * The first thing an import shows: the fixed charges and subscriptions found among the movements
- * (those that are not an automatic movement yet), to add them as automatic movements in one go.
+ * The category where most of the imported expenses went, and a monthly limit for it in line with
+ * what is already spent there, set with one tap.
+ */
+function BudgetSuggestion({
+  rows,
+  categories,
+  onOpenBudgets,
+}: {
+  rows: ImportRowResult[];
+  categories: Category[];
+  onOpenBudgets?: () => void;
+}) {
+  const { t, tCategory } = useI18n();
+  const { money, percent } = useFormat();
+  const { budgetApi } = useApi();
+  const action = useAction(t('app.firstResult.budgetError'));
+  const [saved, setSaved] = useState(false);
+  const { top } = importHighlights(rows);
+  if (!top) return null;
+  const category = categories.find((c) => c.name === top.category);
+  const vars = { category: tCategory(top.category), amount: money(top.monthlyLimit) };
+
+  const save = () =>
+    action.run(async () => {
+      await budgetApi.set((category as NonNullable<typeof category>).id, top.monthlyLimit);
+      setSaved(true);
+    });
+
+  return (
+    <section className="first-result" aria-labelledby="first-result-top">
+      <h3 id="first-result-top" className="first-result-title">
+        <Icon name="target" /> {t('app.firstResult.topTitle')}
+      </h3>
+      <p>
+        {t('app.firstResult.top', {
+          category: tCategory(top.category),
+          share: percent(top.share * 100, 0),
+          amount: money(top.amount),
+        })}
+      </p>
+      {saved ? (
+        <p className="section-success" role="status">
+          <Icon name="checkCircle" /> {t('app.firstResult.budgetSaved', vars)}
+        </p>
+      ) : (
+        category && (
+          <>
+            <p className="section-hint">{t('app.firstResult.budgetHint', vars)}</p>
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={action.pending}
+              aria-busy={action.pending}
+              onClick={() => void save()}
+            >
+              {t('app.firstResult.budget', vars)}
+            </button>
+          </>
+        )
+      )}
+      {onOpenBudgets && (
+        <button type="button" className="leak-link" onClick={onOpenBudgets}>
+          <Icon name="target" /> {t('app.firstResult.seeBudgets')}
+        </button>
+      )}
+      {action.error && (
+        <p className="form-error" role="alert">
+          {action.error}
+        </p>
+      )}
+    </section>
+  );
+}
+
+/**
+ * The first thing an import shows: where most of the money went (with a limit to set for it) and
+ * the fixed charges and subscriptions found among the movements (those that are not an automatic
+ * movement yet), to add them as automatic movements in one go.
  * Only facts: what repeats and what it costs, no promises.
  */
-export function FirstResult({ onOpenGoals }: { onOpenGoals?: () => void }) {
+export function FirstResult({
+  onOpenGoals,
+  rows = [],
+  categories = [],
+  onOpenBudgets,
+}: {
+  onOpenGoals?: () => void;
+  /** The rows of the import (its preview): where the money went. */
+  rows?: ImportRowResult[];
+  /** The person's categories: a limit is offered for one of them. */
+  categories?: Category[];
+  onOpenBudgets?: () => void;
+}) {
+  return (
+    <>
+      <BudgetSuggestion rows={rows} categories={categories} onOpenBudgets={onOpenBudgets} />
+      <RepeatedCharges onOpenGoals={onOpenGoals} />
+    </>
+  );
+}
+
+/** The fixed charges and subscriptions found, to add as automatic movements. */
+function RepeatedCharges({ onOpenGoals }: { onOpenGoals?: () => void }) {
   const { t } = useI18n();
   const { money } = useFormat();
   const { insightsApi } = useApi();

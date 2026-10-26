@@ -87,6 +87,35 @@ describe('ImportModal', () => {
     ]);
   });
 
+  it('says how it understood the columns and keeps them folded, open only when one is missing', async () => {
+    const { upload } = setup();
+    upload(statement('Fecha;Concepto;Importe;\n02/03/2026;MERCADONA;-54,30;x\n'));
+    expect(
+      await screen.findByText(
+        literal(
+          tr('app.import.columnsUnderstood', {
+            columns: 'Fecha: «Fecha» · Concepto: «Concepto» · Importe: «Importe»',
+          })
+        ),
+        { exact: false }
+      )
+    ).toBeInTheDocument();
+    const folded = screen.getByText(tr('app.import.changeColumns')).closest('details')!;
+    expect(folded).not.toHaveAttribute('open');
+    // The column without a header is named by its place.
+    expect(within(folded).getAllByRole('option', { name: '#4' }).length).toBeGreaterThan(0);
+    // The jargon of the formats is in a folded help, not in the main text.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.otherFile') }));
+    expect(screen.getByText(tr('app.import.help.title')).closest('details')).not.toHaveAttribute(
+      'open'
+    );
+    expect(screen.getByText(tr('app.import.hint'))).not.toHaveTextContent(/Norma 43|📌/);
+    upload(statement('Dia;Texto\n02/03/2026;MERCADONA\n'));
+    const open = (await screen.findByText(tr('app.import.changeColumns'))).closest('details')!;
+    expect(open).toHaveAttribute('open');
+    expect(screen.queryByText(/Hemos entendido las columnas/)).toBeNull();
+  });
+
   it('refuses an Excel file with no data, and the old .xls format', async () => {
     const { upload } = setup();
     upload(statement(buildXlsx([{ name: 'Vacía', rows: [['solo cabecera']] }]), 'vacia.xlsx'));
@@ -199,8 +228,9 @@ describe('ImportModal', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.confirm', { count: 2 }) }));
     expect(
-      await screen.findByText(literal(tr('app.import.done', { imported: 2, duplicates: 1 })))
+      await screen.findByRole('heading', { name: tr('app.import.doneTitle', { count: 2 }) })
     ).toBeInTheDocument();
+    expect(screen.getByText(tr('app.import.doneDuplicates', { count: 1 }))).toBeInTheDocument();
     expect(onImported).toHaveBeenCalled();
     fireEvent.click(
       within(screen.getByRole('dialog')).getAllByRole('button', { name: tr('app.common.close') })[1]

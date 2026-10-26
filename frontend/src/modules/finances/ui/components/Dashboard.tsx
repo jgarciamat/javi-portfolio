@@ -292,6 +292,7 @@ function DashboardModals({
       {dash.showImport && (
         <ImportModal
           accounts={finances.accounts}
+          categories={finances.categories}
           shared={shared}
           initialSource={dash.importSource}
           onClose={dash.closeImport}
@@ -303,6 +304,10 @@ function DashboardModals({
           onOpenGoals={() => {
             dash.closeImport();
             dash.setTab('goals');
+          }}
+          onOpenBudgets={() => {
+            dash.closeImport();
+            dash.setTab('budgets');
           }}
         />
       )}
