@@ -33,7 +33,10 @@ export function buildSummaryCards(
       title: t('app.summary.monthBalance'),
       icon: 'chart',
       value: money(summary.balance),
-      sub: t('app.summary.monthBalance.sub', { count: summary.transactionCount }),
+      sub:
+        summary.transactionCount === 1
+          ? t('app.summary.monthBalance.subOne')
+          : t('app.summary.monthBalance.sub', { count: summary.transactionCount }),
       accent: 'var(--slate-400)',
     },
     {

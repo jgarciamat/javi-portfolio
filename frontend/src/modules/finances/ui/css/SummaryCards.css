@@ -36,7 +36,8 @@
   font-variant-numeric: tabular-nums;
   color: var(--accent);
   margin-bottom: 0.25rem;
-  word-break: break-all;
+  /* Long amounts may break, but words («Sin ingresos registrados») only between them. */
+  overflow-wrap: anywhere;
 }
 
 .summary-card-sub {

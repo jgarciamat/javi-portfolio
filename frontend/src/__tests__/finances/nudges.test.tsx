@@ -224,7 +224,7 @@ describe('Month recap', () => {
     ).toBeVisible();
     expect(within(card).getByText(/Cerraste el mes con .*1\.?300.* a tu favor/)).toBeVisible();
     expect(within(card).getByText(/mayor gasto fue .*Ocio.*300/)).toBeVisible();
-    expect(within(card).getByText(/tasa de ahorro fue del 10/)).toBeVisible();
+    expect(within(card).getByText(/Guardaste el 10/)).toBeVisible();
     // Sharing lives in the "Month summary" dialog, not in this card.
     expect(within(card).queryByRole('button', { name: tr('app.recap.share') })).toBeNull();
     expect(within(card).queryByLabelText(tr('app.recap.shareAmounts'))).toBeNull();

@@ -207,7 +207,7 @@ describe('The summary', () => {
       target: { value: '121' },
     });
     const box = summary();
-    expect(box).toHaveTextContent(/1500,50\s€/);
+    expect(box).toHaveTextContent(/1.500,50\s€/);
     expect(box).toHaveTextContent(/121,00\s€/);
     expect(box).toHaveTextContent(tr('app.autonomo.summary.ready'));
   });
@@ -223,7 +223,7 @@ describe('The summary', () => {
     });
     await open();
     expect(summary()).toHaveTextContent(/10\.000,00\s€/);
-    expect(summary()).toHaveTextContent(/2000,00\s€/);
+    expect(summary()).toHaveTextContent(/2.000,00\s€/);
     // Only the fourth quarter is on screen: the 130 stands for the others.
     expect(summary()).not.toHaveTextContent(/7777/);
   });

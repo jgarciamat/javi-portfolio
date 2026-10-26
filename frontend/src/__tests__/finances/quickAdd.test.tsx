@@ -76,7 +76,7 @@ describe('QuickAdd', () => {
     const { field } = setup();
     type(field, '+1.200 nómina');
     expect(
-      screen.getByText(/^Ingreso: Nómina · 1200,00\s€ · /, { selector: '.section-hint' })
+      screen.getByText(/^Ingreso: Nómina · 1.200,00\s€ · /, { selector: '.section-hint' })
     ).toBeVisible();
   });
 

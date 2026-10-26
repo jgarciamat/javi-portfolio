@@ -927,12 +927,18 @@ describe('Crypto console: opening positions', () => {
     fireEvent.click(screen.getByRole('button', { name: '25 %' }));
     expect(capital()).toHaveValue('2247.5');
     fireEvent.change(capital(), { target: { value: '1000' } });
-    fireEvent.change(screen.getByLabelText('Take profit (opcional)'), {
-      target: { value: '55000' },
-    });
-    fireEvent.change(screen.getByLabelText('Stop loss (opcional)'), {
-      target: { value: '45000' },
-    });
+    fireEvent.change(
+      screen.getByLabelText('Take profit: precio para cerrar con ganancia (opcional)'),
+      {
+        target: { value: '55000' },
+      }
+    );
+    fireEvent.change(
+      screen.getByLabelText('Stop loss: precio para cerrar y limitar la pérdida (opcional)'),
+      {
+        target: { value: '45000' },
+      }
+    );
     const box = nb(check().textContent);
     expect(box).toContain('Todo listo');
     expect(box).toContain('Total que se aparta (importe y comisión)1.001,00 €');
@@ -993,7 +999,7 @@ describe('Crypto console: opening positions', () => {
     await ready();
     expect(openButton()).toBeDisabled();
     expect(check()).toHaveTextContent('Escribe cuánto quieres usar');
-    fireEvent.click(screen.getByRole('radio', { name: /Osos · Short/ }));
+    fireEvent.click(screen.getByRole('radio', { name: /Osos \(Short\)/ }));
     expect(
       screen.getByText(/Short: vendes y ganarías si el precio baja/, { selector: 'p' })
     ).toBeInTheDocument();
@@ -1004,13 +1010,19 @@ describe('Crypto console: opening positions', () => {
     fireEvent.change(price, { target: { value: '49000' } });
     expect(check()).toHaveTextContent('se abriría al momento');
     fireEvent.change(price, { target: { value: '52000' } });
-    fireEvent.change(screen.getByLabelText('Take profit (opcional)'), {
-      target: { value: '60000' },
-    });
+    fireEvent.change(
+      screen.getByLabelText('Take profit: precio para cerrar con ganancia (opcional)'),
+      {
+        target: { value: '60000' },
+      }
+    );
     expect(check()).toHaveTextContent('En un short, el take profit tiene que estar por debajo');
-    fireEvent.change(screen.getByLabelText('Take profit (opcional)'), {
-      target: { value: '48000' },
-    });
+    fireEvent.change(
+      screen.getByLabelText('Take profit: precio para cerrar con ganancia (opcional)'),
+      {
+        target: { value: '48000' },
+      }
+    );
     expect(nb(check().textContent)).toContain('Se cerraría sola (garantía agotada) a104.000,00 €');
     fireEvent.change(capital(), { target: { value: '20000' } });
     expect(check()).toHaveTextContent('para la garantía y la comisión');

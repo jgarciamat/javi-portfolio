@@ -73,10 +73,10 @@ describe('The draft in plain words', () => {
   it('explains a 303 and a 130 to pay with the figures of the draft', () => {
     const { vat: v, irpf: i } = explain({ vat: vat(), irpf: irpf() });
     expect(nb(v)).toBe(
-      'IVA (303): a pagar 918,60 €. Cobraste 1116,00 € de IVA en tus facturas y puedes restar 197,40 € de IVA de tus gastos.'
+      'IVA (303): a pagar 918,60 €. Cobraste 1.116,00 € de IVA en tus facturas y puedes restar 197,40 € de IVA de tus gastos.'
     );
     expect(nb(i)).toBe(
-      'IRPF (130): a pagar 15,60 €: el 20 % de tus beneficios acumulados (12.329,75 €) menos lo ya pagado (245,35 €) y las retenciones de tus clientes (2205,00 €).'
+      'IRPF (130): a pagar 15,60 €: el 20 % de tus beneficios acumulados (12.329,75 €) menos lo ya pagado (245,35 €) y las retenciones de tus clientes (2.205,00 €).'
     );
   });
 
@@ -140,14 +140,14 @@ describe('The draft in plain words', () => {
     );
     const withheld = explain({ vat: vat(), irpf: irpf({ '05': 0 }) });
     expect(nb(withheld.irpf)).toContain(
-      '(12.329,75 €) menos las retenciones de tus clientes (2205,00 €).'
+      '(12.329,75 €) menos las retenciones de tus clientes (2.205,00 €).'
     );
     const covered = explain({
       vat: vat(),
       irpf: irpf({ '05': 1000, '06': 2000, '13': 50, '15': 10 }, { result: 'zero', amountDue: 0 }),
     });
     expect(nb(covered.irpf)).toBe(
-      'IRPF (130): resultado cero. El 20 % de tus beneficios acumulados (12.329,75 €) son 2465,95 €, y ya lo cubren lo ya pagado (1000,00 €), las retenciones de tus clientes (2000,00 €), la reducción por rentas bajas (50,00 €) y lo negativo de trimestres anteriores (10,00 €).'
+      'IRPF (130): resultado cero. El 20 % de tus beneficios acumulados (12.329,75 €) son 2.465,95 €, y ya lo cubren lo ya pagado (1.000,00 €), las retenciones de tus clientes (2.000,00 €), la reducción por rentas bajas (50,00 €) y lo negativo de trimestres anteriores (10,00 €).'
     );
     const loss = explain({
       vat: vat(),

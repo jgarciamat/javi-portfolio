@@ -29,24 +29,3 @@ export function SocialLinks() {
     </nav>
   );
 }
-
-/** Only the three glyphs, in the app header: plain links to our profiles. */
-export function SocialIcons() {
-  const { t } = useI18n();
-  return (
-    <nav className="header-socials" aria-label={t('app.social.title')}>
-      {SOCIAL_LINKS.map((s) => (
-        <a
-          key={s.network}
-          href={s.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${t('app.social.title')} ${s.label}`}
-          title={s.label}
-        >
-          <SocialIcon network={s.network} size={22} />
-        </a>
-      ))}
-    </nav>
-  );
-}

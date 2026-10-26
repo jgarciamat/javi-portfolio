@@ -44,10 +44,10 @@ describe('AnnualChart', () => {
     setup();
     const bar = (await screen.findAllByRole('img', { name: /Ene 2026/ }))[0];
     fireEvent.mouseEnter(bar, { clientX: 10, clientY: 20 });
-    expect(screen.getByText(/Ingresos: 2000\s€/)).toBeInTheDocument();
+    expect(screen.getByText(/Ingresos: 2.000\s€/)).toBeInTheDocument();
     fireEvent.mouseMove(bar, { clientX: 15, clientY: 25 });
     fireEvent.mouseLeave(bar);
-    expect(screen.queryByText(/Ingresos: 2000\s€/)).toBeNull();
+    expect(screen.queryByText(/Ingresos: 2.000\s€/)).toBeNull();
   });
 
   it('changes year within the limits and opens months', async () => {

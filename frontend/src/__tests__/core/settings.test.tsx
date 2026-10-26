@@ -100,7 +100,7 @@ describe('useFormat', () => {
     const { result } = setup();
     const f = result.current.format;
     expect(f.currency).toBe('EUR');
-    expect(f.money(1234.5)).toMatch(/^1234,50\s€$/);
+    expect(f.money(1234.5)).toMatch(/^1.234,50\s€$/);
     expect(f.percent(12.34)).toBe('12,3%');
     expect(f.monthName(3)).toBe('Marzo');
     expect(f.monthLabel(2026, 3)).toBe('Marzo 2026');

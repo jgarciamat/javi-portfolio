@@ -314,9 +314,9 @@ describe('PlanBanner', () => {
       })
     );
     const banner = await screen.findByRole('status');
-    expect(banner).toHaveTextContent(/registrado 37 movimientos/);
+    expect(banner).toHaveTextContent(/registrado 37 transacciones/);
     expect(banner).toHaveTextContent(
-      /6 presupuestos \(gratis: 5\), 7 movimientos automáticos \(gratis: 5\)\./
+      /6 presupuestos \(gratis: 5\), 7 operaciones automáticas \(gratis: 5\)\./
     );
     // Imports are unlimited on every plan: they are never a limit to pass.
     expect(banner).not.toHaveTextContent(tr('billing.resource.imports'));
@@ -326,7 +326,7 @@ describe('PlanBanner', () => {
   it('only recaps the movements when everything fits in the free plan', async () => {
     withPlan(<PlanBanner onOpenPlan={jest.fn()} />, f.billing({ trialDaysLeft: 1 }));
     const banner = await screen.findByRole('status');
-    expect(banner).toHaveTextContent(/registrado 5 movimientos/);
+    expect(banner).toHaveTextContent(/registrado 5 transacciones/);
     expect(banner).not.toHaveTextContent(/no podrás añadir más/);
   });
 

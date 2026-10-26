@@ -309,7 +309,7 @@ describe('Crypto console: practice portfolios', () => {
 
 describe('Crypto console: ranking of the month', () => {
   const card = async () =>
-    (await screen.findByRole('heading', { name: 'Ranking de marzo' })).closest('section')!;
+    (await screen.findByRole('heading', { name: 'Clasificación de marzo' })).closest('section')!;
 
   it('shows the top with medals and aliases, the prize, the rules and the person’s figures', async () => {
     setup();
@@ -499,7 +499,7 @@ describe('Crypto console: ranking of the month', () => {
     unmount();
     setup((api) => api.cryptoApi.ranking.mockReturnValue(new Promise(() => undefined)));
     await act(async () => undefined);
-    expect(screen.queryByText(/Ranking de marzo/)).toBeNull();
+    expect(screen.queryByText(/Clasificación de marzo/)).toBeNull();
     expect(screen.getByRole('status')).toHaveTextContent('Cargando la consola…');
   });
 

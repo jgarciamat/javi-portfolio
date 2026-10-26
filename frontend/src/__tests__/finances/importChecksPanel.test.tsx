@@ -124,7 +124,7 @@ describe('«Before you calculate»', () => {
       prior: { on: true, income: '', expenses: '5000', payments: '', withheld: '' },
     });
     const panel = await open();
-    expect(within(panel).getByText(/declara 5000,00 € de gastos deducibles/)).toBeInTheDocument();
+    expect(within(panel).getByText(/declara 5.000,00 € de gastos deducibles/)).toBeInTheDocument();
     const review = within(panel).getByRole('button', { name: tr('app.autonomo.checks.review') });
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.review.hide') }));
     fireEvent.click(review);

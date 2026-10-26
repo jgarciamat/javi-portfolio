@@ -46,7 +46,11 @@ const step = (
 
 // The text queries collapse the narrow spaces of the currency format into plain ones.
 const money = (n: number) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' })
+  new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    useGrouping: 'always' as unknown as boolean,
+  })
     .format(n)
     .replace(/\s/g, ' ');
 const saving = (saving: number, over: Partial<DeductionSaving> = {}): DeductionSaving => ({

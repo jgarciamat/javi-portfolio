@@ -240,7 +240,7 @@ describe('bulk changes', () => {
     await waitFor(() =>
       expect(api.transactionApi.bulkUpdate).toHaveBeenCalledWith(['t1', 't3'], { categoryId: 'c2' })
     );
-    expect(await screen.findByText(/Movimientos actualizados: 1/)).toBeInTheDocument();
+    expect(await screen.findByText(/Transacciones actualizadas: 1/)).toBeInTheDocument();
     expect(
       screen.getByText(`2 · ${tr('app.bulk.reason.INSUFFICIENT_BALANCE')}`)
     ).toBeInTheDocument();

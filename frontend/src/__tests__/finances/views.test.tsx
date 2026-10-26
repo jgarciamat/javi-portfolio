@@ -1237,7 +1237,7 @@ describe('the investments and debts section', () => {
     expect(marks(/▼ 20,0/).sort()).toEqual(['amount-neg', 'amount-pos']);
     expect(marks(/▲ 100,0/)).toEqual(['amount-neg']);
     expect(screen.getByText(literal(tr('app.assets.total'))).parentElement?.textContent).toContain(
-      '3200,00'
+      '3.200,00'
     );
   });
 

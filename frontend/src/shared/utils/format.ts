@@ -7,6 +7,9 @@
 
 const INTL_LOCALE: Record<string, string> = { es: 'es-ES', en: 'en-GB' };
 
+/** es-ES skips the thousands dot under 10.000 («1875,00 €»): the same mark on every amount. */
+const GROUP = { useGrouping: 'always' as unknown as boolean };
+
 export function intlLocale(locale: string): string {
   return INTL_LOCALE[locale] ?? locale;
 }
@@ -19,6 +22,7 @@ export function formatMoney(
 ): string {
   const decimals = options.decimals ?? true;
   return new Intl.NumberFormat(intlLocale(locale), {
+    ...GROUP,
     style: 'currency',
     currency,
     minimumFractionDigits: decimals ? 2 : 0,
@@ -29,6 +33,7 @@ export function formatMoney(
 
 export function formatPercent(value: number, locale: string, digits = 1): string {
   return `${new Intl.NumberFormat(intlLocale(locale), {
+    ...GROUP,
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value)}%`;

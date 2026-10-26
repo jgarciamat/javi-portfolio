@@ -73,6 +73,15 @@ describe('Financial health', () => {
     expect(await screen.findByText(/cubre 2 meses de gastos/)).toBeInTheDocument();
   });
 
+  it('says «1 month», and the points with the decimal mark of the language', async () => {
+    setup({
+      overview: { summary: f.summary({ totalIncome: 2000, totalSaving: 0, totalExpenses: 50 }) },
+      previous: f.overview({ summary: f.summary({ totalExpenses: 6000 }) }),
+    });
+    expect(await screen.findByText(tr('app.health.detail.cushionOne'))).toBeInTheDocument();
+    expect(screen.queryByText(/\d\.\d+\/25/)).toBeNull();
+  });
+
   it('counts the debts when they are known and says so when they are not', async () => {
     setup({
       overview: { summary: f.summary({ totalIncome: 1000, totalSaving: 0, totalExpenses: 500 }) },
@@ -226,6 +235,15 @@ describe('Monthly challenges', () => {
       previous: f.overview({ summary: f.summary({ totalExpenses: 0 }) }),
     });
     expect(await screen.findByText(/cubre 2 meses de gastos/)).toBeInTheDocument();
+  });
+
+  it('says «1 month», and the points with the decimal mark of the language', async () => {
+    setup({
+      overview: { summary: f.summary({ totalIncome: 2000, totalSaving: 0, totalExpenses: 50 }) },
+      previous: f.overview({ summary: f.summary({ totalExpenses: 6000 }) }),
+    });
+    expect(await screen.findByText(tr('app.health.detail.cushionOne'))).toBeInTheDocument();
+    expect(screen.queryByText(/\d\.\d+\/25/)).toBeNull();
   });
 
   it('has a zero-length progress bar for a challenge with no target yet', async () => {

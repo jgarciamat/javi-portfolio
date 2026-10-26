@@ -86,7 +86,7 @@ describe('Reviewing the imported invoices', () => {
     expect(within(first).getByText('Estudio Norte SL')).toBeInTheDocument();
     expect(within(first).getByText('T1')).toBeInTheDocument();
     expect(within(first).getByText('21 %')).toBeInTheDocument();
-    expect(within(first).getByText(/1210,00/)).toBeInTheDocument();
+    expect(within(first).getByText(/1.210,00/)).toBeInTheDocument();
     expect(within(first).getByText(/150,00/)).toBeInTheDocument();
     // Every cell says what it is, for the phone layout where the headings are hidden.
     expect(within(first).getAllByRole('cell')[1]).toHaveAttribute(

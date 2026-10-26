@@ -205,7 +205,7 @@ describe('the 131 and the 303 of the simplified regime on screen', () => {
     expect(screen.getByText(m('resultTitle', { n: 1, year: 2026 }))).toBeInTheDocument();
     const boxes = screen.getByText(m('boxes131')).closest('div') as HTMLElement;
     const row = (box: string) => within(boxes).getByText(box).closest('tr') as HTMLElement;
-    expect(row('01')).toHaveTextContent('8799,08');
+    expect(row('01')).toHaveTextContent('8.799,08');
     expect(row('02')).toHaveTextContent('263,97');
     // Last year's net income not typed: no reduction of box 09.
     expect(row('09')).toHaveTextContent('0,00');

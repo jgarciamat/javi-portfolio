@@ -110,16 +110,16 @@ nuevos). Si hay metas, enlace a Metas (su fecha estimada). «Tu dinero perdido»
 - App de Android: el recordatorio mensual que ya existía (Ajustes → Notificaciones) dice ahora el
   mes y abre el importador al tocarlo (`/?importar=1`). No hay correo nuevo.
 
-## 8. Alta rápida
+## 8. Registrar transacción rápida
 
-Campo «Alta rápida» en el mes: «café 1,50», «1,50 café», «+1.200 nómina». Categoría: regla del
+Campo «Registrar transacción rápida» en el mes: «café 1,50», «1,50 café», «+1.200 nómina». Categoría: regla del
 usuario, la del último movimiento con el mismo concepto o la última usada; chips con las categorías
 recientes. En el ordenador, la tecla N (o +) lleva al campo.
 
 ## Pendiente
 
 - Compartir desde la app nativa de Android (arriba, apartado 4).
-- Widget de Android para el alta rápida: no se ha hecho. Haría falta un `AppWidgetProvider` en
+- Widget de Android para registrar una transacción rápida: no se ha hecho. Haría falta un `AppWidgetProvider` en
   `frontend/android` (fuera de git) con un botón que abra la app en `/?add=expense` (los accesos
   directos del icono ya usan esa dirección) o, mejor, una actividad ligera con un campo de texto
   que reutilice `parseQuickEntry` vía la web. Se deja para un AAB futuro.

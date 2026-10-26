@@ -196,6 +196,39 @@ describe('FirstResult', () => {
     expect(await screen.findByText(tr('app.firstResult.title'))).toBeVisible();
   });
 
+  it('opens the budgets from the result of an import in the dashboard', async () => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ocio' })]);
+    const row = {
+      index: 0,
+      status: 'imported' as const,
+      date: '2026-03-12',
+      description: 'Bar',
+      amount: 3,
+      type: 'EXPENSE' as const,
+      categoryName: 'Ocio',
+    };
+    api.transactionApi.import
+      .mockResolvedValueOnce({ dryRun: true, imported: 1, duplicates: 0, invalid: 0, rows: [row] })
+      .mockResolvedValueOnce({ dryRun: false, imported: 1, duplicates: 0, invalid: 0, rows: [] });
+    renderWithProviders(<Dashboard />, { api, route: '/?importar=1' });
+    fireEvent.click(
+      await screen.findByRole('tab', { name: literal(tr('app.import.source.paste')) })
+    );
+    fireEvent.change(screen.getByLabelText(tr('app.import.paste.label')), {
+      target: { value: '12/03/2026 Bar -3,00 €' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.paste.read')) }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    );
+    expect(await screen.findByRole('button', { name: /Poner un límite de 10,00/ })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.firstResult.seeBudgets') }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(await screen.findByRole('region', { name: tr('app.tabs.budgets') })).toBeVisible();
+  });
+
   it('opens the goals from the importer of the dashboard', async () => {
     const api = createFakeApi();
     api.goalApi.getAll.mockResolvedValue([f.goal()]);

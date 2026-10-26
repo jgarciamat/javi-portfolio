@@ -15,7 +15,11 @@ function Harness({ detail }: { detail?: SavingsDetail }) {
 }
 
 const money = (n: number) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' })
+  new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    useGrouping: 'always' as unknown as boolean,
+  })
     .format(n)
     .replace(/\s/g, ' ');
 const type = (el: HTMLElement, value: string) => fireEvent.change(el, { target: { value } });

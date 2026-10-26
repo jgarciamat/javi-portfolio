@@ -523,7 +523,7 @@ describe('the Renta step by step: persona 02 (couple with two children, one pay,
     // calculo.md of the persona: 342,42 € to pay alone, 1.173 € back together.
     expect(
       await screen.findByText(
-        tr('tools.renta.joint.best.joint', { amount: '1515,42 €' }).replace(/\s/g, ' '),
+        tr('tools.renta.joint.best.joint', { amount: '1.515,42 €' }).replace(/\s/g, ' '),
         {
           normalizer: (text) => text.replace(/\s/g, ' '),
         }

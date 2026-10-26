@@ -230,14 +230,14 @@ describe('Renta planner: amounts by child, percentages and relatives', () => {
     expect(
       within(birth).getByText(tr('tools.renta.req.missing', { count: 3 }))
     ).toBeInTheDocument();
-    expect(within(birth).queryByText(/2485/)).toBeNull();
+    expect(within(birth).queryByText(/2\.485/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     expect(
       await screen.findByText(tr('tools.renta.req.pendingResult', { count: 1 }))
     ).toBeInTheDocument();
     for (const yes of within(birth).getAllByRole('radio', { name: tr('tools.renta.req.yes') }))
       fireEvent.click(yes);
-    expect(within(birth).getByText(/2485/)).toBeInTheDocument();
+    expect(within(birth).getByText(/2\.485/)).toBeInTheDocument();
     expect(within(birth).getByText(tr('tools.renta.req.box', { box: '0986' }))).toBeInTheDocument();
     // One «no» leaves it out.
     fireEvent.click(within(birth).getAllByRole('radio', { name: tr('tools.renta.req.no') })[2]);
