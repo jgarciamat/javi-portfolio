@@ -30,6 +30,7 @@ import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
+import { QuickAdd } from './QuickAdd';
 import { SampleDataCard } from './SampleDataCard';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
@@ -304,6 +305,11 @@ export function MonthlyView({
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
         <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
+        <QuickAdd
+          transactions={f.transactions}
+          defaultDate={defaultDate}
+          onAdd={f.addTransaction}
+        />
         <TransactionForm
           categories={f.categories}
           accounts={f.accounts}

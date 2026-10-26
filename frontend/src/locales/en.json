@@ -6017,5 +6017,16 @@
   "app.firstResult.error": "Not all of them could be added. Please try again.",
   "app.firstResult.goal": "When will you reach your goal? See it in Goals",
   "app.notifications.statementTitle": "Your {month} statement is ready",
-  "app.notifications.statementBody": "It takes 30 seconds: import the bank file, the copied text or a screenshot."
+  "app.notifications.statementBody": "It takes 30 seconds: import the bank file, the copied text or a screenshot.",
+  "app.quickAdd.label": "Quick add",
+  "app.quickAdd.placeholder": "coffee 1.50",
+  "app.quickAdd.add": "Add",
+  "app.quickAdd.hint": "Type the description and the amount, like «coffee 1.50», and press Enter. A + in front makes it an income. On a computer, the N key brings you here.",
+  "app.quickAdd.preview": "{type}: {description} · {amount} · {category}. Press Enter to add it.",
+  "app.quickAdd.expense": "Expense",
+  "app.quickAdd.income": "Income",
+  "app.quickAdd.categories": "Recent categories",
+  "app.quickAdd.invalid": "Type a description and an amount, for example «coffee 1.50».",
+  "app.quickAdd.added": "Added: {description}, {amount} in {category}.",
+  "app.quickAdd.error": "It could not be added. Please try again."
 }

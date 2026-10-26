@@ -84,4 +84,44 @@ aparezca en «Compartir»:
    `/?importar=compartido`.
 4. Probar con Google Fotos (captura), Archivos (CSV/PDF) y la app del banco (texto).
 
+## 5. Datos de ejemplo
+
+- `POST /sample-data` añade cuatro meses de movimientos inventados (nómina, alquiler, recibos,
+  suscripciones, compras, cafés, un cobro doble y una subida de precio) a la cuenta por defecto;
+  `DELETE /sample-data` los borra y `GET /sample-data` dice cuántos hay. Se distinguen por el
+  `import_hash` `sample:…`, así que borrar nunca toca los movimientos propios.
+- En el mes: tarjeta «Pruébalo con datos de ejemplo» si no hay ningún movimiento; con los datos
+  puestos, una línea lo dice con «Ver Tu dinero perdido» y «Borrar datos de ejemplo» (con
+  confirmación).
+
+## 6. Primer resultado tras importar
+
+Al terminar una importación, «Lo que se repite en tus movimientos»: cuántos cargos fijos
+(alquiler, luz, seguros, préstamos: `isEssential` de «Tu dinero perdido») y cuántas suscripciones
+hay, con la lista y «Añadirlos como operaciones automáticas» (en el plan gratis, hasta su límite de
+5). `/stats/subscriptions` añade `fixed`, y en cada una `categoryName` y `essential` (solo campos
+nuevos). Si hay metas, enlace a Metas (su fecha estimada). «Tu dinero perdido» ya salía antes.
+
+## 7. Aviso de principio de mes
+
+- Push web (`ReminderService`, ya existente): el día en que empieza el mes del usuario, «Ya tienes
+  el extracto de <mes>», a quien tenga las notificaciones push activadas; desactivarlas lo quita.
+  Una vez por mes y usuario.
+- App de Android: el recordatorio mensual que ya existía (Ajustes → Notificaciones) dice ahora el
+  mes y abre el importador al tocarlo (`/?importar=1`). No hay correo nuevo.
+
+## 8. Alta rápida
+
+Campo «Alta rápida» en el mes: «café 1,50», «1,50 café», «+1.200 nómina». Categoría: regla del
+usuario, la del último movimiento con el mismo concepto o la última usada; chips con las categorías
+recientes. En el ordenador, la tecla N (o +) lleva al campo.
+
 ## Pendiente
+
+- Compartir desde la app nativa de Android (arriba, apartado 4).
+- Widget de Android para el alta rápida: no se ha hecho. Haría falta un `AppWidgetProvider` en
+  `frontend/android` (fuera de git) con un botón que abra la app en `/?add=expense` (los accesos
+  directos del icono ya usan esa dirección) o, mejor, una actividad ligera con un campo de texto
+  que reutilice `parseQuickEntry` vía la web. Se deja para un AAB futuro.
+- Avisos por correo del extracto mensual: no se ha añadido (el resumen semanal por correo sigue
+  igual).
