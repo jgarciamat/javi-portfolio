@@ -1,6 +1,10 @@
 /* ─── Forecast: safe to spend + outlook ──────────────────────────────────── */
 
-.forecast-safe {
+/* ─── «¿Llegas a fin de mes?»: end of the month, what if, how and what to do with the rest ── */
+
+.eom {
+  display: grid;
+  gap: 0.6rem;
   padding: 0.9rem 1rem;
   border-radius: 12px;
   border: 1px solid var(--slate-700);
@@ -8,45 +12,184 @@
   margin-bottom: 1rem;
 }
 
-.forecast-safe--ok {
-  border-color: #166534;
+.eom--ok {
+  border-color: var(--green-500);
 }
 
-.forecast-safe--tight {
-  border-color: #a16207;
+.eom--tight {
+  border-color: var(--amber-500);
 }
 
-.forecast-safe--over {
-  border-color: var(--red-800);
+.eom--short {
+  border-color: var(--red-500);
 }
 
-.forecast-daily {
-  margin: 0 0 0.3rem;
-  font-size: 1.15rem;
+.eom p {
+  margin: 0;
 }
 
-.forecast-daily strong {
-  font-size: 1.6rem;
-}
-
-.forecast-detail {
-  margin: 0.15rem 0;
+.eom-kicker {
   font-size: 0.9rem;
   color: var(--slate-300);
 }
 
-.forecast-status {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  color: var(--slate-400);
+.eom-figure {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
-.forecast-safe--tight .forecast-status {
+.eom-tone--ok {
+  color: var(--green-400);
+}
+
+.eom-tone--tight {
   color: var(--amber-400);
 }
 
-.forecast-safe--over .forecast-status {
+.eom-tone--short {
   color: var(--red-400);
+}
+
+.eom-status {
+  font-size: 0.88rem;
+  color: var(--slate-300);
+}
+
+.eom-max {
+  font-size: 1rem;
+}
+
+.eom-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.2rem 0 0;
+}
+
+.eom-facts div {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: var(--slate-800);
+}
+
+.eom-facts dt {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+.eom-facts dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.eom-whatif {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+}
+
+.eom-whatif-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.eom-whatif-controls {
+  display: grid;
+  grid-template-columns: 1fr 7.5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.eom-whatif-controls input[type='range'] {
+  width: 100%;
+  min-height: 2.5rem;
+  margin: 0;
+  accent-color: var(--accent-400);
+  cursor: pointer;
+}
+
+.eom-whatif-amount {
+  width: 100%;
+  text-align: right;
+}
+
+.eom-whatif-result {
+  font-weight: 600;
+}
+
+.eom-whatif .btn-link {
+  justify-self: start;
+  padding: 0.25rem 0;
+}
+
+.eom-how summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent-400);
+  padding: 0.3rem 0;
+}
+
+.eom-how ul {
+  margin: 0.4rem 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--slate-300);
+}
+
+.eom-payments h4,
+.eom-surplus h4 {
+  margin: 0.6rem 0 0.3rem;
+  font-size: 0.9rem;
+}
+
+.eom-payments .data-table td:last-child,
+.eom-payments .data-table th:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.eom-surplus-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.eom-surplus-links .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.eom-disclaimer {
+  font-size: 0.78rem;
+  color: var(--slate-400);
+}
+
+.eom-how summary:focus-visible,
+.eom-whatif input:focus-visible,
+.eom-surplus-links .btn-secondary:focus-visible {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+  .eom-whatif-controls {
+    grid-template-columns: 1fr 6rem;
+  }
+
+  .eom-surplus-links .btn-secondary {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
 }
 
 .forecast-subtitle {
@@ -94,14 +237,15 @@
   width: auto;
 }
 
-/* While the forecast loads, the panel keeps the height it will have (measured: ~725 px on a
-   phone, ~510 px on a desktop) so the content below does not jump when the data arrives. */
+/* While the forecast loads, the panel keeps the height it will have with the end of the month and
+   six months ahead (measured: ~1385 px on a phone, ~1030 px on a 1280 px screen) so the content
+   below does not jump when the data arrives. */
 .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
-  min-height: 735px;
+  min-height: 1330px;
 }
 
 @media (min-width: 768px) {
   .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
-    min-height: 520px;
+    min-height: 975px;
   }
 }

@@ -21,7 +21,7 @@ test('the forecast panel does not shift the page when its data arrives', async (
   await expect(page.locator('.summary-card').first()).toBeVisible();
   await page.evaluate(() => ((window as unknown as { __cls: number }).__cls = 0));
   const loading = (await panel.boundingBox())?.height ?? 0;
-  await expect(panel.locator('.forecast-safe')).toBeVisible();
+  await expect(panel.locator('.eom')).toBeVisible();
   const loaded = (await panel.boundingBox())?.height ?? 0;
   expect(Math.abs(loaded - loading)).toBeLessThan(60);
   expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
