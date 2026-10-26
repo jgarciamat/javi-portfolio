@@ -1325,13 +1325,51 @@ button.entity-item {
 
 /* ─── Import: file or pasted text, and the rows read from text to correct ─── */
 .import-tabs {
+  display: flex;
+  gap: 0.25rem;
   margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+/* Three tabs that share the width, also on a 390 px phone. */
+.import-tabs .tab-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.4rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  border-radius: 8px 8px 0 0;
+}
+
+.import-tabs .tab-btn.active {
+  color: var(--accent-400);
+  border-bottom-color: var(--accent);
+}
+
+/* Narrow phones: the words fit without the icons. */
+@media (max-width: 420px) {
+  .import-tabs .tab-btn svg {
+    display: none;
+  }
 }
 
 .import-paste {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem;
   justify-items: start;
+}
+
+.import-paste .file-drop {
+  justify-self: stretch;
+}
+
+.import-paste .file-drop input {
+  min-width: 0;
 }
 
 .import-paste-text {

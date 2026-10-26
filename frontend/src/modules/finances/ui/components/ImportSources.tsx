@@ -48,7 +48,7 @@ export function ImportSourceTabs({
   return (
     <>
       <div
-        className="tx-tabs import-tabs"
+        className="import-tabs"
         role="tablist"
         aria-label={t('app.import.sources')}
         onKeyDown={onKeyDown}

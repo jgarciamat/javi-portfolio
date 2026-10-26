@@ -291,6 +291,12 @@ export function MonthlyView({
         {f.isCurrentPeriod && <CapturedPayments />}
         <MonthActions onImport={onImport} />
         <SampleDataCard onOpenLeaks={() => onOpenTab('leaks')} onImport={onImport} />
+        {/* Near the top: on a phone it is the quickest way to note a movement down. */}
+        <QuickAdd
+          transactions={f.transactions}
+          defaultDate={defaultDate}
+          onAdd={f.addTransaction}
+        />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {activeAccounts.length > 1 && (
           <AccountCards
@@ -305,11 +311,6 @@ export function MonthlyView({
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
         <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
-        <QuickAdd
-          transactions={f.transactions}
-          defaultDate={defaultDate}
-          onAdd={f.addTransaction}
-        />
         <TransactionForm
           categories={f.categories}
           accounts={f.accounts}

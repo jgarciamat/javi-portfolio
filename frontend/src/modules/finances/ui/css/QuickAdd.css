@@ -28,6 +28,8 @@
 
 .quick-add-row .btn-primary {
   flex: none;
+  width: auto;
+  margin: 0;
 }
 
 .quick-add-chips {
