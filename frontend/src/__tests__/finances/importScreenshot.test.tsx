@@ -7,7 +7,12 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
-import { darkDayBelow, dayColumnBalance, lightBlocks } from './fixtures/ocrScreenshots';
+import {
+  darkDayBelow,
+  dayColumnBalance,
+  lightBlocks,
+  webListBalances,
+} from './fixtures/ocrScreenshots';
 
 const worker = { recognize: jest.fn(), terminate: jest.fn() };
 jest.mock('tesseract.js', () => ({ createWorker: jest.fn(async () => worker) }));
@@ -63,6 +68,87 @@ describe('reading screenshots of bank apps (real OCR output of invented screensh
       ['2026-10-21', 'COMISION MANTENIMIENTO', -3],
       ['2026-10-20', 'PAGO MOVIL EN FARMACIA LOPEZ', -8.95],
     ]);
+  });
+});
+
+/**
+ * A web bank list like the one of a real report: the typographic minus «−», the balance «+ 430,10 €»
+ * under each amount, the booked day and «Fecha de operación» under the concept, «Fraccionar pago».
+ * Every row comes out with its type, amount, day of the payment and concept.
+ */
+const WEB_LIST: [string, string, number][] = [
+  ['2026-10-23', 'WWW.AMAZON', -38.84],
+  ['2026-10-23', 'WWW.AMAZON', -15.49],
+  ['2026-10-23', 'WWW.AMAZON', -14.66],
+  ['2026-10-24', 'BIZUM RECIBIDO', 10],
+  ['2026-10-24', 'BIZUM RECIBIDO', 10],
+  ['2026-10-23', 'TRANSFER INMEDIATA', 300],
+  ['2026-10-21', 'Revolut', -130],
+  ['2026-10-21', 'BIZUM ENVIADO', -50],
+  ['2026-10-21', 'BIZUM RECIBIDO', 130],
+  ['2026-10-18', 'GAS POWER31168968', -47.61],
+];
+
+describe('a web bank list with the balance under each amount (reported case)', () => {
+  it('reads the screenshot: signs, days of payment and concepts, without the balances', () => {
+    const parsed = parsePastedMovements(textFromOcrLines(webListBalances), TODAY);
+    expect(parsed.rows.map((r) => [r.date, r.description, r.amount])).toEqual(WEB_LIST);
+    expect(parsed.rows.map((r) => r.type)).toEqual(
+      WEB_LIST.map(([, , amount]) => (amount < 0 ? 'EXPENSE' : 'INCOME'))
+    );
+    expect(parsed.skipped).toEqual([]);
+  });
+
+  it('reads the same list copied as text, with «−», «+ 430,10 €» on its own line and «Fraccionar pago»', () => {
+    const text = [
+      ['WWW.AMAZON', '25 Oct 2026', 'Fecha de operación: 23-10-2026', '−38,84 €', '+ 430,10 €'],
+      ['WWW.AMAZON', '25 Oct 2026', 'Fecha de operación: 23-10-2026', '−15,49 €', '+ 468,94 €'],
+      ['WWW.AMAZON', '25 Oct 2026', 'Fecha de operación: 23-10-2026', '−14,66 €', '+ 484,43 €'],
+      ['BIZUM RECIBIDO', '24 Oct 2026', 'BIZUM', '+10,00 €', '+ 499,09 €'],
+      ['BIZUM RECIBIDO', '24 Oct 2026', 'BIZUM', '+10,00 €', '+ 489,09 €'],
+      ['TRANSFER INMEDIATA', '23 Oct 2026', 'Lucía Martín Sanz', '+300,00 €', '+ 479,09 €'],
+      [
+        'Revolut**4321*',
+        '23 Oct 2026',
+        'Fecha de operación: 21-10-2026',
+        'Fraccionar pago',
+        '−130,00 €',
+        '+ 179,09 €',
+      ],
+      ['BIZUM ENVIADO', '21 Oct 2026', '− 50,00 €', '+ 309,09 €'],
+      ['BIZUM RECIBIDO', '21 Oct 2026', 'BIZUM', '+130,00 €', '+ 359,09 €'],
+      [
+        'GAS POWER31168968',
+        '20 Oct. 2026',
+        'Fecha de operación: 18-10-2026',
+        '–47,61 €',
+        '+ 229,09 €',
+      ],
+    ]
+      .flat()
+      .join('\n');
+    const parsed = parsePastedMovements(text, TODAY);
+    expect(parsed.rows.map((r) => [r.date, r.description, r.amount])).toEqual(WEB_LIST);
+    expect(parsed.review).toEqual([]);
+  });
+
+  it('takes the sign the balances give when the OCR lost a minus', () => {
+    const lost = webListBalances.map((l) => ({ ...l, text: l.text.replace('—50,00', '50,00') }));
+    const parsed = parsePastedMovements(textFromOcrLines(lost), TODAY);
+    expect(parsed.rows.find((r) => r.description === 'BIZUM ENVIADO')).toMatchObject({
+      amount: -50,
+      type: 'EXPENSE',
+    });
+  });
+
+  it('a minus of any kind makes an expense, and the first amount of a line is the movement', () => {
+    for (const dash of ['−', '–', '—', '‐', '-']) {
+      const [row] = parsePastedMovements(
+        `21/10/2026 BIZUM ENVIADO ${dash}50,00 € + 309,09 €`,
+        TODAY
+      ).rows;
+      expect(row).toMatchObject({ amount: -50, type: 'EXPENSE', description: 'BIZUM ENVIADO' });
+    }
   });
 });
 

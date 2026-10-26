@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { SharedContent } from '@core/share/sharedImport';
 import { isImage, useImport } from '../../application/hooks/useImport';
 import {
+  AMOUNT_CLASS,
   EditableRows,
   type ImportSource,
   ImportSourceTabs,
@@ -505,7 +506,9 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
                 <td className="import-card-date">{r.date ? date(r.date) : '—'}</td>
                 <td className="import-card-concept">{r.description ?? r.error}</td>
                 <td className="import-card-type">{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
-                <td className="import-card-amount">{amount(r)}</td>
+                <td className={`import-card-amount ${r.type ? AMOUNT_CLASS[r.type] : ''}`}>
+                  {amount(r)}
+                </td>
                 <td className="import-card-meta">
                   {category(r)}
                   {r.coveredBy && <CoveredRow row={r} imp={imp} />}

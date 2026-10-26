@@ -86,3 +86,60 @@ export const dayColumnBalance: OcrLine[] = [
   { text: '-8,95€', x0: 668, x1: 751, y0: 583, y1: 608 },
   { text: '1.228,95€', x0: 652, x1: 751, y0: 614, y1: 633 },
 ];
+
+// A web bank list 2000 px wide (concept and amount on top; the day, a subtitle and the balance
+// under them; the typographic minus «−»), invented like the others (fictitious holder and card)
+// and read by the same Tesseract: the minus comes out as «—», «Oct» as «0ct», icons as «(+9)».
+export const webListBalances: OcrLine[] = [
+  { text: 'WWW.AMAZON —38,84 €', x0: 206, x1: 1950, y0: 28, y1: 68 },
+  {
+    text: '25 0ct2026 El Fecha de operación: 23-10-2026 + 430,10 €',
+    x0: 207,
+    x1: 1950,
+    y0: 82,
+    y1: 112,
+  },
+  { text: 'WWW.AMAZON —15,49 €', x0: 206, x1: 1950, y0: 170, y1: 210 },
+  {
+    text: '25 0ct2026 El Fecha de operación: 23-10-2026 + 468,94 €',
+    x0: 207,
+    x1: 1950,
+    y0: 224,
+    y1: 254,
+  },
+  { text: 'WWW.AMAZON —14,66 €', x0: 206, x1: 1950, y0: 312, y1: 352 },
+  {
+    text: '25 0ct2026 El Fecha de operación: 23-10-2026 + 484,43 €',
+    x0: 207,
+    x1: 1950,
+    y0: 366,
+    y1: 396,
+  },
+  { text: '(+9) BIZUM RECIBIDO +10,00 €', x0: 116, x1: 1950, y0: 457, y1: 533 },
+  { text: '24 Oct2026 E BIZUM + 499,09 €', x0: 207, x1: 1950, y0: 509, y1: 538 },
+  { text: '(+9) BIZUM RECIBIDO +10,00 €', x0: 116, x1: 1950, y0: 599, y1: 675 },
+  { text: '24 Oct2026 E BIZUM + 489,09 €', x0: 207, x1: 1950, y0: 651, y1: 680 },
+  { text: '(+9) TRANSFER INMEDIATA +300,00 €', x0: 116, x1: 1950, y0: 741, y1: 817 },
+  { text: '23 Oct 2026 El Lucía Martín Sanz + 479,09 €', x0: 207, x1: 1950, y0: 792, y1: 822 },
+  { text: 'Revolut**4321* : —130,00 €', x0: 208, x1: 1950, y0: 885, y1: 917 },
+  { text: ';', x0: 659, x1: 676, y0: 934, y1: 939 },
+  {
+    text: '23 Oct 2026 El Fecha de operación: 21-10-2026 + 179,09 €',
+    x0: 207,
+    x1: 1950,
+    y0: 935,
+    y1: 964,
+  },
+  { text: 'O BIZUM ENVIADO —50,00 €', x0: 120, x1: 1950, y0: 1027, y1: 1097 },
+  { text: '21 Oct 2026 + 309,09 €', x0: 207, x1: 1950, y0: 1078, y1: 1106 },
+  { text: '(+9) BIZUM RECIBIDO +130,00 €', x0: 116, x1: 1950, y0: 1167, y1: 1243 },
+  { text: '21 Oct2026 EBIZUM + 359,09 €', x0: 207, x1: 1950, y0: 1219, y1: 1248 },
+  { text: 'GAS POWER31168968 —47,61 €', x0: 207, x1: 1950, y0: 1310, y1: 1343 },
+  {
+    text: '20 0ct2026 El Fecha de operación: 18-10-2026 + 229,09 €',
+    x0: 207,
+    x1: 1950,
+    y0: 1360,
+    y1: 1390,
+  },
+];

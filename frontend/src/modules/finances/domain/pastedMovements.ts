@@ -41,6 +41,8 @@ const MONTHS: Record<string, number> = {
   setiembre: 9,
   september: 9,
   oct: 10,
+  // The OCR often reads the O of «Oct» as a zero.
+  '0ct': 10,
   octubre: 10,
   october: 10,
   nov: 11,
@@ -59,9 +61,21 @@ const MONTH = `(${Object.keys(MONTHS)
 const DAY_WORDS =
   /^(?:\s|[,.\-–·|]|de|lunes|martes|miercoles|jueves|viernes|sabado|domingo|lun|mar|mie|jue|vie|sab|dom|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)*$/;
 
-/** Lines about the account, not a movement. */
+/** Lines about the account, not a movement («Fecha de operación: …» is the day of one). */
 const NOT_A_MOVEMENT =
-  /^(saldo|balance|disponible|available|total|retenido|pendiente de|movimientos|transactions|fecha|date)\b/;
+  /^(saldo|balance|disponible|available|total|retenido|pendiente de|movimientos|transactions|fecha(?! de operacion)|date)\b/;
+
+/**
+ * «Fecha de operación: 23-10-2026»: the day the payment was made, under the day it was booked. The
+ * label goes; the day stays (it is the one taken: it comes before the booked one in the rules).
+ */
+const OPERATION_LABEL = /\bfecha de operaci[oó]n\s*:?/gi;
+
+/**
+ * Every kind of dash a bank or the OCR may put before an amount (the typographic minus «−», «–»,
+ * «—», «‐»…) is a minus: «−50,00 €» is an expense.
+ */
+const DASHES = /[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g;
 
 /** Words that make an amount without a sign an income. */
 const INCOME_WORDS =
@@ -109,7 +123,7 @@ const DATE_RULES: DateRule[] = [
   },
   {
     re: new RegExp(
-      `\\b(\\d{1,2})(?:\\s+de)?\\s*[\\s-]${MONTH}(?:[\\s-]+(?:de\\s+)?(\\d{4}))?\\b`,
+      `\\b(\\d{1,2})(?:\\s+de)?\\s*[\\s-]${MONTH}(?:[\\s-]*(?:de\\s+)?(\\d{4}))?\\b`,
       'g'
     ),
     read: (m, today) => withYear(MONTHS[m[2]], +m[1], m[3], today),
@@ -125,8 +139,11 @@ const DATE_RULES: DateRule[] = [
   { re: /\b(ayer|yesterday)\b/g, read: (_m, today) => shift(today, 1) },
 ];
 
-/** Hours («14:32») and masked card numbers («**** 5402») are never part of the concept. */
-const NOISE = /\b\d{1,2}:\d{2}(?::\d{2})?\b|[*•·x]{2,}\s?\d{4}\b/gi;
+/**
+ * Hours («14:32»), masked card numbers («**** 5402») and buttons of the bank's app («Fraccionar
+ * pago») are never part of the concept.
+ */
+const NOISE = /\b\d{1,2}:\d{2}(?::\d{2})?\b|[*•·x]{2,}\s?\d{4}\b\*?|\bfraccionar pago\b/gi;
 
 /** An amount: sign, currency before or after, thousands and two decimals (or a currency). */
 const AMOUNT =
@@ -182,7 +199,7 @@ const cleanText = (text: string): string =>
   text
     .replace(/[\t|;]+/g, ' ')
     .replace(/\s+/g, ' ')
-    .replace(/^[\s,.\-–·:]+|[\s,\-–·:]+$/g, '')
+    .replace(/^[\s,.\-–·:]+|[\s,\-–·:*]+$/g, '')
     .trim();
 
 /** «… Saldo 1.204,10 €» at the end of a line is the balance, not part of the movement. */
@@ -191,7 +208,9 @@ const BALANCE_TAIL = /\b(saldo|balance)\b.*$/;
 function splitLine(raw: string, today: string): LineParts {
   const balanceAt = fold(raw).search(BALANCE_TAIL);
   const movement = balanceAt > 0 ? raw.slice(0, balanceAt) : raw;
-  const withoutNoise = movement.replace(NOISE, (s) => ' '.repeat(s.length));
+  const withoutNoise = movement
+    .replace(NOISE, (s) => ' '.repeat(s.length))
+    .replace(OPERATION_LABEL, (s) => ' '.repeat(s.length));
   const dated = takeDate(withoutNoise, today);
   const priced = takeAmounts(dated.line);
   const text = cleanText(priced.line);
@@ -208,9 +227,11 @@ interface Draft {
   amount: FoundAmount;
 }
 
-/** The movement amount of a line: the first signed one (a balance often follows it), else the first. */
-const movementAmount = (amounts: FoundAmount[]): FoundAmount =>
-  amounts.find((a) => a.signed) ?? amounts[0];
+/**
+ * The movement amount of a line: the first one. A balance may follow it («−50,00 €  + 309,09 €»),
+ * and it may carry a sign too: being signed does not make it the movement.
+ */
+const movementAmount = (amounts: FoundAmount[]): FoundAmount => amounts[0];
 
 /**
  * The concept waiting for its amount after a line without one. A day starts a new block (with the
@@ -232,6 +253,11 @@ interface ReadState {
    */
   dayBelow: boolean;
   waiting: { description: string; amount: FoundAmount; line: number } | null;
+  /**
+   * The concept was the line just read, on its own: a day under it («WWW.AMAZON», then «25 Oct
+   * 2026») is the day of that movement, not the start of a new block.
+   */
+  conceptAbove: boolean;
 }
 
 /** A line without an amount: a day (maybe the one of the movement above) or a concept. */
@@ -244,14 +270,21 @@ function readOtherLine(st: ReadState, parts: LineParts): void {
     st.concept = null;
     return;
   }
+  if (parts.date && !parts.text && st.conceptAbove) {
+    st.day = parts.date;
+    return;
+  }
   st.day = parts.date ?? st.day;
+  const before = st.concept;
   st.concept = waitingConcept(parts, st.concept);
+  st.conceptAbove = !parts.date && st.concept !== before;
 }
 
 function readMovementLine(st: ReadState, parts: LineParts, line: number): void {
   const description = parts.text || st.concept;
   const amount = movementAmount(parts.amounts);
   st.concept = null;
+  st.conceptAbove = false;
   st.day = parts.date ?? st.day;
   const date = parts.date ?? (st.dayBelow ? null : st.day);
   if (!description) st.skipped.push(line);
@@ -285,47 +318,72 @@ interface ReadLine {
 
 const near = (a: number, b: number): boolean => Math.abs(a - b) < 0.005;
 
-/** Whether `balances` follow from `amounts`, newest movement first or oldest first. */
-function isRunningBalance(amounts: number[], balances: number[]): boolean {
-  const pairs = balances.slice(1).map((next, k) => ({ prev: balances[k], next, k }));
-  return (
-    pairs.every(({ prev, next, k }) => near(prev, next + amounts[k])) ||
-    pairs.every(({ prev, next, k }) => near(next, prev + amounts[k + 1]))
+/**
+ * The amounts the balances say, newest movement first or oldest first: each one is the difference
+ * between two balances in a row, so its sign comes out too (the OCR may lose a minus). Null when the
+ * balances do not follow from the amounts read. The movement without a balance on the other side
+ * keeps the amount read.
+ */
+function amountsFromBalances(amounts: number[], balances: number[]): number[] | null {
+  const n = balances.length;
+  const newestFirst = amounts.map((a, k) => (k < n - 1 ? balances[k] - balances[k + 1] : a));
+  const oldestFirst = amounts.map((a, k) => (k > 0 ? balances[k] - balances[k - 1] : a));
+  const fits = (signed: number[]) =>
+    signed.every((v, k) => near(Math.abs(v), Math.abs(amounts[k])));
+  // Only the sign comes from the balances: the amount stays as read (no rounding from subtracting).
+  const withSigns = (signed: number[]) =>
+    signed.map((v, k) => (v < 0 ? -1 : 1) * Math.abs(amounts[k]));
+  if (fits(newestFirst)) return withSigns(newestFirst);
+  return fits(oldestFirst) ? withSigns(oldestFirst) : null;
+}
+
+interface Row {
+  movement: ReadLine;
+  balance: ReadLine;
+}
+
+/** Each line with an amount followed by a line with a single amount: the movement and its balance. */
+function movementBalancePairs(lines: ReadLine[]): Row[] | null {
+  const priced = lines.filter((l) => l.parts.amounts.length > 0);
+  if (priced.length < 4 || priced.length % 2 !== 0) return null;
+  const pairs = Array.from({ length: priced.length / 2 }, (_, k) => ({
+    movement: priced[2 * k],
+    balance: priced[2 * k + 1],
+  }));
+  const fit = pairs.every(
+    ({ movement, balance }) =>
+      lines.indexOf(balance) === lines.indexOf(movement) + 1 && balance.parts.amounts.length === 1
   );
+  return fit ? pairs : null;
 }
 
 /**
  * Apps that print the balance under each amount: when every line with an amount is followed by one
- * whose only amount has no sign and the balances add up with the movements, those lines are the
- * balances. Their text is the end of the concept above («CARREFOUR» / «EXPRESS»).
+ * with a single amount and those amounts follow from the movements as a running balance, they are
+ * the balances, signed («+ 430,10 €») or not. The movements take the sign the balances give them.
+ * The text of a balance line is the end of the concept above («CARREFOUR» / «EXPRESS»); when it has
+ * a day, it is the day of the movement and its text a subtitle («BIZUM», «Fecha de operación»).
  */
 function withoutBalances(lines: ReadLine[]): ReadLine[] {
-  const priced = lines.filter((l) => l.parts.amounts.length > 0);
-  const pairs = Array.from({ length: Math.floor(priced.length / 2) }, (_, k) => ({
-    movement: priced[2 * k],
-    balance: priced[2 * k + 1],
-  }));
-  const fits =
-    pairs.length >= 2 &&
-    priced.length % 2 === 0 &&
-    pairs.every(
-      ({ movement, balance }) =>
-        lines.indexOf(balance) === lines.indexOf(movement) + 1 &&
-        !balance.parts.date &&
-        balance.parts.amounts.length === 1 &&
-        !balance.parts.amounts[0].signed
-    ) &&
-    isRunningBalance(
+  const pairs = movementBalancePairs(lines);
+  const signed =
+    pairs &&
+    amountsFromBalances(
       pairs.map((p) => movementAmount(p.movement.parts.amounts).value),
       pairs.map((p) => p.balance.parts.amounts[0].value)
     );
-  if (!fits) return lines;
+  if (!pairs || !signed) return lines;
+  const byMovement = new Map(pairs.map((p, k) => [p.movement, { ...p, amount: signed[k] }]));
   const balances = new Set(pairs.map((p) => p.balance));
-  return lines.flatMap((l, i) => {
+  return lines.flatMap((l) => {
     if (balances.has(l)) return [];
-    const below = lines[i + 1];
-    if (!below || !balances.has(below) || !below.parts.text) return [l];
-    return [{ ...l, parts: { ...l.parts, text: `${l.parts.text} ${below.parts.text}`.trim() } }];
+    const row = byMovement.get(l);
+    if (!row) return [l];
+    const below = row.balance.parts;
+    // The balances confirmed it: it is signed now, whatever the OCR left of its sign.
+    const amounts = [{ value: row.amount, signed: true }];
+    const text = below.date || !below.text ? l.parts.text : `${l.parts.text} ${below.text}`.trim();
+    return [{ ...l, parts: { date: l.parts.date ?? below.date, amounts, text } }];
   });
 }
 
@@ -337,9 +395,12 @@ function readDrafts(text: string, today: string): { drafts: Draft[]; skipped: nu
     concept: null,
     dayBelow: false,
     waiting: null,
+    conceptAbove: false,
   };
-  const lines = joinSplitDays(text.normalize('NFC').split(/\r?\n/)).flatMap((raw, index) =>
-    !raw.trim() || NOT_A_MOVEMENT.test(fold(raw.trim()))
+  const normalized = text.normalize('NFC').replace(DASHES, '-');
+  // Without a letter or a digit a line is a stray mark of the OCR («;»), not part of a movement.
+  const lines = joinSplitDays(normalized.split(/\r?\n/)).flatMap((raw, index) =>
+    !/[\p{L}\d]/u.test(raw) || NOT_A_MOVEMENT.test(fold(raw.trim()))
       ? []
       : [{ parts: splitLine(raw, today), line: index + 1 }]
   );
@@ -359,6 +420,12 @@ export interface OcrLine {
   y0: number;
   y1: number;
 }
+
+/**
+ * The round icon at the left of each movement, read as letters: «(+9) BIZUM RECIBIDO», «O BIZUM
+ * ENVIADO». A short bracket, a lone letter or marks before the concept go.
+ */
+const ICON_NOISE = /^(?:(?:\([^)]{0,4}\)|\p{L}|[^\p{L}\p{N}\s]+)\s+)+(?=\p{L}{2})/u;
 
 /**
  * The text of a screenshot as rows, the way they look: the OCR often reads the concepts and the
@@ -390,6 +457,7 @@ export function textFromOcrLines(lines: OcrLine[]): string {
         .sort((a, b) => a.x0 - b.x0)
         .map((piece) => piece.text.trim())
         .join('  ')
+        .replace(ICON_NOISE, '')
     )
     .join('\n');
 }

@@ -158,6 +158,13 @@ export function ScreenshotPanel({
   );
 }
 
+/** Red for an expense, green for an income, violet for a saving: the colours of the month. */
+export const AMOUNT_CLASS: Record<TransactionType, string> = {
+  EXPENSE: 'amount-neg',
+  INCOME: 'amount-pos',
+  SAVING: 'amount-saving',
+};
+
 const typeName = (t: (key: string) => string, type: TransactionType): string =>
   t(TYPE_LABEL_KEYS[type]).replace(/^[↑↓]\s*/, '');
 
@@ -216,7 +223,8 @@ function EditableRow({
       <input
         type="text"
         inputMode="decimal"
-        className="tx-input import-edit-amount"
+        // Red for an expense, green for an income: the type chosen next to it, at a glance.
+        className={`tx-input import-edit-amount ${AMOUNT_CLASS[type]}`}
         aria-label={`${t('app.import.col.amount')} ${name}`}
         defaultValue={locale === 'es' ? shown.replace('.', ',') : shown}
         onBlur={(e) => {
