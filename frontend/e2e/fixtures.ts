@@ -35,9 +35,14 @@ export async function signIn(page: Page): Promise<void> {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 }
 
-/** Opens a dashboard section from the burger menu. */
+/** Opens a dashboard section: from the side bar on a computer, else from the burger menu. */
 export async function openSection(page: Page, label: string): Promise<void> {
-  await page.getByRole('button', { name: 'Abrir menú' }).click();
-  await page.locator('.burger-nav-item', { hasText: label }).click();
+  const side = page.locator('.side-nav');
+  if (await side.isVisible()) {
+    await side.locator('.burger-nav-item', { hasText: label }).click();
+  } else {
+    await page.getByRole('button', { name: 'Abrir menú' }).click();
+    await page.locator('.burger-panel .burger-nav-item', { hasText: label }).click();
+  }
   await expect(page.getByRole('region', { name: label })).toBeVisible();
 }

@@ -7,6 +7,7 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
+import { mockMatchMedia } from '@test-utils/dom';
 
 jest.mock('@core/notifications/notifications', () => ({
   ...jest.requireActual('@core/notifications/notifications'),
@@ -33,10 +34,43 @@ describe('menu and sections', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalled());
     for (const section of DASHBOARD_SECTIONS) {
-      goTo(section.menuKey ?? section.labelKey);
+      goTo(section.labelKey);
       expect(screen.getByRole('region', { name: tr(section.labelKey) })).toBeInTheDocument();
     }
     expect(localStorage.getItem('mm_last_tab')).toBe('settings');
+  });
+
+  it('on a computer keeps every section in a side bar instead of the menu button', async () => {
+    const restore = mockMatchMedia(true);
+    try {
+      renderWithProviders(<Dashboard />, { plan: true });
+      expect(screen.queryByRole('button', { name: tr('app.menu.open') })).toBeNull();
+      const side = screen.getByRole('navigation', { name: tr('app.menu.ariaLabel') });
+      // Same names as the titles of the screens they open.
+      fireEvent.click(
+        within(side).getByRole('button', { name: literal(tr('app.tabs.automations')) })
+      );
+      const region = await screen.findByRole('region', { name: tr('app.tabs.automations') });
+      expect(region).toHaveFocus();
+      expect(
+        within(side).getByRole('button', { name: literal(tr('app.tabs.automations')) })
+      ).toHaveAttribute('aria-current', 'page');
+      expect(
+        within(side).getByRole('button', { name: literal(tr('app.tabs.plan')) })
+      ).toHaveAttribute('data-tour', 'plan');
+      fireEvent.click(within(side).getByTestId('menu-invite'));
+      expect(await screen.findByRole('dialog', { name: tr('billing.invite.title') })).toBeVisible();
+      fireEvent.click(
+        within(screen.getByRole('dialog', { name: tr('billing.invite.title') })).getAllByRole(
+          'button',
+          { name: tr('app.common.close') }
+        )[0]
+      );
+      fireEvent.click(within(side).getByRole('button', { name: /abrir perfil/i }));
+      expect(await screen.findByRole('dialog', { name: /perfil/i })).toBeVisible();
+    } finally {
+      restore();
+    }
   });
 
   it('closes the menu with Escape, the backdrop or the close button', () => {

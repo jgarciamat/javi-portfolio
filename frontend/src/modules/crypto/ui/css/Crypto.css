@@ -2106,3 +2106,21 @@ html.wiz-contrast .cc-quote-changes {
 .cc-empty-cash strong {
   color: var(--amber-400);
 }
+
+/* ─── Chart and order: one column on phones, side by side on a computer ─── */
+.cc-desk,
+.cc-desk-chart,
+.cc-desk-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cc-gap);
+  min-width: 0;
+}
+
+@media (min-width: 1100px) {
+  .cc-desk {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    align-items: start;
+  }
+}

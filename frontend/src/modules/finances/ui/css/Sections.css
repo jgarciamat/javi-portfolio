@@ -441,7 +441,11 @@
 
 .chart svg {
   width: 100%;
+  /* Drawn at 640 units: wider than that on a computer, its labels would grow over the text. */
+  max-width: 640px;
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .chart-grid {
@@ -1698,4 +1702,16 @@ button.entity-item {
 /* Left out rows are muted, but «Import it anyway» stays readable. */
 .row-muted .import-covered label {
   opacity: 1;
+}
+
+/* At its full size the labels read like the text around them (on phones the chart scales down). */
+@media (min-width: 700px) {
+  .chart-axis {
+    font-size: 14px;
+  }
+}
+
+/* The limit right after the name of its category, not at the far end of a wide row. */
+.budget-list .entity-main {
+  flex: 0 1 18rem;
 }

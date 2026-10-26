@@ -87,7 +87,7 @@ export function BudgetsView() {
         {(action.error ?? budgets.error) && (
           <p className="form-error">{action.error ?? budgets.error}</p>
         )}
-        <ul className="entity-list">
+        <ul className="entity-list budget-list">
           {categories.map((c) => {
             const budget = byCategory.get(c.id);
             const line = spent.get(c.id);

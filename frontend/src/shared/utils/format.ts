@@ -39,7 +39,10 @@ export function monthName(month: number, locale: string, style: 'long' | 'short'
   const name = new Intl.DateTimeFormat(intlLocale(locale), { month: style }).format(
     new Date(2026, month - 1, 15)
   );
-  return name.charAt(0).toUpperCase() + name.slice(1).replace('.', '');
+  const short = name.replace('.', '');
+  // Spanish writes «sept» but «oct», «nov»: three letters for all, so an axis reads even.
+  const even = style === 'short' ? short.slice(0, 3) : short;
+  return even.charAt(0).toUpperCase() + even.slice(1);
 }
 
 export function monthLabel(year: number, month: number, locale: string): string {

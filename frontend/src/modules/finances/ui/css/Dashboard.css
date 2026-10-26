@@ -578,3 +578,76 @@ html {
 .dashboard-section:focus {
   outline: none;
 }
+
+/* ─── Computers: the sections at the left, the content no wider than it reads well ─── */
+.dashboard-body--side {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 1.25rem;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.dashboard-body--side .main {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.side-nav {
+  position: sticky;
+  top: calc(var(--sticky-bar-height, 0px) + 0.75rem);
+  align-self: start;
+  max-height: calc(100vh - var(--sticky-bar-height, 0px) - 1.5rem);
+  overflow-y: auto;
+  margin-top: 1.5rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 14px;
+  background: var(--slate-900);
+}
+
+/* A list, not the tiles of the phone menu: icon and name on one line. */
+.side-nav .burger-nav-group {
+  grid-template-columns: 1fr;
+  gap: 0.1rem;
+}
+
+.side-nav .burger-nav-item {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.side-nav .burger-nav-label {
+  white-space: normal;
+}
+
+.side-nav .burger-nav-item--wide {
+  margin: 0.6rem 0 0.2rem;
+  padding: 0.6rem 0.6rem;
+}
+
+.side-nav .burger-nav-item--wide .burger-nav-icon {
+  position: static;
+  transform: none;
+}
+
+.side-nav .burger-nav-item--wide .burger-nav-text {
+  padding: 0;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.side-nav .burger-nav-dot {
+  display: none;
+}
+
+.side-nav .burger-nav-item--active {
+  box-shadow: inset 3px 0 0 var(--section-color, var(--accent-400));
+}

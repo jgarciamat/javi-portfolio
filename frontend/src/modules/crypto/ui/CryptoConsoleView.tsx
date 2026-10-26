@@ -380,26 +380,33 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
       <SeasonPanel portfolio={sim.portfolio} sim={sim} />
       <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral.data} />
       <SimulatorHead portfolio={sim.portfolio} sim={sim} />
-      <MarketPanel
-        view={view}
-        market={market}
-        coin={coin}
-        lines={lines}
-        layers={layers}
-        currency={currency.chosen}
-        onChange={change}
-        onCurrency={currency.choose}
-        onToggleLayer={toggleLayer}
-        guide={guide}
-        premium={premium}
-      />
-      <SimulatorBody
-        portfolio={sim.portfolio}
-        sim={sim}
-        symbol={view.symbol}
-        coin={coin}
-        onGlossary={() => guide.show('glossary')}
-      />
+      {/* On a computer the chart and the order side by side: both in view while trading. */}
+      <div className="cc-desk">
+        <div className="cc-desk-chart">
+          <MarketPanel
+            view={view}
+            market={market}
+            coin={coin}
+            lines={lines}
+            layers={layers}
+            currency={currency.chosen}
+            onChange={change}
+            onCurrency={currency.choose}
+            onToggleLayer={toggleLayer}
+            guide={guide}
+            premium={premium}
+          />
+        </div>
+        <div className="cc-desk-side">
+          <SimulatorBody
+            portfolio={sim.portfolio}
+            sim={sim}
+            symbol={view.symbol}
+            coin={coin}
+            onGlossary={() => guide.show('glossary')}
+          />
+        </div>
+      </div>
       <SeasonExtras
         portfolio={sim.portfolio}
         coins={market.coins?.coins ?? []}

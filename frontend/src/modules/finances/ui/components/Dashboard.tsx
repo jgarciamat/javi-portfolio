@@ -30,13 +30,14 @@ import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
 import { TourOffer } from '../tour/TourOffer';
 import { BurgerMenu } from './BurgerMenu';
+import { SideNav } from './SideNav';
+import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { InviteDialog } from './InviteDialog';
 import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
 import { BrandLogo } from '@shared/components/BrandLogo';
-import { SocialIcons } from '@shared/components/SocialLinks';
 import { IosInstallHint } from '@shared/components/IosInstallHint';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
@@ -205,31 +206,45 @@ function TabContent({
   }
 }
 
-function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
+/** Wide enough for the side bar: every section at the left instead of the menu button. */
+export const WIDE_SCREEN = '(min-width: 1024px)';
+
+function Header({
+  dash,
+  sectionLabel,
+  wide,
+}: {
+  dash: UseDashboardReturn;
+  sectionLabel: ReactNode;
+  wide: boolean;
+}) {
   const { t } = useI18n();
   const { logout } = useAuth();
   return (
     <header className="header">
       <div className="header-brand">
-        <button
-          className="burger-btn"
-          data-tour="menu"
-          onClick={() => dash.setMenuOpen(true)}
-          aria-label={t('app.menu.open')}
-          aria-expanded={dash.menuOpen}
-        >
+        {wide ? (
           <BrandLogo className="burger-btn-logo" size={28} />
-          <span className="burger-btn-lines" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-        </button>
+        ) : (
+          <button
+            className="burger-btn"
+            data-tour="menu"
+            onClick={() => dash.setMenuOpen(true)}
+            aria-label={t('app.menu.open')}
+            aria-expanded={dash.menuOpen}
+          >
+            <BrandLogo className="burger-btn-logo" size={28} />
+            <span className="burger-btn-lines" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+        )}
         <div>
           <h1 className="header-title">{t('app.header.title')}</h1>
           <p className="header-sub">{sectionLabel}</p>
         </div>
-        <SocialIcons />
       </div>
       <button
         type="button"
@@ -381,6 +396,7 @@ export function Dashboard() {
     if (menuPicks > 0) sectionRef.current!.focus();
   }, [menuPicks]);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const wide = useMediaQuery(WIDE_SCREEN);
   const selectFromMenu = (next: DashboardTab) => {
     dash.setTab(next);
     setMenuPicks((n) => n + 1);
@@ -391,6 +407,7 @@ export function Dashboard() {
       <div className="dashboard-sticky" ref={stickyRef}>
         <Header
           dash={dash}
+          wide={wide}
           sectionLabel={
             <>
               <span className="section-badge" style={{ color: section.color }}>
@@ -409,32 +426,42 @@ export function Dashboard() {
         )}
       </div>
 
-      <main className="main">
-        <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
-        <HouseholdJoinPrompt />
-        <div
-          ref={sectionRef}
-          className="dashboard-section"
-          role="region"
-          aria-label={sectionLabel}
-          tabIndex={-1}
-          data-tour="section"
-          style={{ '--section-color': section.color } as CSSProperties}
-        >
-          {tour.hasGuide && <SectionGuideButton label={sectionLabel} onStart={tour.startGuide} />}
-          {/* A failing section does not take the menu down; changing section clears the error. */}
-          <ErrorBoundary key={dash.tab}>
-            <Suspense fallback={<SectionLoading />}>
-              <TabContent
-                dash={dash}
-                onStartTour={tour.start}
-                onStartFullTour={tour.startFull}
-                onImport={dash.openImport}
-              />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-      </main>
+      <div className={`dashboard-body${wide ? ' dashboard-body--side' : ''}`}>
+        {wide && (
+          <SideNav
+            tab={dash.tab}
+            onSelectTab={selectFromMenu}
+            onOpenProfile={dash.openProfile}
+            onOpenInvite={() => setInviteOpen(true)}
+          />
+        )}
+        <main className="main">
+          <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
+          <HouseholdJoinPrompt />
+          <div
+            ref={sectionRef}
+            className="dashboard-section"
+            role="region"
+            aria-label={sectionLabel}
+            tabIndex={-1}
+            data-tour="section"
+            style={{ '--section-color': section.color } as CSSProperties}
+          >
+            {tour.hasGuide && <SectionGuideButton label={sectionLabel} onStart={tour.startGuide} />}
+            {/* A failing section does not take the menu down; changing section clears the error. */}
+            <ErrorBoundary key={dash.tab}>
+              <Suspense fallback={<SectionLoading />}>
+                <TabContent
+                  dash={dash}
+                  onStartTour={tour.start}
+                  onStartFullTour={tour.startFull}
+                  onImport={dash.openImport}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        </main>
+      </div>
 
       <BurgerMenu
         open={dash.menuOpen}

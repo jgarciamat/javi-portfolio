@@ -35,8 +35,6 @@ export interface DashboardSection {
   color: string;
   /** Groups shown as separate blocks in the menu. */
   group: 'overview' | 'money' | 'work' | 'learn' | 'account';
-  /** Shorter name for the menu tiles, when the full one wraps. */
-  menuKey?: string;
 }
 
 /** One soft colour per menu group: its icons, and the screens under it, share it. */
@@ -66,7 +64,6 @@ const SECTIONS: Omit<DashboardSection, 'color'>[] = [
     id: 'leaks',
     icon: 'coins',
     labelKey: 'app.tabs.leaks',
-    menuKey: 'app.menu.short.leaks',
     group: 'overview',
   },
   { id: 'health', icon: 'heart', labelKey: 'app.tabs.health', group: 'overview' },
@@ -112,14 +109,12 @@ const SECTIONS: Omit<DashboardSection, 'color'>[] = [
     id: 'hacienda',
     icon: 'compass',
     labelKey: 'app.tabs.hacienda',
-    menuKey: 'app.menu.short.hacienda',
     group: 'work',
   },
   {
     id: 'automations',
     icon: 'settings',
     labelKey: 'app.tabs.automations',
-    menuKey: 'app.menu.short.automations',
     group: 'money',
   },
   {

@@ -226,9 +226,9 @@ test('whoever turned the tour off is offered the renewed one once, without block
   await expect(notice).toBeVisible();
   // Not blocking: the app underneath still works.
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Abrir menú' }).click();
-  await expect(page.getByRole('dialog', { name: /menú/i })).toBeVisible();
-  await page.keyboard.press('Escape');
+  // On a computer the sections are in the side bar: it works with the notice open.
+  await page.locator('.side-nav .burger-nav-item', { hasText: 'Presupuestos' }).click();
+  await expect(page.getByRole('region', { name: 'Presupuestos' })).toBeVisible();
   await notice.getByRole('button', { name: 'Ahora no' }).click();
   await expect(notice).toBeHidden();
 
