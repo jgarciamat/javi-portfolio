@@ -1678,3 +1678,24 @@ button.entity-item {
     color: var(--slate-300);
   }
 }
+
+/* A row an automatic operation already added: said under its category, with «Import it anyway». */
+.import-covered {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+  color: var(--amber-300, #fcd34d);
+}
+
+.import-covered label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 32px;
+  color: var(--slate-200);
+}
+
+/* Left out rows are muted, but «Import it anyway» stays readable. */
+.row-muted .import-covered label {
+  opacity: 1;
+}

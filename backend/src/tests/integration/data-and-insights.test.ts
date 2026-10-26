@@ -75,6 +75,63 @@ describe('Import', () => {
     expect(month.transactions).toHaveLength(5);
     expect(month.summary.totalExpenses).toBe(80.7);
   });
+
+  it('says which rows repeat a movement of an automatic operation, and still imports them if sent', async () => {
+    await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Alquiler piso',
+        type: 'EXPENSE',
+        category: 'Vivienda',
+        amount: 650,
+        startYear: 2026,
+        startMonth: 3,
+      })
+      .expect(201);
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    const generated = month.transactions.find(
+      (t: { description: string }) => t.description === 'Alquiler piso'
+    );
+    expect(generated.date).toBe('2026-03-01');
+    const statement = [
+      { date: '2026-03-03', description: 'TRANSFERENCIA ALQUILER PISO MARZO', amount: -650 },
+      // A second rent the same month is not taken for it: one movement covers one row.
+      { date: '2026-03-04', description: 'ALQUILER PISO', amount: -650 },
+      { date: '2026-03-02', description: 'MERCADONA', amount: -650 },
+    ];
+    const preview = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: statement, dryRun: true })
+      .expect(200);
+    expect(preview.body.imported).toBe(3);
+    expect(preview.body.rows[0].coveredBy).toEqual({
+      transactionId: generated.id,
+      description: 'Alquiler piso',
+      date: '2026-03-01',
+    });
+    expect(preview.body.rows[1].coveredBy).toBeUndefined();
+    expect(preview.body.rows[2].coveredBy).toBeUndefined();
+    // What the person decided to keep is imported as sent.
+    const done = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: statement.slice(1) })
+      .expect(201);
+    expect(done.body.imported).toBe(2);
+  });
+
+  it('looks for nothing when every row was already imported', async () => {
+    const only = [{ date: '2026-03-02', description: 'MERCADONA', amount: -10 }];
+    await request(ctx.app).post('/api/transactions/import').set(user.auth).send({ rows: only });
+    const again = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: only, dryRun: true })
+      .expect(200);
+    expect(again.body).toMatchObject({ imported: 0, duplicates: 1 });
+  });
 });
 
 describe('Export', () => {

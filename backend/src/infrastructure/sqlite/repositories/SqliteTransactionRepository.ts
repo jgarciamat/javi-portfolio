@@ -9,6 +9,7 @@ import {
   TransactionView,
 } from '@domain/ports/repositories';
 import { LeakMovement } from '@domain/services/money-leaks';
+import { RuleMovement } from '@domain/services/recurring-match';
 import { SAMPLE_HASH_PREFIX } from '@domain/services/sample-data';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
@@ -333,6 +334,17 @@ export class SqliteTransactionRepository implements TransactionRepository {
       )
       .all(userId, fromDate, limit) as LeakMovement[];
     return rows;
+  }
+
+  listFromRulesBetween(userId: string, fromDate: string, toDate: string): RuleMovement[] {
+    return this.db
+      .prepare(
+        `SELECT id, description, date, amount_cents AS amountCents, type
+           FROM transactions
+          WHERE user_id = ? AND recurring_rule_id IS NOT NULL AND date BETWEEN ? AND ?
+          ORDER BY date`
+      )
+      .all(userId, fromDate, toDate) as RuleMovement[];
   }
 
   existingImportHashes(userId: string, hashes: string[]): Set<string> {

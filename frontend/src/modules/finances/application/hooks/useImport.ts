@@ -174,6 +174,11 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [useAi, setUseAiState] = useState(() => storage.get(AI_KEY) === '1');
+  /**
+   * Rows of the preview left out of the import (their index): those an automatic operation
+   * already added, unless the person asks to keep them.
+   */
+  const [omitted, setOmitted] = useState<number[]>([]);
 
   const setUseAi = (on: boolean) => {
     setUseAiState(on);
@@ -257,13 +262,15 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setBusy(true);
     setError(null);
     try {
-      const response = await transactionApi.import(read.rows, {
+      const rows = dryRun ? read.rows : read.rows.filter((_, i) => !omitted.includes(i));
+      const response = await transactionApi.import(rows, {
         accountId: accountId || null,
         dryRun,
         useAi,
       });
       if (dryRun) {
         setPreview(response);
+        setOmitted(response.rows.filter((r) => r.coveredBy).map((r) => r.index));
         setStep('preview');
       } else {
         setResult(response);
@@ -307,6 +314,12 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     useAi,
     setUseAi,
     preview,
+    omitted,
+    /** Keeps a row an automatic operation already covers, or leaves it out again. */
+    toggleOmitted: (index: number) =>
+      setOmitted((list) =>
+        list.includes(index) ? list.filter((i) => i !== index) : [...list, index]
+      ),
     result,
     busy,
     reading: screenshot.reading,

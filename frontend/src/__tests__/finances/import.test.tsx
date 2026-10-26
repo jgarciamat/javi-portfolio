@@ -116,6 +116,112 @@ describe('ImportModal', () => {
     expect(screen.queryByText(/Hemos entendido las columnas/)).toBeNull();
   });
 
+  it('leaves out what an automatic operation already added, unless asked to import it anyway', async () => {
+    const { api, upload } = setup();
+    upload(
+      statement(
+        'Fecha;Concepto;Importe\n03/03/2026;ALQUILER PISO;-650,00\n04/03/2026;NETFLIX;-13,99\n05/03/2026;BAR;-3,00\n'
+      )
+    );
+    const cover = (id: string, description: string) => ({
+      transactionId: id,
+      description,
+      date: '2026-03-01',
+    });
+    const preview = (index: number, description: string, amount: number) => ({
+      index,
+      status: 'imported' as const,
+      date: '2026-03-03',
+      description,
+      amount,
+      type: 'EXPENSE' as const,
+      categoryName: 'Vivienda',
+      categorySource: 'keywords' as const,
+    });
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: true,
+      imported: 3,
+      duplicates: 0,
+      invalid: 0,
+      rows: [
+        { ...preview(0, 'ALQUILER PISO', 650), coveredBy: cover('t1', 'Alquiler piso') },
+        { ...preview(1, 'NETFLIX', 13.99), coveredBy: cover('t2', 'Netflix') },
+        preview(2, 'BAR', 3),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
+    expect(
+      await screen.findByText(tr('app.import.coveredNotice', { count: 2 }), { exact: false })
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Ya cubierto por una operación automática/)).toHaveLength(2);
+    const anyway = screen.getByRole('checkbox', { name: /Importar igualmente\s+NETFLIX/ });
+    expect(anyway).not.toBeChecked();
+    // Only the new one is imported by default; ticking one adds it back.
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    ).toBeVisible();
+    fireEvent.click(anyway);
+    expect(anyway.closest('tr')).not.toHaveClass('row-muted');
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: false,
+      imported: 2,
+      duplicates: 0,
+      invalid: 0,
+      rows: [],
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.confirm', { count: 2 }) }));
+    await waitFor(() =>
+      expect(api.transactionApi.import).toHaveBeenLastCalledWith(
+        [
+          expect.objectContaining({ description: 'NETFLIX' }),
+          expect.objectContaining({ description: 'BAR' }),
+        ],
+        expect.objectContaining({ dryRun: false })
+      )
+    );
+    expect(
+      await screen.findByRole('heading', { name: tr('app.import.doneTitle', { count: 2 }) })
+    ).toBeInTheDocument();
+  });
+
+  it('says it of one row alone, and can leave it out again', async () => {
+    const { api, upload } = setup();
+    upload(statement('Fecha;Concepto;Importe\n03/03/2026;ALQUILER;-650,00\n'));
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: true,
+      imported: 1,
+      duplicates: 0,
+      invalid: 0,
+      rows: [
+        {
+          index: 0,
+          status: 'imported',
+          date: '2026-03-03',
+          description: 'ALQUILER',
+          amount: 650,
+          type: 'EXPENSE',
+          categoryName: 'Vivienda',
+          coveredBy: { transactionId: 't1', description: 'Alquiler', date: '2026-03-01' },
+        },
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
+    expect(
+      await screen.findByText(tr('app.import.coveredNoticeOne'), { exact: false })
+    ).toBeInTheDocument();
+    const confirm = screen.getByRole('button', { name: tr('app.import.confirm', { count: 0 }) });
+    expect(confirm).toBeDisabled();
+    const anyway = screen.getByRole('checkbox', { name: /Importar igualmente/ });
+    fireEvent.click(anyway);
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    ).toBeEnabled();
+    fireEvent.click(anyway);
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 0 }) })
+    ).toBeDisabled();
+  });
+
   it('refuses an Excel file with no data, and the old .xls format', async () => {
     const { upload } = setup();
     upload(statement(buildXlsx([{ name: 'Vacía', rows: [['solo cabecera']] }]), 'vacia.xlsx'));

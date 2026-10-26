@@ -200,6 +200,8 @@ export interface ImportRowResult {
   categoryName?: string;
   categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
+  /** A movement of an automatic operation this row seems to repeat (date ±3 days, amount, concept). */
+  coveredBy?: { transactionId: string; description: string; date: string };
 }
 
 export interface ImportResult {

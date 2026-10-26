@@ -433,6 +433,30 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
   );
 }
 
+/**
+ * «Already covered by an automatic operation»: the row repeats a movement one of them added. Left
+ * out unless the person ticks «Import it anyway».
+ */
+function CoveredRow({ row, imp }: { row: ImportedRow; imp: ImportState }) {
+  const { t } = useI18n();
+  const { date } = useFormat();
+  const cover = row.coveredBy as NonNullable<ImportedRow['coveredBy']>;
+  return (
+    <span className="import-covered">
+      <small>{t('app.import.covered', { name: cover.description, date: date(cover.date) })}</small>
+      <label>
+        <input
+          type="checkbox"
+          checked={!imp.omitted.includes(row.index)}
+          onChange={() => imp.toggleOmitted(row.index)}
+        />{' '}
+        {t('app.import.importAnyway')}
+        <span className="sr-only"> {row.description}</span>
+      </label>
+    </span>
+  );
+}
+
 function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult }) {
   const { t, tCategory } = useI18n();
   const { money, date } = useFormat();
@@ -442,6 +466,9 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
       : t(`app.import.status.${r.status}`);
   const amount = (r: ImportedRow): string =>
     r.amount === undefined ? '—' : money(r.type === 'EXPENSE' ? -r.amount : r.amount);
+  const covered = preview.rows.filter((r) => r.coveredBy).length;
+  const toImport = preview.imported - imp.omitted.length;
+  const left = (r: ImportedRow) => r.status !== 'imported' || imp.omitted.includes(r.index);
 
   return (
     <div className="modal-body">
@@ -452,6 +479,14 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           invalid: preview.invalid,
         })}
       </p>
+      {covered > 0 && (
+        <p className="plan-note" role="status">
+          <Icon name="repeat" />{' '}
+          {t(covered === 1 ? 'app.import.coveredNoticeOne' : 'app.import.coveredNotice', {
+            count: covered,
+          })}
+        </p>
+      )}
       <ScrollRegion className="table-scroll" label={t('app.import.preview')}>
         {/* On phones each row is a card: concept and amount whole, the category under them. */}
         <table className="data-table import-cards">
@@ -466,12 +501,15 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           </thead>
           <tbody>
             {preview.rows.slice(0, 100).map((r) => (
-              <tr key={r.index} className={r.status !== 'imported' ? 'row-muted' : undefined}>
+              <tr key={r.index} className={left(r) ? 'row-muted' : undefined}>
                 <td className="import-card-date">{r.date ? date(r.date) : '—'}</td>
                 <td className="import-card-concept">{r.description ?? r.error}</td>
                 <td className="import-card-type">{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
                 <td className="import-card-amount">{amount(r)}</td>
-                <td className="import-card-meta">{category(r)}</td>
+                <td className="import-card-meta">
+                  {category(r)}
+                  {r.coveredBy && <CoveredRow row={r} imp={imp} />}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -483,12 +521,10 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
         </button>
         <button
           className="btn-primary"
-          disabled={imp.busy || preview.imported === 0}
+          disabled={imp.busy || toImport === 0}
           onClick={imp.confirmImport}
         >
-          {imp.busy
-            ? t('app.common.loading')
-            : t('app.import.confirm', { count: preview.imported })}
+          {imp.busy ? t('app.common.loading') : t('app.import.confirm', { count: toImport })}
         </button>
       </div>
     </div>
@@ -603,7 +639,7 @@ function StepBody({
     return (
       <DoneStep
         result={imp.result}
-        rows={(imp.preview as ImportResult).rows}
+        rows={(imp.preview as ImportResult).rows.filter((r) => !imp.omitted.includes(r.index))}
         categories={categories}
         onOpenLeaks={onOpenLeaks}
         onOpenGoals={onOpenGoals}
