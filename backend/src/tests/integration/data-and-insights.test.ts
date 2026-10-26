@@ -288,12 +288,13 @@ describe('Forecast', () => {
   beforeEach(async () => {
     ctx = createTestApp({ now: '2026-04-11T12:00:00Z' });
     user = await createUser(ctx);
-    for (const [date, amount] of [
-      ['2026-01-10', 300],
-      ['2026-02-10', 300],
-      ['2026-03-10', 300],
+    // Different names, or they would look like a monthly subscription.
+    for (const [date, amount, description] of [
+      ['2026-01-10', 300, 'Rebajas'],
+      ['2026-02-10', 300, 'Taller'],
+      ['2026-03-10', 300, 'Viaje'],
     ] as const) {
-      await addTransaction(ctx, user, { amount, date });
+      await addTransaction(ctx, user, { amount, date, description });
     }
     await addTransaction(ctx, user, {
       type: 'INCOME',
@@ -319,6 +320,47 @@ describe('Forecast', () => {
     });
     expect(res.body).toMatchObject({ year: 2026, month: 4, locked: false });
     expect(res.body.projection).toHaveLength(6);
+    // History: 300 € in 22 days of January (data from the 10th), 28 of February and 31 of March:
+    // 11,34 €/day. Nothing spent in the 11 days of April: (0 + 7 · 11,34) / 18 = 4,41 €/day.
+    expect(res.body.endOfMonth).toEqual({
+      enoughData: false, // 4 movements
+      fewData: false,
+      available: 1100,
+      daysLeft: 20,
+      daysElapsed: 11,
+      monthVariable: 0,
+      monthDaily: 0,
+      historyDaily: 11.34,
+      historyMonths: 3,
+      pace: 4.41,
+      pending: [],
+      pendingTotal: 0,
+      scheduled: [],
+      scheduledTotal: 0,
+      oneOffs: [],
+      outlierMonths: [],
+      projectedEnd: 1011.8,
+      maxDaily: 55,
+      status: 'ok',
+    });
+  });
+
+  it('takes the subscriptions still to come and the expenses dated later this month', async () => {
+    for (const date of ['2026-01-20', '2026-02-20', '2026-03-20']) {
+      await addTransaction(ctx, user, { description: 'Netflix', amount: 12.99, date });
+    }
+    await addTransaction(ctx, user, { description: 'Dentista', amount: 60, date: '2026-04-25' });
+    const { endOfMonth } = (await forecast().expect(200)).body;
+    expect(endOfMonth).toMatchObject({
+      enoughData: true,
+      pending: [{ description: 'Netflix', date: '2026-04-19', amount: 12.99 }],
+      pendingTotal: 12.99,
+      scheduled: [{ description: 'Dentista', date: '2026-04-25', amount: 60 }],
+      scheduledTotal: 60,
+      // 1100 − 3 · 12,99 − 60 available; (1001,03 − 12,99) / 20 days.
+      available: 1001.03,
+      maxDaily: 49.4,
+    });
   });
 
   it('projects the next months from the recurring rules and lets rules be left out', async () => {
