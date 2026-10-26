@@ -210,3 +210,9 @@
   border-radius: 10px;
   background: #000;
 }
+
+/* «Suggested by what you typed»: under the category the concept put in. */
+.tx-field-hint {
+  color: var(--slate-400);
+  font-size: 0.8rem;
+}

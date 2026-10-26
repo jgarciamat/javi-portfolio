@@ -7,7 +7,7 @@ test('adds a movement and edits it in a dialog that keeps the focus', async ({ p
   await page.getByRole('button', { name: /Nueva transacción/ }).click();
   await page.getByLabel('Descripción').fill(description);
   await page.getByLabel('Importe', { exact: true }).fill('12.5');
-  await page.getByLabel('Categoría...').selectOption({ label: '🍔 Alimentación' });
+  await page.getByLabel('Categoría', { exact: true }).selectOption({ label: '🍔 Alimentación' });
   await page.getByRole('button', { name: 'Guardar transacción' }).click();
 
   const edit = page.getByRole('button', { name: `Editar: ${description}` });

@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useResource } from '@shared/hooks/useResource';
+import { suggestCategory } from '@modules/finances/domain/quickEntry';
 import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import type {
   Account,
   Category,
   CreateTransactionDTO,
+  Transaction,
   TransactionType,
 } from '@modules/finances/domain/types';
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
@@ -28,6 +32,8 @@ export interface TransactionFormProps {
   onQuickAddDone: () => void;
   /** Opens the form with this account chosen (a new object each time, so the same one can be asked twice). */
   accountRequest?: { id: string } | null;
+  /** Movements of the month: the category the concept suggests comes from them and the rules. */
+  transactions?: Transaction[];
 }
 
 /** Collapsible "new movement" form of the month view. */
@@ -41,11 +47,14 @@ export function TransactionForm({
   quickAdd,
   onQuickAddDone,
   accountRequest = null,
+  transactions = [],
 }: TransactionFormProps) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
   const { money } = useFormat();
+  const { categoryRuleApi } = useApi();
+  const rules = useResource(() => categoryRuleApi.getAll(), [categoryRuleApi], { initial: [] });
   const defaultAccountId = accounts.find((a) => a.isDefault)?.id ?? accounts[0]?.id ?? null;
   const form = useTransactionForm({
     availableBalance,
@@ -54,6 +63,13 @@ export function TransactionForm({
     defaultAccountId,
     formatMoney: money,
     t,
+    // Only a category the person has: a rule or a movement may point at one deleted since.
+    suggest: (description, type) => {
+      const has = (name: string | null) => categories.some((c) => c.name === name);
+      const usable = rules.data.filter((r) => has(r.categoryName));
+      const name = suggestCategory({ description, type }, usable, transactions);
+      return has(name) ? name : null;
+    },
   });
 
   // The anchor has no box of its own (display: contents): the panel inside it is what scrolls into view.

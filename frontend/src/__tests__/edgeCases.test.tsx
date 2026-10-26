@@ -519,10 +519,9 @@ describe('dashboard edge cases', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: literal(tr('app.transaction.form.title')) })
     );
-    fireEvent.change(
-      screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
-      { target: { value: '__manage__' } }
-    );
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.category') }), {
+      target: { value: '__manage__' },
+    });
     const manager = await screen.findByRole('dialog', { name: tr('app.category.manager.title') });
     fireEvent.change(
       within(manager).getByRole('textbox', { name: tr('app.category.manager.name.placeholder') }),

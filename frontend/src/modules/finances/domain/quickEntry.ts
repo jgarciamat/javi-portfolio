@@ -49,15 +49,15 @@ export function recentCategories(
 }
 
 /**
- * The category for a quick movement: a rule of the person whose text is in the concept (the
- * longest one), else the category of the last movement with the same concept, else the last one
- * used for that type, else «Otros».
+ * The category a concept suggests: a rule of the person whose text is in the concept (the longest
+ * one), else the category of the last movement with the same concept, else the last one used for
+ * that type. Null when there is nothing to go by.
  */
-export function quickCategory(
-  entry: QuickEntry,
+export function suggestCategory(
+  entry: Pick<QuickEntry, 'description' | 'type'>,
   rules: CategoryRule[],
   transactions: Transaction[]
-): string {
+): string | null {
   const concept = normalize(entry.description);
   const rule = rules
     .filter((r) => concept.includes(normalize(r.pattern)))
@@ -66,5 +66,14 @@ export function quickCategory(
   const same = transactions
     .filter((tx) => normalize(tx.description) === concept)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
-  return same?.category ?? recentCategories(transactions, entry.type, 1)[0] ?? 'Otros';
+  return same?.category ?? recentCategories(transactions, entry.type, 1)[0] ?? null;
+}
+
+/** The category for a quick movement: the suggested one, else «Otros». */
+export function quickCategory(
+  entry: QuickEntry,
+  rules: CategoryRule[],
+  transactions: Transaction[]
+): string {
+  return suggestCategory(entry, rules, transactions) ?? 'Otros';
 }

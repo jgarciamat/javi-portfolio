@@ -76,6 +76,8 @@
   "app.transaction.form.category": "Categoría",
   "app.transaction.form.category.placeholder": "Categoría...",
   "app.transaction.form.category.manage": "Crear / Eliminar categoría",
+  "app.transaction.form.categoryRequired": "Elige una categoría para guardarlo.",
+  "app.transaction.form.categorySuggested": "Sugerida por lo que has escrito. Puedes cambiarla.",
   "app.transaction.form.notes": "Notas (opcional)",
   "app.transaction.form.date": "Fecha",
   "app.transaction.form.save": "Guardar transacción",

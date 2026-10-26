@@ -347,6 +347,7 @@ export function MonthlyView({
           quickAdd={quickAdd}
           onQuickAddDone={() => setParams({}, { replace: true })}
           accountRequest={accountRequest}
+          transactions={f.transactions}
         />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {activeAccounts.length > 1 && (
