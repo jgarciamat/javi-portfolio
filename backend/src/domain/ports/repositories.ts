@@ -256,6 +256,10 @@ export interface TransactionRepository {
   earliestPeriod(userId: string): Period | null;
   /** How many movements the user has in total. */
   count(userId: string): number;
+  /** The invented movements of «Pruébalo con datos de ejemplo» (import hash `sample:…`). */
+  countSample(userId: string): number;
+  /** Removes those invented movements; returns how many. */
+  deleteSample(userId: string): number;
 }
 
 export interface RecurringRuleRepository {

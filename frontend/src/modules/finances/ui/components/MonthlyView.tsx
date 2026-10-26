@@ -30,6 +30,7 @@ import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
+import { SampleDataCard } from './SampleDataCard';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
@@ -288,6 +289,7 @@ export function MonthlyView({
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
         <MonthActions onImport={onImport} />
+        <SampleDataCard onOpenLeaks={() => onOpenTab('leaks')} onImport={onImport} />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {activeAccounts.length > 1 && (
           <AccountCards

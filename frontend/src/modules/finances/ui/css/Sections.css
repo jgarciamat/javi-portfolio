@@ -1412,3 +1412,18 @@ button.entity-item {
   font-size: 0.85rem;
   color: var(--green-400, #4ade80);
 }
+
+/* ─── «Pruébalo con datos de ejemplo» ─── */
+.sample-card {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.sample-card p {
+  margin: 0;
+}
+
+.sample-card--active {
+  border-color: var(--amber-400, #fbbf24);
+}

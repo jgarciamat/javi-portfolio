@@ -133,6 +133,10 @@ export function createFakeApi(): FakeApi {
     authApi: fakeAuthApi(),
     monthApi: { get: ok(f.overview()) },
     transactionApi: {
+      // Someone who already has movements: the sample data is not offered.
+      sampleStatus: ok({ sample: 0, movements: 12 }),
+      loadSample: ok({ sample: 80, movements: 80 }),
+      removeSample: ok({ deleted: 80 }),
       create: ok(f.transaction()),
       update: ok(f.transaction()),
       patch: ok(f.transaction()),

@@ -210,6 +210,12 @@ export interface ImportResult {
   rows: ImportRowResult[];
 }
 
+/** «Pruébalo con datos de ejemplo»: invented movements, and all the movements of the person. */
+export interface SampleDataStatus {
+  sample: number;
+  movements: number;
+}
+
 // ─── Recurring rules ──────────────────────────────────────────────────────────
 
 export type RecurringFrequency = 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';

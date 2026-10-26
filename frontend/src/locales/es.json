@@ -5979,5 +5979,17 @@
   "app.import.screenshot.choose": "Elegir captura de pantalla",
   "app.import.screenshot.reading": "Leyendo la captura en tu dispositivo… La primera vez tarda un poco más.",
   "app.import.screenshot.nothing": "No hemos encontrado movimientos en la imagen. Prueba con una captura más nítida, solo de la lista de movimientos, o copia y pega el texto.",
-  "app.import.screenshot.error": "No se ha podido leer la imagen. Prueba con una captura en PNG o JPG, o copia y pega el texto."
+  "app.import.screenshot.error": "No se ha podido leer la imagen. Prueba con una captura en PNG o JPG, o copia y pega el texto.",
+  "app.sample.title": "Pruébalo con datos de ejemplo",
+  "app.sample.body": "¿Quieres ver cómo funciona antes de meter nada? Añadimos cuatro meses de movimientos inventados (nómina, alquiler, recibos, suscripciones y compras) y verás el resumen del mes, tus suscripciones y «Tu dinero perdido». Los borras con un toque cuando quieras.",
+  "app.sample.load": "Pruébalo con datos de ejemplo",
+  "app.sample.loading": "Añadiendo los datos de ejemplo…",
+  "app.sample.active": "Estás viendo {count} movimientos inventados de ejemplo. Al borrarlos, lo que hayas añadido tú se queda.",
+  "app.sample.seeLeaks": "Ver «Tu dinero perdido»",
+  "app.sample.remove": "Borrar datos de ejemplo",
+  "app.sample.confirmTitle": "¿Borrar los datos de ejemplo?",
+  "app.sample.confirmBody": "Se borran los {count} movimientos inventados. Lo que hayas añadido tú se queda.",
+  "app.sample.removed": "Datos de ejemplo borrados. Ahora te toca a ti: importar tu banco es gratis e ilimitado.",
+  "app.sample.import": "Importar mi banco",
+  "app.sample.error": "No se ha podido completar. Vuelve a probarlo."
 }

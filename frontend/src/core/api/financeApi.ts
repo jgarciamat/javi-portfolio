@@ -35,6 +35,7 @@ import type {
   Goal,
   GoalInput,
   ImportResult,
+  SampleDataStatus,
   ImportRowDTO,
   MonthOverview,
   NetWorthPoint,
@@ -60,6 +61,16 @@ export const monthApi = {
 };
 
 export const transactionApi = {
+  /** «Pruébalo con datos de ejemplo»: how many invented movements there are, and in total. */
+  sampleStatus() {
+    return apiRequest<SampleDataStatus>('/sample-data');
+  },
+  loadSample() {
+    return apiRequest<SampleDataStatus>('/sample-data', { method: 'POST' });
+  },
+  removeSample() {
+    return apiRequest<{ deleted: number }>('/sample-data', { method: 'DELETE' });
+  },
   create(dto: CreateTransactionDTO) {
     return apiRequest<Transaction>('/transactions', { method: 'POST', body: jsonBody(dto) });
   },

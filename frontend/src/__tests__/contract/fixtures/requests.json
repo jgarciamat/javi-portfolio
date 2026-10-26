@@ -222,6 +222,20 @@
     }
   },
   {
+    "name": "sampleDataLoad",
+    "method": "POST",
+    "path": "/sample-data",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "sampleDataRemove",
+    "method": "DELETE",
+    "path": "/sample-data",
+    "auth": true,
+    "body": null
+  },
+  {
     "name": "accountCreate",
     "method": "POST",
     "path": "/accounts",

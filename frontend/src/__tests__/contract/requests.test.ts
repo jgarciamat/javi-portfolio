@@ -157,6 +157,8 @@ add('importCommit', () =>
   )
 );
 add('categoryCreate', () => categoryApi.create({ name: 'Mascotas', icon: '🐶', color: '#aabbcc' }));
+add('sampleDataLoad', () => transactionApi.loadSample());
+add('sampleDataRemove', () => transactionApi.removeSample());
 add('accountCreate', () =>
   accountApi.create({ name: 'Cuenta nómina', type: 'checking', initialBalance: 100 })
 );

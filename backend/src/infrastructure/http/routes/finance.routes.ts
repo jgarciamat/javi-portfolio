@@ -132,6 +132,31 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
     })
   );
 
+  /** «Pruébalo con datos de ejemplo»: invented movements to try the app, and their removal. */
+  router.get(
+    '/sample-data',
+    authed((req, res) => {
+      res.json(c.sampleData.status(req.dataUserId));
+    })
+  );
+  router.post(
+    '/sample-data',
+    limiter({
+      windowMs: 60 * 60 * 1000,
+      limit: 20,
+      keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+    }),
+    authed((req, res) => {
+      res.status(201).json(c.sampleData.load(req.dataUserId));
+    })
+  );
+  router.delete(
+    '/sample-data',
+    authed((req, res) => {
+      res.json({ deleted: c.sampleData.remove(req.dataUserId) });
+    })
+  );
+
   router.post(
     '/transactions',
     authed((req, res) => {

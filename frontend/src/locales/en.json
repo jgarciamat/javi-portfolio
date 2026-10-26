@@ -5990,5 +5990,17 @@
   "app.import.screenshot.choose": "Choose a screenshot",
   "app.import.screenshot.reading": "Reading the screenshot on your device… The first time takes a little longer.",
   "app.import.screenshot.nothing": "We found no movements in the image. Try a sharper screenshot of just the list of movements, or copy and paste the text.",
-  "app.import.screenshot.error": "The image could not be read. Try a PNG or JPG screenshot, or copy and paste the text."
+  "app.import.screenshot.error": "The image could not be read. Try a PNG or JPG screenshot, or copy and paste the text.",
+  "app.sample.title": "Try it with sample data",
+  "app.sample.body": "Want to see how it works before adding anything? We add four months of invented movements (salary, rent, bills, subscriptions and shopping) so you can see the month summary, your subscriptions and «Money you're losing». Remove them with one tap whenever you like.",
+  "app.sample.load": "Try it with sample data",
+  "app.sample.loading": "Adding the sample data…",
+  "app.sample.active": "You are looking at {count} invented sample movements. Removing them keeps everything you added yourself.",
+  "app.sample.seeLeaks": "See «Money you're losing»",
+  "app.sample.remove": "Remove sample data",
+  "app.sample.confirmTitle": "Remove the sample data?",
+  "app.sample.confirmBody": "The {count} invented movements are removed. Everything you added yourself stays.",
+  "app.sample.removed": "Sample data removed. Now it is your turn: importing your bank is free and unlimited.",
+  "app.sample.import": "Import my bank",
+  "app.sample.error": "That did not work. Please try again."
 }
