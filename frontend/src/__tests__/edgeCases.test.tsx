@@ -20,6 +20,7 @@ import * as notifications from '@core/notifications/notifications';
 import { reasonFromError } from '@modules/billing/application/PlanContext';
 import { AnalysisView } from '@modules/finances/ui/views/AnalysisView';
 import { AIAdvisor } from '@modules/finances/ui/components/AIAdvisor';
+import { useFinances } from '@modules/finances/application/FinancesContext';
 import { CalendarDayModal } from '@modules/finances/ui/components/CalendarDayModal';
 import { CategoryChart } from '@modules/finances/ui/components/CategoryChart';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
@@ -285,6 +286,28 @@ describe('billing edge cases', () => {
       await screen.findByRole('button', { name: new RegExp(tr('billing.seePlans')) })
     );
     expect(screen.getByRole('dialog', { name: tr('billing.upgradeTitle') })).toBeInTheDocument();
+  });
+
+  it('reads only the month again without «invalidate», and the accounts too with it', async () => {
+    const api = createFakeApi();
+    function Refresh() {
+      const { refresh } = useFinances();
+      return (
+        <>
+          <button onClick={() => void refresh()}>mes</button>
+          <button onClick={() => void refresh({ invalidate: true })}>todo</button>
+        </>
+      );
+    }
+    renderWithProviders(<Refresh />, { api });
+    await waitFor(() => expect(api.accountApi.getAll).toHaveBeenCalled());
+    const accounts = api.accountApi.getAll.mock.calls.length;
+    const months = api.monthApi.get.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'mes' }));
+    await waitFor(() => expect(api.monthApi.get.mock.calls.length).toBeGreaterThan(months));
+    expect(api.accountApi.getAll.mock.calls.length).toBe(accounts);
+    fireEvent.click(screen.getByRole('button', { name: 'todo' }));
+    await waitFor(() => expect(api.accountApi.getAll.mock.calls.length).toBeGreaterThan(accounts));
   });
 
   it('analyses a month before the user is known (signing in still loading)', async () => {
