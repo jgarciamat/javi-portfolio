@@ -550,115 +550,34 @@ html {
   outline: none;
 }
 
-/* ─── Computers: one centred frame for the header, the month bar, the side menu and the content ───
-   The same width and side margins for all of them: the menu lines up with the logo, the cards
-   with the month bar. */
-.dashboard--wide {
-  --shell-max: 1440px;
-  --shell-pad: 1.5rem;
-  --side-width: 240px;
-  --side-gap: 1.5rem;
+/* ─── Computers: the month bar and the content share one centred width; the top bar stays full
+   width (brand and menu at the left edge, language and «Salir» at the right one) ─── */
+@media (min-width: 1024px) {
+  .dashboard {
+    --shell-max: 1150px;
+    --shell-pad: 1.5rem;
+  }
+
+  .sticky-nav-inner,
+  .main {
+    max-width: calc(var(--shell-max) + 2 * var(--shell-pad));
+    padding-inline: var(--shell-pad);
+  }
+
+  /* The guide button starts the column, level with the content. */
+  .section-guide-row {
+    margin: 0 0 0.75rem;
+  }
 }
 
-.dashboard--wide .header {
-  padding-inline: max(var(--shell-pad), calc((100% - var(--shell-max)) / 2 + var(--shell-pad)));
+/* The crypto console is a work table: on large screens it takes more width, chart and order side by side. */
+@media (min-width: 1500px) {
+  .main--wide {
+    max-width: 1640px;
+  }
 }
 
-.dashboard--wide .sticky-nav-inner {
-  max-width: var(--shell-max);
-  padding: 0 var(--shell-pad) 0 calc(var(--shell-pad) + var(--side-width) + var(--side-gap));
-}
-
-.dashboard-body--side {
-  display: grid;
-  grid-template-columns: var(--side-width) minmax(0, 1fr);
-  gap: var(--side-gap);
-  max-width: var(--shell-max);
-  margin: 0 auto;
-  padding: 1.5rem var(--shell-pad) 0;
-}
-
-.dashboard-body--side .main {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 0 0 1.5rem;
-}
-
-/* The guide button starts the column, level with the top of the menu. */
-.dashboard--wide .section-guide-row {
-  margin: 0 0 0.75rem;
-}
-
-.side-nav {
-  /* Always whole on screen, under the fixed bar: what does not fit scrolls inside it. */
-  position: sticky;
-  top: calc(var(--sticky-bar-height, 0px) + 1.5rem);
-  align-self: start;
-  max-height: calc(100vh - var(--sticky-bar-height, 0px) - 3rem);
-  max-height: calc(100dvh - var(--sticky-bar-height, 0px) - 3rem);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border: 1px solid var(--slate-800);
-  border-radius: 14px;
-  background: var(--slate-900);
-}
-
-.side-nav .burger-nav {
-  padding: 0.75rem 0.6rem;
-  gap: 0.35rem;
-}
-
-.side-nav .burger-nav-group + .burger-nav-group {
-  margin-top: 0.5rem;
-  padding-top: 0.6rem;
-}
-
-.side-nav .burger-nav-group-title {
-  margin: 0.2rem 0.55rem 0.3rem;
-}
-
-/* A list, not the tiles of the phone menu: icon and name on one line. */
-.side-nav .burger-nav-group {
-  grid-template-columns: 1fr;
-  gap: 0.1rem;
-}
-
-.side-nav .burger-nav-item {
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 0.55rem;
-  padding: 0.45rem 0.55rem;
-  font-size: 0.86rem;
-  text-align: left;
-}
-
-.side-nav .burger-nav-label {
-  white-space: normal;
-}
-
-.side-nav .burger-nav-item--wide {
-  margin: 0.6rem 0 0.2rem;
-  padding: 0.6rem 0.6rem;
-}
-
-.side-nav .burger-nav-item--wide .burger-nav-icon {
-  position: static;
-  transform: none;
-}
-
-.side-nav .burger-nav-item--wide .burger-nav-text {
-  padding: 0;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.side-nav .burger-nav-dot {
-  display: none;
-}
-
-.side-nav .burger-nav-item--active {
-  background: color-mix(in srgb, var(--section-color, var(--accent-400)) 16%, var(--slate-800));
-  color: var(--slate-100);
-  box-shadow: inset 3px 0 0 var(--section-color, var(--accent-400));
+/* Opening the menu stops the page from scrolling: its scroll bar keeps its room, nothing jumps. */
+html {
+  scrollbar-gutter: stable;
 }

@@ -30,8 +30,6 @@ import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
 import { TourOffer } from '../tour/TourOffer';
 import { BurgerMenu } from './BurgerMenu';
-import { SideNav } from './SideNav';
-import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { InviteDialog } from './InviteDialog';
 import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
 import { EditTransactionModal } from './EditTransactionModal';
@@ -206,41 +204,30 @@ function TabContent({
   }
 }
 
-/** Wide enough for the side bar: every section at the left instead of the menu button. */
-export const WIDE_SCREEN = '(min-width: 1024px)';
-
-function Header({
-  dash,
-  sectionLabel,
-  wide,
-}: {
-  dash: UseDashboardReturn;
-  sectionLabel: ReactNode;
-  wide: boolean;
-}) {
+function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
   const { logout } = useAuth();
   return (
     <header className="header">
       <div className="header-brand">
-        {wide ? (
+        <button
+          className="burger-btn"
+          data-tour="menu"
+          onClick={() => dash.setMenuOpen(true)}
+          aria-label={t('app.menu.open')}
+          aria-expanded={dash.menuOpen}
+        >
           <BrandLogo className="burger-btn-logo" size={28} />
-        ) : (
-          <button
-            className="burger-btn"
-            data-tour="menu"
-            onClick={() => dash.setMenuOpen(true)}
-            aria-label={t('app.menu.open')}
-            aria-expanded={dash.menuOpen}
-          >
-            <BrandLogo className="burger-btn-logo" size={28} />
-            <span className="burger-btn-lines" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-          </button>
-        )}
+          <span className="burger-btn-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+          {/* On a computer the button says what it is: «Menú». */}
+          <span className="burger-btn-text" aria-hidden="true">
+            {t('app.menu.button')}
+          </span>
+        </button>
         <div>
           <h1 className="header-title">{t('app.header.title')}</h1>
           <p className="header-sub">{sectionLabel}</p>
@@ -397,18 +384,16 @@ export function Dashboard() {
     if (menuPicks > 0) sectionRef.current!.focus({ preventScroll: true });
   }, [menuPicks]);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const wide = useMediaQuery(WIDE_SCREEN);
   const selectFromMenu = (next: DashboardTab) => {
     dash.setTab(next);
     setMenuPicks((n) => n + 1);
   };
 
   return (
-    <div className={`dashboard${wide ? ' dashboard--wide' : ''}`}>
+    <div className="dashboard">
       <div className="dashboard-sticky" ref={stickyRef}>
         <Header
           dash={dash}
-          wide={wide}
           sectionLabel={
             <>
               <span className="section-badge" style={{ color: section.color }}>
@@ -427,54 +412,41 @@ export function Dashboard() {
         )}
       </div>
 
-      <div className={`dashboard-body${wide ? ' dashboard-body--side' : ''}`}>
-        {wide && (
-          <SideNav
-            tab={dash.tab}
-            onSelectTab={selectFromMenu}
-            onOpenProfile={dash.openProfile}
-            onOpenInvite={() => setInviteOpen(true)}
-          />
-        )}
-        <main className="main">
-          <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
-          <HouseholdJoinPrompt />
-          <div
-            ref={sectionRef}
-            className="dashboard-section"
-            role="region"
-            aria-label={sectionLabel}
-            tabIndex={-1}
-            data-tour="section"
-            style={{ '--section-color': section.color } as CSSProperties}
-          >
-            {tour.hasGuide && <SectionGuideButton label={sectionLabel} onStart={tour.startGuide} />}
-            {/* A failing section does not take the menu down; changing section clears the error. */}
-            <ErrorBoundary key={dash.tab}>
-              <Suspense fallback={<SectionLoading />}>
-                <TabContent
-                  dash={dash}
-                  onStartTour={tour.start}
-                  onStartFullTour={tour.startFull}
-                  onImport={dash.openImport}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        </main>
-      </div>
+      <main className={`main${dash.tab === 'crypto' ? ' main--wide' : ''}`}>
+        <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
+        <HouseholdJoinPrompt />
+        <div
+          ref={sectionRef}
+          className="dashboard-section"
+          role="region"
+          aria-label={sectionLabel}
+          tabIndex={-1}
+          data-tour="section"
+          style={{ '--section-color': section.color } as CSSProperties}
+        >
+          {tour.hasGuide && <SectionGuideButton label={sectionLabel} onStart={tour.startGuide} />}
+          {/* A failing section does not take the menu down; changing section clears the error. */}
+          <ErrorBoundary key={dash.tab}>
+            <Suspense fallback={<SectionLoading />}>
+              <TabContent
+                dash={dash}
+                onStartTour={tour.start}
+                onStartFullTour={tour.startFull}
+                onImport={dash.openImport}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      </main>
 
-      {/* On a computer the side bar has every section: no menu panel to keep behind the page. */}
-      {!wide && (
-        <BurgerMenu
-          open={dash.menuOpen}
-          tab={dash.tab}
-          onSelectTab={selectFromMenu}
-          onOpenProfile={dash.openProfile}
-          onOpenInvite={() => setInviteOpen(true)}
-          onClose={() => dash.setMenuOpen(false)}
-        />
-      )}
+      <BurgerMenu
+        open={dash.menuOpen}
+        tab={dash.tab}
+        onSelectTab={selectFromMenu}
+        onOpenProfile={dash.openProfile}
+        onOpenInvite={() => setInviteOpen(true)}
+        onClose={() => dash.setMenuOpen(false)}
+      />
       {inviteOpen && <InviteDialog onClose={() => setInviteOpen(false)} />}
       <Suspense fallback={null}>
         <DashboardModals dash={dash} shared={shared} />

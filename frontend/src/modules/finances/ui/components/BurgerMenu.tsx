@@ -41,22 +41,22 @@ function MenuFocus({
   return null;
 }
 
-/** Every section by groups, with the profile and «invite a friend»: in the menu and the side bar. */
-export function MenuNav({
+/**
+ * Every section by groups, each group a grid of two columns, with the profile and «invite a
+ * friend». `open`: only then does «Your plan» answer to the tour (closed, it is off the screen).
+ */
+function MenuNav({
   tab,
+  open,
   onSelectTab,
   onOpenProfile,
   onOpenInvite,
-  className,
-  label,
 }: {
   tab: DashboardTab;
+  open: boolean;
   onSelectTab: (tab: DashboardTab) => void;
   onOpenProfile: () => void;
   onOpenInvite: () => void;
-  className?: string;
-  /** Name of the navigation, when it is not inside a named dialog. */
-  label?: string;
 }) {
   const { t } = useI18n();
   const { user } = useAuth();
@@ -65,7 +65,7 @@ export function MenuNav({
     (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
   );
   return (
-    <nav className={`burger-nav${className ? ` ${className}` : ''}`} aria-label={label}>
+    <nav className="burger-nav" aria-label={t('app.menu.ariaLabel')}>
       {SECTION_GROUPS.map((group) => (
         <div
           key={group}
@@ -107,7 +107,7 @@ export function MenuNav({
                 className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
                 onClick={() => onSelectTab(id)}
                 aria-current={tab === id ? 'page' : undefined}
-                data-tour={id === 'plan' ? 'plan' : undefined}
+                data-tour={open && id === 'plan' ? 'plan' : undefined}
                 style={{ '--section-color': color } as CSSProperties}
               >
                 <span className="burger-nav-icon">
@@ -195,6 +195,7 @@ export function BurgerMenu({
         </div>
         <MenuNav
           tab={tab}
+          open={open}
           onSelectTab={(id) => {
             onSelectTab(id);
             onClose();

@@ -450,6 +450,7 @@
   "app.common.save": "Save",
   "app.menu.open": "Open menu",
   "app.menu.close": "Close menu",
+  "app.menu.button": "Menu",
   "app.menu.group.overview": "Overview",
   "app.menu.group.money": "My money",
   "app.menu.group.work": "Taxes and work",

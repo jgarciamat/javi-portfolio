@@ -450,6 +450,7 @@
   "app.common.save": "Guardar",
   "app.menu.open": "Abrir menú",
   "app.menu.close": "Cerrar menú",
+  "app.menu.button": "Menú",
   "app.menu.group.overview": "Resumen",
   "app.menu.group.money": "Mi dinero",
   "app.menu.group.work": "Hacienda y trabajo",

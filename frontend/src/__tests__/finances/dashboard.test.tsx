@@ -7,7 +7,6 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
-import { mockMatchMedia } from '@test-utils/dom';
 
 jest.mock('@core/notifications/notifications', () => ({
   ...jest.requireActual('@core/notifications/notifications'),
@@ -40,37 +39,22 @@ describe('menu and sections', () => {
     expect(localStorage.getItem('mm_last_tab')).toBe('settings');
   });
 
-  it('on a computer keeps every section in a side bar instead of the menu button', async () => {
-    const restore = mockMatchMedia(true);
-    try {
-      renderWithProviders(<Dashboard />, { plan: true });
-      expect(screen.queryByRole('button', { name: tr('app.menu.open') })).toBeNull();
-      const side = screen.getByRole('navigation', { name: tr('app.menu.ariaLabel') });
-      // Same names as the titles of the screens they open.
-      fireEvent.click(
-        within(side).getByRole('button', { name: literal(tr('app.tabs.automations')) })
-      );
-      const region = await screen.findByRole('region', { name: tr('app.tabs.automations') });
-      expect(region).toHaveFocus();
-      expect(
-        within(side).getByRole('button', { name: literal(tr('app.tabs.automations')) })
-      ).toHaveAttribute('aria-current', 'page');
-      expect(
-        within(side).getByRole('button', { name: literal(tr('app.tabs.plan')) })
-      ).toHaveAttribute('data-tour', 'plan');
-      fireEvent.click(within(side).getByTestId('menu-invite'));
-      expect(await screen.findByRole('dialog', { name: tr('billing.invite.title') })).toBeVisible();
-      fireEvent.click(
-        within(screen.getByRole('dialog', { name: tr('billing.invite.title') })).getAllByRole(
-          'button',
-          { name: tr('app.common.close') }
-        )[0]
-      );
-      fireEvent.click(within(side).getByRole('button', { name: /abrir perfil/i }));
-      expect(await screen.findByRole('dialog', { name: /perfil/i })).toBeVisible();
-    } finally {
-      restore();
-    }
+  it('shows every group of the menu in two columns, the names as the screens, «Tu plan» for the tour only while open', async () => {
+    renderWithProviders(<Dashboard />, { plan: true });
+    const open = screen.getByRole('button', { name: tr('app.menu.open') });
+    expect(document.querySelector('[data-tour="plan"]')).toBeNull();
+    fireEvent.click(open);
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
+    expect(within(menu).getByRole('navigation', { name: tr('app.menu.ariaLabel') })).toBeVisible();
+    expect(
+      within(menu).getByRole('button', { name: literal(tr('app.tabs.plan')) })
+    ).toHaveAttribute('data-tour', 'plan');
+    fireEvent.click(
+      within(menu).getByRole('button', { name: literal(tr('app.tabs.automations')) })
+    );
+    const region = await screen.findByRole('region', { name: tr('app.tabs.automations') });
+    expect(region).toHaveFocus();
+    expect(open).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('closes the menu with Escape, the backdrop or the close button', () => {

@@ -200,7 +200,7 @@ describe('GuidedTour', () => {
     expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '96px' });
   });
 
-  it('highlights the copy of the target that is on screen (side bar or header button)', () => {
+  it('highlights the copy of the target that is on this screen, not a hidden one', () => {
     const hidden = placeTarget('hidden', 0, 0, 0, 0).element;
     hidden.className = 'menu';
     const shown = placeTarget('shown', 200, 40).element;

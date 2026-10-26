@@ -2117,7 +2117,9 @@ html.wiz-contrast .cc-quote-changes {
   min-width: 0;
 }
 
-@media (min-width: 1100px) {
+/* Only where the console has room for it (it takes a wider page there): beside a narrower chart
+   the coin list and the chart would stack, and the order box would squeeze them. */
+@media (min-width: 1500px) {
   .cc-desk {
     display: grid;
     grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);

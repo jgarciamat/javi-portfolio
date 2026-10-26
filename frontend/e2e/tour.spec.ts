@@ -3,6 +3,7 @@ import { expect, logIn, signIn, openSection, test, type Page } from './fixtures'
 /** Steps that talk about the screen as a whole: no element is highlighted. */
 const NO_ELEMENT = [
   /Esto es Finanverso/,
+  /Tu plan/,
   /Te enseñamos/,
   /La Renta, paso a paso/,
   /Qué hace y qué no hace/,
@@ -13,13 +14,13 @@ const NO_ELEMENT = [
   /¡Listo!/,
 ];
 
-/** On phones «Your plan» is inside the menu: the card is centred. */
-const NO_ELEMENT_ON_PHONES = [/Tu plan/];
+/** Nothing only on phones: «Your plan» is inside the closed menu on every screen (centred card). */
+const NO_ELEMENT_ON_PHONES: RegExp[] = [];
 
 /** The short tour of the sign-in: the five essentials. */
 const SHORT_TITLES = [
   /Esto es Finanverso/,
-  /Mete tus movimientos/,
+  /Mete tus transacciones/,
   /El resumen del mes/,
   /El menú/,
   /Tu plan/,
@@ -226,9 +227,9 @@ test('whoever turned the tour off is offered the renewed one once, without block
   await expect(notice).toBeVisible();
   // Not blocking: the app underneath still works.
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  // On a computer the sections are in the side bar: it works with the notice open.
-  await page.locator('.side-nav .burger-nav-item', { hasText: 'Presupuestos' }).click();
-  await expect(page.getByRole('region', { name: 'Presupuestos' })).toBeVisible();
+  await page.getByRole('button', { name: 'Abrir menú' }).click();
+  await expect(page.getByRole('dialog', { name: /menú/i })).toBeVisible();
+  await page.keyboard.press('Escape');
   await notice.getByRole('button', { name: 'Ahora no' }).click();
   await expect(notice).toBeHidden();
 

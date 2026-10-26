@@ -1718,3 +1718,117 @@ button.entity-item {
 .budget-list .entity-main {
   flex: 0 1 18rem;
 }
+
+/* ─── The menu: each group a grid of two columns, icon and name side by side, all of it in view
+   at once (rows that shrink a little on short screens; it scrolls only below ~600 px high) ─── */
+.burger-panel {
+  width: min(380px, 92vw);
+  --menu-row: clamp(30px, 4.4vh, 40px);
+}
+
+.burger-panel-header {
+  padding: 0.55rem 0.9rem;
+}
+
+.burger-nav {
+  gap: 0;
+  padding: 0.35rem 0.6rem 0.6rem;
+}
+
+.burger-nav-group {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.1rem 0.4rem;
+}
+
+.burger-nav-group + .burger-nav-group {
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+}
+
+.burger-nav-group-title {
+  margin: 0.15rem 0.55rem 0.1rem;
+}
+
+.burger-nav-item {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: var(--menu-row);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Names break between words, never inside one («Operaciones / automáticas»). */
+.burger-nav-label {
+  overflow-wrap: normal;
+  hyphens: manual;
+}
+
+.burger-nav-icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+}
+
+/* «Invite a friend»: the same frame, as low as a row. */
+.burger-nav-item--wide {
+  margin: 0.45rem 0 0;
+  padding: 0.35rem 0.75rem;
+}
+
+.burger-nav-item--wide .burger-nav-text {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.5rem;
+}
+
+.burger-nav-item--active {
+  background: color-mix(in srgb, var(--section-color, var(--accent-400)) 16%, var(--slate-800));
+  box-shadow: inset 3px 0 0 var(--section-color, var(--accent-400));
+}
+
+.burger-nav-item:focus-visible {
+  outline: 2px solid var(--section-color, var(--accent-400));
+  outline-offset: 1px;
+}
+
+.burger-nav-dot {
+  display: none;
+}
+
+.burger-btn-text {
+  display: none;
+}
+
+/* Computers: a wide panel with room for two columns of whole names, opened from «Menú». */
+@media (min-width: 1024px) {
+  .burger-panel {
+    width: min(720px, calc(100vw - 2rem));
+  }
+
+  .burger-nav {
+    padding: 0.4rem 1rem 0.75rem;
+  }
+
+  .burger-nav-group {
+    gap: 0.1rem 0.75rem;
+  }
+
+  .burger-nav-item {
+    font-size: 0.93rem;
+  }
+
+  .burger-btn {
+    border: 1px solid var(--slate-700);
+    padding: 0.3rem 0.75rem 0.3rem 0.5rem;
+  }
+
+  .burger-btn-text {
+    display: inline;
+    font-weight: 600;
+    color: var(--slate-200);
+  }
+}

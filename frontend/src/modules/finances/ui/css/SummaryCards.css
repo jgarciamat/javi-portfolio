@@ -160,14 +160,3 @@
   font-size: 0.85rem;
   color: var(--slate-300);
 }
-
-/* Next to the side menu: 3 + 3 while the column is narrow, so «12.345,67 €» stays on one line. */
-.dashboard--wide .summary-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-@media (min-width: 1400px) {
-  .dashboard--wide .summary-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}

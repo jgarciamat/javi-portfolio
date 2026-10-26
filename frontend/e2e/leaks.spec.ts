@@ -47,7 +47,7 @@ test('a statement with repeating charges: the figure after importing, the sectio
   await dialog.getByRole('button', { name: /^Importar \d+$/ }).click();
 
   // The moment it matters most: what was found, with the way there.
-  await expect(dialog.getByText(/Hemos revisado tus movimientos: unos .* al año/)).toBeVisible();
+  await expect(dialog.getByText(/Hemos revisado tus transacciones: unos .* al año/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Ver', exact: true }).click();
   await expect(dialog).toBeHidden();
   const section = page.getByRole('region', { name: 'Tu dinero perdido' });
