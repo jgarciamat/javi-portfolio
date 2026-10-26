@@ -215,7 +215,9 @@ describe('Saving in the account', () => {
     await waitFor(() => expect(stored().version).toBe(2));
     // A minute later it says when.
     await wait(60_000);
-    expect(sync()).toHaveTextContent(/14:00|12:00/);
+    // In the local time of whoever runs the tests (12:00 UTC is 13:00 in winter in Madrid).
+    const hour = String(new Date(NOW).getHours()).padStart(2, '0');
+    expect(sync()).toHaveTextContent(`${hour}:00`);
     expect(sync()).not.toHaveTextContent(tr('app.autonomo.cloud.status.savedNow'));
   });
 
