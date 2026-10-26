@@ -62,7 +62,7 @@ describe('EntitlementService', () => {
       expect.objectContaining({ plan: 'free', subscription: null, trialDaysLeft: 0 })
     );
     expect(service.limits('u1').resources.assets).toBe(3);
-    expect(service.limits('u1').resources.imports).toBe(1);
+    expect(service.limits('u1').resources.imports).toBe(Infinity);
   });
 
   it('blocks Premium features and the creation past the free limit, saying which one', () => {
@@ -78,9 +78,8 @@ describe('EntitlementService', () => {
     expect(() => service.assertCanCreate('u1', 'assets', 3)).toThrow(
       'Has llegado al máximo del plan gratuito para inversiones y deudas: 3'
     );
-    expect(() => service.assertCanCreate('u1', 'imports', 1)).toThrow(
-      'Has llegado al máximo del plan gratuito para importaciones de extractos: 1'
-    );
+    // Bank statement imports are free and unlimited on every plan.
+    expect(() => service.assertCanCreate('u1', 'imports', 500)).not.toThrow();
     expect(thrown(() => service.assertCanCreate('u1', 'accounts', 3))).toEqual(
       expect.objectContaining({ code: 'PLAN_LIMIT', details: { resource: 'accounts', limit: 3 } })
     );

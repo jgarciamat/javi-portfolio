@@ -250,7 +250,7 @@ interface MonthlyViewProps {
   onManageCategories: () => void;
   onManageBudgets: () => void;
   onOpenTab: (tab: DashboardTab) => void;
-  /** Opens the bank statement importer (the free plan's limit is handled by the caller). */
+  /** Opens the bank statement importer (free and unlimited on every plan). */
   onImport?: () => void;
 }
 

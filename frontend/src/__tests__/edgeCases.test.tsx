@@ -231,7 +231,10 @@ describe('billing edge cases', () => {
     // Premium-only rows: trends, annual report, receipts by e-mail, household and AI questions.
     expect(screen.getAllByText('✓')).toHaveLength(5);
     const row = (label: string) => screen.getByText(label).closest('tr') as HTMLElement;
-    expect(row(tr('pricing.row.imports'))).toHaveTextContent(`1${tr('pricing.unlimited')}`);
+    // Free and unlimited on every plan.
+    expect(row(tr('pricing.row.imports'))).toHaveTextContent(
+      `${tr('pricing.unlimited')}${tr('pricing.unlimited')}`
+    );
     expect(row(tr('pricing.row.rentaCalculations'))).toHaveTextContent(
       tr('pricing.perCampaign', { count: 3 })
     );

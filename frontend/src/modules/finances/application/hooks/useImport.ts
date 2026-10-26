@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
-import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { errorMessage } from '@shared/utils/errors';
 import { storage } from '@shared/utils/storage';
 import type { ImportResult, ImportRowDTO, TransactionType } from '@modules/finances/domain/types';
@@ -65,7 +64,6 @@ export function changeMapping(
  */
 export function useImport(onImported: () => void, defaultAccountId: string | null) {
   const { transactionApi } = useApi();
-  const plan = useOptionalPlan();
   const [step, setStep] = useState<ImportStep>('file');
   const [fileName, setFileName] = useState('');
   const [format, setFormat] = useState<'csv' | 'norma43' | 'pdf'>('csv');
@@ -179,8 +177,6 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         setResult(response);
         setStep('done');
         onImported();
-        // The free plan's import is now used: the next one opens the plans.
-        void plan?.refresh();
       }
     } catch (e) {
       setError(errorMessage(e, 'app.import.error.generic'));

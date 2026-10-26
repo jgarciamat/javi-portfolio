@@ -278,8 +278,8 @@ function pagesIn(lang) {
         : `Precios de Finanverso: plan gratis y Premium desde ${monthly}/mes`;
     const description =
       lang === 'en'
-        ? `Start free with everything you need to track your month. Premium: ${monthly}/month or ${yearly}/year, with a 14-day free trial and no card.`
-        : `Empieza gratis con lo esencial para llevar tus cuentas. Premium: ${monthly}/mes o ${yearly}/año, con 14 días de prueba gratis y sin tarjeta.`;
+        ? `Start free with everything you need to track your month; importing your bank is free and unlimited. Premium: ${monthly}/month or ${yearly}/year, with a 14-day free trial and no card.`
+        : `Empieza gratis con lo esencial para llevar tus cuentas; importar tu banco es gratis e ilimitado. Premium: ${monthly}/mes o ${yearly}/año, con 14 días de prueba gratis y sin tarjeta.`;
     add({
       path: '/pricing',
       title,

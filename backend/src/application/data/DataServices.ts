@@ -89,15 +89,14 @@ export class ImportService {
   ) {}
 
   /**
-   * Imports a bank statement: the free plan can import one (previews do not count and neither
-   * does a file where nothing new was imported), Premium as many as it wants.
+   * Imports a bank statement, free and unlimited on every plan. The imports that brought something
+   * new are counted (previews and files where nothing new was imported are not), only as usage.
    */
   async import(
     userId: string,
     rows: ImportRow[],
     options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
   ): Promise<ImportResult> {
-    this.entitlements.assertCanCreate(userId, 'imports', this.usage.count(userId));
     const result = await this.importRows(userId, rows, options);
     if (!result.dryRun && result.imported > 0) this.usage.increment(userId);
     return result;

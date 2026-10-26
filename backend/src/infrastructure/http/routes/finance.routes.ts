@@ -100,7 +100,14 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
 
   router.post(
     '/transactions/import',
-    limiter({ windowMs: 60 * 60 * 1000, limit: 30 }),
+    // Imports are unlimited on every plan; this only stops abuse (a preview and an import are two
+    // requests, and pasting a list may preview it a few times). Each request is capped too: the
+    // JSON body (4 MB) and MAX_IMPORT_ROWS rows.
+    limiter({
+      windowMs: 60 * 60 * 1000,
+      limit: 60,
+      keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+    }),
     authed(async (req, res) => {
       const body = importBody.parse(req.body);
       const rows = body.rows.map((r) => ({ ...r, amountCents: r.amount }));

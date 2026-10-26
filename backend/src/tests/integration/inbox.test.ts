@@ -124,7 +124,7 @@ describe('Receipts forwarded by e-mail', () => {
     expect(back.recent[0]).toMatchObject({ status: 'failed', description: null });
   });
 
-  it('does not use up the free bank statement import', async () => {
+  it('does not count as a bank statement import', async () => {
     const { address } = await inbox();
     await mail(address).expect(200);
     const overview = (await request(ctx.app).get('/api/billing').set(user.auth)).body;

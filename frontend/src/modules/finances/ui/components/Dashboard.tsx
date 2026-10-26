@@ -15,7 +15,6 @@ import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useScrollToStart, useStickyBarHeight } from '@shared/hooks/useStickyBar';
 import { lazyNamed } from '@shared/utils/lazyNamed';
-import { usageLimit } from './AutonomoLimit';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
@@ -337,14 +336,6 @@ export function Dashboard() {
     setMenuPicks((n) => n + 1);
   };
 
-  // Free plan: one bank statement import; once used, the button opens the paywall instead.
-  const imports = usageLimit(plan, 'imports');
-  const openImport =
-    plan && imports.locked
-      ? () =>
-          plan.openUpgrade({ kind: 'limit', resource: 'imports', limit: imports.limit as number })
-      : dash.openImport;
-
   return (
     <div className="dashboard">
       <div className="dashboard-sticky" ref={stickyRef}>
@@ -383,7 +374,7 @@ export function Dashboard() {
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
             <Suspense fallback={<SectionLoading />}>
-              <TabContent dash={dash} onStartTour={tour.start} onImport={openImport} />
+              <TabContent dash={dash} onStartTour={tour.start} onImport={dash.openImport} />
             </Suspense>
           </ErrorBoundary>
         </div>

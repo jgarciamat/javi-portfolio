@@ -18,7 +18,7 @@ export const planCatalog = {
         autonomoDrafts: 1,
         autonomoPdfs: 1,
         assets: 3,
-        imports: 1,
+        imports: null,
       },
       features: {
         insights: false,
