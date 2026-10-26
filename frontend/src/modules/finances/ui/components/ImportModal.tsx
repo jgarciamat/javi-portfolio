@@ -7,7 +7,9 @@ import type { Account, ImportResult, TransactionType } from '@modules/finances/d
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
+import { useState } from 'react';
 import { useImport } from '../../application/hooks/useImport';
+import { EditableRows, type ImportSource, ImportSourceTabs, PastePanel } from './ImportSources';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { LeaksAfterImport } from './LeaksTeaser';
@@ -95,19 +97,23 @@ function missingColumns(mapping: ColumnMapping): string[] {
   return missing;
 }
 
-const FORMAT_NAMES = { csv: 'CSV', norma43: 'Norma 43', pdf: 'PDF' } as const;
+/** Files keep their format's name; pasted text and screenshots are named in the person's language. */
+const FORMAT_NAMES: Record<ImportState['format'], string> = {
+  csv: 'CSV',
+  norma43: 'Norma 43',
+  pdf: 'PDF',
+  text: 'app.import.source.paste',
+  image: 'app.import.source.screenshot',
+};
+const editable = (imp: ImportState): boolean => imp.format === 'text' || imp.format === 'image';
 
 const IMPORT_ACCEPT =
   '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-function FileStep({ imp }: { imp: ImportState }) {
+function FilePanel({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   return (
-    <FileDropZone
-      className="modal-body"
-      accept={IMPORT_ACCEPT}
-      onFiles={(list) => void imp.loadFile(list[0])}
-    >
+    <>
       <p className="section-hint">{t('app.import.hint')}</p>
       <p className="section-hint">{t('app.leaks.importTip')}</p>
       <TemplateLink />
@@ -122,6 +128,23 @@ function FileStep({ imp }: { imp: ImportState }) {
         />
         <span>{t('app.import.choose')}</span>
       </label>
+    </>
+  );
+}
+
+/** The first step: a statement file or the movements pasted from the bank's app. */
+function FileStep({ imp }: { imp: ImportState }) {
+  const [source, setSource] = useState<ImportSource>('file');
+  // A file can be dropped on the whole step, whichever tab is open.
+  return (
+    <FileDropZone
+      className="modal-body"
+      accept={IMPORT_ACCEPT}
+      onFiles={(list) => void imp.loadFile(list[0])}
+    >
+      <ImportSourceTabs source={source} onSource={setSource}>
+        {source === 'file' ? <FilePanel imp={imp} /> : <PastePanel onRead={imp.loadText} />}
+      </ImportSourceTabs>
     </FileDropZone>
   );
 }
@@ -184,13 +207,51 @@ function PdfNotes({ imp }: { imp: ImportState }) {
   );
 }
 
-function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
+/** The rows read from a file, with the type of each one to correct. */
+function ImportedRows({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
   return (
+    <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
+      <table className="data-table">
+        <tbody>
+          {imp.rows.map((r, i) => (
+            <tr key={i}>
+              <td>{date(r.date)}</td>
+              <td>{r.description}</td>
+              <td>
+                <select
+                  className="tx-input import-type-select"
+                  aria-label={`${t('app.import.col.type')} ${r.description}`}
+                  value={rowType(r)}
+                  onChange={(e) => imp.setRowType(i, e.target.value as TransactionType)}
+                >
+                  {TRANSACTION_TYPES.map((ty) => (
+                    <option key={ty} value={ty}>
+                      {typeName(t, ty)}
+                    </option>
+                  ))}
+                </select>
+                {imp.review.includes(i) && (
+                  <small className="import-review"> {t('app.import.typeReview')}</small>
+                )}
+              </td>
+              <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </ScrollRegion>
+  );
+}
+
+function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
+  const { t } = useI18n();
+  return (
     <div className="modal-body">
       <p className="section-hint">
-        {imp.fileName} · {FORMAT_NAMES[imp.format]} ·{' '}
+        {imp.fileName && `${imp.fileName} · `}
+        {editable(imp) ? t(FORMAT_NAMES[imp.format]) : FORMAT_NAMES[imp.format]} ·{' '}
         {t('app.import.rowsFound', { count: imp.rows.length })}
         {imp.skipped.length > 0 &&
           ` · ${t('app.import.rowsSkipped', { count: imp.skipped.length })}`}
@@ -230,36 +291,17 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           onChange={(e) => imp.setUseAi(e.target.checked)}
         />
       </label>
-      <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
-        <table className="data-table">
-          <tbody>
-            {imp.rows.map((r, i) => (
-              <tr key={i}>
-                <td>{date(r.date)}</td>
-                <td>{r.description}</td>
-                <td>
-                  <select
-                    className="tx-input import-type-select"
-                    aria-label={`${t('app.import.col.type')} ${r.description}`}
-                    value={rowType(r)}
-                    onChange={(e) => imp.setRowType(i, e.target.value as TransactionType)}
-                  >
-                    {TRANSACTION_TYPES.map((ty) => (
-                      <option key={ty} value={ty}>
-                        {typeName(t, ty)}
-                      </option>
-                    ))}
-                  </select>
-                  {imp.review.includes(i) && (
-                    <small className="import-review"> {t('app.import.typeReview')}</small>
-                  )}
-                </td>
-                <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </ScrollRegion>
+      {editable(imp) ? (
+        <EditableRows
+          rows={imp.rows}
+          review={imp.review}
+          onEdit={imp.editRow}
+          onType={imp.setRowType}
+          onRemove={imp.removeRow}
+        />
+      ) : (
+        <ImportedRows imp={imp} />
+      )}
       {imp.skipped.length > 0 && (
         <ScrollRegion className="import-skipped-scroll" label={t('app.import.skippedLines')}>
           <small>
@@ -352,7 +394,7 @@ function Footer({ imp, onClose }: { imp: ImportState; onClose: () => void }) {
     return (
       <div className="modal-footer">
         <button className="btn-secondary" onClick={imp.reset}>
-          {t('app.import.otherFile')}
+          {t(editable(imp) ? 'app.import.otherSource' : 'app.import.otherFile')}
         </button>
         <button
           className="btn-primary"

@@ -1322,3 +1322,84 @@ button.entity-item {
   margin-top: 0.35rem;
   text-decoration: none;
 }
+
+/* ─── Import: file or pasted text, and the rows read from text to correct ─── */
+.import-tabs {
+  margin-bottom: 0.75rem;
+}
+
+.import-paste {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.import-paste-text {
+  width: 100%;
+  min-height: 9rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.import-edit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.import-edit-row {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) auto 7rem auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.import-edit-row > .tx-input {
+  min-width: 0;
+}
+
+.import-edit-amount {
+  text-align: right;
+}
+
+.import-edit-row > .import-review {
+  grid-column: 1 / -1;
+}
+
+/* Phones: the concept on its own line; then the date, the amount and the bin; then the type. */
+@media (max-width: 600px) {
+  .import-edit-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--slate-800);
+  }
+
+  .import-edit-description {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .import-edit-date {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .import-edit-amount {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .import-edit-remove {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .import-edit-row > .import-type-select {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
+    width: 100%;
+  }
+}

@@ -46,3 +46,32 @@ test('imports a bank statement: preview first, then the movements, and a second 
   await dialog.getByRole('button', { name: 'Previsualizar' }).click();
   await expect(dialog.getByText(/Se importarán 0 movimientos · 3 ya existían/)).toBeVisible();
 });
+
+test('pastes the movements copied from the bank app, corrects one and imports them', async ({
+  page,
+}) => {
+  const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
+  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await dialog.getByRole('tab', { name: /Pegar texto/ }).click();
+  await dialog
+    .getByLabel('Pega aquí tus movimientos')
+    .fill(
+      [
+        '05/03/2026',
+        `Panadería Inventada ${run}`,
+        '-2,40 €',
+        `Bizum Ficticio ${run}`,
+        '+15,00 €',
+      ].join('\n')
+    );
+  await dialog.getByRole('button', { name: /Leer movimientos/ }).click();
+  await expect(dialog.getByText('2 movimientos leídos')).toBeVisible();
+  const amount = dialog.getByLabel(`Importe Panadería Inventada ${run}`);
+  await amount.fill('2,60');
+  await amount.blur();
+  await dialog.getByRole('button', { name: 'Previsualizar' }).click();
+  await expect(dialog.getByText(/Se importarán 2 movimientos · 0 ya existían/)).toBeVisible();
+  await expect(dialog.getByText('-2,60 €')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Importar 2' }).click();
+  await expect(dialog.getByText(/Importados 2 movimientos/)).toBeVisible();
+});

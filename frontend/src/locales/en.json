@@ -5972,5 +5972,16 @@
   "pricing.row.cryptoConsole.free": "Season, ranking and 1 practice portfolio",
   "pricing.row.cryptoConsole.premium": "Plus statistics, price alerts, 5 practice portfolios and report",
   "billing.feature.cryptoPro": "the crypto console statistics and alerts",
-  "billing.benefit.crypto": "Crypto console: statistics, price alerts, 5 practice portfolios and season report (no advantage in the ranking)"
+  "billing.benefit.crypto": "Crypto console: statistics, price alerts, 5 practice portfolios and season report (no advantage in the ranking)",
+  "app.import.sources": "How to add the movements",
+  "app.import.source.file": "File",
+  "app.import.source.paste": "Paste text",
+  "app.import.paste.label": "Paste your movements here",
+  "app.import.paste.placeholder": "Oct 12, 2026  Supermarket  -€45.30\nOct 11  Salary  +€1,800.00\nYesterday  Coffee  -€1.50",
+  "app.import.paste.hint": "Copy the list of movements from your bank's app or website (on a phone, press and hold and «Select all»; on a computer, Ctrl/Cmd+A and Ctrl/Cmd+C) and paste it here. We read the date, the description and the amount, and you can correct them before importing.",
+  "app.import.paste.read": "Read movements",
+  "app.import.paste.nothing": "We found no movements in the text. Each one needs a date, a description and an amount with cents or a currency, for example «Oct 12 Supermarket -€45.30».",
+  "app.import.editHint": "Check what we read: you can change the date, the description, the type and the amount, or remove a row. The preview shows which ones you had already imported.",
+  "app.import.removeRow": "Remove {name}",
+  "app.import.otherSource": "Start again"
 }

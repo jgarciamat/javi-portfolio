@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { errorMessage } from '@shared/utils/errors';
+import { todayDateOnly } from '@shared/utils/format';
 import { storage } from '@shared/utils/storage';
 import type { ImportResult, ImportRowDTO, TransactionType } from '@modules/finances/domain/types';
 import {
@@ -11,17 +12,25 @@ import {
 } from '@modules/finances/domain/bankFormats';
 import {
   type ColumnMapping,
+  type ParsedRows,
+  detectColumns,
+  detectDelimiter,
   looksLikeNorma43,
   parseCSV,
   parseNorma43,
   rowsFromCSV,
   withType,
 } from '@modules/finances/domain/importParsers';
+import { parsePastedMovements } from '@modules/finances/domain/pastedMovements';
 
 import { BankPdfError, readBankPdf } from '../bankPdf';
 import { readSpreadsheet, sheetAsText } from '../spreadsheet';
 
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
+/** Where the movements come from: a file, text pasted from the bank's app or a screenshot of it. */
+export type ImportFormat = 'csv' | 'norma43' | 'pdf' | 'text' | 'image';
+/** What a row of pasted movements can be corrected in, before the preview. */
+export type RowChanges = Partial<Pick<ImportRowDTO, 'date' | 'description' | 'amount'>>;
 
 /** The person's choice to let the AI suggest categories (off until they turn it on). */
 const AI_KEY = 'mm_import_ai';
@@ -44,6 +53,25 @@ export async function readStatement(file: File): Promise<string> {
   return utf8.includes('�') ? new TextDecoder('windows-1252').decode(buffer) : utf8;
 }
 
+/**
+ * Pasted text that is a table with a header (copied from a spreadsheet or the bank's web): it is
+ * read as a CSV, with its columns.
+ */
+export function looksLikeTable(text: string): boolean {
+  const delimiter = detectDelimiter(text);
+  if (delimiter !== '\t' && delimiter !== ';') return false;
+  const columns = detectColumns(parseCSV(text, delimiter)[0] ?? []);
+  return (
+    columns.date >= 0 &&
+    columns.description >= 0 &&
+    (columns.amount >= 0 || columns.debit >= 0 || columns.credit >= 0)
+  );
+}
+
+/** A row taken out of the list: the indexes after it move one up. */
+export const withoutIndex = (indexes: number[], removed: number): number[] =>
+  indexes.filter((i) => i !== removed).map((i) => (i > removed ? i - 1 : i));
+
 /** An amount column and debit/credit columns exclude each other. */
 export function changeMapping(
   mapping: ColumnMapping,
@@ -58,26 +86,64 @@ export function changeMapping(
 }
 
 /**
- * Bank statement import: read the file (CSV, Excel, Norma 43 or PDF), map the CSV columns,
- * preview what the API would import and import it. `error` is an i18n key or an
- * API message.
+ * The movements read from a statement, with the corrections the person made: the type of a row,
+ * and, for pasted text or a screenshot, any field of it or the whole row.
+ */
+function useReadRows() {
+  const [parsedRows, setRows] = useState<ImportRowDTO[]>([]);
+  /** Types the person corrected row by row (index in the read rows). */
+  const [typeOverrides, setTypeOverrides] = useState<Record<number, TransactionType>>({});
+  const [review, setReview] = useState<number[]>([]);
+  const [skipped, setSkipped] = useState<number[]>([]);
+  const rows = parsedRows.map((r, i) => (typeOverrides[i] ? withType(r, typeOverrides[i]) : r));
+
+  const load = (parsed: ParsedRows) => {
+    setRows(parsed.rows);
+    setSkipped(parsed.skipped);
+    setReview(parsed.review);
+    setTypeOverrides({});
+  };
+  /** Corrections apply to the rows as they are shown (with the types chosen so far). */
+  const change = (next: ImportRowDTO[]) => {
+    setRows(next);
+    setTypeOverrides({});
+  };
+
+  return {
+    rows,
+    skipped,
+    review,
+    load,
+    setRowType: (index: number, type: TransactionType) =>
+      setTypeOverrides((prev) => ({ ...prev, [index]: type })),
+    editRow: (index: number, changes: RowChanges) =>
+      change(rows.map((r, i) => (i === index ? { ...r, ...changes } : r))),
+    removeRow: (index: number) => {
+      change(rows.filter((_, i) => i !== index));
+      setReview(withoutIndex(review, index));
+    },
+  };
+}
+
+const NOTHING_READ: ParsedRows = { rows: [], skipped: [], review: [] };
+
+/**
+ * Bank statement import: read the file (CSV, Excel, Norma 43 or PDF), the pasted text or the
+ * screenshot, map the CSV columns, preview what the API would import and import it. `error` is an
+ * i18n key or an API message.
  */
 export function useImport(onImported: () => void, defaultAccountId: string | null) {
   const { transactionApi } = useApi();
   const [step, setStep] = useState<ImportStep>('file');
   const [fileName, setFileName] = useState('');
-  const [format, setFormat] = useState<'csv' | 'norma43' | 'pdf'>('csv');
+  const [format, setFormat] = useState<ImportFormat>('csv');
   const [table, setTable] = useState<string[][]>([]);
   const [bank, setBank] = useState<BankId | null>(null);
   /** PDF statements: the bank when its format is known, and the movements whose balance does not follow. */
   const [pdfBank, setPdfBank] = useState<string | null>(null);
   const [balanceMismatches, setBalanceMismatches] = useState(0);
   const [mapping, setMapping] = useState<ColumnMapping>(NO_MAPPING);
-  const [parsedRows, setRows] = useState<ImportRowDTO[]>([]);
-  /** Types the person corrected row by row (index in the read rows). */
-  const [typeOverrides, setTypeOverrides] = useState<Record<number, TransactionType>>({});
-  const [review, setReview] = useState<number[]>([]);
-  const [skipped, setSkipped] = useState<number[]>([]);
+  const read = useReadRows();
   /** '' = the API's default account. */
   const [accountId, setAccountId] = useState(defaultAccountId ?? '');
   const [preview, setPreview] = useState<ImportResult | null>(null);
@@ -91,15 +157,9 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     storage.set(AI_KEY, on ? '1' : null);
   };
 
-  const rows = parsedRows.map((r, i) => (typeOverrides[i] ? withType(r, typeOverrides[i]) : r));
-
   const applyMapping = (tableRows: string[][], next: ColumnMapping) => {
     setMapping(next);
-    const parsed = rowsFromCSV(tableRows, next);
-    setRows(parsed.rows);
-    setSkipped(parsed.skipped);
-    setReview(parsed.review);
-    setTypeOverrides({});
+    read.load(rowsFromCSV(tableRows, next));
   };
 
   /** A statement as a table of text: find the bank, the header row and the columns. */
@@ -114,6 +174,33 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setBalanceMismatches(0);
     setTable(bankTable);
     applyMapping(bankTable, bankMapping(bankTable[0], found.bank));
+    setStep('mapping');
+  };
+
+  /** Movements already read, without columns to map (Norma 43, PDF, pasted text, screenshot). */
+  const loadRows = (
+    parsed: ParsedRows,
+    source: Exclude<ImportFormat, 'csv'>,
+    pdf: { bank: string | null; balanceMismatches: number } = { bank: null, balanceMismatches: 0 }
+  ) => {
+    setFormat(source);
+    setBank(null);
+    setPdfBank(pdf.bank);
+    setBalanceMismatches(pdf.balanceMismatches);
+    setTable([]);
+    read.load(parsed);
+    setStep('mapping');
+  };
+
+  /** Text copied from the bank's app or web: a table with a header, or a list of movements. */
+  const loadText = (text: string) => {
+    setError(null);
+    setFileName('');
+    const table = looksLikeTable(text) ? parseCSV(text) : [];
+    if (table.length > 1) return loadTable(table);
+    const parsed = parsePastedMovements(text, todayDateOnly());
+    if (parsed.rows.length === 0) setError('app.import.paste.nothing');
+    else loadRows(parsed, 'text');
   };
 
   const loadFile = async (file: File) => {
@@ -124,36 +211,15 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         // A spreadsheet export: its first sheet with data is the table, as a CSV would be.
         const sheet = (await readSpreadsheet(file)).find((sh) => sh.rows.length >= 2);
         if (!sheet) throw new Error('empty');
-        loadTable(sheetAsText(sheet));
-        setStep('mapping');
-        return;
+        return loadTable(sheetAsText(sheet));
       }
       if (/\.pdf$/i.test(file.name) || file.type === 'application/pdf') {
         const parsed = await readBankPdf(file);
-        setFormat('pdf');
-        setPdfBank(parsed.bank);
-        setBalanceMismatches(parsed.balanceMismatches);
-        setRows(parsed.rows);
-        setSkipped(parsed.skipped);
-        setReview([]);
-        setTypeOverrides({});
-        setStep('mapping');
-        return;
+        return loadRows({ ...parsed, review: [] }, 'pdf', parsed);
       }
       const text = await readStatement(file);
-      if (looksLikeNorma43(text)) {
-        const parsed = parseNorma43(text);
-        setFormat('norma43');
-        setPdfBank(null);
-        setBalanceMismatches(0);
-        setRows(parsed.rows);
-        setSkipped(parsed.skipped);
-        setReview([]);
-        setTypeOverrides({});
-      } else {
-        loadTable(parseCSV(text));
-      }
-      setStep('mapping');
+      if (looksLikeNorma43(text)) loadRows(parseNorma43(text), 'norma43');
+      else loadTable(parseCSV(text));
     } catch (e) {
       setError(
         e instanceof BankPdfError ? `app.import.error.pdf.${e.code}` : 'app.import.error.read'
@@ -165,7 +231,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setBusy(true);
     setError(null);
     try {
-      const response = await transactionApi.import(rows, {
+      const response = await transactionApi.import(read.rows, {
         accountId: accountId || null,
         dryRun,
         useAi,
@@ -193,10 +259,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setPdfBank(null);
     setBalanceMismatches(0);
     setMapping(NO_MAPPING);
-    setRows([]);
-    setSkipped([]);
-    setReview([]);
-    setTypeOverrides({});
+    read.load(NOTHING_READ);
     setPreview(null);
     setResult(null);
     setError(null);
@@ -211,11 +274,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     balanceMismatches,
     headers: table[0] ?? [],
     mapping,
-    rows,
-    skipped,
-    review,
-    setRowType: (index: number, type: TransactionType) =>
-      setTypeOverrides((prev) => ({ ...prev, [index]: type })),
+    // rows, skipped, review and their corrections.
+    ...read,
     accountId,
     setAccountId,
     useAi,
@@ -225,6 +285,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     busy,
     error,
     loadFile,
+    loadText,
+    loadRows,
     updateMapping: (field: keyof ColumnMapping, index: number) =>
       applyMapping(table, changeMapping(mapping, field, index)),
     previewImport: () => run(true),

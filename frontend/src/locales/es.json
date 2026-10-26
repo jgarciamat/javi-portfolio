@@ -5961,5 +5961,16 @@
   "pricing.row.cryptoConsole.free": "Temporada, ranking y 1 cartera de prácticas",
   "pricing.row.cryptoConsole.premium": "Además estadísticas, avisos de precio, 5 carteras de prácticas e informe",
   "billing.feature.cryptoPro": "las estadísticas y avisos de la consola crypto",
-  "billing.benefit.crypto": "Consola crypto: estadísticas, avisos de precio, 5 carteras de prácticas e informe de temporada (sin ventaja en el ranking)"
+  "billing.benefit.crypto": "Consola crypto: estadísticas, avisos de precio, 5 carteras de prácticas e informe de temporada (sin ventaja en el ranking)",
+  "app.import.sources": "Cómo quieres añadir los movimientos",
+  "app.import.source.file": "Archivo",
+  "app.import.source.paste": "Pegar texto",
+  "app.import.paste.label": "Pega aquí tus movimientos",
+  "app.import.paste.placeholder": "12/10/2026  Mercadona  -45,30 €\n11 oct  Nómina  +1.800,00 €\nAyer  Café  -1,50 €",
+  "app.import.paste.hint": "Copia la lista de movimientos de la app o la web de tu banco (en el móvil, mantén pulsado y «Seleccionar todo»; en el ordenador, Ctrl/Cmd+A y Ctrl/Cmd+C) y pégala aquí. Leemos la fecha, el concepto y el importe, y podrás corregirlos antes de importar.",
+  "app.import.paste.read": "Leer movimientos",
+  "app.import.paste.nothing": "No hemos encontrado movimientos en el texto. Cada uno necesita una fecha, un concepto y un importe con céntimos o con €, por ejemplo «12/10 Mercadona -45,30 €».",
+  "app.import.editHint": "Revisa lo que hemos leído: puedes cambiar la fecha, el concepto, el tipo y el importe, o quitar una fila. En la vista previa verás cuáles ya tenías importados.",
+  "app.import.removeRow": "Quitar {name}",
+  "app.import.otherSource": "Empezar de nuevo"
 }
