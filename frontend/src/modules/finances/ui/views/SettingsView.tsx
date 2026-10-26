@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { THEME_CHOICES, type ThemeChoice, loadTheme, saveTheme } from '@core/theme/theme';
+import { type Readability, loadReadability, saveReadability } from '@core/theme/readability';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useSettings } from '@core/settings/SettingsContext';
@@ -47,6 +48,45 @@ interface SettingsViewProps {
   onStartTour: () => void;
   /** Every section, step by step (the short tour only has the essentials). */
   onStartFullTour?: () => void;
+}
+
+/** «Letra grande» and «Contraste» for the whole app (before, only in the Renta and Autónomos). */
+function ReadabilitySetting() {
+  const { t } = useI18n();
+  const [value, setValue] = useState<Readability>(loadReadability);
+  const change = (patch: Partial<Readability>) => {
+    const next = { ...value, ...patch };
+    setValue(next);
+    saveReadability(next);
+  };
+  return (
+    <>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.bigText')}</strong>
+          <small>{t('app.settings.bigTextHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={value.big}
+          onChange={(e) => change({ big: e.target.checked })}
+        />
+      </label>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.contrast')}</strong>
+          <small>{t('app.settings.contrastHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={value.contrast}
+          onChange={(e) => change({ contrast: e.target.checked })}
+        />
+      </label>
+    </>
+  );
 }
 
 /** The look of the app on this device: follow the system, light or dark. */
@@ -99,6 +139,7 @@ function PreferencesCard({
   return (
     <div className="settings-list">
       <ThemeSetting />
+      <ReadabilitySetting />
       <label className="setting-row">
         <span>
           <strong>{t('app.settings.currency')}</strong>

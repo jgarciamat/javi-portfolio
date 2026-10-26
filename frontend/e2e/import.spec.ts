@@ -16,7 +16,10 @@ test('imports a bank statement: preview first, then the movements, and a second 
 }) => {
   const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
   const open = async () => {
-    await page.getByRole('button', { name: /Importar extracto/ }).click();
+    await page
+      .getByRole('button', { name: /Importar extracto|Importar mi banco/ })
+      .first()
+      .click();
     await expect(dialog).toBeVisible();
   };
   await open();
@@ -35,7 +38,7 @@ test('imports a bank statement: preview first, then the movements, and a second 
   await expect(dialog.getByText(/Se importarán 3 movimientos · 0 ya existían/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Importar 3' }).click();
   await expect(
-    dialog.getByText(/Importados 3 movimientos \(0 duplicados omitidos\)/)
+    dialog.getByRole('heading', { name: 'Listo: 3 transacciones importadas' })
   ).toBeVisible();
 
   // The same file again: everything is recognised as already imported.
@@ -51,7 +54,10 @@ test('pastes the movements copied from the bank app, corrects one and imports th
   page,
 }) => {
   const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
-  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await page
+    .getByRole('button', { name: /Importar extracto|Importar mi banco/ })
+    .first()
+    .click();
   await dialog.getByRole('tab', { name: /Pegar texto/ }).click();
   await dialog
     .getByLabel('Pega aquí tus movimientos')
@@ -73,7 +79,9 @@ test('pastes the movements copied from the bank app, corrects one and imports th
   await expect(dialog.getByText(/Se importarán 2 movimientos · 0 ya existían/)).toBeVisible();
   await expect(dialog.getByText('-2,60 €')).toBeVisible();
   await dialog.getByRole('button', { name: 'Importar 2' }).click();
-  await expect(dialog.getByText(/Importados 2 movimientos/)).toBeVisible();
+  await expect(
+    dialog.getByRole('heading', { name: 'Listo: 2 transacciones importadas' })
+  ).toBeVisible();
 });
 
 /** An invented screenshot of a bank app (light theme, a day above each block). */
@@ -103,7 +111,10 @@ test('reads a screenshot of the bank app on the device and imports its movements
     if (r.method() !== 'GET') uploads.push(r.url());
   });
   const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
-  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await page
+    .getByRole('button', { name: /Importar extracto|Importar mi banco/ })
+    .first()
+    .click();
   await dialog.getByRole('tab', { name: /Captura/ }).click();
   await expect(dialog.getByText(/la imagen no sale de él/)).toBeVisible();
   await dialog

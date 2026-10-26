@@ -33,7 +33,10 @@ test('a statement with repeating charges: the figure after importing, the sectio
   page,
 }) => {
   const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
-  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await page
+    .getByRole('button', { name: /Importar extracto|Importar mi banco/ })
+    .first()
+    .click();
   await expect(dialog.getByText(/últimos 12 meses en un solo archivo/)).toBeVisible();
   await dialog.locator('input[type="file"]').setInputFiles({
     name: 'extracto.csv',
