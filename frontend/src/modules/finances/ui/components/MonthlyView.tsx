@@ -214,10 +214,16 @@ function defaultDateOf(f: ReturnType<typeof useFinances>): string {
  * «Do I reach the end of the month?», once there are movements enough for it to mean something;
  * before that, a calm line instead of red warnings about data not there yet.
  */
-function Forecast({ empty }: { empty: boolean }) {
+function Forecast({
+  empty,
+  onOpenTab,
+}: {
+  empty: boolean;
+  onOpenTab: (tab: DashboardTab) => void;
+}) {
   const { t } = useI18n();
   const enough = useEnoughData();
-  if (enough) return <ForecastPanel />;
+  if (enough) return <ForecastPanel onOpenTab={onOpenTab} />;
   if (empty) return null;
   return (
     <p className="card section-hint forecast-not-yet">
@@ -254,7 +260,7 @@ function CurrentPeriodPanels({
         <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
       )}
       <LeaksTeaser onOpen={() => onOpenTab('leaks')} />
-      <Forecast empty={empty} />
+      <Forecast empty={empty} onOpenTab={onOpenTab} />
     </>
   );
 }
