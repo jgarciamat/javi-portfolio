@@ -122,6 +122,33 @@ describe('Import', () => {
     expect(done.body.imported).toBe(2);
   });
 
+  it('puts the imported rows in the account chosen, and the accounts still add up to the available money', async () => {
+    const created = await request(ctx.app)
+      .post('/api/accounts')
+      .set(user.auth)
+      .send({ name: 'Otra', type: 'cash', initialBalance: 1000 })
+      .expect(201);
+    const other = created.body.find((a: { name: string }) => a.name === 'Otra');
+    await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: rows.slice(0, 3), accountId: other.id })
+      .expect(201);
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    expect(month.transactions.map((t: { accountId: string }) => t.accountId)).toEqual([
+      other.id,
+      other.id,
+      other.id,
+    ]);
+    const accounts = (
+      await request(ctx.app).get('/api/accounts?year=2026&month=3').set(user.auth).expect(200)
+    ).body;
+    const balance = (id: string) =>
+      accounts.accounts.find((a: { id: string }) => a.id === id).balance;
+    expect(balance(other.id)).toBeCloseTo(1000 + 1800 - 54.3 - 3.2);
+    expect(accounts.total).toBe(month.available);
+  });
+
   it('looks for nothing when every row was already imported', async () => {
     const only = [{ date: '2026-03-02', description: 'MERCADONA', amount: -10 }];
     await request(ctx.app).post('/api/transactions/import').set(user.auth).send({ rows: only });

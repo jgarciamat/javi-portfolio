@@ -542,8 +542,11 @@ function DoneStep({
   onOpenLeaks,
   onOpenGoals,
   onOpenBudgets,
+  onChanged,
 }: {
   result: ImportResult;
+  /** Something more changed the movements (automatic operations added): read them again. */
+  onChanged: () => void;
   categories: Category[];
   /** The rows of the preview: what was imported, with its category. */
   rows: ImportResult['rows'];
@@ -572,6 +575,7 @@ function DoneStep({
             categories={categories}
             onOpenGoals={onOpenGoals}
             onOpenBudgets={onOpenBudgets}
+            onRulesAdded={onChanged}
           />
           {onOpenLeaks && <LeaksAfterImport onOpen={onOpenLeaks} />}
         </>
@@ -647,6 +651,7 @@ function StepBody({
         onOpenLeaks={onOpenLeaks}
         onOpenGoals={onOpenGoals}
         onOpenBudgets={onOpenBudgets}
+        onChanged={imp.onImported}
       />
     );
   }

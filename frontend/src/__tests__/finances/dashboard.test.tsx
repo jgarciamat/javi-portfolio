@@ -240,6 +240,43 @@ describe('import', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('reads the balances of the accounts again after an import, not only the month', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [f.transaction()] }));
+    const accounts = (principal: number) => ({
+      accounts: [
+        f.account({ id: 'a1', name: 'Principal', isDefault: true, balance: principal }),
+        f.account({ id: 'a2', name: 'Otra', balance: 1000 }),
+      ],
+      total: principal + 1000,
+    });
+    api.accountApi.getAll.mockResolvedValue(accounts(5017.96));
+    api.transactionApi.import
+      .mockResolvedValueOnce({ dryRun: true, imported: 1, duplicates: 0, invalid: 0, rows: [] })
+      .mockResolvedValueOnce({ dryRun: false, imported: 1, duplicates: 0, invalid: 0, rows: [] });
+    renderWithProviders(<Dashboard />, { api });
+    expect(await screen.findByText(/5\.017,96/)).toBeInTheDocument();
+    const calls = api.accountApi.getAll.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
+    const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    fireEvent.click(
+      within(dialog).getByRole('tab', { name: literal(tr('app.import.source.paste')) })
+    );
+    fireEvent.change(within(dialog).getByLabelText(tr('app.import.paste.label')), {
+      target: { value: '12/03/2026 Bar -3,00 €' },
+    });
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: literal(tr('app.import.paste.read')) })
+    );
+    fireEvent.click(await within(dialog).findByRole('button', { name: tr('app.import.preview') }));
+    api.accountApi.getAll.mockResolvedValue(accounts(5014.96));
+    fireEvent.click(
+      await within(dialog).findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    );
+    await waitFor(() => expect(api.accountApi.getAll.mock.calls.length).toBeGreaterThan(calls));
+    expect(await screen.findByText(/5\.014,96/)).toBeInTheDocument();
+  });
+
   it('opens the importer on the free plan however many statements were imported', async () => {
     const api = createFakeApi();
     api.billingApi.get.mockResolvedValue(

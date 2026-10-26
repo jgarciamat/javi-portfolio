@@ -333,5 +333,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     confirmImport: () => run(false),
     back: () => setStep('mapping'),
     reset,
+    /** What to do when the movements change (also after the import, from its result). */
+    onImported,
   };
 }

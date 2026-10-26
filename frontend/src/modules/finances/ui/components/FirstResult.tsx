@@ -24,7 +24,14 @@ const asRule = (s: DetectedSubscription) => ({
 });
 
 /** Adds every listed charge as an automatic movement, and says how many were added. */
-function AddAsRules({ items }: { items: DetectedSubscription[] }) {
+function AddAsRules({
+  items,
+  onAdded,
+}: {
+  items: DetectedSubscription[];
+  /** The rules may add this month's movements: the month and the accounts are read again. */
+  onAdded?: () => void;
+}) {
   const { t } = useI18n();
   const { recurringApi } = useApi();
   const action = useAction(t('app.firstResult.error'));
@@ -37,6 +44,7 @@ function AddAsRules({ items }: { items: DetectedSubscription[] }) {
         await recurringApi.create(asRule(s));
         setAdded((n) => n + 1);
       }
+      onAdded?.();
     });
 
   return (
@@ -168,8 +176,11 @@ export function FirstResult({
   rows = [],
   categories = [],
   onOpenBudgets,
+  onRulesAdded,
 }: {
   onOpenGoals?: () => void;
+  /** Called once the charges are automatic operations (they may add movements to the month). */
+  onRulesAdded?: () => void;
   /** The rows of the import (its preview): where the money went. */
   rows?: ImportRowResult[];
   /** The person's categories: a limit is offered for one of them. */
@@ -179,13 +190,19 @@ export function FirstResult({
   return (
     <>
       <BudgetSuggestion rows={rows} categories={categories} onOpenBudgets={onOpenBudgets} />
-      <RepeatedCharges onOpenGoals={onOpenGoals} />
+      <RepeatedCharges onOpenGoals={onOpenGoals} onRulesAdded={onRulesAdded} />
     </>
   );
 }
 
 /** The fixed charges and subscriptions found, to add as automatic movements. */
-function RepeatedCharges({ onOpenGoals }: { onOpenGoals?: () => void }) {
+function RepeatedCharges({
+  onOpenGoals,
+  onRulesAdded,
+}: {
+  onOpenGoals?: () => void;
+  onRulesAdded?: () => void;
+}) {
   const { t } = useI18n();
   const { money } = useFormat();
   const { insightsApi } = useApi();
@@ -221,7 +238,7 @@ function RepeatedCharges({ onOpenGoals }: { onOpenGoals?: () => void }) {
           {t('app.firstResult.locked', { shown: data.subscriptions.length, count: data.count })}
         </p>
       )}
-      <AddAsRules items={data.subscriptions} />
+      <AddAsRules items={data.subscriptions} onAdded={onRulesAdded} />
       {onOpenGoals && <GoalLink onOpen={onOpenGoals} />}
     </section>
   );

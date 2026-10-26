@@ -6,9 +6,11 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
-const setup = (onOpenGoals?: () => void) => {
+const setup = (onOpenGoals?: () => void, onRulesAdded?: () => void) => {
   const api = createFakeApi();
-  renderWithProviders(<FirstResult onOpenGoals={onOpenGoals} />, { api });
+  renderWithProviders(<FirstResult onOpenGoals={onOpenGoals} onRulesAdded={onRulesAdded} />, {
+    api,
+  });
   return api;
 };
 
@@ -70,7 +72,8 @@ describe('FirstResult: where most money went', () => {
 
 describe('FirstResult', () => {
   it('says how many fixed charges and subscriptions there are and adds them as automatic movements', async () => {
-    const api = setup();
+    const onRulesAdded = jest.fn();
+    const api = setup(undefined, onRulesAdded);
     expect(
       await screen.findByText(
         tr('app.firstResult.found', {
@@ -84,6 +87,8 @@ describe('FirstResult', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       tr('app.firstResult.added', { count: 2 })
     );
+    // They may add this month's movements: the month and the accounts are read again.
+    expect(onRulesAdded).toHaveBeenCalledTimes(1);
     expect(api.recurringApi.create.mock.calls.map((c) => c[0])).toEqual([
       {
         description: 'Netflix',
