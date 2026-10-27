@@ -1749,6 +1749,11 @@ button.entity-item {
   margin: 0.15rem 0.55rem 0.1rem;
 }
 
+/* The first title breathes below the line of the panel header. */
+.burger-nav-group:first-child .burger-nav-group-title {
+  margin-top: 0.55rem;
+}
+
 .burger-nav-item {
   flex-direction: row;
   justify-content: flex-start;

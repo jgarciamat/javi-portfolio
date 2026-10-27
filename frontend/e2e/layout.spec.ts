@@ -46,3 +46,19 @@ test('the social links show on a phone, beside the Videoteca pill', async ({ pag
     path: '../docs/auditoria-recorrido-2026-10-26/despues/movil-cabecera-redes.png',
   });
 });
+
+/** The menu shows every group at once, and its first title does not touch the line above it. */
+test('the menu fits a 1280x720 screen without scrolling and spaces its first title', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await signIn(page);
+  await page.getByRole('button', { name: 'Abrir menú' }).click();
+  const nav = page.locator('.burger-nav');
+  await expect(nav).toBeVisible();
+  const size = await nav.evaluate((e) => ({ scroll: e.scrollHeight, client: e.clientHeight }));
+  expect(size.scroll).toBeLessThanOrEqual(size.client + 1);
+  const title = await page.locator('.burger-nav-group-title').first().boundingBox();
+  const head = await page.locator('.burger-panel-header').boundingBox();
+  expect((title?.y ?? 0) - ((head?.y ?? 0) + (head?.height ?? 0))).toBeGreaterThanOrEqual(12);
+});
