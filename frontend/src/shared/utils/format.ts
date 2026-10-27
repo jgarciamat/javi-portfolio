@@ -7,6 +7,9 @@
 
 const INTL_LOCALE: Record<string, string> = { es: 'es-ES', en: 'en-GB' };
 
+/** es-ES skips the thousands dot under 10.000 («1875,00 €»): the same mark on every amount. */
+const GROUP = { useGrouping: 'always' as unknown as boolean };
+
 export function intlLocale(locale: string): string {
   return INTL_LOCALE[locale] ?? locale;
 }
@@ -19,6 +22,7 @@ export function formatMoney(
 ): string {
   const decimals = options.decimals ?? true;
   return new Intl.NumberFormat(intlLocale(locale), {
+    ...GROUP,
     style: 'currency',
     currency,
     minimumFractionDigits: decimals ? 2 : 0,
@@ -29,6 +33,7 @@ export function formatMoney(
 
 export function formatPercent(value: number, locale: string, digits = 1): string {
   return `${new Intl.NumberFormat(intlLocale(locale), {
+    ...GROUP,
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value)}%`;
@@ -39,7 +44,10 @@ export function monthName(month: number, locale: string, style: 'long' | 'short'
   const name = new Intl.DateTimeFormat(intlLocale(locale), { month: style }).format(
     new Date(2026, month - 1, 15)
   );
-  return name.charAt(0).toUpperCase() + name.slice(1).replace('.', '');
+  const short = name.replace('.', '');
+  // Spanish writes «sept» but «oct», «nov»: three letters for all, so an axis reads even.
+  const even = style === 'short' ? short.slice(0, 3) : short;
+  return even.charAt(0).toUpperCase() + even.slice(1);
 }
 
 export function monthLabel(year: number, month: number, locale: string): string {

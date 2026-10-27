@@ -313,7 +313,7 @@ describe('guided questions: the summary', () => {
     expect(summary).toHaveTextContent(
       tr('tools.renta.guide.familyCount', { children: 1, ascendants: 0 })
     );
-    expect(summary).toHaveTextContent(`${tr('tools.renta.guide.opt.joint.couple')} · 9000,00 €`);
+    expect(summary).toHaveTextContent(`${tr('tools.renta.guide.opt.joint.couple')} · 9.000,00 €`);
     expect(summary).toHaveTextContent(tr('tools.renta.guide.opt.housing.no'));
     fireEvent.click(
       screen.getByRole('button', {
@@ -378,7 +378,7 @@ describe('the joint return in the result', () => {
     premium();
     const table = await screen.findByRole('region', { name: tr('tools.renta.joint.compareTitle') });
     expect(within(table).getByRole('status')).toHaveTextContent(
-      tr('tools.renta.joint.best.joint', { amount: '1457,75 €' })
+      tr('tools.renta.joint.best.joint', { amount: '1.457,75 €' })
     );
     for (const col of ['you', 'partner', 'sum', 'joint']) {
       expect(
@@ -388,7 +388,7 @@ describe('the joint return in the result', () => {
     const result = within(table).getByRole('row', {
       name: new RegExp(tr('tools.renta.joint.row.result')),
     });
-    expect(result).toHaveTextContent('-1096,50 €');
+    expect(result).toHaveTextContent('-1.096,50 €');
     expect(table).toHaveTextContent(
       tr('tools.renta.joint.note.childrenToOne', {
         who: tr('tools.renta.joint.to.you'),
@@ -410,7 +410,7 @@ describe('the joint return in the result', () => {
     premium();
     const table = await screen.findByRole('region', { name: tr('tools.renta.joint.compareTitle') });
     expect(table).toHaveTextContent(
-      tr('tools.renta.joint.best.individual', { amount: '3538,15 €' })
+      tr('tools.renta.joint.best.individual', { amount: '3.538,15 €' })
     );
     expect(table).toHaveTextContent(tr('tools.renta.joint.note.lowPay', { amount: '54,95 €' }));
     expect(table).toHaveTextContent(/si contara uno solo, la conjunta saldría/);

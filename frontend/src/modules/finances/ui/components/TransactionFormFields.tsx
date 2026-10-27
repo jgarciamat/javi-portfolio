@@ -66,6 +66,12 @@ export function TransactionFormFields({
       ? { 'aria-invalid': true, 'aria-describedby': form.errorId }
       : { 'aria-invalid': undefined, 'aria-describedby': undefined };
 
+  // The category has its own message, right under it.
+  const categoryMissing = invalid.includes('category');
+  const categoryCheck = categoryMissing
+    ? { 'aria-invalid': true, 'aria-describedby': `${id}-category-error ${form.errorId}` }
+    : { 'aria-invalid': undefined, 'aria-describedby': undefined };
+
   // A refused submit takes focus to the first wrong field.
   useEffect(() => {
     if (invalid.length > 0) refs[invalid[0]].current!.focus();
@@ -128,17 +134,17 @@ export function TransactionFormFields({
           </select>
         </div>
         <div className="tx-field">
-          <span className="tx-field-label" aria-hidden="true">
+          <label className="tx-field-label" htmlFor={`${id}-category`}>
             {t('app.transaction.form.category')}
-          </span>
+          </label>
           <select
             ref={refs.category}
+            id={`${id}-category`}
             className="tx-input"
             value={fields.category}
             onChange={(e) => form.handleCategoryChange(e.target.value, onManageCategories)}
-            aria-label={t('app.transaction.form.category.placeholder')}
             required
-            {...check('category')}
+            {...categoryCheck}
           >
             <option value="">{t('app.transaction.form.category.placeholder')}</option>
             <option value={MANAGE_CATEGORIES}>⚙ {t('app.transaction.form.category.manage')}</option>
@@ -149,6 +155,15 @@ export function TransactionFormFields({
               </option>
             ))}
           </select>
+          {/* Said next to the field, not only at the end of the form. */}
+          {categoryMissing && (
+            <small id={`${id}-category-error`} className="inline-error">
+              {t('app.transaction.form.categoryRequired')}
+            </small>
+          )}
+          {!categoryMissing && form.suggested && (
+            <small className="tx-field-hint">{t('app.transaction.form.categorySuggested')}</small>
+          )}
         </div>
         <div className="tx-field">
           <span className="tx-field-label" aria-hidden="true">

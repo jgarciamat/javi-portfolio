@@ -25,7 +25,15 @@ interface Options {
   t: (key: string, vars?: Record<string, string | number>) => string;
   /** Editing an existing movement: the form starts with its values and is never reset. */
   initialValues?: TransactionFields;
+  /**
+   * The category a new movement's concept suggests (the person's rules, the last one used…), put
+   * in until the person picks one. Null: nothing to suggest.
+   */
+  suggest?: (description: string, type: TransactionType) => string | null;
 }
+
+/** Concepts shorter than this suggest nothing yet. */
+const SUGGEST_FROM = 2;
 
 /** Fields a refused submit can point at, in the order they are shown. */
 export type CheckedField = 'description' | 'amount' | 'category';
@@ -41,6 +49,7 @@ export function useTransactionForm({
   formatMoney,
   t,
   initialValues,
+  suggest,
 }: Options) {
   const blank = (): TransactionFields => ({
     description: '',
@@ -57,6 +66,19 @@ export function useTransactionForm({
   /** Fields the last refused submit found wrong; the error text describes them. */
   const [invalid, setInvalid] = useState<CheckedField[]>([]);
   const errorId = useId();
+  /** The person chose the category: no suggestion replaces it. */
+  const [chosen, setChosen] = useState(false);
+  const concept = fields.description.trim();
+  const auto = !chosen && !initialValues && !!suggest;
+  const suggestion = auto && concept.length >= SUGGEST_FROM ? suggest(concept, fields.type) : null;
+
+  // The suggestion follows the concept and the type while the person has not chosen.
+  useEffect(() => {
+    if (!auto) return;
+    setFields((f) =>
+      f.category === (suggestion ?? '') ? f : { ...f, category: suggestion ?? '' }
+    );
+  }, [auto, suggestion]);
 
   const set = <K extends keyof TransactionFields>(key: K, value: TransactionFields[K]) => {
     setFields((f) => ({ ...f, [key]: value }));
@@ -80,8 +102,9 @@ export function useTransactionForm({
   }, [defaultAccountId]);
 
   const handleCategoryChange = (value: string, onManageCategories: () => void) => {
-    if (value === MANAGE_CATEGORIES) onManageCategories();
-    else set('category', value);
+    if (value === MANAGE_CATEGORIES) return onManageCategories();
+    setChosen(true);
+    set('category', value);
   };
 
   const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
@@ -114,7 +137,10 @@ export function useTransactionForm({
         accountId: fields.accountId,
       })
     );
-    if (saved && !initialValues) setFields(blank());
+    if (saved && !initialValues) {
+      setFields(blank());
+      setChosen(false);
+    }
     return saved;
   };
 
@@ -130,9 +156,12 @@ export function useTransactionForm({
     handleSubmit,
     reset: () => {
       setFields(initialValues ?? blank());
+      setChosen(false);
       setError(null);
       setInvalid([]);
     },
+    /** The category shown was suggested by the concept (not chosen by the person). */
+    suggested: !!suggestion && fields.category === suggestion,
     invalid,
     /** Id of the error text, for aria-describedby. */
     errorId,

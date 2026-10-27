@@ -20,6 +20,7 @@ import {
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { guessCategoryName } from '@domain/services/categorizer';
+import { MATCH_DAYS, RuleMovement, coveringMovements } from '@domain/services/recurring-match';
 import { Cents, fromCents } from '@domain/shared/money';
 import { toDateOnly } from '@domain/shared/period';
 import { normalizeText } from '@domain/shared/text';
@@ -52,6 +53,12 @@ export interface ImportedRowResult {
   categoryName?: string;
   categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
+  /**
+   * A movement an automatic operation already added that this row seems to repeat (date within 3
+   * days, close amount, concept alike). The row is still imported if sent: the app leaves it out
+   * unless the person asks to keep it.
+   */
+  coveredBy?: { transactionId: string; description: string; date: string };
 }
 
 export interface ImportResult {
@@ -89,15 +96,14 @@ export class ImportService {
   ) {}
 
   /**
-   * Imports a bank statement: the free plan can import one (previews do not count and neither
-   * does a file where nothing new was imported), Premium as many as it wants.
+   * Imports a bank statement, free and unlimited on every plan. The imports that brought something
+   * new are counted (previews and files where nothing new was imported are not), only as usage.
    */
   async import(
     userId: string,
     rows: ImportRow[],
     options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
   ): Promise<ImportResult> {
-    this.entitlements.assertCanCreate(userId, 'imports', this.usage.count(userId));
     const result = await this.importRows(userId, rows, options);
     if (!result.dryRun && result.imported > 0) this.usage.increment(userId);
     return result;
@@ -139,6 +145,7 @@ export class ImportService {
       userId,
       prepared.map((r) => normalizeText(r.description))
     );
+    const covering = this.coveredByRules(userId, prepared, existing);
     const startDay = this.settings.get(userId).monthStartDay;
     const categoryNames = this.categories.listByUser(userId).map((c) => c.name);
     const knownNames = new Set(categoryNames.map(normalizeText));
@@ -205,11 +212,19 @@ export class ImportService {
           }
         }
         existing.add(row.hash);
+        const cover = covering.get(row.index);
         results.push({
           ...base,
           status: 'imported',
           categoryName: category.name,
           categorySource: source,
+          ...(cover && {
+            coveredBy: {
+              transactionId: cover.id,
+              description: cover.description,
+              date: cover.date,
+            },
+          }),
         });
       }
     };
@@ -224,6 +239,34 @@ export class ImportService {
       invalid: results.filter((r) => r.status === 'invalid').length,
       rows: results,
     };
+  }
+
+  /**
+   * The rows (new ones, not already imported) that repeat a movement of an automatic operation:
+   * someone who added the rent as an automatic operation and then imports the statement with it.
+   */
+  private coveredByRules(
+    userId: string,
+    prepared: PreparedRow[],
+    existing: Set<string>
+  ): Map<number, RuleMovement> {
+    const fresh = prepared.filter((r) => !existing.has(r.hash));
+    const covering = new Map<number, RuleMovement>();
+    if (fresh.length === 0) return covering;
+    const dates = fresh.map((r) => r.date).sort();
+    const shift = (date: string, days: number) =>
+      new Date(Date.parse(`${date}T00:00:00Z`) + days * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+    const movements = this.transactions.listFromRulesBetween(
+      userId,
+      shift(dates[0], -MATCH_DAYS),
+      shift(dates[dates.length - 1], MATCH_DAYS)
+    );
+    coveringMovements(fresh, movements).forEach((m, i) => {
+      if (m) covering.set(fresh[i].index, m);
+    });
+    return covering;
   }
 
   private prepare(userId: string, rows: ImportRow[], results: ImportedRowResult[]): PreparedRow[] {

@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { installChunkReload } from '@core/monitoring/chunkReload';
 import { startTheme } from '@core/theme/theme';
+import { applyReadability, loadReadability } from '@core/theme/readability';
 import { installErrorReporting } from '@core/monitoring/errorReporting';
 import { captureHouseholdInvite } from '@core/householdInvite';
 import { removeLegacyAcquisition } from '@core/acquisition';
@@ -12,6 +13,7 @@ import { captureCreatorCode } from '@core/creatorCode';
 import { track } from '@core/analytics';
 
 startTheme();
+applyReadability(loadReadability());
 installErrorReporting();
 installChunkReload(Date.now);
 // Before the router redirects to the login page and drops the query string.

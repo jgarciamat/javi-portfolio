@@ -6,7 +6,7 @@ import { rentaState } from '@modules/tools/data/renta/state';
 import { NO_DRAFT } from '@modules/tools/domain/rentaDraft';
 import { emptyForm, type RentaForm } from '@modules/tools/domain/rentaForm';
 import { NO_REVIEW } from '@modules/tools/domain/rentaReview';
-import { ASSISTANT_KEY, RentaAssistant, wizardKey } from '@modules/tools/ui/renta/RentaWizard';
+import { RentaAssistant, wizardKey } from '@modules/tools/ui/renta/RentaWizard';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -371,25 +371,48 @@ describe('the boxes to copy, in the app with Premium', () => {
   });
 });
 
-describe('step by step or everything together', () => {
-  it('switches to the expert screen and back, remembering it, with nothing lost', () => {
+describe('step by step only: the toolbar', () => {
+  const toolbar = () => screen.getByRole('toolbar', { name: tr('wizard.tools') });
+  const newReturn = () =>
+    within(toolbar()).getByRole('button', { name: tr('tools.renta.newReturn.button') });
+
+  it('has no «see it all together» and puts «Start a new return» at its end, once', () => {
     saved({ gross: '31000' });
     local();
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.expert')) }));
-    expect(localStorage.getItem(ASSISTANT_KEY)).toBe('expert');
+    expect(screen.queryByRole('button', { name: /todo junto/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: tr('tools.renta.newReturn.button') })).toBe(
+      newReturn()
+    );
+    const buttons = within(toolbar()).getAllByRole('button');
+    expect(buttons[buttons.length - 1]).toBe(newReturn());
+    expect(newReturn()).toHaveClass('wiz-tool-danger');
+  });
+
+  it('asks «Are you sure?» with the year and does not wipe anything on Cancel', () => {
+    saved({ gross: '31000' });
+    at(3);
+    local();
+    fireEvent.click(newReturn());
+    const dialog = screen.getByRole('dialog');
     expect(
-      screen.getByRole('heading', { name: tr('tools.renta.investCard.title') })
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr('wizard.backToSteps') }));
-    expect(localStorage.getItem(ASSISTANT_KEY)).toBe('steps');
-    expect(heading(tr('wizard.renta.q.draft'))).toBeInTheDocument();
+      within(dialog).getByRole('heading', {
+        name: tr('tools.renta.newReturn.title', { year: rentaState.year }),
+      })
+    ).toHaveTextContent('¿Estás seguro?');
+    expect(dialog).toHaveTextContent(
+      tr('tools.renta.newReturn.intro', { year: rentaState.year }).replace(/:$/, '')
+    );
+    expect(within(dialog).getByRole('button', { name: 'Aceptar' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(JSON.parse(localStorage.getItem(wizardKey(rentaState.year)) as string).at).toBe(3);
   });
 
   it('starts again from step 1 and wipes the data, once confirmed', async () => {
     saved({ gross: '31000', ccaaId: 'madrid' });
     at(3);
     local();
-    // One button for it, under the title of every screen (no «Start again» in the toolbar).
+    // One button for it, in the toolbar (no «Start again» next to it).
     expect(screen.queryByRole('button', { name: new RegExp(tr('wizard.restart')) })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
@@ -523,7 +546,7 @@ describe('the Renta step by step: persona 02 (couple with two children, one pay,
     // calculo.md of the persona: 342,42 € to pay alone, 1.173 € back together.
     expect(
       await screen.findByText(
-        tr('tools.renta.joint.best.joint', { amount: '1515,42 €' }).replace(/\s/g, ' '),
+        tr('tools.renta.joint.best.joint', { amount: '1.515,42 €' }).replace(/\s/g, ' '),
         {
           normalizer: (text) => text.replace(/\s/g, ' '),
         }

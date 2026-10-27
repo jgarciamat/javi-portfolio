@@ -79,8 +79,10 @@ describe('crypto formats', () => {
     expect(formatTick(at, 0, 'es')).toBe('2026');
     expect(formatTick(at, 1, 'en')).toBe('Mar');
     expect(formatTick(at, 2, 'es')).toBe('15');
-    expect(formatTick(at, 3, 'es')).toBe('12:30');
-    expect(formatTick(at, 4, 'es')).toBe('12:30');
+    // 12:30 UTC in the local time of whoever runs the tests.
+    const local = `${String(new Date(at).getHours()).padStart(2, '0')}:30`;
+    expect(formatTick(at, 3, 'es')).toBe(local);
+    expect(formatTick(at, 4, 'es')).toBe(local);
   });
 
   it('tells gains, losses and nothing apart', () => {

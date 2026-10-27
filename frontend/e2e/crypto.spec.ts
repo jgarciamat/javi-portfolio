@@ -37,8 +37,8 @@ test('opens a long with take profit and stop loss, changes them and closes it at
 
   // The invented BTC price moves around 60.000 €: far from both.
   await page.getByLabel('Capital por operación').fill('100');
-  await page.getByLabel('Take profit (opcional)').fill('100000');
-  await page.getByLabel('Stop loss (opcional)').fill('30000');
+  await page.getByLabel(/^Take profit/).fill('100000');
+  await page.getByLabel(/^Stop loss/).fill('30000');
   await expect(page.getByText('Todo listo. Revisa las cifras de abajo.')).toBeVisible();
   // The commission is explained before opening: amount and percentage, kind and reason.
   await expect(
@@ -110,7 +110,7 @@ test('opens a long with take profit and stop loss, changes them and closes it at
 });
 
 test('keeps a pending short until it is cancelled', async ({ page }) => {
-  await page.getByRole('radio', { name: /Osos · Short/ }).check();
+  await page.getByRole('radio', { name: /Osos \(Short\)/ }).check();
   await page.getByRole('radio', { name: 'Límite' }).check();
   await page.getByLabel('Capital por operación').fill('250');
   await page.getByLabel('Abrir si el precio sube a').fill('200000');
@@ -421,6 +421,24 @@ test('fits a phone upright and on its side without sideways scrolling', async ({
   }
 });
 
+test('keeps the console as wide and centred as the other screens, without sideways scrolling', async ({
+  page,
+}) => {
+  const box = () => page.locator('main.main').boundingBox();
+  for (const width of [1280, 1920, 2560]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(page.getByRole('img', { name: /Gráfica de Bitcoin/ })).toBeVisible();
+    const crypto = await box();
+    // The same container as «Resumen mensual»: at most ~1.2k px, equal margins either side.
+    expect(crypto!.width).toBeLessThanOrEqual(1250);
+    expect(Math.abs(crypto!.x - (width - crypto!.x - crypto!.width))).toBeLessThanOrEqual(20);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  }
+});
+
 test('season, practice portfolio, ranking and Premium comforts', async ({ page, pageErrors }) => {
   // The official season of this month, with its countdown; no commission notice before typing an
   // amount (it appears in «Before opening») and no free CSV.
@@ -551,7 +569,7 @@ test('numbers two operations per coin on rows and chart lines, and refuses a thi
   await expect(who).toHaveText(['▲ LongSOL#1(operación 1)']);
   await expect(note).toHaveText('Ya tienes 1 de 2 operaciones de SOL; esta será la #2.');
 
-  await page.getByRole('radio', { name: /Osos · Short/ }).check();
+  await page.getByRole('radio', { name: /Osos \(Short\)/ }).check();
   await page.getByLabel('Capital por operación').fill('100');
   await page.getByRole('button', { name: 'Abrir short' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (2)' })).toBeVisible();
@@ -581,7 +599,7 @@ test('numbers two operations per coin on rows and chart lines, and refuses a thi
   await open.getByRole('button', { name: '¿Seguro? Sí, cerrar (Long de SOL #1)' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
   await expect(note).toHaveText('Ya tienes 1 de 2 operaciones de SOL; esta será la #1.');
-  await page.getByRole('radio', { name: /Toros · Long/ }).check();
+  await page.getByRole('radio', { name: /Toros \(Long\)/ }).check();
   await page.getByLabel('Capital por operación').fill('100');
   await page.getByRole('button', { name: 'Abrir long' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (2)' })).toBeVisible();

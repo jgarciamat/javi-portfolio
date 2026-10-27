@@ -13,6 +13,34 @@
   "dir": "ltr",
   "categories": ["finance", "productivity"],
   "prefer_related_applications": false,
+  "share_target": {
+    "action": "/compartir",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": [
+            "image/*",
+            "application/pdf",
+            ".pdf",
+            "text/csv",
+            ".csv",
+            "text/plain",
+            ".txt",
+            ".xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".n43",
+            ".q43"
+          ]
+        }
+      ]
+    }
+  },
   "shortcuts": [
     {
       "name": "Añadir gasto",

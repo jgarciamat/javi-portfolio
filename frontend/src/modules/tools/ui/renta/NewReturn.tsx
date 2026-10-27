@@ -21,7 +21,7 @@ const WIPED = ['answers', 'data', 'draft', 'invest', 'properties', 'result'] as 
 /**
  * «Start a new return»: one compact button that asks first, in the app's delete dialog, and then
  * wipes everything of this year's return. The activity brought from Autónomos stays unless ticked.
- * The same in the assistant (under the title of each screen) and in the expert mode.
+ * In the assistant it is the red button at the end of the toolbar («Letter size · Contrast»).
  */
 export function NewReturn({
   year,
@@ -43,7 +43,7 @@ export function NewReturn({
   };
   return (
     <>
-      <button type="button" className="btn-danger renta-new-return" onClick={() => setOpen(true)}>
+      <button type="button" className="wiz-tool wiz-tool-danger" onClick={() => setOpen(true)}>
         <Icon name="repeat" /> {t(k('button'))}
       </button>
       {open && (

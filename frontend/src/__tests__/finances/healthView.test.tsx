@@ -19,10 +19,15 @@ interface Options {
   accounts?: ReturnType<typeof f.account>[];
 }
 
+/** A movement two weeks old: enough history for the score (an income: no day with spending). */
+const HISTORY = [f.transaction({ date: '2026-03-01', type: 'INCOME', category: 'Salario' })];
+
 function setup(o: Options = {}) {
   const api = createFakeApi();
   api.monthApi.get.mockImplementation((_y: number, month: number) =>
-    Promise.resolve(month === 2 && o.previous ? o.previous : f.overview(o.overview))
+    Promise.resolve(
+      month === 2 && o.previous ? o.previous : f.overview({ transactions: HISTORY, ...o.overview })
+    )
   );
   if (o.assets instanceof Error) api.assetApi.getAll.mockRejectedValue(o.assets);
   else api.assetApi.getAll.mockResolvedValue(o.assets ?? []);
@@ -35,6 +40,13 @@ function setup(o: Options = {}) {
 }
 
 describe('Financial health', () => {
+  it('waits for a few days of movements before giving a score', async () => {
+    setup({ overview: { transactions: [f.transaction({ date: '2026-03-14' })] } });
+    expect(await screen.findByText(tr('app.health.notYet'))).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: /100/ })).toBeNull();
+    expect(screen.queryByText(tr('app.health.pillar.cushion'))).toBeNull();
+  });
+
   it('shows the score, its level and every pillar', async () => {
     setup({
       overview: {
@@ -59,6 +71,15 @@ describe('Financial health', () => {
       previous: f.overview({ summary: f.summary({ totalExpenses: 3000 }) }),
     });
     expect(await screen.findByText(/cubre 2 meses de gastos/)).toBeInTheDocument();
+  });
+
+  it('says «1 month», and the points with the decimal mark of the language', async () => {
+    setup({
+      overview: { summary: f.summary({ totalIncome: 2000, totalSaving: 0, totalExpenses: 50 }) },
+      previous: f.overview({ summary: f.summary({ totalExpenses: 6000 }) }),
+    });
+    expect(await screen.findByText(tr('app.health.detail.cushionOne'))).toBeInTheDocument();
+    expect(screen.queryByText(/\d\.\d+\/25/)).toBeNull();
   });
 
   it('counts the debts when they are known and says so when they are not', async () => {
@@ -214,6 +235,15 @@ describe('Monthly challenges', () => {
       previous: f.overview({ summary: f.summary({ totalExpenses: 0 }) }),
     });
     expect(await screen.findByText(/cubre 2 meses de gastos/)).toBeInTheDocument();
+  });
+
+  it('says «1 month», and the points with the decimal mark of the language', async () => {
+    setup({
+      overview: { summary: f.summary({ totalIncome: 2000, totalSaving: 0, totalExpenses: 50 }) },
+      previous: f.overview({ summary: f.summary({ totalExpenses: 6000 }) }),
+    });
+    expect(await screen.findByText(tr('app.health.detail.cushionOne'))).toBeInTheDocument();
+    expect(screen.queryByText(/\d\.\d+\/25/)).toBeNull();
   });
 
   it('has a zero-length progress bar for a challenge with no target yet', async () => {

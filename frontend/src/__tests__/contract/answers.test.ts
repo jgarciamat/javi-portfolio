@@ -21,6 +21,7 @@ import type {
   CategoryBudget,
   Goal,
   ImportResult,
+  SampleDataStatus,
   LeakFinding,
   MoneyLeaks,
   MonthOverview,
@@ -61,6 +62,7 @@ import { goals } from './fixtures/goals';
 import { leakDecision } from './fixtures/leakDecision';
 import { moneyLeaks } from './fixtures/moneyLeaks';
 import { importResult } from './fixtures/importResult';
+import { sampleData } from './fixtures/sampleData';
 import { monthOverview } from './fixtures/monthOverview';
 import { nameChange } from './fixtures/nameChange';
 import { planCatalog } from './fixtures/planCatalog';
@@ -89,6 +91,7 @@ describe('API answers fit the types of the app', () => {
     contract<MoneyLeaks>()(moneyLeaks);
     contract<LeakFinding>()(leakDecision);
     contract<ImportResult>()(importResult);
+    contract<SampleDataStatus>()(sampleData);
     expect(monthOverview.transactions.length).toBeGreaterThan(0);
   });
 

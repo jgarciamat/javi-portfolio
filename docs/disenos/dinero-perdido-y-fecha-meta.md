@@ -321,9 +321,9 @@ Cobertura = días entre el gasto más antiguo y el más reciente de la ventana, 
 | `partial`  | < 90 días o < 30 gastos | Cobros dobles; mensuales con 3 cobros; hormiga con ≥ 45 días | Lo que haya + barra «Llevas 41 de 90 días. Con 3 meses de movimientos veremos mucho más» + botón importar              |
 | `complete` | ≥ 90 días y ≥ 30 gastos | Todo menos anuales con < 13 meses                            | Resultado completo. Nota: «Los cobros anuales necesitan más de un año de movimientos» si la cobertura es < 13 meses    |
 
-Consejo al importar (el plan gratis solo tiene **1 importación**): «Descarga de tu banco los
+Consejo al importar (importar es gratis e ilimitado desde octubre de 2026): «Descarga de tu banco los
 **últimos 12 meses en un solo archivo**: así el análisis sale completo a la primera.» Esto se
-añade al texto de `ImportModal`, sin cambiar el límite.
+añade al texto de `ImportModal`.
 
 ---
 

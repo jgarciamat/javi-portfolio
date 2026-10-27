@@ -60,8 +60,10 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       autonomoPdfs: 1,
       // Investments, property and debts (any kind, in total).
       assets: 3,
-      // Bank statement imports (in total; previews do not count).
-      imports: 1,
+      // Bank statement imports are free and unlimited on every plan (the server still caps the
+      // size of each file and how many are sent per hour). Kept as a resource so the apps
+      // already installed read it as unlimited.
+      imports: Infinity,
     },
     features: {
       insights: false,

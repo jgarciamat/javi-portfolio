@@ -94,8 +94,9 @@ export default defineConfig({
           // The crypto console's chart (TradingView Lightweight Charts): online only anyway.
           '**/PriceChart-*.js',
         ],
-        // Shows the push notifications and opens the app when one is tapped.
-        importScripts: ['push-sw.js'],
+        // Shows the push notifications and opens the app when one is tapped; receives what other
+        // apps share with Finanverso (share-sw.js).
+        importScripts: ['push-sw.js', 'share-sw.js'],
         // Las respuestas de /api nunca se cachean: son datos privados de cada usuario.
         navigateFallbackDenylist: [/^\/api\//],
       },

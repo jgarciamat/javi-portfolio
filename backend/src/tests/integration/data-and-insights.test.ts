@@ -75,6 +75,90 @@ describe('Import', () => {
     expect(month.transactions).toHaveLength(5);
     expect(month.summary.totalExpenses).toBe(80.7);
   });
+
+  it('says which rows repeat a movement of an automatic operation, and still imports them if sent', async () => {
+    await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Alquiler piso',
+        type: 'EXPENSE',
+        category: 'Vivienda',
+        amount: 650,
+        startYear: 2026,
+        startMonth: 3,
+      })
+      .expect(201);
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    const generated = month.transactions.find(
+      (t: { description: string }) => t.description === 'Alquiler piso'
+    );
+    expect(generated.date).toBe('2026-03-01');
+    const statement = [
+      { date: '2026-03-03', description: 'TRANSFERENCIA ALQUILER PISO MARZO', amount: -650 },
+      // A second rent the same month is not taken for it: one movement covers one row.
+      { date: '2026-03-04', description: 'ALQUILER PISO', amount: -650 },
+      { date: '2026-03-02', description: 'MERCADONA', amount: -650 },
+    ];
+    const preview = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: statement, dryRun: true })
+      .expect(200);
+    expect(preview.body.imported).toBe(3);
+    expect(preview.body.rows[0].coveredBy).toEqual({
+      transactionId: generated.id,
+      description: 'Alquiler piso',
+      date: '2026-03-01',
+    });
+    expect(preview.body.rows[1].coveredBy).toBeUndefined();
+    expect(preview.body.rows[2].coveredBy).toBeUndefined();
+    // What the person decided to keep is imported as sent.
+    const done = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: statement.slice(1) })
+      .expect(201);
+    expect(done.body.imported).toBe(2);
+  });
+
+  it('puts the imported rows in the account chosen, and the accounts still add up to the available money', async () => {
+    const created = await request(ctx.app)
+      .post('/api/accounts')
+      .set(user.auth)
+      .send({ name: 'Otra', type: 'cash', initialBalance: 1000 })
+      .expect(201);
+    const other = created.body.find((a: { name: string }) => a.name === 'Otra');
+    await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: rows.slice(0, 3), accountId: other.id })
+      .expect(201);
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    expect(month.transactions.map((t: { accountId: string }) => t.accountId)).toEqual([
+      other.id,
+      other.id,
+      other.id,
+    ]);
+    const accounts = (
+      await request(ctx.app).get('/api/accounts?year=2026&month=3').set(user.auth).expect(200)
+    ).body;
+    const balance = (id: string) =>
+      accounts.accounts.find((a: { id: string }) => a.id === id).balance;
+    expect(balance(other.id)).toBeCloseTo(1000 + 1800 - 54.3 - 3.2);
+    expect(accounts.total).toBe(month.available);
+  });
+
+  it('looks for nothing when every row was already imported', async () => {
+    const only = [{ date: '2026-03-02', description: 'MERCADONA', amount: -10 }];
+    await request(ctx.app).post('/api/transactions/import').set(user.auth).send({ rows: only });
+    const again = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows: only, dryRun: true })
+      .expect(200);
+    expect(again.body).toMatchObject({ imported: 0, duplicates: 1 });
+  });
 });
 
 describe('Export', () => {
@@ -204,12 +288,13 @@ describe('Forecast', () => {
   beforeEach(async () => {
     ctx = createTestApp({ now: '2026-04-11T12:00:00Z' });
     user = await createUser(ctx);
-    for (const [date, amount] of [
-      ['2026-01-10', 300],
-      ['2026-02-10', 300],
-      ['2026-03-10', 300],
+    // Different names, or they would look like a monthly subscription.
+    for (const [date, amount, description] of [
+      ['2026-01-10', 300, 'Rebajas'],
+      ['2026-02-10', 300, 'Taller'],
+      ['2026-03-10', 300, 'Viaje'],
     ] as const) {
-      await addTransaction(ctx, user, { amount, date });
+      await addTransaction(ctx, user, { amount, date, description });
     }
     await addTransaction(ctx, user, {
       type: 'INCOME',
@@ -235,6 +320,47 @@ describe('Forecast', () => {
     });
     expect(res.body).toMatchObject({ year: 2026, month: 4, locked: false });
     expect(res.body.projection).toHaveLength(6);
+    // History: 300 € in 22 days of January (data from the 10th), 28 of February and 31 of March:
+    // 11,34 €/day. Nothing spent in the 11 days of April: (0 + 7 · 11,34) / 18 = 4,41 €/day.
+    expect(res.body.endOfMonth).toEqual({
+      enoughData: false, // 4 movements
+      fewData: false,
+      available: 1100,
+      daysLeft: 20,
+      daysElapsed: 11,
+      monthVariable: 0,
+      monthDaily: 0,
+      historyDaily: 11.34,
+      historyMonths: 3,
+      pace: 4.41,
+      pending: [],
+      pendingTotal: 0,
+      scheduled: [],
+      scheduledTotal: 0,
+      oneOffs: [],
+      outlierMonths: [],
+      projectedEnd: 1011.8,
+      maxDaily: 55,
+      status: 'ok',
+    });
+  });
+
+  it('takes the subscriptions still to come and the expenses dated later this month', async () => {
+    for (const date of ['2026-01-20', '2026-02-20', '2026-03-20']) {
+      await addTransaction(ctx, user, { description: 'Netflix', amount: 12.99, date });
+    }
+    await addTransaction(ctx, user, { description: 'Dentista', amount: 60, date: '2026-04-25' });
+    const { endOfMonth } = (await forecast().expect(200)).body;
+    expect(endOfMonth).toMatchObject({
+      enoughData: true,
+      pending: [{ description: 'Netflix', date: '2026-04-19', amount: 12.99 }],
+      pendingTotal: 12.99,
+      scheduled: [{ description: 'Dentista', date: '2026-04-25', amount: 60 }],
+      scheduledTotal: 60,
+      // 1100 − 3 · 12,99 − 60 available; (1001,03 − 12,99) / 20 days.
+      available: 1001.03,
+      maxDaily: 49.4,
+    });
   });
 
   it('projects the next months from the recurring rules and lets rules be left out', async () => {
@@ -378,8 +504,11 @@ describe('Subscriptions', () => {
         lastDate: '2026-04-05',
         nextDate: '2026-05-05',
         priceIncrease: { from: 12.99, to: 13.99 },
+        categoryName: 'Ocio',
+        essential: false,
       },
     ]);
+    expect(res.body.fixed).toBe(0);
   });
 
   it('leaves out what is already a recurring rule and keeps the view for Premium', async () => {
@@ -416,7 +545,7 @@ describe('Subscriptions', () => {
     expireTrial(ctx, user);
     const free = (await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200))
       .body;
-    expect(free).toMatchObject({ count: 5, locked: true, annual: premium.annual });
+    expect(free).toMatchObject({ count: 5, locked: true, annual: premium.annual, fixed: 0 });
     expect(free.subscriptions.map((s: { description: string }) => s.description)).toEqual([
       'Gimnasio',
       'Netflix',

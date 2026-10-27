@@ -8,6 +8,7 @@ import { SplitGroupView } from '@application/split/SplitService';
 import { YearTax } from '@domain/services/tax';
 import { AssetView } from '@application/assets/AssetService';
 import { InboxOverview } from '@application/inbox/InboxService';
+import { EndOfMonthPlan, EomPayment } from '@domain/services/end-of-month';
 import { ProjectedMonth } from '@domain/services/forecast';
 import {
   AnnualReport,
@@ -254,6 +255,35 @@ export function presentNetWorth(p: NetWorthPoint) {
   };
 }
 
+function presentEndOfMonth(e: EndOfMonthPlan) {
+  const payment = (p: EomPayment) => ({
+    description: p.description,
+    date: p.date,
+    amount: m(p.amountCents),
+  });
+  return {
+    enoughData: e.enoughData,
+    fewData: e.fewData,
+    available: m(e.availableCents),
+    daysLeft: e.daysLeft,
+    daysElapsed: e.daysElapsed,
+    monthVariable: m(e.monthVariableCents),
+    monthDaily: m(e.monthDailyCents),
+    historyDaily: e.historyDailyCents === null ? null : m(e.historyDailyCents),
+    historyMonths: e.historyMonths,
+    pace: m(e.paceCents),
+    pending: e.pending.map(payment),
+    pendingTotal: m(e.pendingCents),
+    scheduled: e.scheduled.map(payment),
+    scheduledTotal: m(e.scheduledCents),
+    oneOffs: e.oneOffs.map(payment),
+    outlierMonths: e.outlierMonths,
+    projectedEnd: m(e.projectedEndCents),
+    maxDaily: m(e.maxDailyCents),
+    status: e.status,
+  };
+}
+
 export function presentForecast(f: ForecastResult) {
   const month = (p: ProjectedMonth) => ({
     year: p.year,
@@ -275,6 +305,7 @@ export function presentForecast(f: ForecastResult) {
       projectedEnd: m(f.safeToSpend.projectedEndCents),
       status: f.safeToSpend.status,
     },
+    endOfMonth: presentEndOfMonth(f.endOfMonth),
     locked: f.locked,
     projection: f.projection.map(month),
     firstShortfall: f.firstShortfall,
@@ -294,6 +325,7 @@ export function presentSubscriptions(r: SubscriptionsView) {
     annual: m(r.annualCents),
     count: r.count,
     locked: r.locked,
+    fixed: r.fixed,
     subscriptions: r.subscriptions.map((s) => ({
       key: s.key,
       description: s.description,
@@ -306,6 +338,8 @@ export function presentSubscriptions(r: SubscriptionsView) {
       priceIncrease: s.priceIncrease
         ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
         : null,
+      categoryName: s.categoryName,
+      essential: s.essential,
     })),
   };
 }

@@ -37,7 +37,7 @@ describe('SummaryCards', () => {
     expect(screen.getByText('Ingresos')).toBeInTheDocument();
     expect(screen.getByText('Gastos')).toBeInTheDocument();
     expect(screen.getByText('Ahorrado')).toBeInTheDocument();
-    expect(screen.getByText('Tasa de ahorro')).toBeInTheDocument();
+    expect(screen.getByText('Cuánto guardas')).toBeInTheDocument();
   });
 
   test('shows transaction count in sub-text', () => {

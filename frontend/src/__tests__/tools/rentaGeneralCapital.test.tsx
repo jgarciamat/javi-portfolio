@@ -41,7 +41,7 @@ describe('Renta: capital income of the general base', () => {
     type(two.getByLabelText(tr(k('related.share'))), 'x');
     type(two.getByLabelText(tr(k('related.share'))), '40');
     expect(status()).toContain('714,29');
-    expect(status()).toContain('4285,71');
+    expect(status()).toContain('4.285,71');
     fireEvent.click(two.getByLabelText(tr(k('related'))));
     expect(last.generalCapital?.[1]).not.toHaveProperty('related');
     fireEvent.click(two.getByRole('button', { name: tr(k('remove'), { n: 2 }) }));

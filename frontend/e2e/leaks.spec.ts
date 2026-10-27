@@ -33,7 +33,10 @@ test('a statement with repeating charges: the figure after importing, the sectio
   page,
 }) => {
   const dialog = page.getByRole('dialog', { name: 'Importar movimientos' });
-  await page.getByRole('button', { name: /Importar extracto/ }).click();
+  await page
+    .getByRole('button', { name: /Importar extracto|Importar mi banco/ })
+    .first()
+    .click();
   await expect(dialog.getByText(/últimos 12 meses en un solo archivo/)).toBeVisible();
   await dialog.locator('input[type="file"]').setInputFiles({
     name: 'extracto.csv',
@@ -44,7 +47,7 @@ test('a statement with repeating charges: the figure after importing, the sectio
   await dialog.getByRole('button', { name: /^Importar \d+$/ }).click();
 
   // The moment it matters most: what was found, with the way there.
-  await expect(dialog.getByText(/Hemos revisado tus movimientos: unos .* al año/)).toBeVisible();
+  await expect(dialog.getByText(/Hemos revisado tus transacciones: unos .* al año/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Ver', exact: true }).click();
   await expect(dialog).toBeHidden();
   const section = page.getByRole('region', { name: 'Tu dinero perdido' });

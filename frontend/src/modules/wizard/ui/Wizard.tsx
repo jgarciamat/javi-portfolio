@@ -52,18 +52,16 @@ interface WizardProps {
   defs: readonly WizardStep[];
   steps: WizardStepView[];
   controls: WizardControls;
-  /** «Everything together»: the expert mode. */
-  onExpert: () => void;
   /** Starts again: the data of the flow goes too (asked first). Unset: no button in the toolbar. */
   onRestart?: () => void;
-  /** Shown under the title of every screen (the Renta's «Start a new return»). */
-  screenAction?: ReactNode;
+  /** One more button at the end of the toolbar (the Renta's «Start a new return»). */
+  toolbarAction?: ReactNode;
   /** The end of the flow, shown once every step is done. */
   finale: ReactNode;
 }
 
-/** Letter size, contrast, the expert mode and starting again. */
-function Toolbar({ onExpert, onRestart }: { onExpert: () => void; onRestart?: () => void }) {
+/** Letter size, contrast, and the ways to start again. */
+function Toolbar({ onRestart, extra }: { onRestart?: () => void; extra?: ReactNode }) {
   const { t } = useI18n();
   const [prefs, setPrefs] = useWizardPrefs();
   useEffect(() => {
@@ -100,9 +98,6 @@ function Toolbar({ onExpert, onRestart }: { onExpert: () => void; onRestart?: ()
         </span>
         {t('wizard.contrast')}
       </button>
-      <button type="button" className="wiz-tool" onClick={onExpert}>
-        <Icon name="clipboard" /> {t('wizard.expert')}
-      </button>
       {onRestart && (
         <button
           type="button"
@@ -112,6 +107,7 @@ function Toolbar({ onExpert, onRestart }: { onExpert: () => void; onRestart?: ()
           <Icon name="repeat" /> {t('wizard.restart')}
         </button>
       )}
+      {extra}
     </div>
   );
 }
@@ -385,7 +381,6 @@ function ScreenCard({
   lastStep,
   headingRef,
   onFinishStep,
-  action,
 }: {
   flow: string;
   step: WizardStepView;
@@ -396,7 +391,6 @@ function ScreenCard({
   lastStep: boolean;
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   onFinishStep: () => void;
-  action?: ReactNode;
 }) {
   const { t } = useI18n();
   const screen = step.screens[index];
@@ -419,7 +413,6 @@ function ScreenCard({
       <h2 id={titleId} ref={headingRef} tabIndex={-1} className="wiz-title">
         {screen.title}
       </h2>
-      {action && <div className="wiz-screen-action">{action}</div>}
       {screen.hint && <p className="wiz-hint">{screen.hint}</p>}
       <HelpRow flow={flow} screen={screen} />
       <div className="wiz-body">{screen.body}</div>
@@ -447,9 +440,8 @@ export function Wizard({
   defs,
   steps,
   controls,
-  onExpert,
   onRestart,
-  screenAction,
+  toolbarAction,
   finale,
 }: WizardProps) {
   const { t } = useI18n();
@@ -500,7 +492,7 @@ export function Wizard({
 
   return (
     <div className={`wiz wiz--${flow}`}>
-      <Toolbar onExpert={onExpert} onRestart={onRestart} />
+      <Toolbar onRestart={onRestart} extra={toolbarAction} />
       {resumeShown && (
         <p className="wiz-resume" role="status">
           {t('wizard.resumed', { n: at + 1, title: step.title })}
@@ -534,7 +526,6 @@ export function Wizard({
           <h2 id={`${flow}-finale-title`} ref={heading} tabIndex={-1} className="wiz-title">
             {t('wizard.finaleTitle')}
           </h2>
-          {screenAction && <div className="wiz-screen-action">{screenAction}</div>}
           <ul className="wiz-badges" aria-label={t('wizard.badges')}>
             {steps.map((s) => (
               <li key={s.id}>
@@ -556,7 +547,6 @@ export function Wizard({
           lastStep={at === steps.length - 1}
           headingRef={heading}
           onFinishStep={finishStep}
-          action={screenAction}
         />
       )}
     </div>

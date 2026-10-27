@@ -114,7 +114,10 @@ describe('«Tu dinero perdido» from the dashboard', () => {
       ],
     });
     renderWithProviders(<Dashboard />, { api });
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.open') }));
+    // An empty month: its panel opens the importer.
+    fireEvent.click(
+      await screen.findByRole('button', { name: new RegExp(tr('app.emptyMonth.import')) })
+    );
     const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
     expect(within(dialog).getByText(tr('app.leaks.importTip'))).toBeInTheDocument();
     fireEvent.change(dialog.querySelector('input[type="file"]')!, {
@@ -155,7 +158,10 @@ describe('«Tu dinero perdido» from the dashboard', () => {
       rows: [],
     });
     renderWithProviders(<Dashboard />, { api });
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.open') }));
+    // An empty month: its panel opens the importer.
+    fireEvent.click(
+      await screen.findByRole('button', { name: new RegExp(tr('app.emptyMonth.import')) })
+    );
     const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
     fireEvent.change(dialog.querySelector('input[type="file"]')!, {
       target: { files: [statement('Fecha;Concepto;Importe\n02/03/2026;FITBOX;-39,90\n')] },
@@ -171,9 +177,7 @@ describe('«Tu dinero perdido» from the dashboard', () => {
     fireEvent.click(
       await within(dialog).findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
     );
-    await within(dialog).findByText(tr('app.import.done', { imported: 1, duplicates: 0 }), {
-      exact: false,
-    });
+    await within(dialog).findByRole('heading', { name: tr('app.import.doneTitleOne') });
     await waitFor(() => expect(api.insightsApi.moneyLeaks).toHaveBeenCalledWith('import'));
     expect(within(dialog).queryByText(/Hemos revisado/)).toBeNull();
   });

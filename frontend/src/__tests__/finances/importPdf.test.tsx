@@ -59,7 +59,7 @@ describe('ImportModal with a PDF statement', () => {
     expect(screen.getByText(tr('app.import.pdfBank', { bank: 'Ibercaja' }))).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.getByText('TARJETA VISA - TIENDA DE EJEMPLO')).toBeInTheDocument();
-    expect(screen.queryByText(tr('app.import.col.debit'))).toBeNull();
+    expect(screen.queryByText(tr('app.import.changeColumns'))).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     await waitFor(() => expect(api.transactionApi.import).toHaveBeenCalled());
     expect(api.transactionApi.import.mock.calls[0][0]).toEqual([

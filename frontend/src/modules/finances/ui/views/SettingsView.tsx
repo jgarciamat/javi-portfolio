@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { THEME_CHOICES, type ThemeChoice, loadTheme, saveTheme } from '@core/theme/theme';
+import { type Readability, loadReadability, saveReadability } from '@core/theme/readability';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useSettings } from '@core/settings/SettingsContext';
@@ -9,7 +10,7 @@ import {
   cancelMonthlyReminder,
   notificationsSupported,
   requestNotificationPermission,
-  scheduleMonthlyReminder,
+  scheduleMonthlyReminders,
 } from '@core/notifications/notifications';
 import type {
   Account,
@@ -19,6 +20,7 @@ import type {
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { importReminders } from '../../application/hooks/useImportReminders';
 import { AppLockCard } from '../components/AppLockCard';
 import { PushSetting } from '../components/PushSetting';
 import { CategoryRulesCard } from '../components/CategoryRulesCard';
@@ -44,6 +46,47 @@ const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
 interface SettingsViewProps {
   onOpenProfile: () => void;
   onStartTour: () => void;
+  /** Every section, step by step (the short tour only has the essentials). */
+  onStartFullTour?: () => void;
+}
+
+/** «Letra grande» and «Contraste» for the whole app (before, only in the Renta and Autónomos). */
+function ReadabilitySetting() {
+  const { t } = useI18n();
+  const [value, setValue] = useState<Readability>(loadReadability);
+  const change = (patch: Partial<Readability>) => {
+    const next = { ...value, ...patch };
+    setValue(next);
+    saveReadability(next);
+  };
+  return (
+    <>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.bigText')}</strong>
+          <small>{t('app.settings.bigTextHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={value.big}
+          onChange={(e) => change({ big: e.target.checked })}
+        />
+      </label>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.contrast')}</strong>
+          <small>{t('app.settings.contrastHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={value.contrast}
+          onChange={(e) => change({ contrast: e.target.checked })}
+        />
+      </label>
+    </>
+  );
 }
 
 /** The look of the app on this device: follow the system, light or dark. */
@@ -96,6 +139,7 @@ function PreferencesCard({
   return (
     <div className="settings-list">
       <ThemeSetting />
+      <ReadabilitySetting />
       <label className="setting-row">
         <span>
           <strong>{t('app.settings.currency')}</strong>
@@ -233,11 +277,13 @@ function TourCard({
   saving,
   save,
   onStartTour,
+  onStartFullTour,
 }: {
   settings: UserSettings;
   saving: boolean;
   save: (changes: SettingsChanges) => Promise<boolean>;
   onStartTour: () => void;
+  onStartFullTour?: () => void;
 }) {
   const { t } = useI18n();
   return (
@@ -263,6 +309,9 @@ function TourCard({
       <div className="button-row">
         <button className="btn-secondary" onClick={onStartTour}>
           ▶️ {t('app.settings.startTour')}
+        </button>
+        <button className="btn-secondary" onClick={onStartFullTour ?? onStartTour}>
+          <Icon name="compass" /> {t('app.settings.startFullTour')}
         </button>
       </div>
     </div>
@@ -341,8 +390,8 @@ function SecurityCard({
   );
 }
 
-export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) {
-  const { t } = useI18n();
+export function SettingsView({ onOpenProfile, onStartTour, onStartFullTour }: SettingsViewProps) {
+  const { t, locale } = useI18n();
   const { settings, updateSettings } = useSettings();
   const { accounts, refresh } = useFinances();
   const action = useAction();
@@ -353,12 +402,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
 
   if (!settings) return <div className="card">{t('app.common.loading')}</div>;
 
-  const reminder = (day: number) =>
-    scheduleMonthlyReminder(
-      day,
-      t('app.notifications.monthlyTitle'),
-      t('app.notifications.monthlyBody')
-    );
+  const reminder = (day: number) => scheduleMonthlyReminders(importReminders(day, t, locale));
 
   const save = async (changes: SettingsChanges): Promise<boolean> => {
     setSaved(false);
@@ -406,7 +450,13 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
       <InboxCard />
       <CaptureCard />
       <HouseholdCard />
-      <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
+      <TourCard
+        settings={settings}
+        saving={action.pending}
+        save={save}
+        onStartTour={onStartTour}
+        onStartFullTour={onStartFullTour}
+      />
       <InstallGuideCard />
       <AppLockCard />
       <DataCard onError={action.setError} />

@@ -33,6 +33,7 @@ import { TwoFactorService } from '@application/auth/TwoFactorService';
 import { CategoryRuleService } from '@application/categories/CategoryRuleService';
 import { CategoryService } from '@application/categories/CategoryService';
 import { ExportService, ImportService } from '@application/data/DataServices';
+import { SampleDataService } from '@application/data/SampleDataService';
 import { AdviceService, StatsService } from '@application/insights/InsightsServices';
 import { MoneyLeakService } from '@application/insights/MoneyLeakService';
 import {
@@ -466,7 +467,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       entitlements,
       repos.rules,
       clock,
-      repos.assets
+      repos.assets,
+      repos.categories
     ),
     moneyLeaks: new MoneyLeakService(
       repos.transactions,
@@ -558,6 +560,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,
+    sampleData: new SampleDataService(
+      repos.transactions,
+      categoryResolver,
+      accountResolver,
+      repos.settings,
+      uow,
+      clock
+    ),
     renta,
     autonomoData: new AutonomoDataService(repos.autonomoData, autonomoBox, clock),
     learn: new LearnService(PREMIUM_CHAPTERS, entitlements),

@@ -25,7 +25,8 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         autonomoDrafts: 1,
         autonomoPdfs: 1,
         assets: 3,
-        imports: 1,
+        // Free and unlimited on every plan.
+        imports: null,
       },
       features: {
         insights: false,
@@ -108,7 +109,6 @@ export const FEATURE_KEYS: Record<PremiumFeature, string> = {
 
 export const PREMIUM_BENEFITS = [
   'billing.benefit.unlimited',
-  'billing.benefit.import',
   'billing.benefit.insights',
   'billing.benefit.subscriptions',
   'billing.benefit.forecast',

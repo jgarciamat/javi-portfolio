@@ -64,7 +64,8 @@ describe('Plans and limits', () => {
             autonomoDrafts: 1,
             autonomoPdfs: 1,
             assets: 3,
-            imports: 1,
+            // Free and unlimited on every plan; the apps already installed read null as such.
+            imports: null,
           },
           features: { forecast: false, inbox: false, capture: false, investCourse: false },
         },
@@ -219,25 +220,21 @@ describe('Plans and limits', () => {
     expect((await alert(4).expect(402)).body.details.resource).toBe('customAlerts');
   });
 
-  it('lets the free plan import one bank statement; previews and empty files do not count', async () => {
+  it('lets the free plan import as many statements as it wants; only real imports count', async () => {
     expireTrial(ctx, user);
     const send = (body: Record<string, unknown>) =>
       request(ctx.app).post('/api/transactions/import').set(user.auth).send(body);
-    const rows = [{ date: '2026-03-01', description: 'Cine', amount: -12 }];
-    await send({ rows, dryRun: true }).expect(200);
-    await send({ rows, dryRun: true }).expect(200);
+    const rows = (n: number) => [{ date: '2026-03-01', description: `Cine ${n}`, amount: -n }];
+    await send({ rows: rows(1), dryRun: true }).expect(200);
     expect((await billing()).usage.imports).toBe(0);
-    // Nothing new imported (only invalid rows): it does not use the free import.
+    // Nothing new imported (only invalid rows): it is not counted.
     await send({ rows: [{ date: 'nope', description: 'X', amount: -1 }] }).expect(201);
     expect((await billing()).usage.imports).toBe(0);
-    expect((await send({ rows }).expect(201)).body.imported).toBe(1);
-    expect((await billing()).usage.imports).toBe(1);
-    const second = await send({ rows, dryRun: true }).expect(402);
-    expect(second.body).toMatchObject({
-      code: 'PLAN_LIMIT',
-      details: { resource: 'imports', limit: 1 },
-    });
-    await send({ rows: [{ date: '2026-03-02', description: 'Bus', amount: -2 }] }).expect(402);
+    for (const n of [1, 2, 3]) {
+      expect((await send({ rows: rows(n) }).expect(201)).body.imported).toBe(1);
+    }
+    expect((await billing()).usage.imports).toBe(3);
+    expect((await billing()).limits.resources.imports).toBeNull();
   });
 
   it('imports as many statements as wanted with Premium', async () => {

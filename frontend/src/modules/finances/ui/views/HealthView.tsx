@@ -4,9 +4,10 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useResource } from '@shared/hooks/useResource';
-import { todayDateOnly } from '@shared/utils/format';
+import { intlLocale, todayDateOnly } from '@shared/utils/format';
 import { storage } from '@shared/utils/storage';
 import { useFinances } from '../../application/FinancesContext';
+import { useEnoughData } from '../../application/hooks/useEnoughData';
 import {
   NO_SPEND_TARGET,
   PILLAR_POINTS,
@@ -52,17 +53,21 @@ function ScoreRing({ health }: { health: Health }) {
 }
 
 function Pillars({ health }: { health: Health }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { percent } = useFormat();
   const text = (id: string, value: number) =>
-    t(`app.health.detail.${id}`, { value: id === 'cushion' ? value : percent(value, 0) });
+    id === 'cushion' && value === 1
+      ? t('app.health.detail.cushionOne')
+      : t(`app.health.detail.${id}`, { value: id === 'cushion' ? value : percent(value, 0) });
+  // «4,1/25» with the decimal mark of the language, like every other figure.
+  const points = (value: number) => value.toLocaleString(intlLocale(locale));
   return (
     <ul className="health-pillars">
       {health.pillars.map((p) => (
         <li key={p.id}>
           <div className="health-pillar-head">
             <strong>{t(`app.health.pillar.${p.id}`)}</strong>
-            <span>{t('app.health.points', { points: p.points, max: PILLAR_POINTS })}</span>
+            <span>{t('app.health.points', { points: points(p.points), max: PILLAR_POINTS })}</span>
           </div>
           <div className="health-bar" aria-hidden="true">
             <span style={{ width: `${(p.points / PILLAR_POINTS) * 100}%` }} />
@@ -270,6 +275,7 @@ export function HealthView() {
   );
   // The debts come from a Premium section: without them that pillar is left out.
   const assets = useResource(() => assetApi.getAll(), [assetApi]);
+  const enough = useEnoughData();
 
   if (!f.summary) return <div className="card">{t('app.common.loading')}</div>;
   const income = f.summary.totalIncome;
@@ -297,16 +303,25 @@ export function HealthView() {
           <Icon name="heart" /> {t('app.health.title')}
         </h2>
         <p className="section-hint">{t('app.health.hint')}</p>
-        <div className="health-head">
-          <ScoreRing health={health} />
-          <div>
-            <p className="health-level">{t(`app.health.level.${health.level}`)}</p>
-            <p className="section-hint">{t('app.health.score', { score: health.score })}</p>
-          </div>
-        </div>
-        <Pillars health={health} />
-        {debt === null && <p className="section-hint">{t('app.health.noDebts')}</p>}
-        {f.budgets.length === 0 && <p className="section-hint">{t('app.health.noBudgets')}</p>}
+        {/* A new account would only get a low score for data it does not have yet. */}
+        {enough ? (
+          <>
+            <div className="health-head">
+              <ScoreRing health={health} />
+              <div>
+                <p className="health-level">{t(`app.health.level.${health.level}`)}</p>
+                <p className="section-hint">{t('app.health.score', { score: health.score })}</p>
+              </div>
+            </div>
+            <Pillars health={health} />
+            {debt === null && <p className="section-hint">{t('app.health.noDebts')}</p>}
+            {f.budgets.length === 0 && <p className="section-hint">{t('app.health.noBudgets')}</p>}
+          </>
+        ) : (
+          <p className="section-hint health-not-yet" role="status">
+            <Icon name="info" /> {t('app.health.notYet')}
+          </p>
+        )}
       </div>
       <Challenges
         period={`${f.year}-${f.month}`}

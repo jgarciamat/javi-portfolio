@@ -885,28 +885,6 @@
   padding-top: 0.75rem;
 }
 
-/* «Start a new return»: the app's red destructive button (.btn-danger), on one compact line. */
-.renta-new-return {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.8rem;
-  font-size: 0.85rem;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-/* High contrast: a light edge so the red button stands out from the dark card. */
-html.wiz-contrast .renta-new-return {
-  outline: 2px solid var(--slate-50);
-  outline-offset: 0;
-}
-
-html.wiz-contrast .renta-new-return:focus-visible {
-  outline: 3px solid var(--red-400);
-  outline-offset: 2px;
-}
-
 .renta-new-return-modal {
   text-align: left;
   max-height: calc(100vh - 2rem);

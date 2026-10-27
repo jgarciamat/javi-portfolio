@@ -5,6 +5,7 @@ import type {
   AIAnswer,
   AnnualReport,
   Asset,
+  EndOfMonth,
   Forecast,
   SubscriptionReport,
   LeakFinding,
@@ -230,10 +231,38 @@ export const advice = (over: Partial<AIAdvice> = {}): AIAdvice => ({
   ...over,
 });
 
+/** The worked example of docs/llegas-a-fin-de-mes.md. */
+export const endOfMonth = (over: Partial<EndOfMonth> = {}): EndOfMonth => ({
+  enoughData: true,
+  fewData: false,
+  available: 2317.52,
+  daysLeft: 5,
+  daysElapsed: 27,
+  monthVariable: 1890,
+  monthDaily: 70,
+  historyDaily: 75,
+  historyMonths: 3,
+  pace: 71.03,
+  pending: [
+    { description: 'NETFLIX.COM', date: '2026-10-29', amount: 12.99 },
+    { description: 'Seguro hogar', date: '2026-10-30', amount: 186.4 },
+  ],
+  pendingTotal: 199.39,
+  scheduled: [{ description: 'Dentista', date: '2026-10-30', amount: 60 }],
+  scheduledTotal: 60,
+  oneOffs: [],
+  outlierMonths: [],
+  projectedEnd: 1762.98,
+  maxDaily: 423.62,
+  status: 'ok',
+  ...over,
+});
+
 export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
   year: 2026,
   month: 3,
   safeToSpend: { available: 900, daysLeft: 18, daily: 50, projectedEnd: 500, status: 'ok' },
+  endOfMonth: endOfMonth(),
   locked: false,
   projection: [
     {
@@ -306,6 +335,8 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       lastDate: '2026-03-05',
       nextDate: '2026-04-04',
       priceIncrease: { from: 12.99, to: 13.99 },
+      categoryName: 'Ocio',
+      essential: false,
     },
     {
       key: 'seguro coche',
@@ -317,10 +348,13 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       lastDate: '2026-03-02',
       nextDate: '2027-03-02',
       priceIncrease: null,
+      categoryName: null,
+      essential: true,
     },
   ],
   count: 2,
   locked: false,
+  fixed: 1,
   ...over,
 });
 
@@ -422,7 +456,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         autonomoDrafts: 1,
         autonomoPdfs: 1,
         assets: 3,
-        imports: 1,
+        imports: null,
       },
       features: {
         insights: false,

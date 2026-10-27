@@ -200,6 +200,8 @@ export interface ImportRowResult {
   categoryName?: string;
   categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
+  /** A movement of an automatic operation this row seems to repeat (date ±3 days, amount, concept). */
+  coveredBy?: { transactionId: string; description: string; date: string };
 }
 
 export interface ImportResult {
@@ -208,6 +210,12 @@ export interface ImportResult {
   duplicates: number;
   invalid: number;
   rows: ImportRowResult[];
+}
+
+/** «Pruébalo con datos de ejemplo»: invented movements, and all the movements of the person. */
+export interface SampleDataStatus {
+  sample: number;
+  movements: number;
 }
 
 // ─── Recurring rules ──────────────────────────────────────────────────────────
@@ -485,10 +493,55 @@ export interface ForecastRule {
   frequency: 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';
 }
 
+/** A payment in «¿Llegas a fin de mes?»: still to come, already dated later, or a one-off. */
+export interface EndOfMonthPayment {
+  description: string;
+  date: string;
+  amount: number;
+}
+
+/**
+ * «¿Llegas a fin de mes?» from this month's pace, the last months and the payments still to come
+ * (backend/src/domain/services/end-of-month.ts, docs/llegas-a-fin-de-mes.md).
+ */
+export interface EndOfMonth {
+  /** At least 5 transactions and 7 days of data; otherwise the card asks for more. */
+  enoughData: boolean;
+  /** No earlier month to compare with: this month's pace only. */
+  fewData: boolean;
+  /** The «Saldo disponible» of the month. */
+  available: number;
+  /** From today to the end of the month, today included. */
+  daysLeft: number;
+  daysElapsed: number;
+  /** Everyday spending of the month so far (no recurring charges, transfers, savings, one-offs). */
+  monthVariable: number;
+  monthDaily: number;
+  /** The same per day in the last complete months, or null without any. */
+  historyDaily: number | null;
+  historyMonths: number;
+  /** Usual pace per day: this month and the history weighed together. */
+  pace: number;
+  /** Detected subscriptions not charged yet this month. */
+  pending: EndOfMonthPayment[];
+  pendingTotal: number;
+  /** Expenses already recorded with a later date this month (already in `available`). */
+  scheduled: EndOfMonthPayment[];
+  scheduledTotal: number;
+  oneOffs: EndOfMonthPayment[];
+  outlierMonths: { year: number; month: number }[];
+  /** available − pending − pace · daysLeft */
+  projectedEnd: number;
+  /** (available − pending) / daysLeft, never below zero. */
+  maxDaily: number;
+  status: 'ok' | 'tight' | 'short';
+}
+
 export interface Forecast {
   year: number;
   month: number;
   safeToSpend: SafeToSpend;
+  endOfMonth: EndOfMonth;
   /** Free plan: only next month is projected; the longer outlook and «what if…» are Premium. */
   locked: boolean;
   projection: ProjectedMonth[];
@@ -531,6 +584,10 @@ export interface DetectedSubscription {
   lastDate: string;
   nextDate: string;
   priceIncrease: { from: number; to: number } | null;
+  /** Category of the latest charge (older API versions leave it out). */
+  categoryName?: string | null;
+  /** A fixed charge of life (rent, power, insurance…) rather than a subscription. */
+  essential?: boolean;
 }
 
 export interface SubscriptionReport {
@@ -542,6 +599,8 @@ export interface SubscriptionReport {
   count: number;
   /** Free plan: the list is cut to the first few; the full list is Premium. */
   locked: boolean;
+  /** How many are fixed charges, also those not listed (older API versions leave it out). */
+  fixed?: number;
 }
 
 // ─── Tu dinero perdido ───────────────────────────────────────────────────────

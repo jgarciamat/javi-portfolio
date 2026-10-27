@@ -6,6 +6,9 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { errorMessage } from '@shared/utils/errors';
 import { Icon } from '@shared/components/Icon';
+import '@shared/components/css/AuthFields.css';
+import '@shared/components/css/AuthPage.css';
+import '@shared/components/css/AuthReset.css';
 
 type Status = 'loading' | 'success' | 'error' | 'resent';
 
@@ -51,38 +54,36 @@ export function VerifyEmailPage() {
   };
 
   return (
-    <>
+    <div className="auth-page-root">
       <PublicHeader />
       <main className="auth-page-with-header">
-        <div className="auth-card">
+        <div className="auth-card auth-card--reset">
           {status === 'loading' && (
             <>
-              <div className="auth-logo">⏳</div>
+              <div className="auth-badge">
+                <Icon name="clock" size={30} />
+              </div>
               <h1 className="auth-title">{t('app.auth.verify.loading')}</h1>
             </>
           )}
           {status === 'success' && (
             <>
-              <div className="auth-logo">
-                <Icon name="checkCircle" />
+              <div className="auth-badge auth-badge--ok">
+                <Icon name="checkCircle" size={30} />
               </div>
               <h1 className="auth-title">{t('app.auth.verify.success')}</h1>
               <p className="auth-sub" style={{ textAlign: 'center' }}>
                 {t('app.auth.verify.successSub')}
               </p>
-              <button
-                className="auth-btn"
-                style={{ marginTop: '24px' }}
-                onClick={() => navigate('/login', { replace: true })}
-              >
+              <button className="auth-btn" onClick={() => navigate('/login', { replace: true })}>
                 {t('app.auth.login.submit')}
               </button>
             </>
           )}
           {status === 'resent' && (
             <>
-              <div className="auth-logo">
-                <Icon name="mail" />
+              <div className="auth-badge">
+                <Icon name="mail" size={30} />
               </div>
               <h1 className="auth-title">{t('app.auth.verify.resent')}</h1>
               <p className="auth-sub" style={{ textAlign: 'center' }}>
@@ -92,7 +93,9 @@ export function VerifyEmailPage() {
           )}
           {status === 'error' && (
             <>
-              <div className="auth-logo">❌</div>
+              <div className="auth-badge auth-badge--error">
+                <Icon name="alert" size={30} />
+              </div>
               <h1 className="auth-title">{t('app.auth.verify.error')}</h1>
               <p className="auth-sub" style={{ textAlign: 'center', color: 'var(--red-400)' }}>
                 {message}
@@ -113,17 +116,13 @@ export function VerifyEmailPage() {
                   </button>
                 </form>
               )}
-              <button
-                className="auth-btn"
-                style={{ marginTop: '24px' }}
-                onClick={() => navigate('/login', { replace: true })}
-              >
+              <button className="auth-btn" onClick={() => navigate('/login', { replace: true })}>
                 {t('app.auth.verify.back')}
               </button>
             </>
           )}
         </div>
       </main>
-    </>
+    </div>
   );
 }

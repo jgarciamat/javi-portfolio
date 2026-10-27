@@ -7,7 +7,8 @@ import {
   requestNotificationPermission,
   scheduleBillReminders,
   cancelBillReminders,
-  scheduleMonthlyReminder,
+  scheduleMonthlyReminders,
+  onNotificationTap,
   showNotification,
 } from '@core/notifications/notifications';
 
@@ -16,6 +17,7 @@ const plugin = {
   checkPermissions: jest.fn(),
   schedule: jest.fn(),
   cancel: jest.fn(),
+  addListener: jest.fn(),
 };
 jest.mock('@capacitor/local-notifications', () => ({ LocalNotifications: plugin }));
 
@@ -55,18 +57,46 @@ describe('native (Android / iOS)', () => {
     expect(plugin.schedule).toHaveBeenCalledWith({
       notifications: [{ id: 7, title: 'T', body: 'B' }],
     });
-    await scheduleMonthlyReminder(25, 'Nuevo mes', 'Revisa');
-    expect(plugin.cancel).toHaveBeenCalled();
-    expect(plugin.schedule).toHaveBeenLastCalledWith({
-      notifications: [
-        expect.objectContaining({
-          title: 'Nuevo mes',
-          schedule: expect.objectContaining({ on: { day: 25, hour: 9, minute: 0 } }),
-        }),
-      ],
+    const at = new Date('2026-11-01T09:00:00');
+    await scheduleMonthlyReminders(
+      ['A', 'B', 'C', 'D'].map((title) => ({ at, title, body: 'Son 30 segundos' }))
+    );
+    expect(plugin.cancel).toHaveBeenCalledWith({
+      notifications: [{ id: 1001 }, { id: 1002 }, { id: 1003 }],
     });
+    const { notifications } = plugin.schedule.mock.lastCall[0];
+    expect(notifications).toHaveLength(3);
+    expect(notifications[0]).toEqual({
+      id: 1001,
+      title: 'A',
+      body: 'Son 30 segundos',
+      schedule: { at, allowWhileIdle: true },
+      extra: { url: '/?importar=1' },
+    });
+    plugin.schedule.mockClear();
+    await scheduleMonthlyReminders([]);
+    expect(plugin.schedule).not.toHaveBeenCalled();
     await cancelMonthlyReminder();
-    expect(plugin.cancel).toHaveBeenCalledTimes(2);
+    expect(plugin.cancel).toHaveBeenCalledTimes(3);
+  });
+
+  it('opens the address of a tapped notification, only an address of the app', async () => {
+    const remove = jest.fn();
+    let listener!: (action: { notification: { extra?: { url?: unknown } } }) => void;
+    plugin.addListener.mockImplementation(async (_event, fn) => {
+      listener = fn;
+      return { remove };
+    });
+    const open = jest.fn();
+    const stop = await onNotificationTap(open);
+    expect(plugin.addListener).toHaveBeenCalledWith('localNotificationActionPerformed', listener);
+    listener({ notification: { extra: { url: '/?importar=1' } } });
+    listener({ notification: { extra: { url: 'https://example.com' } } });
+    listener({ notification: {} });
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(open).toHaveBeenCalledWith('/?importar=1');
+    stop();
+    expect(remove).toHaveBeenCalled();
   });
 });
 
@@ -104,8 +134,9 @@ describe('browser', () => {
     expect(await requestNotificationPermission()).toBe(false);
     expect(await hasNotificationPermission()).toBe(false);
     await showNotification(1, 'T', 'B');
-    await scheduleMonthlyReminder(1, 'T', 'B');
+    await scheduleMonthlyReminders([{ at: new Date(), title: 'T', body: 'B' }]);
     await cancelMonthlyReminder();
+    (await onNotificationTap(jest.fn()))();
     await scheduleBillReminders([{ at: new Date(), title: 'T', body: 'B' }]);
     await cancelBillReminders();
     expect(plugin.schedule).not.toHaveBeenCalled();

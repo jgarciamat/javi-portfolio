@@ -58,8 +58,8 @@ describe('«Preparar mi declaración de la renta»', () => {
     const figure = (key: string) =>
       screen.getByText(tr(`tools.renta.bring.fig.${key}`)).closest('li') as HTMLElement;
     expect(figure('income')).toHaveTextContent('24.000,00');
-    expect(figure('expenses')).toHaveTextContent('5000,00');
-    expect(figure('withholdings')).toHaveTextContent('1200,00');
+    expect(figure('expenses')).toHaveTextContent('5.000,00');
+    expect(figure('withholdings')).toHaveTextContent('1.200,00');
     expect(figure('payments')).toHaveTextContent('500,00');
     expect(figure('net')).toHaveTextContent('19.000,00');
     expect(screen.queryByText(tr('tools.renta.prepare.estimated'))).toBeNull();

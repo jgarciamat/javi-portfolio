@@ -46,6 +46,19 @@ html.wiz-big-text {
   outline: 3px solid var(--accent-400);
   outline-offset: 2px;
 }
+/* «Start a new return»: the same pill as the other tools, in a red that reads in light and dark. */
+.wiz-tool.wiz-tool-danger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #fff;
+  font-weight: 600;
+}
+.wiz-tool.wiz-tool-danger:hover {
+  background: #991b1b;
+}
+.wiz-tool.wiz-tool-danger:focus-visible {
+  outline-color: #fca5a5;
+}
 .wiz-tool-icon {
   font-weight: 800;
 }
@@ -315,7 +328,9 @@ html.wiz-big-text {
   border: 2px solid var(--slate-800);
   border-radius: 14px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 .wiz-choice:has(input:checked) {
   border-color: var(--accent-600);
@@ -483,6 +498,10 @@ html.wiz-contrast .wiz select {
   border-color: var(--slate-200);
   border-width: 2px;
 }
+html.wiz-contrast .wiz-tool.wiz-tool-danger {
+  border-color: var(--slate-50);
+  background: #7f1d1d;
+}
 html.wiz-contrast .wiz-link {
   color: var(--slate-50);
 }
@@ -550,9 +569,8 @@ html.wiz-contrast .wiz-route-item.is-locked button {
     font-size: 0.8rem;
     padding: 0.3rem 0.5rem;
   }
-}
-
-/* A compact action under the title of every screen (the Renta's «Start a new return»). */
-.wiz-screen-action {
-  margin: 0.5rem 0 0.9rem;
+  /* The red button (or «Start again») takes the whole third row: one clean line. */
+  .wiz-tool.wiz-tool-danger {
+    grid-column: 1 / -1;
+  }
 }

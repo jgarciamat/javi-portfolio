@@ -14,5 +14,3 @@ export const AUTONOMO_STEPS: readonly WizardStep[] = [
 
 /** Where the person is in it, on this device (and in the account copy with the rest). */
 export const AUTONOMO_WIZARD_KEY = 'mm_autonomo_wizard';
-/** Step by step or everything together. */
-export const AUTONOMO_ASSISTANT_KEY = 'mm_autonomo_assistant';

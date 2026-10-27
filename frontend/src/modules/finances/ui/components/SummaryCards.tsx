@@ -37,7 +37,10 @@ function Card({
           <Icon name={icon} />
         </span>
       </div>
-      <div className="summary-card-value">{value}</div>
+      {/* A sentence instead of a figure («No income recorded») takes a smaller size. */}
+      <div className={`summary-card-value${/\d/.test(value) ? '' : ' summary-card-value--text'}`}>
+        {value}
+      </div>
       <div className="summary-card-sub">{sub}</div>
     </div>
   );

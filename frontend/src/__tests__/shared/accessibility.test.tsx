@@ -288,10 +288,9 @@ describe('new movement form', () => {
     fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.type') }), {
       target: { value: 'SAVING' },
     });
-    fireEvent.change(
-      screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
-      { target: { value: 'Alimentación' } }
-    );
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.category') }), {
+      target: { value: 'Alimentación' },
+    });
     save();
     await waitFor(() => expect(amount).toHaveFocus());
     expect(amount).toHaveAttribute('aria-invalid', 'true');

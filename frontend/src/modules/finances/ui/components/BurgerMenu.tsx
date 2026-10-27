@@ -41,6 +41,104 @@ function MenuFocus({
   return null;
 }
 
+/**
+ * Every section by groups, each group a grid of two columns, with the profile and «invite a
+ * friend». `open`: only then does «Your plan» answer to the tour (closed, it is off the screen).
+ */
+function MenuNav({
+  tab,
+  open,
+  onSelectTab,
+  onOpenProfile,
+  onOpenInvite,
+}: {
+  tab: DashboardTab;
+  open: boolean;
+  onSelectTab: (tab: DashboardTab) => void;
+  onOpenProfile: () => void;
+  onOpenInvite: () => void;
+}) {
+  const { t } = useI18n();
+  const { user } = useAuth();
+  const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
+  const sections = DASHBOARD_SECTIONS.filter(
+    (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
+  );
+  return (
+    <nav className="burger-nav" aria-label={t('app.menu.ariaLabel')}>
+      {SECTION_GROUPS.map((group) => (
+        <div
+          key={group}
+          className="burger-nav-group"
+          role="group"
+          aria-label={t(`app.menu.group.${group}`)}
+        >
+          <h3 className="burger-nav-group-title" aria-hidden="true">
+            {t(`app.menu.group.${group}`)}
+          </h3>
+          {group === 'account' && (
+            <button
+              className="burger-nav-item"
+              onClick={onOpenProfile}
+              style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
+              aria-label={
+                user?.name
+                  ? t('app.header.openProfileOf', { name: user.name })
+                  : t('app.header.openProfile')
+              }
+            >
+              <span className="burger-nav-icon">
+                {user?.avatar ? (
+                  <span className="burger-nav-avatar" aria-hidden="true">
+                    {user.avatar}
+                  </span>
+                ) : (
+                  <Icon name="user" />
+                )}
+              </span>
+              <span className="burger-nav-label">{t('app.menu.profile')}</span>
+            </button>
+          )}
+          {sections
+            .filter((s) => s.group === group)
+            .map(({ id, icon, labelKey, color }) => (
+              <button
+                key={id}
+                className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
+                onClick={() => onSelectTab(id)}
+                aria-current={tab === id ? 'page' : undefined}
+                data-tour={open && id === 'plan' ? 'plan' : undefined}
+                style={{ '--section-color': color } as CSSProperties}
+              >
+                <span className="burger-nav-icon">
+                  <Icon name={icon} />
+                </span>
+                <span className="burger-nav-label">{t(labelKey)}</span>
+                {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
+              </button>
+            ))}
+          {group === 'account' && (
+            <button
+              className="burger-nav-item burger-nav-item--wide"
+              onClick={onOpenInvite}
+              style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
+              data-testid="menu-invite"
+            >
+              <span className="burger-nav-icon">
+                <Icon name="gift" />
+              </span>
+              <span className="burger-nav-text">
+                <span className="burger-nav-label">{t('app.menu.invite')}</span>
+                <span className="burger-nav-sub">{t('app.menu.inviteSub')}</span>
+              </span>
+            </button>
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
 /** Side menu with every section; the offers entry hides when the user turned offers off. */
 export function BurgerMenu({
   open,
@@ -51,12 +149,6 @@ export function BurgerMenu({
   onClose,
 }: BurgerMenuProps) {
   const { t } = useI18n();
-  const { user } = useAuth();
-  const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
-  const sections = DASHBOARD_SECTIONS.filter(
-    (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
-  );
-
   const panel = useRef<HTMLElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
 
@@ -101,85 +193,22 @@ export function BurgerMenu({
             <Icon name="close" />
           </button>
         </div>
-        <nav className="burger-nav">
-          {SECTION_GROUPS.map((group) => (
-            <div
-              key={group}
-              className="burger-nav-group"
-              role="group"
-              aria-label={t(`app.menu.group.${group}`)}
-            >
-              <h3 className="burger-nav-group-title" aria-hidden="true">
-                {t(`app.menu.group.${group}`)}
-              </h3>
-              {group === 'account' && (
-                <button
-                  className="burger-nav-item"
-                  onClick={() => {
-                    onOpenProfile();
-                    onClose();
-                  }}
-                  style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
-                  aria-label={
-                    user?.name
-                      ? t('app.header.openProfileOf', { name: user.name })
-                      : t('app.header.openProfile')
-                  }
-                >
-                  <span className="burger-nav-icon">
-                    {user?.avatar ? (
-                      <span className="burger-nav-avatar" aria-hidden="true">
-                        {user.avatar}
-                      </span>
-                    ) : (
-                      <Icon name="user" />
-                    )}
-                  </span>
-                  <span className="burger-nav-label">{t('app.menu.profile')}</span>
-                </button>
-              )}
-              {sections
-                .filter((s) => s.group === group)
-                .map(({ id, icon, labelKey, menuKey, color }) => (
-                  <button
-                    key={id}
-                    className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
-                    onClick={() => {
-                      onSelectTab(id);
-                      onClose();
-                    }}
-                    aria-current={tab === id ? 'page' : undefined}
-                    style={{ '--section-color': color } as CSSProperties}
-                  >
-                    <span className="burger-nav-icon">
-                      <Icon name={icon} />
-                    </span>
-                    <span className="burger-nav-label">{t(menuKey ?? labelKey)}</span>
-                    {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
-                  </button>
-                ))}
-              {group === 'account' && (
-                <button
-                  className="burger-nav-item burger-nav-item--wide"
-                  onClick={() => {
-                    onOpenInvite();
-                    onClose();
-                  }}
-                  style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
-                  data-testid="menu-invite"
-                >
-                  <span className="burger-nav-icon">
-                    <Icon name="gift" />
-                  </span>
-                  <span className="burger-nav-text">
-                    <span className="burger-nav-label">{t('app.menu.invite')}</span>
-                    <span className="burger-nav-sub">{t('app.menu.inviteSub')}</span>
-                  </span>
-                </button>
-              )}
-            </div>
-          ))}
-        </nav>
+        <MenuNav
+          tab={tab}
+          open={open}
+          onSelectTab={(id) => {
+            onSelectTab(id);
+            onClose();
+          }}
+          onOpenProfile={() => {
+            onOpenProfile();
+            onClose();
+          }}
+          onOpenInvite={() => {
+            onOpenInvite();
+            onClose();
+          }}
+        />
       </aside>
     </>
   );

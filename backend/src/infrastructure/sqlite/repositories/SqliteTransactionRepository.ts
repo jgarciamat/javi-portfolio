@@ -9,11 +9,16 @@ import {
   TransactionView,
 } from '@domain/ports/repositories';
 import { LeakMovement } from '@domain/services/money-leaks';
+import { RuleMovement } from '@domain/services/recurring-match';
+import { SAMPLE_HASH_PREFIX } from '@domain/services/sample-data';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
 import { normalizeText } from '@domain/shared/text';
 import { Db, escapeLike, inChunks, placeholders } from '../database';
+
+/** The invented movements of «Pruébalo con datos de ejemplo» (see sample-data.ts). */
+const SAMPLE_ROWS = 'import_hash LIKE ?';
 
 interface TransactionRow {
   id: string;
@@ -331,6 +336,17 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return rows;
   }
 
+  listFromRulesBetween(userId: string, fromDate: string, toDate: string): RuleMovement[] {
+    return this.db
+      .prepare(
+        `SELECT id, description, date, amount_cents AS amountCents, type
+           FROM transactions
+          WHERE user_id = ? AND recurring_rule_id IS NOT NULL AND date BETWEEN ? AND ?
+          ORDER BY date`
+      )
+      .all(userId, fromDate, toDate) as RuleMovement[];
+  }
+
   existingImportHashes(userId: string, hashes: string[]): Set<string> {
     const found = new Set<string>();
     inChunks(hashes, 500, (chunk) => {
@@ -412,5 +428,18 @@ export class SqliteTransactionRepository implements TransactionRepository {
       .prepare('SELECT COUNT(*) AS n FROM transactions WHERE user_id = ?')
       .get(userId) as { n: number };
     return row.n;
+  }
+
+  countSample(userId: string): number {
+    const row = this.db
+      .prepare(`SELECT COUNT(*) AS n FROM transactions WHERE user_id = ? AND ${SAMPLE_ROWS}`)
+      .get(userId, `${SAMPLE_HASH_PREFIX}%`) as { n: number };
+    return row.n;
+  }
+
+  deleteSample(userId: string): number {
+    return this.db
+      .prepare(`DELETE FROM transactions WHERE user_id = ? AND ${SAMPLE_ROWS}`)
+      .run(userId, `${SAMPLE_HASH_PREFIX}%`).changes;
   }
 }

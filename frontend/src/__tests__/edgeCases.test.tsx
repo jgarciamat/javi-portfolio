@@ -20,6 +20,7 @@ import * as notifications from '@core/notifications/notifications';
 import { reasonFromError } from '@modules/billing/application/PlanContext';
 import { AnalysisView } from '@modules/finances/ui/views/AnalysisView';
 import { AIAdvisor } from '@modules/finances/ui/components/AIAdvisor';
+import { useFinances } from '@modules/finances/application/FinancesContext';
 import { CalendarDayModal } from '@modules/finances/ui/components/CalendarDayModal';
 import { CategoryChart } from '@modules/finances/ui/components/CategoryChart';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
@@ -231,7 +232,10 @@ describe('billing edge cases', () => {
     // Premium-only rows: trends, annual report, receipts by e-mail, household and AI questions.
     expect(screen.getAllByText('✓')).toHaveLength(5);
     const row = (label: string) => screen.getByText(label).closest('tr') as HTMLElement;
-    expect(row(tr('pricing.row.imports'))).toHaveTextContent(`1${tr('pricing.unlimited')}`);
+    // Free and unlimited on every plan.
+    expect(row(tr('pricing.row.imports'))).toHaveTextContent(
+      `${tr('pricing.unlimited')}${tr('pricing.unlimited')}`
+    );
     expect(row(tr('pricing.row.rentaCalculations'))).toHaveTextContent(
       tr('pricing.perCampaign', { count: 3 })
     );
@@ -282,6 +286,40 @@ describe('billing edge cases', () => {
       await screen.findByRole('button', { name: new RegExp(tr('billing.seePlans')) })
     );
     expect(screen.getByRole('dialog', { name: tr('billing.upgradeTitle') })).toBeInTheDocument();
+  });
+
+  it('reads only the month again without «invalidate», and the accounts too with it', async () => {
+    const api = createFakeApi();
+    function Refresh() {
+      const { refresh } = useFinances();
+      return (
+        <>
+          <button onClick={() => void refresh()}>mes</button>
+          <button onClick={() => void refresh({ invalidate: true })}>todo</button>
+        </>
+      );
+    }
+    renderWithProviders(<Refresh />, { api });
+    await waitFor(() => expect(api.accountApi.getAll).toHaveBeenCalled());
+    const accounts = api.accountApi.getAll.mock.calls.length;
+    const months = api.monthApi.get.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'mes' }));
+    await waitFor(() => expect(api.monthApi.get.mock.calls.length).toBeGreaterThan(months));
+    expect(api.accountApi.getAll.mock.calls.length).toBe(accounts);
+    fireEvent.click(screen.getByRole('button', { name: 'todo' }));
+    await waitFor(() => expect(api.accountApi.getAll.mock.calls.length).toBeGreaterThan(accounts));
+  });
+
+  it('analyses a month before the user is known (signing in still loading)', async () => {
+    const api = createFakeApi();
+    api.insightsApi.advice.mockResolvedValue(f.advice({ source: 'rules' }));
+    renderWithProviders(<AIAdvisor year={2026} month={3} onAnalyzed={jest.fn()} />, {
+      api,
+      authenticated: false,
+      finances: true,
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.ai.btn.analyze') }));
+    await waitFor(() => expect(api.insightsApi.advice).toHaveBeenCalled());
   });
 
   it('shows offers while loading and hides the empty text on errors', async () => {
@@ -504,10 +542,9 @@ describe('dashboard edge cases', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: literal(tr('app.transaction.form.title')) })
     );
-    fireEvent.change(
-      screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
-      { target: { value: '__manage__' } }
-    );
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.category') }), {
+      target: { value: '__manage__' },
+    });
     const manager = await screen.findByRole('dialog', { name: tr('app.category.manager.title') });
     fireEvent.change(
       within(manager).getByRole('textbox', { name: tr('app.category.manager.name.placeholder') }),

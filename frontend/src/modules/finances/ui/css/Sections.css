@@ -441,7 +441,11 @@
 
 .chart svg {
   width: 100%;
+  /* Drawn at 640 units: wider than that on a computer, its labels would grow over the text. */
+  max-width: 640px;
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .chart-grid {
@@ -590,21 +594,62 @@
   overflow-y: auto;
 }
 
-.file-drop {
+.import-file {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   border: 2px dashed var(--slate-700);
   border-radius: 12px;
-  color: var(--slate-400);
-  cursor: pointer;
   text-align: center;
 }
 
-.file-drop input {
+.import-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   max-width: 100%;
+}
+
+.import-file-name {
+  margin: 0;
+  max-width: 100%;
+  color: var(--slate-200);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.import-file-formats {
+  margin: 0;
+}
+
+/* The AI option of the importer: the label next to its box, the line on what it does under it. */
+.import-ai {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+.import-ai-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--slate-200);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.import-ai-check .toggle {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.import-ai .section-hint {
+  margin: 0;
+  padding-left: 1.85rem;
 }
 
 /* ─── Month navigator extras ──────────────────────────────────────────────── */
@@ -691,13 +736,16 @@
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s;
   padding-top: env(safe-area-inset-top);
 }
 
+/* The shadow only while open: closed, it would show as a grey line at the left of the page. */
 .burger-panel--open {
   transform: translateX(0);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
 .burger-panel-header {
@@ -1321,4 +1369,508 @@ button.entity-item {
   min-height: 2.75rem;
   margin-top: 0.35rem;
   text-decoration: none;
+}
+
+/* ─── Import: file or pasted text, and the rows read from text to correct ─── */
+.import-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+/* Three tabs that share the width, also on a 390 px phone. */
+.import-tabs .tab-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.4rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  border-radius: 8px 8px 0 0;
+}
+
+.import-tabs .tab-btn.active {
+  color: var(--accent-400);
+  border-bottom-color: var(--accent);
+}
+
+/* Narrow phones: the words fit without the icons. */
+@media (max-width: 420px) {
+  .import-tabs .tab-btn svg {
+    display: none;
+  }
+}
+
+.import-paste {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.import-paste .import-file {
+  justify-self: stretch;
+}
+
+.import-paste-text {
+  width: 100%;
+  min-height: 9rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.import-edit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.import-edit-row {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) auto 7rem auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.import-edit-row > .tx-input {
+  min-width: 0;
+}
+
+.import-edit-amount {
+  text-align: right;
+}
+
+.import-edit-row > .import-review {
+  grid-column: 1 / -1;
+}
+
+/* Phones: the concept on its own line; then the date, the amount and the bin; then the type. */
+@media (max-width: 600px) {
+  .import-edit-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--slate-800);
+  }
+
+  .import-edit-description {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .import-edit-date {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .import-edit-amount {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .import-edit-remove {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .import-edit-row > .import-type-select {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.import-private {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--green-400, #4ade80);
+}
+
+/* ─── «Pruébalo con datos de ejemplo» ─── */
+.sample-card {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.sample-card p {
+  margin: 0;
+}
+
+.sample-card--active {
+  border-color: var(--amber-400, #fbbf24);
+}
+
+/* ─── After an import: the fixed charges and subscriptions found ─── */
+.first-result {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--slate-800);
+}
+
+.first-result p {
+  margin: 0;
+}
+
+.first-result-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.first-result-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.first-result-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.first-result-list span {
+  overflow-wrap: anywhere;
+}
+
+.first-result-list strong {
+  white-space: nowrap;
+}
+
+/* «How does it work?»: the guide of the open section, small and out of the way. */
+.section-guide-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.5rem 0 0.5rem;
+}
+
+.section-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--slate-300);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.section-guide-btn:hover,
+.section-guide-btn:focus-visible {
+  color: var(--slate-100);
+  border-color: var(--section-color, var(--accent-400));
+}
+
+/* ─── An empty month: the ways to start, as big buttons ─── */
+.empty-month-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.empty-month-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-height: 64px;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  text-align: left;
+  cursor: pointer;
+}
+
+.empty-month-option:hover,
+.empty-month-option:focus-visible {
+  border-color: var(--accent-400);
+}
+
+.empty-month-option:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.empty-month-option span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.empty-month-option small {
+  color: var(--slate-400);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.empty-month-option svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: var(--accent-400);
+}
+
+.forecast-not-yet {
+  margin: 0;
+}
+
+/* ─── Import: folded help and columns, rows as cards on phones, the result ─── */
+.import-help,
+.import-columns {
+  margin: 0.4rem 0 0.6rem;
+}
+
+.import-help summary,
+.import-columns summary {
+  cursor: pointer;
+  color: var(--accent-400);
+  font-size: 0.9rem;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.import-columns[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.import-done-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  color: var(--green-400, #4ade80);
+}
+
+@media (max-width: 640px) {
+  .import-cards thead {
+    display: none;
+  }
+
+  .import-cards,
+  .import-cards tbody {
+    display: block;
+    width: 100%;
+  }
+
+  /* Concept on the left with the date over it, the whole amount on the right, the rest under. */
+  .import-cards tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'date amount'
+      'concept amount'
+      'meta meta';
+    gap: 0.15rem 0.75rem;
+    padding: 0.6rem 0.25rem;
+    border-bottom: 1px solid var(--slate-800);
+  }
+
+  .import-cards td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .import-cards .import-card-date {
+    grid-area: date;
+    font-size: 0.8rem;
+    color: var(--slate-400);
+  }
+
+  .import-cards .import-card-concept {
+    grid-area: concept;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .import-cards .import-card-amount {
+    grid-area: amount;
+    align-self: center;
+    white-space: nowrap;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .import-cards .import-card-type {
+    display: none;
+  }
+
+  .import-cards .import-card-meta {
+    grid-area: meta;
+    font-size: 0.85rem;
+    color: var(--slate-300);
+  }
+}
+
+/* A row an automatic operation already added: said under its category, with «Import it anyway». */
+.import-covered {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+  color: var(--amber-300, #fcd34d);
+}
+
+.import-covered label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 32px;
+  color: var(--slate-200);
+}
+
+/* Left out rows are muted, but «Import it anyway» stays readable. */
+.row-muted .import-covered label {
+  opacity: 1;
+}
+
+/* At its full size the labels read like the text around them (on phones the chart scales down). */
+@media (min-width: 700px) {
+  .chart-axis {
+    font-size: 14px;
+  }
+}
+
+/* The limit right after the name of its category, not at the far end of a wide row. */
+.budget-list .entity-main {
+  flex: 0 1 18rem;
+}
+
+/* ─── The menu: each group a grid of two columns, icon and name side by side, all of it in view
+   at once (rows that shrink a little on short screens; it scrolls only below ~600 px high) ─── */
+.burger-panel {
+  width: min(380px, 92vw);
+  --menu-row: clamp(30px, 4.4vh, 40px);
+}
+
+.burger-panel-header {
+  padding: 0.55rem 0.9rem;
+}
+
+.burger-nav {
+  gap: 0;
+  padding: 0.35rem 0.6rem 0.6rem;
+}
+
+.burger-nav-group {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.1rem 0.4rem;
+}
+
+.burger-nav-group + .burger-nav-group {
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+}
+
+.burger-nav-group-title {
+  margin: 0.15rem 0.55rem 0.1rem;
+}
+
+/* The first title breathes below the line of the panel header. */
+.burger-nav-group:first-child .burger-nav-group-title {
+  margin-top: 0.55rem;
+}
+
+.burger-nav-item {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: var(--menu-row);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Names break between words, never inside one («Operaciones / automáticas»). */
+.burger-nav-label {
+  overflow-wrap: normal;
+  hyphens: manual;
+}
+
+.burger-nav-icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+}
+
+/* «Invite a friend»: the same frame, as low as a row. */
+.burger-nav-item--wide {
+  margin: 0.45rem 0 0;
+  padding: 0.35rem 0.75rem;
+}
+
+.burger-nav-item--wide .burger-nav-text {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.5rem;
+}
+
+.burger-nav-item--active {
+  background: color-mix(in srgb, var(--section-color, var(--accent-400)) 16%, var(--slate-800));
+  box-shadow: inset 3px 0 0 var(--section-color, var(--accent-400));
+}
+
+.burger-nav-item:focus-visible {
+  outline: 2px solid var(--section-color, var(--accent-400));
+  outline-offset: 1px;
+}
+
+.burger-nav-dot {
+  display: none;
+}
+
+.burger-btn-text {
+  display: none;
+}
+
+/* Computers: a wide panel with room for two columns of whole names, opened from «Menú». */
+@media (min-width: 1024px) {
+  .burger-panel {
+    width: min(720px, calc(100vw - 2rem));
+  }
+
+  .burger-nav {
+    padding: 0.4rem 1rem 0.75rem;
+  }
+
+  .burger-nav-group {
+    gap: 0.1rem 0.75rem;
+  }
+
+  .burger-nav-item {
+    font-size: 0.93rem;
+  }
+
+  .burger-btn {
+    border: 1px solid var(--slate-700);
+    padding: 0.3rem 0.75rem 0.3rem 0.5rem;
+  }
+
+  .burger-btn-text {
+    display: inline;
+    font-weight: 600;
+    color: var(--slate-200);
+  }
 }

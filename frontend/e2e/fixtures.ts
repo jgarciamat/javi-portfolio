@@ -35,9 +35,9 @@ export async function signIn(page: Page): Promise<void> {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 }
 
-/** Opens a dashboard section from the burger menu. */
+/** Opens a dashboard section from the menu. */
 export async function openSection(page: Page, label: string): Promise<void> {
   await page.getByRole('button', { name: 'Abrir menú' }).click();
-  await page.locator('.burger-nav-item', { hasText: label }).click();
+  await page.locator('.burger-nav-item', { hasText: label }).first().click();
   await expect(page.getByRole('region', { name: label })).toBeVisible();
 }

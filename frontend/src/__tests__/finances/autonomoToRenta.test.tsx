@@ -11,7 +11,6 @@ import {
   preferredYear,
   yearCheck,
 } from '@modules/finances/ui/components/autonomoForRenta';
-import { AUTONOMO_ASSISTANT_KEY } from '@modules/finances/domain/autonomoWizard';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { wizardKey } from '@modules/tools/ui/renta/RentaWizard';
@@ -20,6 +19,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
+
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
 
 /**
  * From the self-employed screen to the Renta of the same year, end to end (invented data).
@@ -89,7 +92,7 @@ const boxRow = (box: string) =>
 beforeEach(() => {
   localStorage.clear();
   // Everything together on the self-employed screen; the Renta step by step.
-  localStorage.setItem(AUTONOMO_ASSISTANT_KEY, 'expert');
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
 });
 afterEach(restoreTime);
 
@@ -196,12 +199,12 @@ describe('Autónomos 2026 → Renta 2026, in one tap', () => {
     expect(screen.getByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeVisible();
     const boxes: [string, string][] = [
       ['0180', '20.000,00'],
-      ['0218', '4000,00'],
+      ['0218', '4.000,00'],
       ['0222', '800,00'],
       ['0224', '15.200,00'],
       ['0231', '15.200,00'],
       ['0235', '15.200,00'],
-      ['0599', '3000,00'],
+      ['0599', '3.000,00'],
       ['0604', '200,00'],
     ];
     for (const [box, amount] of boxes) expect(boxRow(box)).toHaveTextContent(amount);
@@ -275,7 +278,7 @@ describe('the activity brought, without contradictory figures, and taken out aga
       target: { value: '2026' },
     });
     expect(
-      await screen.findByText(/en 2026 entraron .*3505,00.* y salieron .*1090,00/)
+      await screen.findByText(/en 2026 entraron .*3.505,00.* y salieron .*1.090,00/)
     ).toBeVisible();
     fireEvent.click(
       await screen.findByRole('button', { name: tr('tools.renta.bring.button', { year: 2026 }) })
@@ -351,13 +354,13 @@ describe('a taxi in módulos → Renta 2026', () => {
     });
     for (const [box, amount] of [
       ['1465', '10.358,63'],
-      ['1474', '9262,19'],
-      ['1479', '8799,08'],
-      ['1482', '8799,08'],
+      ['1474', '9.262,19'],
+      ['1479', '8.799,08'],
+      ['1482', '8.799,08'],
       // Art. 32.2.3.º: income between 8,000 and 12,000 €: 1,620 − 0.405 × 799.08 = 1,296.37.
-      ['1483', '1296,37'],
-      ['1484', '7502,71'],
-      ['0604', '1055,88'],
+      ['1483', '1.296,37'],
+      ['1484', '7.502,71'],
+      ['0604', '1.055,88'],
     ])
       expect(boxRow(box)).toHaveTextContent(amount);
   });

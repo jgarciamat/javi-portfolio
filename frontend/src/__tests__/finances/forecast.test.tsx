@@ -11,9 +11,13 @@ beforeEach(() => {
 });
 afterEach(restoreTime);
 
+/** Movements over two weeks: enough for the forecast to mean something. */
+const HISTORY = [f.transaction({ date: '2026-03-01' })];
+
 function setup(forecast = f.forecast(), options: { plan?: boolean } = {}) {
   const api = createFakeApi();
   api.insightsApi.forecast.mockResolvedValue(forecast);
+  api.monthApi.get.mockResolvedValue(f.overview({ transactions: HISTORY }));
   const view = renderWithProviders(<Dashboard />, { ...options, api });
   return { ...view, api };
 }
@@ -28,16 +32,22 @@ const panel = async () => {
   return within(header.closest('.card') as HTMLElement);
 };
 
+/** The month-by-month table (the end-of-month block has tables of its own). */
+const outlookOf = (view: Awaited<ReturnType<typeof panel>>) =>
+  within(view.getByRole('region', { name: tr('app.forecast.outlook') }));
+
+const whatIf = { name: tr('app.forecast.whatIf') };
+
 describe('Forecast panel', () => {
-  it('says what can be spent per day and shows the coming months (Premium)', async () => {
+  it('says how the month would end, what can be spent a day and the coming months (Premium)', async () => {
     const { api } = setup();
     const view = await panel();
-    expect(await view.findByText(/al día para llegar a fin de mes/)).toBeInTheDocument();
-    expect(view.getByText(/Te quedan .*900.* para 18 días/)).toBeInTheDocument();
-    expect(view.getByText(/terminarías el mes con .*500/)).toBeInTheDocument();
-    expect(view.getByText(tr('app.forecast.status.ok'))).toBeInTheDocument();
+    expect(await view.findByText(tr('app.forecast.eom.kicker'))).toBeInTheDocument();
+    expect(view.getByText(/^1\.?762,98/)).toBeInTheDocument();
+    expect(view.getByText(/423,62.*\/día/, { selector: 'strong' })).toBeInTheDocument();
+    expect(view.getByText(tr('app.forecast.eom.status.ok'))).toBeInTheDocument();
     expect(view.getByText(has('app.forecast.noShortfall'))).toBeInTheDocument();
-    const rows = view.getAllByRole('row');
+    const rows = outlookOf(view).getAllByRole('row');
     expect(rows).toHaveLength(3); // header + 2 projected months
     expect(within(rows[1]).getByText(/1\.?200/)).toBeInTheDocument();
     expect(api.insightsApi.forecast).toHaveBeenCalledWith(6, []);
@@ -46,7 +56,7 @@ describe('Forecast panel', () => {
   it('asks again for another range and for scenarios without a recurring expense', async () => {
     const { api } = setup();
     const view = await panel();
-    await view.findByRole('table');
+    await view.findByRole('region', { name: tr('app.forecast.outlook') });
     fireEvent.change(view.getByLabelText(tr('app.forecast.range')), { target: { value: '3' } });
     await waitFor(() => expect(api.insightsApi.forecast).toHaveBeenLastCalledWith(3, []));
     // Only expenses can be left out, not the payslip.
@@ -67,31 +77,38 @@ describe('Forecast panel', () => {
         projection,
         firstShortfall: { year: 2026, month: 5 },
         rules: [base.rules[1]], // no expenses to try without
-        safeToSpend: {
-          available: 100,
-          daysLeft: 10,
-          daily: 10,
-          projectedEnd: -20,
-          status: 'tight',
-        },
       })
     );
     const view = await panel();
     expect(await view.findByRole('alert')).toHaveTextContent(/te quedarías sin saldo en/);
-    expect(view.getByText(tr('app.forecast.status.tight'))).toBeInTheDocument();
     expect(view.getByText(/-50/).closest('td')).toHaveClass('forecast-negative');
-    expect(view.queryByRole('group')).toBeNull();
+    expect(view.queryByRole('group', whatIf)).toBeNull();
   });
 
   it('shows there is nothing left when the month is already over budget', async () => {
     setup(
       f.forecast({
-        safeToSpend: { available: -30, daysLeft: 5, daily: 0, projectedEnd: -80, status: 'over' },
+        endOfMonth: f.endOfMonth({
+          available: -30,
+          projectedEnd: -80,
+          maxDaily: 0,
+          status: 'short',
+        }),
       })
     );
     const view = await panel();
     expect(await view.findByText(tr('app.forecast.noneLeft'))).toBeInTheDocument();
-    expect(view.getByText(tr('app.forecast.status.over'))).toBeInTheDocument();
+    expect(view.getByText(tr('app.forecast.eom.status.short'))).toBeInTheDocument();
+  });
+
+  it('opens the guide of how to invest from «Qué hacer con lo que sobre»', async () => {
+    setup();
+    const view = await panel();
+    fireEvent.click(
+      await view.findByRole('button', { name: tr('app.forecast.eom.surplus.invest') })
+    );
+    await waitFor(() => expect(localStorage.getItem('mm_last_tab')).toBe('invest'));
+    expect(screen.queryByRole('button', titleButton)).toBeNull();
   });
 
   const nextMonthOnly = () => {
@@ -104,9 +121,9 @@ describe('Forecast panel', () => {
     const view = await panel();
     expect(await view.findByText(has('app.forecast.locked'))).toBeInTheDocument();
     expect(view.getByText(tr('app.forecast.nextMonth'))).toBeInTheDocument();
-    expect(view.getAllByRole('row')).toHaveLength(2); // header + next month
+    expect(outlookOf(view).getAllByRole('row')).toHaveLength(2); // header + next month
     expect(view.queryByLabelText(tr('app.forecast.range'))).toBeNull();
-    expect(view.queryByRole('group')).toBeNull(); // no «what if…» on the free plan
+    expect(view.queryByRole('group', whatIf)).toBeNull(); // no «what if…» on the free plan
     fireEvent.click(view.getByRole('button', { name: tr('billing.seePlans') }));
     expect(
       await screen.findByText(
@@ -125,9 +142,30 @@ describe('Forecast panel', () => {
   it('reports a failed request', async () => {
     const api = createFakeApi();
     api.insightsApi.forecast.mockRejectedValue(new Error('sin conexión'));
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: HISTORY }));
     renderWithProviders(<Dashboard />, { api });
     const view = await panel();
     expect(await view.findByText('sin conexión')).toBeInTheDocument();
+  });
+
+  it('waits for a few days of movements, and says nothing on an empty month', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({ transactions: [f.transaction({ date: '2026-03-14' })] })
+    );
+    renderWithProviders(<Dashboard />, { api });
+    expect(await screen.findByText(tr('app.forecast.notYet'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', titleButton)).toBeNull();
+  });
+
+  it('shows up with five movements of the account, however recent', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({ transactions: [f.transaction({ date: '2026-03-14' })] })
+    );
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    expect(await screen.findByRole('button', titleButton)).toBeInTheDocument();
+    expect(screen.queryByText(tr('app.forecast.notYet'))).toBeNull();
   });
 
   it('only appears for the current month', async () => {

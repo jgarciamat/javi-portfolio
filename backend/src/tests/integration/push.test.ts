@@ -245,4 +245,37 @@ describe('Scheduled push reminders', () => {
     await ctx.container.reminders.run();
     expect(ctx.push.sent[2].payload.body).toBe('Last week you spent €0.00.');
   });
+
+  it('on the day the month starts, says the statement of the month just ended can be imported', async () => {
+    ctx.clock.set('2026-04-01T08:00:00Z');
+    expect(await ctx.container.reminders.run()).toBe(1);
+    expect(ctx.push.sent[0].payload).toEqual({
+      title: 'Ya tienes el extracto de marzo',
+      body: 'Son 30 segundos: impórtalo con el archivo del banco, el texto copiado o una captura.',
+      url: '/?importar=1',
+    });
+    ctx.clock.set('2026-04-01T09:00:00Z');
+    expect(await ctx.container.reminders.run()).toBe(0);
+    // January: the statement of December; in English, and on the day the user's month starts.
+    await request(ctx.app)
+      .patch('/api/settings')
+      .set(user.auth)
+      .send({ locale: 'en', monthStartDay: 27 })
+      .expect(200);
+    ctx.clock.set('2027-01-01T08:00:00Z');
+    expect(await ctx.container.reminders.run()).toBe(0);
+    ctx.clock.set('2027-01-27T08:00:00Z');
+    expect(await ctx.container.reminders.run()).toBe(1);
+    expect(ctx.push.sent[1].payload.title).toBe('Your December statement is ready');
+  });
+
+  it('stops the monthly notice when push is turned off on the device', async () => {
+    await request(ctx.app)
+      .post('/api/push/unsubscribe')
+      .set(user.auth)
+      .send({ endpoint: SUB.endpoint })
+      .expect(204);
+    ctx.clock.set('2026-04-01T08:00:00Z');
+    expect(await ctx.container.reminders.run()).toBe(0);
+  });
 });

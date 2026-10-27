@@ -7,6 +7,7 @@ import {
   AiUsageRepository,
   AssetRepository,
   CategoryBudgetRepository,
+  CategoryRepository,
   RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
@@ -24,6 +25,12 @@ import {
   projectMonths,
   safeToSpend,
 } from '@domain/services/forecast';
+import {
+  EndOfMonthPlan,
+  HISTORY_MONTHS,
+  madridDay,
+  planEndOfMonth,
+} from '@domain/services/end-of-month';
 import { Clock, FinancialAdvisor } from '@domain/ports/services';
 import {
   Advice,
@@ -42,6 +49,7 @@ import {
   comparePeriods,
   currentPeriod,
   periodEnd,
+  periodOfDate,
   periodOrdinal,
   periodStart,
   periodsBetween,
@@ -70,6 +78,8 @@ export interface NetWorthPoint {
 
 export interface ForecastResult extends Period {
   safeToSpend: SafeToSpend;
+  /** «¿Llegas a fin de mes?» from this month's pace, the history and the payments still to come. */
+  endOfMonth: EndOfMonthPlan;
   /** True on the free plan: only one month is projected and the rest needs Premium. */
   locked: boolean;
   projection: ProjectedMonth[];
@@ -84,9 +94,11 @@ export interface SubscriptionsView extends SubscriptionReport {
   count: number;
   /** True on the free plan: the list is cut to the first few and the rest needs Premium. */
   locked: boolean;
+  /** How many of them are fixed charges (rent, power, insurance…), also those not listed. */
+  fixed: number;
 }
 
-/** Past periods used to learn the usual non-recurring spending. */
+/** Past periods used to learn the usual non-recurring spending of the coming months. */
 const VARIABLE_HISTORY = 3;
 
 export interface AnnualReport {
@@ -115,7 +127,8 @@ export class StatsService {
     private readonly entitlements: EntitlementService,
     private readonly rules: RecurringRuleRepository,
     private readonly clock: Clock,
-    private readonly assets: AssetRepository
+    private readonly assets: AssetRepository,
+    private readonly categories: CategoryRepository
   ) {}
 
   /**
@@ -125,21 +138,42 @@ export class StatsService {
    */
   forecast(userId: string, options: { months: number; exclude: string[] }): ForecastResult {
     const startDay = this.settings.get(userId).monthStartDay;
-    const now = this.clock.now();
-    const period = currentPeriod(startDay, now);
+    // The day in Spain, so the month does not end an hour or two early on a UTC server.
+    const today = madridDay(this.clock.now());
+    const period = periodOfDate(today, startDay);
     const month = this.transactionService.getMonth(userId, period);
-    const past = Array.from({ length: VARIABLE_HISTORY }, (_, i) =>
-      this.transactions.listByPeriod(userId, addMonths(period, -(i + 1)))
-    );
-    const variable = averageVariable(past);
+    const past = Array.from({ length: Math.max(VARIABLE_HISTORY, HISTORY_MONTHS) }, (_, i) =>
+      addMonths(period, -(i + 1))
+    ).map((p) => ({ period: p, movements: this.transactions.listByPeriod(userId, p) }));
+    const variable = averageVariable(past.slice(0, VARIABLE_HISTORY).map((p) => p.movements));
+    const start = periodStart(period, startDay);
+    const end = periodEnd(period, startDay);
     const safe = safeToSpend({
       availableCents: month.availableCents,
-      today: todayDateOnly(now),
-      periodStart: periodStart(period, startDay),
-      periodEnd: periodEnd(period, startDay),
+      today,
+      periodStart: start,
+      periodEnd: end,
       variable,
     });
     const rules = this.rules.listByUser(userId).filter((r) => r.active);
+    const detected = this.detectSubscriptions(userId);
+    const endOfMonth = planEndOfMonth({
+      availableCents: month.availableCents,
+      today,
+      periodStart: start,
+      periodEnd: end,
+      movements: month.transactions,
+      history: past.map(({ period: p, movements }) => ({
+        ...p,
+        start: periodStart(p, startDay),
+        end: periodEnd(p, startDay),
+        movements,
+      })),
+      subscriptions: detected.report.subscriptions,
+      ruleKeys: detected.coveredKeys,
+      firstDate: detected.firstDate,
+      totalMovements: detected.count,
+    });
     const locked = !this.entitlements.limits(userId).features.forecast;
     const projection = projectMonths({
       from: addMonths(period, 1),
@@ -158,6 +192,7 @@ export class StatsService {
     return {
       ...period,
       safeToSpend: safe,
+      endOfMonth,
       locked,
       projection,
       firstShortfall: firstShortfall(projection),
@@ -240,9 +275,34 @@ export class StatsService {
    * plan sees how many there are, what they cost and the most expensive ones; Premium, all.
    */
   subscriptions(userId: string): SubscriptionsView {
+    const { report } = this.detectSubscriptions(userId);
+    const locked = !this.entitlements.limits(userId).features.insights;
+    return {
+      ...report,
+      subscriptions: locked
+        ? report.subscriptions.slice(0, FREE_SUBSCRIPTIONS_SHOWN)
+        : report.subscriptions,
+      count: report.subscriptions.length,
+      locked,
+      fixed: report.subscriptions.filter((s) => s.essential).length,
+    };
+  }
+
+  /** Every detected subscription (no plan cut), with what else the forecast needs of the movements. */
+  private detectSubscriptions(userId: string): {
+    report: SubscriptionReport;
+    coveredKeys: Set<string>;
+    firstDate: string | null;
+    count: number;
+  } {
+    const categoryNames = new Map(
+      this.categories.listByUser(userId).map((c) => [c.id, c.name] as const)
+    );
     const movements = this.transactions.listAllByUser(userId).map((tx) => {
-      const { description, amountCents, date, type, recurringRuleId } = tx.toPrimitives();
-      return { description, amountCents, date, type, recurringRuleId };
+      const { description, amountCents, date, type, recurringRuleId, categoryId } =
+        tx.toPrimitives();
+      const categoryName = categoryNames.get(categoryId);
+      return { description, amountCents, date, type, recurringRuleId, categoryName };
     });
     const coveredKeys = new Set(
       this.rules
@@ -254,15 +314,11 @@ export class StatsService {
       today: todayDateOnly(this.clock.now()),
       coveredKeys,
     });
-    const locked = !this.entitlements.limits(userId).features.insights;
-    return {
-      ...report,
-      subscriptions: locked
-        ? report.subscriptions.slice(0, FREE_SUBSCRIPTIONS_SHOWN)
-        : report.subscriptions,
-      count: report.subscriptions.length,
-      locked,
-    };
+    const firstDate = movements.reduce<string | null>(
+      (min, m) => (min === null || m.date < min ? m.date : min),
+      null
+    );
+    return { report, coveredKeys, firstDate, count: movements.length };
   }
 
   netWorth(userId: string, months: number): NetWorthPoint[] {

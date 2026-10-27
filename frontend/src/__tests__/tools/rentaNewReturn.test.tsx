@@ -49,8 +49,8 @@ describe('«Start a new return»', () => {
   it('says what is wiped and that it cannot be undone, and keeps everything on cancel', () => {
     start();
     expect(screen.getByText(k('wiped.invest'))).toBeInTheDocument();
-    // Red like the app's other deletes: the button, and the confirm next to a neutral «Cancel».
-    expect(screen.getByRole('button', { name: k('button') })).toHaveClass('btn-danger');
+    // Red: the pill of the toolbar, and the confirm next to a neutral «Cancel».
+    expect(screen.getByRole('button', { name: k('button') })).toHaveClass('wiz-tool-danger');
     expect(screen.getByRole('button', { name: k('confirm') })).toHaveClass('btn-danger');
     expect(screen.getByRole('button', { name: k('cancel') })).toHaveClass('btn-cancel');
     expect(screen.getByText(k('undo'))).toBeInTheDocument();

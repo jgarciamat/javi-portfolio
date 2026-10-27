@@ -29,7 +29,8 @@ Alternativas: `Gastos y Presupuesto – MM` · `Finanverso Ahorro`
 > ✔ Funciona sin conexión
 >
 > GRATIS para empezar. 14 días de Premium de regalo al registrarte, sin tarjeta.
-> Premium desbloquea cuentas, presupuestos y metas ilimitados, previsión, importación, análisis con IA y modo hogar.
+> Importar tu banco es gratis e ilimitado en todos los planes.
+> Premium desbloquea cuentas, presupuestos y metas ilimitados, previsión, análisis con IA y modo hogar.
 >
 > Tus datos son tuyos: puedes exportarlos o borrar tu cuenta cuando quieras.
 > Sin anuncios.

@@ -669,6 +669,13 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - La librería de gráficos va en un chunk aparte fuera de la precaché offline; las pestañas de la
   guía y sus dibujos también se cargan diferidos.
 
+## Disposición
+
+La consola usa el mismo contenedor centrado que el resto de pantallas (unos 1.200 px, márgenes
+iguales; la barra superior va a todo el ancho). La gráfica va arriba y debajo la caja de órdenes y
+los paneles, a cualquier ancho; el esqueleto de carga tiene la misma disposición. Capturas en
+`docs/auditoria-recorrido-2026-10-26/despues/*-consola-centrada.jpg`.
+
 ## Pruebas
 
 Backend (dominio, mercado con `fetch` simulado, integración con mercado falso, contrato), frontend

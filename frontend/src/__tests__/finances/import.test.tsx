@@ -78,13 +78,177 @@ describe('ImportModal', () => {
       },
     ]);
     upload(statement(workbook, 'extracto.xlsx'));
-    expect(await screen.findByText(/extracto\.xlsx · CSV/)).toBeInTheDocument();
+    expect(await screen.findByText(/extracto\.xlsx · Excel ·/)).toBeInTheDocument();
+    expect(screen.queryByText(/· CSV/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     await waitFor(() => expect(api.transactionApi.import).toHaveBeenCalled());
     expect(api.transactionApi.import.mock.calls[0][0]).toEqual([
       expect.objectContaining({ date: '2026-03-02', description: 'MERCADONA', amount: -54.3 }),
       expect.objectContaining({ date: '2026-03-03', description: 'NOMINA', amount: 1800 }),
     ]);
+  });
+
+  it("chooses the file with the app's own button: the browser's field stays hidden", () => {
+    setup();
+    const input = screen.getByLabelText<HTMLInputElement>(tr('app.import.file.choose'));
+    expect(input).not.toBeVisible();
+    expect(input.accept).toContain('.xlsm');
+    const button = screen.getByRole('button', { name: tr('app.import.file.choose') });
+    expect(button).toHaveAccessibleDescription(tr('app.import.file.formats'));
+    const opened = jest.spyOn(input, 'click');
+    fireEvent.click(button);
+    expect(opened).toHaveBeenCalled();
+  });
+
+  it('names an Excel with macros as Excel too, and reads its first sheet', async () => {
+    const { upload } = setup();
+    const workbook = buildXlsx([
+      {
+        name: 'Movimientos',
+        rows: [
+          ['Fecha', 'Concepto', 'Importe'],
+          ['02/03/2026', 'BAR', -3],
+        ],
+      },
+    ]);
+    upload(statement(workbook, 'Extracto.XLSM'));
+    expect(await screen.findByText(/Extracto\.XLSM · Excel ·/)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: tr('app.import.col.date') })).toBeInTheDocument();
+  });
+
+  it('says how it understood the columns and keeps them folded, open only when one is missing', async () => {
+    const { upload } = setup();
+    upload(statement('Fecha;Concepto;Importe;\n02/03/2026;MERCADONA;-54,30;x\n'));
+    expect(
+      await screen.findByText(
+        literal(
+          tr('app.import.columnsUnderstood', {
+            columns: 'Fecha: «Fecha» · Concepto: «Concepto» · Importe: «Importe»',
+          })
+        ),
+        { exact: false }
+      )
+    ).toBeInTheDocument();
+    const folded = screen.getByText(tr('app.import.changeColumns')).closest('details')!;
+    expect(folded).not.toHaveAttribute('open');
+    // The column without a header is named by its place.
+    expect(within(folded).getAllByRole('option', { name: '#4' }).length).toBeGreaterThan(0);
+    // The jargon of the formats is in a folded help, not in the main text.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.otherFile') }));
+    expect(screen.getByText(tr('app.import.help.title')).closest('details')).not.toHaveAttribute(
+      'open'
+    );
+    expect(screen.getByText(tr('app.import.hint'))).not.toHaveTextContent(/Norma 43|📌/);
+    upload(statement('Dia;Texto\n02/03/2026;MERCADONA\n'));
+    const open = (await screen.findByText(tr('app.import.changeColumns'))).closest('details')!;
+    expect(open).toHaveAttribute('open');
+    expect(screen.queryByText(/Hemos entendido las columnas/)).toBeNull();
+  });
+
+  it('leaves out what an automatic operation already added, unless asked to import it anyway', async () => {
+    const { api, upload } = setup();
+    upload(
+      statement(
+        'Fecha;Concepto;Importe\n03/03/2026;ALQUILER PISO;-650,00\n04/03/2026;NETFLIX;-13,99\n05/03/2026;BAR;-3,00\n'
+      )
+    );
+    const cover = (id: string, description: string) => ({
+      transactionId: id,
+      description,
+      date: '2026-03-01',
+    });
+    const preview = (index: number, description: string, amount: number) => ({
+      index,
+      status: 'imported' as const,
+      date: '2026-03-03',
+      description,
+      amount,
+      type: 'EXPENSE' as const,
+      categoryName: 'Vivienda',
+      categorySource: 'keywords' as const,
+    });
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: true,
+      imported: 3,
+      duplicates: 0,
+      invalid: 0,
+      rows: [
+        { ...preview(0, 'ALQUILER PISO', 650), coveredBy: cover('t1', 'Alquiler piso') },
+        { ...preview(1, 'NETFLIX', 13.99), coveredBy: cover('t2', 'Netflix') },
+        preview(2, 'BAR', 3),
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
+    expect(
+      await screen.findByText(tr('app.import.coveredNotice', { count: 2 }), { exact: false })
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Ya cubierto por una operación automática/)).toHaveLength(2);
+    const anyway = screen.getByRole('checkbox', { name: /Importar igualmente\s+NETFLIX/ });
+    expect(anyway).not.toBeChecked();
+    // Only the new one is imported by default; ticking one adds it back.
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    ).toBeVisible();
+    fireEvent.click(anyway);
+    expect(anyway.closest('tr')).not.toHaveClass('row-muted');
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: false,
+      imported: 2,
+      duplicates: 0,
+      invalid: 0,
+      rows: [],
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.confirm', { count: 2 }) }));
+    await waitFor(() =>
+      expect(api.transactionApi.import).toHaveBeenLastCalledWith(
+        [
+          expect.objectContaining({ description: 'NETFLIX' }),
+          expect.objectContaining({ description: 'BAR' }),
+        ],
+        expect.objectContaining({ dryRun: false })
+      )
+    );
+    expect(
+      await screen.findByRole('heading', { name: tr('app.import.doneTitle', { count: 2 }) })
+    ).toBeInTheDocument();
+  });
+
+  it('says it of one row alone, and can leave it out again', async () => {
+    const { api, upload } = setup();
+    upload(statement('Fecha;Concepto;Importe\n03/03/2026;ALQUILER;-650,00\n'));
+    api.transactionApi.import.mockResolvedValueOnce({
+      dryRun: true,
+      imported: 1,
+      duplicates: 0,
+      invalid: 0,
+      rows: [
+        {
+          index: 0,
+          status: 'imported',
+          date: '2026-03-03',
+          description: 'ALQUILER',
+          amount: 650,
+          type: 'EXPENSE',
+          categoryName: 'Vivienda',
+          coveredBy: { transactionId: 't1', description: 'Alquiler', date: '2026-03-01' },
+        },
+      ],
+    });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
+    expect(
+      await screen.findByText(tr('app.import.coveredNoticeOne'), { exact: false })
+    ).toBeInTheDocument();
+    const confirm = screen.getByRole('button', { name: tr('app.import.confirm', { count: 0 }) });
+    expect(confirm).toBeDisabled();
+    const anyway = screen.getByRole('checkbox', { name: /Importar igualmente/ });
+    fireEvent.click(anyway);
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    ).toBeEnabled();
+    fireEvent.click(anyway);
+    expect(
+      screen.getByRole('button', { name: tr('app.import.confirm', { count: 0 }) })
+    ).toBeDisabled();
   });
 
   it('refuses an Excel file with no data, and the old .xls format', async () => {
@@ -170,8 +334,9 @@ describe('ImportModal', () => {
 
     // Back to the mapping, opt in to the AI (remembered) and forward again.
     fireEvent.click(screen.getByRole('button', { name: tr('app.common.back') }));
-    const ai = screen.getByRole('checkbox', { name: new RegExp(tr('app.import.useAi')) });
+    const ai = screen.getByRole('checkbox', { name: tr('app.import.useAi') });
     expect(ai).not.toBeChecked();
+    expect(ai).toHaveAccessibleDescription(tr('app.import.useAiHint'));
     fireEvent.click(ai);
     expect(localStorage.getItem('mm_import_ai')).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
@@ -199,8 +364,9 @@ describe('ImportModal', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.confirm', { count: 2 }) }));
     expect(
-      await screen.findByText(literal(tr('app.import.done', { imported: 2, duplicates: 1 })))
+      await screen.findByRole('heading', { name: tr('app.import.doneTitle', { count: 2 }) })
     ).toBeInTheDocument();
+    expect(screen.getByText(tr('app.import.doneDuplicates', { count: 1 }))).toBeInTheDocument();
     expect(onImported).toHaveBeenCalled();
     fireEvent.click(
       within(screen.getByRole('dialog')).getAllByRole('button', { name: tr('app.common.close') })[1]
@@ -240,16 +406,19 @@ describe('ImportModal', () => {
     const { api, upload } = setup();
     upload(statement('solo una línea'));
     expect(await screen.findByText(tr('app.import.error.read'))).toBeInTheDocument();
+    // The file that could not be read is named under the button.
+    expect(screen.getByText(tr('app.import.file.chosen', { name: 'extracto.csv' }))).toBeVisible();
     upload(statement(csv));
     await screen.findByText(/extracto\.csv · CSV/);
     api.transactionApi.import.mockRejectedValueOnce(new Error('Demasiadas filas'));
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     expect(await screen.findByText('Demasiadas filas')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.otherFile') }));
-    expect(screen.getByText(tr('app.import.choose'))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr('app.import.file.choose') })).toBeInTheDocument();
+    expect(screen.queryByText(/^Elegido:/)).toBeNull();
     // Choosing nothing in the file dialog does nothing.
     fireEvent.change(document.querySelector('input[type="file"]')!, { target: { files: [] } });
-    expect(screen.getByText(tr('app.import.choose'))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr('app.import.file.choose') })).toBeInTheDocument();
   });
 
   it('cannot confirm a preview without new movements', async () => {

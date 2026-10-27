@@ -17,6 +17,7 @@ export function useMoney() {
     style: 'currency',
     currency: 'EUR',
     maximumFractionDigits: 2,
+    useGrouping: 'always' as unknown as boolean, // also 1.000 (es-ES skips the dot under 10.000)
   });
   return (n: number) => formatter.format(n);
 }

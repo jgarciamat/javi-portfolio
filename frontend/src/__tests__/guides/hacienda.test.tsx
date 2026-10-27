@@ -32,6 +32,10 @@ import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const guide = (slug: string) => findHaciendaGuide(slug)!;
 const m303 = guide('modelo-303');
 const title = (g = m303) => tr(guideKey(g, 'title'));

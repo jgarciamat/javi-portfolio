@@ -64,9 +64,9 @@ Hoy es 25 de octubre de 2026.
 ### Riesgos transversales
 
 1. **Cobertura de datos reales.** Resumen del año, reto y comparador dan mejores resultados si el
-   usuario importa todos sus movimientos. La importación (y el límite de 1 importación en el plan
-   gratis, `imports: 1` en `plans.ts`) puede quedarse corta para esto: **a revisar con el dueño**
-   antes de lanzar el Resumen del año (un resumen anual con un solo extracto sería pobre).
+   usuario importa todos sus movimientos. **Decidido (octubre 2026):** importar es gratis e
+   ilimitado en todos los planes (`imports: Infinity` en `plans.ts`); el servidor solo limita el
+   tamaño de cada envío y cuántos se mandan por hora.
 2. **Privacidad acumulada.** Cuatro funciones nuevas dan más motivos para compartir; las que muestran
    algo a otras personas (Resumen compartido y reto) son las que hay que pasar por el abogado. La
    nómina y el comparador de datos públicos no sacan datos del dispositivo o del usuario.
@@ -85,5 +85,4 @@ Hoy es 25 de octubre de 2026.
 2. **Reto de ahorro:** ¿sin ningún premio con valor, solo insignias (recomendado)?
 3. **Comparador:** ¿solo datos públicos hasta tener >= 800 contribuyentes (recomendado)?
 4. **Nómina:** ¿MVP reducido con campos manuales y todo en el dispositivo, sin IA externa (recomendado)?
-5. **Importación en el plan gratis:** ¿se amplía el límite de importaciones para que el Resumen del
-   año no salga pobre? (decisión del dueño, fuera de estos diseños).
+5. **Importación en el plan gratis:** decidido, gratis e ilimitada en todos los planes.

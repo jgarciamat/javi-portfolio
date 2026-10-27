@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { useAssistantMode, useWizardProgress } from '@modules/wizard/application/useWizard';
+import { useWizardProgress } from '@modules/wizard/application/useWizard';
 import {
   NEW_PROGRESS,
   cheerOf,
@@ -132,15 +132,5 @@ describe('the progress hook', () => {
     act(() => result.current.replace({ at: 1, done: ['a'], answers: { q: 'no' } }));
     expect(result.current.progress).toMatchObject({ at: 1, done: ['a'], answers: { q: 'no' } });
     expect(JSON.parse(localStorage.getItem('k') as string).at).toBe(1);
-  });
-
-  it('remembers step by step or everything together', () => {
-    const { result } = renderHook(() => useAssistantMode('mode'));
-    expect(result.current[0]).toBe(false);
-    act(() => result.current[1](true));
-    expect(result.current[0]).toBe(true);
-    expect(localStorage.getItem('mode')).toBe('expert');
-    act(() => result.current[1](false));
-    expect(localStorage.getItem('mode')).toBe('steps');
   });
 });

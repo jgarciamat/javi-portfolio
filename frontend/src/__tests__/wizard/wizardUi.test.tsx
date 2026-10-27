@@ -1,5 +1,5 @@
-import { act, fireEvent, screen } from '@testing-library/react';
-import { useState } from 'react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
+import { useState, type ReactNode } from 'react';
 import { useWizardProgress, PREFS_KEY, speak } from '@modules/wizard/application/useWizard';
 import { Choice } from '@modules/wizard/ui/Choice';
 import { Wizard, type WizardStepView } from '@modules/wizard/ui/Wizard';
@@ -12,7 +12,7 @@ const DEFS = [
 const KEY = 'test_wizard';
 
 /** Two steps: the first with a question and a screen with nothing to answer, the second with one. */
-function Harness({ onExpert = jest.fn(), onRestart = jest.fn() }) {
+function Harness({ onRestart = jest.fn(), extra = null as ReactNode }) {
   const controls = useWizardProgress(KEY, DEFS);
   const [colour, setColour] = useState<string | null>(null);
   const steps: WizardStepView[] = [
@@ -69,7 +69,7 @@ function Harness({ onExpert = jest.fn(), onRestart = jest.fn() }) {
       defs={DEFS}
       steps={steps}
       controls={controls}
-      onExpert={onExpert}
+      toolbarAction={extra}
       onRestart={() => {
         onRestart();
         controls.restart();
@@ -207,17 +207,17 @@ describe('coming back after the end', () => {
 });
 
 describe('reading tools', () => {
-  it('starts with high contrast, saving nothing until the person chooses', () => {
+  it('starts without high contrast, saving nothing until the person chooses', () => {
     renderWithProviders(<Harness />, { authenticated: false });
     expect(screen.getByRole('button', { name: tr('wizard.contrast') })).toHaveAttribute(
       'aria-pressed',
-      'true'
+      'false'
     );
-    expect(document.documentElement).toHaveClass('wiz-contrast');
+    expect(document.documentElement).not.toHaveClass('wiz-contrast');
     expect(localStorage.getItem(PREFS_KEY)).toBeNull();
   });
 
-  it('makes the letters bigger and remembers the contrast turned off', () => {
+  it('makes the letters bigger and remembers the contrast turned on', () => {
     const { unmount } = renderWithProviders(<Harness />, { authenticated: false });
     const big = screen.getByRole('button', { name: tr('wizard.big') });
     fireEvent.click(big);
@@ -226,27 +226,37 @@ describe('reading tools', () => {
     // Letters only: the contrast is still not a choice.
     expect(JSON.parse(localStorage.getItem(PREFS_KEY) as string)).toEqual({
       big: true,
-      contrast: true,
+      contrast: false,
     });
     fireEvent.click(screen.getByRole('button', { name: tr('wizard.contrast') }));
-    expect(document.documentElement).not.toHaveClass('wiz-contrast');
+    expect(document.documentElement).toHaveClass('wiz-contrast');
     expect(JSON.parse(localStorage.getItem(PREFS_KEY) as string)).toEqual({
       big: true,
-      contrast: false,
+      contrast: true,
       contrastChosen: true,
     });
     unmount();
     // Leaving the assistant leaves the rest of the app as it was.
     expect(document.documentElement).not.toHaveClass('wiz-big-text');
+    expect(document.documentElement).not.toHaveClass('wiz-contrast');
     renderWithProviders(<Harness />, { authenticated: false });
     expect(document.documentElement).toHaveClass('wiz-big-text');
+    expect(document.documentElement).toHaveClass('wiz-contrast');
+  });
+
+  it('leaves the contrast off for a copy saved before without a choice of it', () => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ big: false, contrast: true }));
+    renderWithProviders(<Harness />, { authenticated: false });
     expect(document.documentElement).not.toHaveClass('wiz-contrast');
   });
 
-  it('turns the contrast on for a copy saved before without a choice of it', () => {
-    localStorage.setItem(PREFS_KEY, JSON.stringify({ big: false, contrast: false }));
+  it('keeps the contrast off when the person turned it off', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ big: false, contrast: false, contrastChosen: true })
+    );
     renderWithProviders(<Harness />, { authenticated: false });
-    expect(document.documentElement).toHaveClass('wiz-contrast');
+    expect(document.documentElement).not.toHaveClass('wiz-contrast');
   });
 
   it('keeps the contrast on when the person chose it', () => {
@@ -258,14 +268,23 @@ describe('reading tools', () => {
     expect(document.documentElement).toHaveClass('wiz-contrast');
   });
 
-  it('opens the expert mode and starts again only after confirming', () => {
-    const onExpert = jest.fn();
-    const onRestart = jest.fn();
-    renderWithProviders(<Harness onExpert={onExpert} onRestart={onRestart} />, {
+  it('has no expert mode and shows the extra action at the end of the toolbar', () => {
+    renderWithProviders(<Harness extra={<button type="button">Extra tool</button>} />, {
       authenticated: false,
     });
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.expert')) }));
-    expect(onExpert).toHaveBeenCalled();
+    const tools = screen.getByRole('toolbar', { name: tr('wizard.tools') });
+    const names = within(tools)
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+    expect(names[names.length - 1]).toBe('Extra tool');
+    expect(names.join('|')).not.toMatch(/todo junto/i);
+  });
+
+  it('starts again only after confirming', () => {
+    const onRestart = jest.fn();
+    renderWithProviders(<Harness onRestart={onRestart} />, {
+      authenticated: false,
+    });
     const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.restart')) }));
     expect(onRestart).not.toHaveBeenCalled();

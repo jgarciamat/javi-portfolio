@@ -38,9 +38,27 @@ describe('detectSubscriptions', () => {
         lastDate: '2026-04-05',
         nextDate: '2026-05-05',
         priceIncrease: { fromCents: 1299, toCents: 1399 },
+        categoryName: null,
+        essential: false,
       },
     ]);
     expect(report).toMatchObject({ annualCents: 16788, monthlyCents: 1399 });
+  });
+
+  it('tells a fixed charge (the rent, by its category or words) from a subscription', () => {
+    const rent = ['2026-01-01', '2026-02-01', '2026-03-01', '2026-04-01'].map((date) => ({
+      ...charge('Alquiler piso', date, 650),
+      categoryName: 'Vivienda',
+    }));
+    const insurance = ['2026-01-10', '2026-02-10', '2026-03-10', '2026-04-10'].map((date) =>
+      charge('Seguro coche', date, 30)
+    );
+    const report = detectSubscriptions([...rent, ...insurance, ...netflix], options);
+    expect(report.subscriptions.map((s) => [s.key, s.categoryName, s.essential])).toEqual([
+      ['alquiler piso', 'Vivienda', true],
+      ['seguro coche', null, true],
+      ['netflix', null, false],
+    ]);
   });
 
   it('finds yearly charges and orders everything by annual cost', () => {

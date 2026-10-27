@@ -9,6 +9,10 @@ import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 import { bringIntoView } from '@modules/finances/ui/components/bringIntoView';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const entry = (date: string, concept: string, base: number, over: Partial<BookEntry> = {}) => ({
   date,
   quarter: (Math.floor((Number(date.slice(5, 7)) - 1) / 3) + 1) as 1 | 2 | 3 | 4,
@@ -124,7 +128,7 @@ describe('«Before you calculate»', () => {
       prior: { on: true, income: '', expenses: '5000', payments: '', withheld: '' },
     });
     const panel = await open();
-    expect(within(panel).getByText(/declara 5000,00 € de gastos deducibles/)).toBeInTheDocument();
+    expect(within(panel).getByText(/declara 5.000,00 € de gastos deducibles/)).toBeInTheDocument();
     const review = within(panel).getByRole('button', { name: tr('app.autonomo.checks.review') });
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.review.hide') }));
     fireEvent.click(review);

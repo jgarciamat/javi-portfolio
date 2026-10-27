@@ -355,6 +355,9 @@ const cases: Case[] = [
   ['annual report', () => insightsApi.report(2026), 'GET', '/stats/report/2026'],
   ['ask the assistant', () => insightsApi.ask('hola', 'es'), 'POST', '/ai/ask'],
   ['subscriptions', () => insightsApi.subscriptions(), 'GET', '/stats/subscriptions'],
+  ['sample data status', () => transactionApi.sampleStatus(), 'GET', '/sample-data'],
+  ['load sample data', () => transactionApi.loadSample(), 'POST', '/sample-data'],
+  ['remove sample data', () => transactionApi.removeSample(), 'DELETE', '/sample-data'],
   ['money leaks', () => insightsApi.moneyLeaks(), 'GET', '/stats/money-leaks'],
   [
     'money leaks from the goals',

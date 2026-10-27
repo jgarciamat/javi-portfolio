@@ -36,7 +36,14 @@
   font-variant-numeric: tabular-nums;
   color: var(--accent);
   margin-bottom: 0.25rem;
-  word-break: break-all;
+  /* Long amounts may break; a sentence takes a smaller size so its words stay whole. */
+  overflow-wrap: anywhere;
+}
+
+.summary-card-value--text {
+  font-size: 1rem;
+  line-height: 1.3;
+  overflow-wrap: normal;
 }
 
 .summary-card-sub {
@@ -59,7 +66,9 @@
   padding: 0.1rem 0.3rem;
   border-radius: 5px;
   opacity: 0.6;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   line-height: 1;
 }
 

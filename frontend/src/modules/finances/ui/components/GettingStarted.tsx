@@ -10,9 +10,12 @@ type Checklist = ReturnType<typeof useGettingStarted>;
 export function GettingStarted({
   checklist,
   onOpenTab,
+  onAddMovement,
 }: {
   checklist: Checklist;
   onOpenTab: (tab: DashboardTab) => void;
+  /** «Go» on the steps done in the month view: opens the form of a new movement. */
+  onAddMovement?: () => void;
 }) {
   const { t } = useI18n();
   const { steps, completed } = checklist;
@@ -49,6 +52,11 @@ export function GettingStarted({
             <span className="getting-started-text">{t(`app.gettingStarted.${step.id}`)}</span>
             {!step.done && step.tab && (
               <button className="btn-secondary" onClick={() => onOpenTab(step.tab as DashboardTab)}>
+                {t('app.gettingStarted.go')}
+              </button>
+            )}
+            {!step.done && step.id === 'movements' && onAddMovement && (
+              <button className="btn-secondary" onClick={onAddMovement}>
                 {t('app.gettingStarted.go')}
               </button>
             )}

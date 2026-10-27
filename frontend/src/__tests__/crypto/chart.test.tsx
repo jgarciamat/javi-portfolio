@@ -171,7 +171,7 @@ describe('PriceChart', () => {
     draw();
     const open = screen.getByTitle('Apertura');
     expect(open).toHaveTextContent('Ap.');
-    expect(open.closest('p')).toHaveTextContent(/Vol\. 14/);
+    expect(open.closest('p')).toHaveTextContent(/Volumen 14/);
     expect(screen.getByText(/La vela cierra en/)).toBeInTheDocument();
   });
 

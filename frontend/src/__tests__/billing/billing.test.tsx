@@ -314,17 +314,19 @@ describe('PlanBanner', () => {
       })
     );
     const banner = await screen.findByRole('status');
-    expect(banner).toHaveTextContent(/registrado 37 movimientos/);
+    expect(banner).toHaveTextContent(/registrado 37 transacciones/);
     expect(banner).toHaveTextContent(
-      /6 presupuestos \(gratis: 5\), 7 movimientos automáticos \(gratis: 5\), 2 importaciones de extractos del banco \(gratis: 1\)/
+      /6 presupuestos \(gratis: 5\), 7 operaciones automáticas \(gratis: 5\)\./
     );
+    // Imports are unlimited on every plan: they are never a limit to pass.
+    expect(banner).not.toHaveTextContent(tr('billing.resource.imports'));
     expect(banner).not.toHaveTextContent(/cuentas \(gratis/);
   });
 
   it('only recaps the movements when everything fits in the free plan', async () => {
     withPlan(<PlanBanner onOpenPlan={jest.fn()} />, f.billing({ trialDaysLeft: 1 }));
     const banner = await screen.findByRole('status');
-    expect(banner).toHaveTextContent(/registrado 5 movimientos/);
+    expect(banner).toHaveTextContent(/registrado 5 transacciones/);
     expect(banner).not.toHaveTextContent(/no podrás añadir más/);
   });
 
@@ -389,17 +391,18 @@ describe('PlanView', () => {
     expect(await screen.findByText(text)).toBeInTheDocument();
   });
 
-  it('shows the free usage, the bank statement import included, and marks what is used up', async () => {
+  it('shows the free usage without the imports (unlimited) and marks what is used up', async () => {
     const overview = f.billing({
       plan: 'free',
       trialDaysLeft: 0,
       limits: f.catalog().limits.free,
-      usage: { ...f.billing().usage, imports: 1 },
+      usage: { ...f.billing().usage, imports: 1, assets: 3 },
     });
     withPlan(<PlanView />, overview);
-    const row = (await screen.findByText(tr('billing.resource.imports'))).closest('li');
-    expect(row).toHaveTextContent('1 / 1');
+    const row = (await screen.findByText(tr('billing.resource.assets'))).closest('li');
+    expect(row).toHaveTextContent('3 / 3');
     expect(row).toHaveClass('plan-usage-full');
+    expect(screen.queryByText(tr('billing.resource.imports'))).toBeNull();
     expect(screen.getByText(tr('billing.resource.accounts')).closest('li')).not.toHaveClass(
       'plan-usage-full'
     );

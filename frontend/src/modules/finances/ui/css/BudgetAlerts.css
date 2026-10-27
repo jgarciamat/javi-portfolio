@@ -53,7 +53,9 @@
   flex-shrink: 0;
   min-width: 28px;
   min-height: 28px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .alert-card-dismiss:hover {

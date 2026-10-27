@@ -424,3 +424,15 @@ button > .icon:only-child,
     scroll-behavior: auto !important;
   }
 }
+
+/* ─── Readability (Settings): larger letters and stronger colours in the whole app ─── */
+html.app-big-text {
+  font-size: 118%;
+}
+
+/* Secondary texts and borders take the stronger shades of the same theme. */
+:root.app-contrast[data-theme] {
+  --slate-500: var(--slate-300);
+  --slate-400: var(--slate-200);
+  --slate-700: var(--slate-500);
+}

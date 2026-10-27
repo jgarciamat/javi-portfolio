@@ -100,7 +100,14 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
 
   router.post(
     '/transactions/import',
-    limiter({ windowMs: 60 * 60 * 1000, limit: 30 }),
+    // Imports are unlimited on every plan; this only stops abuse (a preview and an import are two
+    // requests, and pasting a list may preview it a few times). Each request is capped too: the
+    // JSON body (4 MB) and MAX_IMPORT_ROWS rows.
+    limiter({
+      windowMs: 60 * 60 * 1000,
+      limit: 60,
+      keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+    }),
     authed(async (req, res) => {
       const body = importBody.parse(req.body);
       const rows = body.rows.map((r) => ({ ...r, amountCents: r.amount }));
@@ -122,6 +129,31 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
           amountCents: undefined,
         })),
       });
+    })
+  );
+
+  /** «Pruébalo con datos de ejemplo»: invented movements to try the app, and their removal. */
+  router.get(
+    '/sample-data',
+    authed((req, res) => {
+      res.json(c.sampleData.status(req.dataUserId));
+    })
+  );
+  router.post(
+    '/sample-data',
+    limiter({
+      windowMs: 60 * 60 * 1000,
+      limit: 20,
+      keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+    }),
+    authed((req, res) => {
+      res.status(201).json(c.sampleData.load(req.dataUserId));
+    })
+  );
+  router.delete(
+    '/sample-data',
+    authed((req, res) => {
+      res.json({ deleted: c.sampleData.remove(req.dataUserId) });
     })
   );
 

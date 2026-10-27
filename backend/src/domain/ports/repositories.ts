@@ -12,6 +12,7 @@ import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
 import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
+import { RuleMovement } from '@domain/services/recurring-match';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
@@ -247,6 +248,8 @@ export interface TransactionRepository {
    */
   listSince(userId: string, fromDate: string, limit: number): LeakMovement[];
   existingImportHashes(userId: string, hashes: string[]): Set<string>;
+  /** Movements added by automatic operations dated between two days (both included). */
+  listFromRulesBetween(userId: string, fromDate: string, toDate: string): RuleMovement[];
   /** Most recent category used for each normalised description. */
   lastCategoryByDescription(userId: string, descriptionKeys: string[]): Map<string, string>;
   listByRule(userId: string, ruleId: string): Transaction[];
@@ -256,6 +259,10 @@ export interface TransactionRepository {
   earliestPeriod(userId: string): Period | null;
   /** How many movements the user has in total. */
   count(userId: string): number;
+  /** The invented movements of «Pruébalo con datos de ejemplo» (import hash `sample:…`). */
+  countSample(userId: string): number;
+  /** Removes those invented movements; returns how many. */
+  deleteSample(userId: string): number;
 }
 
 export interface RecurringRuleRepository {

@@ -40,7 +40,9 @@ SEGURIDAD Y COMODIDAD
 • Bloqueo con PIN o huella, resumen semanal y recordatorios
 • Tus datos son tuyos: expórtalos o bórralos cuando quieras
 
-Gratis para empezar. Premium opcional (previsión, importación, plan de deudas, Renta y autónomos sin límite, IA y más): 3,49 €/mes, 29,99 €/año o 59 € de por vida.
+Importar los movimientos de tu banco es gratis e ilimitado: archivo del banco (CSV, Excel, PDF o Norma 43), texto pegado o captura de pantalla leída en tu móvil.
+
+Gratis para empezar. Premium opcional (previsión, plan de deudas, Renta y autónomos sin límite, IA y más): 3,49 €/mes, 29,99 €/año o 59 € de por vida.
 
 Las estimaciones fiscales son orientativas: revísalas con tu gestor antes de presentar.
 
@@ -54,11 +56,13 @@ Las estimaciones fiscales son orientativas: revísalas con tu gestor antes de pr
 
 **Full:** Will you make it to the end of the month? Finanverso tells you before it happens. Log expenses and income in seconds, set budgets with alerts, save towards goals and get an end-of-month forecast.
 
-Also: bank statement import (CSV), auto-categorisation, subscription detection, receipt scanning, split expenses, net worth, debt payoff plan, multi-currency, PIN/biometric lock and a home-screen widget.
+Also: free, unlimited bank statement import (CSV, Excel, PDF, pasted text or a screenshot), auto-categorisation, subscription detection, receipt scanning, split expenses, net worth, debt payoff plan, multi-currency, PIN/biometric lock and a home-screen widget.
 
 For people in Spain: an income tax (Renta) calculator with state and regional deductions that can read your tax draft and point out deductions you may be missing, plus a self-employed quarterly draft (modelo 303 VAT and modelo 130) you can download as a PDF for your adviser. Tax figures are indicative.
 
-Free to start. Optional Premium adds the forecast, import, unlimited tax drafts and an AI financial advisor.
+Importing your bank movements is free and unlimited: a bank file (CSV, Excel, PDF or Norma 43), pasted text or a screenshot read on your phone.
+
+Free to start. Optional Premium adds the forecast, unlimited tax drafts and an AI financial advisor.
 
 ## Capturas y gráfico
 - Capturas: docs/marketing/play-screenshots/ (teléfono 1080x1920) y tablet/ (1600x2560, valen para 7" y 10"). Orden y titular de cada una:

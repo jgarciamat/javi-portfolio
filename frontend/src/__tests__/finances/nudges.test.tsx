@@ -62,12 +62,17 @@ describe('Getting started', () => {
     expect(
       within(card).getByText(tr('app.gettingStarted.progress', { done: 0, total: 5 }))
     ).toBeVisible();
-    expect(within(card).getAllByRole('button', { name: tr('app.gettingStarted.go') })).toHaveLength(
-      3
-    );
+    const go = () => within(card).getAllByRole('button', { name: tr('app.gettingStarted.go') });
+    expect(go()).toHaveLength(4);
     expect(screen.queryByRole('region', { name: /Resumen de/ })).toBeNull();
 
-    fireEvent.click(within(card).getAllByRole('button', { name: tr('app.gettingStarted.go') })[0]);
+    // The first one, «register 3 movements», opens the form of a new movement right there.
+    const form = screen.getByRole('button', { name: new RegExp(tr('app.transaction.form.title')) });
+    expect(form).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(go()[0]);
+    await waitFor(() => expect(form).toHaveAttribute('aria-expanded', 'true'));
+
+    fireEvent.click(go()[1]);
     expect(await screen.findByRole('region', { name: tr('app.tabs.budgets') })).toBeInTheDocument();
   });
 
@@ -162,7 +167,7 @@ describe('Getting started progress', () => {
       within(await card()).getByText(tr('app.gettingStarted.progress', { done: 0, total: 5 }))
     ).toBeVisible();
     fireEvent.click(
-      within(await card()).getAllByRole('button', { name: tr('app.gettingStarted.go') })[0]
+      within(await card()).getAllByRole('button', { name: tr('app.gettingStarted.go') })[1]
     );
     await screen.findByRole('region', { name: tr('app.tabs.budgets') });
 
@@ -182,7 +187,11 @@ describe('Getting started progress', () => {
   });
 
   it('ticks the analysis even without the AI provider and celebrates when all is done', async () => {
-    setup(usage({ movements: 5, budgets: 1, goals: 1, recurringRules: 1 }));
+    // The analysis needs movements in the month: without them the month shows how to start.
+    setup(
+      usage({ movements: 5, budgets: 1, goals: 1, recurringRules: 1 }),
+      f.overview({ transactions: [f.transaction()] })
+    );
     expect(
       within(await card()).getByText(tr('app.gettingStarted.progress', { done: 4, total: 5 }))
     ).toBeVisible();
@@ -215,7 +224,7 @@ describe('Month recap', () => {
     ).toBeVisible();
     expect(within(card).getByText(/Cerraste el mes con .*1\.?300.* a tu favor/)).toBeVisible();
     expect(within(card).getByText(/mayor gasto fue .*Ocio.*300/)).toBeVisible();
-    expect(within(card).getByText(/tasa de ahorro fue del 10/)).toBeVisible();
+    expect(within(card).getByText(/Guardaste el 10/)).toBeVisible();
     // Sharing lives in the "Month summary" dialog, not in this card.
     expect(within(card).queryByRole('button', { name: tr('app.recap.share') })).toBeNull();
     expect(within(card).queryByLabelText(tr('app.recap.shareAmounts'))).toBeNull();

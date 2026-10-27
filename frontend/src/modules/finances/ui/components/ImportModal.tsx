@@ -3,21 +3,48 @@ import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
-import type { Account, ImportResult, TransactionType } from '@modules/finances/domain/types';
+import type {
+  Account,
+  Category,
+  ImportResult,
+  TransactionType,
+} from '@modules/finances/domain/types';
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
-import { useImport } from '../../application/hooks/useImport';
+import { useEffect, useId, useRef, useState } from 'react';
+import type { SharedContent } from '@core/share/sharedImport';
+import { isImage, useImport } from '../../application/hooks/useImport';
+import {
+  AMOUNT_CLASS,
+  EditableRows,
+  FileChooser,
+  type ImportSource,
+  ImportSourceTabs,
+  PastePanel,
+  ScreenshotPanel,
+} from './ImportSources';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { LeaksAfterImport } from './LeaksTeaser';
+import { FirstResult } from './FirstResult';
 
 interface ImportModalProps {
   accounts: Account[];
+  /** After the import, a limit is offered for the category where most money went. */
+  categories?: Category[];
+  /** What another app shared with Finanverso: read as soon as the importer opens. */
+  shared?: SharedContent | null;
+  /** The tab it opens on, when nothing was shared. */
+  initialSource?: ImportSource;
   onClose: () => void;
   onImported: () => void;
   /** Opens «Tu dinero perdido» (after an import it says what was found). */
   onOpenLeaks?: () => void;
+  /** Opens the goals, to see when a goal is reached (after an import, if there are goals). */
+  onOpenGoals?: () => void;
+  /** Opens the budgets (after an import, next to the limit it suggests). */
+  onOpenBudgets?: () => void;
 }
 
 type ImportState = ReturnType<typeof useImport>;
@@ -95,41 +122,162 @@ function missingColumns(mapping: ColumnMapping): string[] {
   return missing;
 }
 
-const FORMAT_NAMES = { csv: 'CSV', norma43: 'Norma 43', pdf: 'PDF' } as const;
+/** Files keep their format's name; pasted text and screenshots are named in the person's language. */
+const FORMAT_NAMES: Record<ImportState['format'], string> = {
+  csv: 'CSV',
+  excel: 'Excel',
+  norma43: 'Norma 43',
+  pdf: 'PDF',
+  text: 'app.import.source.paste',
+  image: 'app.import.source.screenshot',
+};
+/** Read from the bank's app (pasted or a screenshot), not from a file. */
+const fromApp = (imp: ImportState): boolean => imp.format === 'text' || imp.format === 'image';
+/** Movements read without columns from the bank's app: each row can be corrected. */
+const editable = (imp: ImportState): boolean => fromApp(imp) && !imp.columns;
 
 const IMPORT_ACCEPT =
-  '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  '.csv,.xlsx,.xlsm,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,image/*';
 
-function FileStep({ imp }: { imp: ImportState }) {
+/** An image pasted with Ctrl/Cmd+V while the importer is open is read as a screenshot. */
+function usePastedImage(onImage: (image: File) => void) {
+  useEffect(() => {
+    const onPaste = (event: ClipboardEvent) => {
+      const image = Array.from(event.clipboardData?.files ?? []).find(isImage);
+      if (!image) return;
+      event.preventDefault();
+      onImage(image);
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [onImage]);
+}
+
+/** The formats and how the category is chosen, for whoever wants the details. */
+function FormatsHelp() {
   const { t } = useI18n();
+  return (
+    <details className="import-help">
+      <summary>{t('app.import.help.title')}</summary>
+      <p className="section-hint">{t('app.import.help.formats')}</p>
+      <p className="section-hint">{t('app.import.help.categories')}</p>
+    </details>
+  );
+}
+
+function FilePanel({ imp }: { imp: ImportState }) {
+  const { t } = useI18n();
+  return (
+    <>
+      <p className="section-hint">{t('app.import.hint')}</p>
+      <p className="section-hint">{t('app.leaks.importTip')}</p>
+      <FormatsHelp />
+      <TemplateLink />
+      <FileChooser
+        label={t('app.import.file.choose')}
+        icon="upload"
+        accept={IMPORT_ACCEPT}
+        formats={t('app.import.file.formats')}
+        fileName={imp.fileName}
+        onFile={(file) => void imp.loadFile(file)}
+      />
+    </>
+  );
+}
+
+/** The first step: a statement file or the movements pasted from the bank's app. */
+function FileStep({
+  imp,
+  shared,
+  onShared,
+  initialSource,
+}: {
+  imp: ImportState;
+  shared: SharedContent | null;
+  /** The shared content was read: starting again does not read it again. */
+  onShared: () => void;
+  initialSource: ImportSource;
+}) {
+  const [source, setSource] = useState<ImportSource>(() =>
+    shared?.file && isImage(shared.file) ? 'screenshot' : shared?.text ? 'paste' : initialSource
+  );
+  const { loadFile, loadText } = imp;
+  // What was shared is read once, when the importer opens.
+  const sharedRead = useRef(false);
+  useEffect(() => {
+    if (!shared || sharedRead.current) return;
+    sharedRead.current = true;
+    onShared();
+    if (shared.file) void loadFile(shared.file);
+    else if (shared.text) loadText(shared.text);
+  }, [shared, loadFile, loadText, onShared]);
+  usePastedImage((image) => {
+    setSource('screenshot');
+    void loadFile(image);
+  });
+  // A file can be dropped on the whole step, whichever tab is open.
   return (
     <FileDropZone
       className="modal-body"
       accept={IMPORT_ACCEPT}
       onFiles={(list) => void imp.loadFile(list[0])}
     >
-      <p className="section-hint">{t('app.import.hint')}</p>
-      <p className="section-hint">{t('app.leaks.importTip')}</p>
-      <TemplateLink />
-      <label className="file-drop">
-        <input
-          type="file"
-          accept={IMPORT_ACCEPT}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void imp.loadFile(file);
-          }}
-        />
-        <span>{t('app.import.choose')}</span>
-      </label>
+      <ImportSourceTabs source={source} onSource={setSource}>
+        {source === 'file' && <FilePanel imp={imp} />}
+        {source === 'paste' && (
+          <PastePanel onRead={imp.loadText} initialText={shared?.text ?? ''} />
+        )}
+        {source === 'screenshot' && (
+          <ScreenshotPanel
+            reading={imp.reading}
+            fileName={imp.fileName}
+            onImage={(image) => void imp.loadFile(image)}
+          />
+        )}
+      </ImportSourceTabs>
     </FileDropZone>
   );
 }
 
+/** A column by its header, or by its place when it has none. */
+const columnName = (headers: string[], index: number): string => headers[index] || `#${index + 1}`;
+
+/** «Date: “Fecha valor” · Concept: “Concepto” · Amount: “Importe”»: what each column was taken as. */
+function understoodColumns(
+  imp: ImportState,
+  t: (key: string, vars?: Record<string, string | number>) => string
+): string {
+  return MAPPING_FIELDS.filter(({ key }) => imp.mapping[key] >= 0)
+    .map(({ key, labelKey }) => `${t(labelKey)}: «${columnName(imp.headers, imp.mapping[key])}»`)
+    .join(' · ');
+}
+
+/**
+ * The columns of a CSV. When they were found, a line says how they were understood and the
+ * selects wait folded under «Change columns»; when one is missing, they are open with the error.
+ */
 function ColumnMappingFields({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
+  const missing = missingColumns(imp.mapping);
+  return (
+    <>
+      {missing.length === 0 && (
+        <p className="section-success">
+          <Icon name="checkCircle" />{' '}
+          {t('app.import.columnsUnderstood', { columns: understoodColumns(imp, t) })}
+        </p>
+      )}
+      <details className="import-columns" open={missing.length > 0}>
+        <summary>{t('app.import.changeColumns')}</summary>
+        <ColumnSelects imp={imp} missing={missing} />
+      </details>
+    </>
+  );
+}
+
+function ColumnSelects({ imp, missing }: { imp: ImportState; missing: string[] }) {
+  const { t } = useI18n();
   const { mapping } = imp;
-  const missing = missingColumns(mapping);
   return (
     <>
       {missing.length > 0 && (
@@ -153,9 +301,9 @@ function ColumnMappingFields({ imp }: { imp: ImportState }) {
               onChange={(e) => imp.updateMapping(key, Number(e.target.value))}
             >
               {optional && <option value={-1}>—</option>}
-              {imp.headers.map((h, i) => (
+              {imp.headers.map((_, i) => (
                 <option key={i} value={i}>
-                  {h || `#${i + 1}`}
+                  {columnName(imp.headers, i)}
                 </option>
               ))}
             </select>
@@ -184,13 +332,76 @@ function PdfNotes({ imp }: { imp: ImportState }) {
   );
 }
 
-function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
+/** The rows read from a file, with the type of each one to correct. */
+function ImportedRows({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
   return (
+    <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
+      <table className="data-table import-cards">
+        <tbody>
+          {imp.rows.map((r, i) => (
+            <tr key={i}>
+              <td className="import-card-date">{date(r.date)}</td>
+              <td className="import-card-concept">{r.description}</td>
+              <td className="import-card-meta">
+                <select
+                  className="tx-input import-type-select"
+                  aria-label={`${t('app.import.col.type')} ${r.description}`}
+                  value={rowType(r)}
+                  onChange={(e) => imp.setRowType(i, e.target.value as TransactionType)}
+                >
+                  {TRANSACTION_TYPES.map((ty) => (
+                    <option key={ty} value={ty}>
+                      {typeName(t, ty)}
+                    </option>
+                  ))}
+                </select>
+                {imp.review.includes(i) && (
+                  <small className="import-review"> {t('app.import.typeReview')}</small>
+                )}
+              </td>
+              <td className={`import-card-amount ${r.amount < 0 ? 'amount-neg' : 'amount-pos'}`}>
+                {money(r.amount)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </ScrollRegion>
+  );
+}
+
+/** The AI option, its label next to the box and one line on what it does. */
+function AiOption({ imp }: { imp: ImportState }) {
+  const { t } = useI18n();
+  const hintId = useId();
+  return (
+    <div className="import-ai">
+      <label className="import-ai-check">
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={imp.useAi}
+          aria-describedby={hintId}
+          onChange={(e) => imp.setUseAi(e.target.checked)}
+        />
+        <span>{t('app.import.useAi')}</span>
+      </label>
+      <p id={hintId} className="section-hint">
+        {t('app.import.useAiHint')}
+      </p>
+    </div>
+  );
+}
+
+function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
+  const { t } = useI18n();
+  return (
     <div className="modal-body">
       <p className="section-hint">
-        {imp.fileName} · {FORMAT_NAMES[imp.format]} ·{' '}
+        {imp.fileName && `${imp.fileName} · `}
+        {fromApp(imp) ? t(FORMAT_NAMES[imp.format]) : FORMAT_NAMES[imp.format]} ·{' '}
         {t('app.import.rowsFound', { count: imp.rows.length })}
         {imp.skipped.length > 0 &&
           ` · ${t('app.import.rowsSkipped', { count: imp.skipped.length })}`}
@@ -201,7 +412,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
         </p>
       )}
       {imp.format === 'pdf' && <PdfNotes imp={imp} />}
-      {imp.format === 'csv' && <ColumnMappingFields imp={imp} />}
+      {imp.columns && <ColumnMappingFields imp={imp} />}
       {accounts.length > 1 && (
         <label className="field">
           <span className="field-label">{t('app.transaction.form.account')}</span>
@@ -218,48 +429,18 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           </select>
         </label>
       )}
-      <label className="setting-row">
-        <span>
-          <strong>{t('app.import.useAi')}</strong>
-          <small>{t('app.import.useAiHint')}</small>
-        </span>
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={imp.useAi}
-          onChange={(e) => imp.setUseAi(e.target.checked)}
+      <AiOption imp={imp} />
+      {editable(imp) ? (
+        <EditableRows
+          rows={imp.rows}
+          review={imp.review}
+          onEdit={imp.editRow}
+          onType={imp.setRowType}
+          onRemove={imp.removeRow}
         />
-      </label>
-      <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
-        <table className="data-table">
-          <tbody>
-            {imp.rows.map((r, i) => (
-              <tr key={i}>
-                <td>{date(r.date)}</td>
-                <td>{r.description}</td>
-                <td>
-                  <select
-                    className="tx-input import-type-select"
-                    aria-label={`${t('app.import.col.type')} ${r.description}`}
-                    value={rowType(r)}
-                    onChange={(e) => imp.setRowType(i, e.target.value as TransactionType)}
-                  >
-                    {TRANSACTION_TYPES.map((ty) => (
-                      <option key={ty} value={ty}>
-                        {typeName(t, ty)}
-                      </option>
-                    ))}
-                  </select>
-                  {imp.review.includes(i) && (
-                    <small className="import-review"> {t('app.import.typeReview')}</small>
-                  )}
-                </td>
-                <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </ScrollRegion>
+      ) : (
+        <ImportedRows imp={imp} />
+      )}
       {imp.skipped.length > 0 && (
         <ScrollRegion className="import-skipped-scroll" label={t('app.import.skippedLines')}>
           <small>
@@ -268,6 +449,30 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
         </ScrollRegion>
       )}
     </div>
+  );
+}
+
+/**
+ * «Already covered by an automatic operation»: the row repeats a movement one of them added. Left
+ * out unless the person ticks «Import it anyway».
+ */
+function CoveredRow({ row, imp }: { row: ImportedRow; imp: ImportState }) {
+  const { t } = useI18n();
+  const { date } = useFormat();
+  const cover = row.coveredBy as NonNullable<ImportedRow['coveredBy']>;
+  return (
+    <span className="import-covered">
+      <small>{t('app.import.covered', { name: cover.description, date: date(cover.date) })}</small>
+      <label>
+        <input
+          type="checkbox"
+          checked={!imp.omitted.includes(row.index)}
+          onChange={() => imp.toggleOmitted(row.index)}
+        />{' '}
+        {t('app.import.importAnyway')}
+        <span className="sr-only"> {row.description}</span>
+      </label>
+    </span>
   );
 }
 
@@ -280,6 +485,9 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
       : t(`app.import.status.${r.status}`);
   const amount = (r: ImportedRow): string =>
     r.amount === undefined ? '—' : money(r.type === 'EXPENSE' ? -r.amount : r.amount);
+  const covered = preview.rows.filter((r) => r.coveredBy).length;
+  const toImport = preview.imported - imp.omitted.length;
+  const left = (r: ImportedRow) => r.status !== 'imported' || imp.omitted.includes(r.index);
 
   return (
     <div className="modal-body">
@@ -290,8 +498,17 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           invalid: preview.invalid,
         })}
       </p>
+      {covered > 0 && (
+        <p className="plan-note" role="status">
+          <Icon name="repeat" />{' '}
+          {t(covered === 1 ? 'app.import.coveredNoticeOne' : 'app.import.coveredNotice', {
+            count: covered,
+          })}
+        </p>
+      )}
       <ScrollRegion className="table-scroll" label={t('app.import.preview')}>
-        <table className="data-table">
+        {/* On phones each row is a card: concept and amount whole, the category under them. */}
+        <table className="data-table import-cards">
           <thead>
             <tr>
               <th>{t('app.import.col.date')}</th>
@@ -303,12 +520,17 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           </thead>
           <tbody>
             {preview.rows.slice(0, 100).map((r) => (
-              <tr key={r.index} className={r.status !== 'imported' ? 'row-muted' : undefined}>
-                <td>{r.date ? date(r.date) : '—'}</td>
-                <td>{r.description ?? r.error}</td>
-                <td>{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
-                <td>{amount(r)}</td>
-                <td>{category(r)}</td>
+              <tr key={r.index} className={left(r) ? 'row-muted' : undefined}>
+                <td className="import-card-date">{r.date ? date(r.date) : '—'}</td>
+                <td className="import-card-concept">{r.description ?? r.error}</td>
+                <td className="import-card-type">{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
+                <td className={`import-card-amount ${r.type ? AMOUNT_CLASS[r.type] : ''}`}>
+                  {amount(r)}
+                </td>
+                <td className="import-card-meta">
+                  {category(r)}
+                  {r.coveredBy && <CoveredRow row={r} imp={imp} />}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -320,27 +542,62 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
         </button>
         <button
           className="btn-primary"
-          disabled={imp.busy || preview.imported === 0}
+          disabled={imp.busy || toImport === 0}
           onClick={imp.confirmImport}
         >
-          {imp.busy
-            ? t('app.common.loading')
-            : t('app.import.confirm', { count: preview.imported })}
+          {imp.busy ? t('app.common.loading') : t('app.import.confirm', { count: toImport })}
         </button>
       </div>
     </div>
   );
 }
 
-function DoneStep({ result, onOpenLeaks }: { result: ImportResult; onOpenLeaks?: () => void }) {
+/** What the import left, and the next steps: a limit for the biggest expense, the charges that repeat, the leaks. */
+function DoneStep({
+  result,
+  rows,
+  categories,
+  onOpenLeaks,
+  onOpenGoals,
+  onOpenBudgets,
+  onChanged,
+}: {
+  result: ImportResult;
+  /** Something more changed the movements (automatic operations added): read them again. */
+  onChanged: () => void;
+  categories: Category[];
+  /** The rows of the preview: what was imported, with its category. */
+  rows: ImportResult['rows'];
+  onOpenLeaks?: () => void;
+  onOpenGoals?: () => void;
+  onOpenBudgets?: () => void;
+}) {
   const { t } = useI18n();
+  const one = result.imported === 1;
   return (
-    <div className="modal-body">
-      <p className="section-success">
+    <div className="modal-body import-done">
+      <h3 className="import-done-title">
         <Icon name="checkCircle" />{' '}
-        {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
-      </p>
-      {onOpenLeaks && result.imported > 0 && <LeaksAfterImport onOpen={onOpenLeaks} />}
+        {t(one ? 'app.import.doneTitleOne' : 'app.import.doneTitle', { count: result.imported })}
+      </h3>
+      {result.duplicates > 0 && (
+        <p className="section-hint">
+          {t('app.import.doneDuplicates', { count: result.duplicates })}
+        </p>
+      )}
+      {result.imported > 0 && (
+        <>
+          <p className="section-hint">{t('app.import.doneNext')}</p>
+          <FirstResult
+            rows={rows}
+            categories={categories}
+            onOpenGoals={onOpenGoals}
+            onOpenBudgets={onOpenBudgets}
+            onRulesAdded={onChanged}
+          />
+          {onOpenLeaks && <LeaksAfterImport onOpen={onOpenLeaks} />}
+        </>
+      )}
     </div>
   );
 }
@@ -352,7 +609,7 @@ function Footer({ imp, onClose }: { imp: ImportState; onClose: () => void }) {
     return (
       <div className="modal-footer">
         <button className="btn-secondary" onClick={imp.reset}>
-          {t('app.import.otherFile')}
+          {t(fromApp(imp) ? 'app.import.otherSource' : 'app.import.otherFile')}
         </button>
         <button
           className="btn-primary"
@@ -384,22 +641,55 @@ function StepBody({
   imp,
   accounts,
   onOpenLeaks,
+  onOpenGoals,
+  shared,
+  onShared,
+  initialSource,
+  onOpenBudgets,
+  categories,
 }: {
   imp: ImportState;
   accounts: Account[];
+  categories: Category[];
   onOpenLeaks?: () => void;
+  onOpenGoals?: () => void;
+  onOpenBudgets?: () => void;
+  shared: SharedContent | null;
+  onShared: () => void;
+  initialSource: ImportSource;
 }) {
   if (imp.step === 'mapping') return <MappingStep imp={imp} accounts={accounts} />;
   if (imp.step === 'preview' && imp.preview) return <PreviewStep imp={imp} preview={imp.preview} />;
   if (imp.step === 'done' && imp.result) {
-    return <DoneStep result={imp.result} onOpenLeaks={onOpenLeaks} />;
+    return (
+      <DoneStep
+        result={imp.result}
+        rows={(imp.preview as ImportResult).rows.filter((r) => !imp.omitted.includes(r.index))}
+        categories={categories}
+        onOpenLeaks={onOpenLeaks}
+        onOpenGoals={onOpenGoals}
+        onOpenBudgets={onOpenBudgets}
+        onChanged={imp.onImported}
+      />
+    );
   }
-  return <FileStep imp={imp} />;
+  return <FileStep imp={imp} shared={shared} onShared={onShared} initialSource={initialSource} />;
 }
 
 /** Bank statement import: choose file → map columns → preview → import. */
-export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: ImportModalProps) {
+export function ImportModal({
+  accounts,
+  categories = [],
+  shared: sharedContent = null,
+  initialSource = 'file',
+  onClose,
+  onImported,
+  onOpenLeaks,
+  onOpenGoals,
+  onOpenBudgets,
+}: ImportModalProps) {
   const { t } = useI18n();
+  const [shared, setShared] = useState(sharedContent);
   const activeAccounts = accounts.filter((a) => !a.archived);
   const imp = useImport(onImported, defaultAccountId(activeAccounts));
 
@@ -407,7 +697,7 @@ export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: Impo
     <Modal
       label={t('app.import.title')}
       onClose={onClose}
-      dismissible={!imp.busy}
+      dismissible={!imp.busy && !imp.reading}
       className="modal-panel modal-panel--wide"
     >
       <div className="modal-header">
@@ -418,7 +708,17 @@ export function ImportModal({ accounts, onClose, onImported, onOpenLeaks }: Impo
           <Icon name="close" />
         </button>
       </div>
-      <StepBody imp={imp} accounts={activeAccounts} onOpenLeaks={onOpenLeaks} />
+      <StepBody
+        imp={imp}
+        accounts={activeAccounts}
+        onOpenLeaks={onOpenLeaks}
+        onOpenGoals={onOpenGoals}
+        onOpenBudgets={onOpenBudgets}
+        categories={categories}
+        shared={shared}
+        onShared={() => setShared(null)}
+        initialSource={initialSource}
+      />
       {imp.error && <p className="form-error">{t(imp.error)}</p>}
       {imp.step !== 'preview' && <Footer imp={imp} onClose={onClose} />}
     </Modal>

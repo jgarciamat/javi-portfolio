@@ -5,11 +5,7 @@ import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { emptyManual } from '@modules/finances/ui/components/AutonomoManual';
 import { toInvoices } from '@modules/finances/domain/invoiceLedger';
 import { toSaved } from '@modules/finances/ui/components/autonomoSync';
-import {
-  AUTONOMO_ASSISTANT_KEY,
-  AUTONOMO_STEPS,
-  AUTONOMO_WIZARD_KEY,
-} from '@modules/finances/domain/autonomoWizard';
+import { AUTONOMO_STEPS, AUTONOMO_WIZARD_KEY } from '@modules/finances/domain/autonomoWizard';
 import { NEW_PROGRESS } from '@modules/wizard/domain/wizard';
 import { ApiError } from '@core/api/http';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -282,14 +278,9 @@ describe('the other paths of the self-employed assistant', () => {
     expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toBeNull();
   });
 
-  it('switches to everything together and back, remembering it', () => {
+  it('is always step by step: no «see it all together» in the toolbar', () => {
     open();
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.expert')) }));
-    expect(localStorage.getItem(AUTONOMO_ASSISTANT_KEY)).toBe('expert');
-    expect(
-      screen.getByRole('navigation', { name: tr('app.autonomo.steps.label') })
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr('wizard.backToSteps') }));
+    expect(screen.queryByRole('button', { name: /todo junto/i })).toBeNull();
     expect(heading(tr(w('q.period')))).toBeInTheDocument();
   });
 

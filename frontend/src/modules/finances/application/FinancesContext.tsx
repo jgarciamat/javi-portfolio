@@ -108,6 +108,15 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     await Promise.all([fetchMonth({ invalidate: true }), refreshAccounts()]);
   }, [fetchMonth, refreshAccounts]);
 
+  /**
+   * Reads the month again; with `invalidate` (something changed the movements outside this
+   * context: an import, the sample data…) the balances of the accounts too, like any change here.
+   */
+  const refresh = useCallback(
+    (opts?: { invalidate?: boolean }) => (opts?.invalidate ? afterMutation() : fetchMonth(opts)),
+    [afterMutation, fetchMonth]
+  );
+
   const addTransaction = useCallback(
     async (dto: CreateTransactionDTO) => {
       const tx = await transactionApi.create(dto);
@@ -207,7 +216,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       removeCategory,
       refreshAccounts,
       refreshCategories,
-      refresh: fetchMonth,
+      refresh,
     }),
     [
       nav,
@@ -227,7 +236,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       removeCategory,
       refreshAccounts,
       refreshCategories,
-      fetchMonth,
+      refresh,
     ]
   );
 

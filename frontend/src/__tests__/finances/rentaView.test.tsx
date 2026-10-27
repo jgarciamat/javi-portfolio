@@ -4,6 +4,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+jest.mock('@modules/tools/ui/renta/RentaWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').rentaWithForm()
+);
+
 // The full form: the expert mode (the guided questions have their own suite).
 beforeEach(() => {
   localStorage.clear();

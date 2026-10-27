@@ -29,7 +29,7 @@ const nbsp = (s: string) => s.replace(/\u00a0|\u202f/g, ' ');
 
 describe('format utils', () => {
   it('formats money in the user currency and language', () => {
-    expect(nbsp(formatMoney(1234.5, 'EUR', 'es'))).toBe('1234,50 €');
+    expect(nbsp(formatMoney(1234.5, 'EUR', 'es'))).toBe('1.234,50 €');
     expect(nbsp(formatMoney(1234.5, 'USD', 'en'))).toBe('US$1,234.50');
     expect(nbsp(formatMoney(-20, 'EUR', 'es', { decimals: false }))).toBe('-20 €');
     expect(nbsp(formatMoney(15, 'EUR', 'es', { signed: true }))).toBe('+15,00 €');

@@ -49,31 +49,33 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
       role="group"
       aria-label={t('app.monthActions.ariaLabel')}
     >
-      <button
-        type="button"
-        className="month-action"
-        disabled={!hasMovements}
-        onClick={() => exportMonthCSV(f.transactions, f.summary, f.year, f.month)}
-      >
-        <Icon name="download" /> {t('app.export.month')}
-      </button>
-      <button
-        type="button"
-        className="month-action"
-        disabled={!hasMovements || pdf.pending}
-        aria-busy={pdf.pending}
-        onClick={() => void exportMonthPdf()}
-      >
-        <Icon name="file" /> {pdf.pending ? t('app.report.preparing') : t('app.export.monthPdf')}
-      </button>
-      <button
-        type="button"
-        className="month-action"
-        disabled={!hasSummary}
-        onClick={() => setRecapOpen(true)}
-      >
-        <Icon name="sparkles" /> {t('app.recap.open')}
-      </button>
+      {/* Without movements there is nothing to export or sum up: the buttons wait for them. */}
+      {hasMovements && (
+        <>
+          <button
+            type="button"
+            className="month-action"
+            onClick={() => exportMonthCSV(f.transactions, f.summary, f.year, f.month)}
+          >
+            <Icon name="download" /> {t('app.export.month')}
+          </button>
+          <button
+            type="button"
+            className="month-action"
+            disabled={pdf.pending}
+            aria-busy={pdf.pending}
+            onClick={() => void exportMonthPdf()}
+          >
+            <Icon name="file" />{' '}
+            {pdf.pending ? t('app.report.preparing') : t('app.export.monthPdf')}
+          </button>
+        </>
+      )}
+      {hasSummary && (
+        <button type="button" className="month-action" onClick={() => setRecapOpen(true)}>
+          <Icon name="sparkles" /> {t('app.recap.open')}
+        </button>
+      )}
       {onImport && (
         <button type="button" className="month-action" data-tour="import" onClick={onImport}>
           <Icon name="upload" /> {t('app.import.open')}

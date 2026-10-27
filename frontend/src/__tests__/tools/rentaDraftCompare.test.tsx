@@ -113,7 +113,7 @@ describe('Renta planner: the draft next to the planner', () => {
     const same = document.querySelector('.renta-compare-summary') as HTMLElement;
     expect(same.textContent?.replace(/\s/g, ' ')).toBe(
       tr('tools.renta.compare.summarySame', {
-        draft: tr('tools.renta.compare.refund', { amount: '1117,09 €' }),
+        draft: tr('tools.renta.compare.refund', { amount: '1.117,09 €' }),
       }).replace(/\s/g, ' ')
     );
     // A refund is green (the words say it too).
@@ -125,7 +125,7 @@ describe('Renta planner: the draft next to the planner', () => {
     await paste(DRAFT);
     await table();
     const summary = document.querySelector('.renta-compare-summary') as HTMLElement;
-    expect(summary).toHaveTextContent(/Tu borrador da a devolver 1117,09/);
+    expect(summary).toHaveTextContent(/Tu borrador da a devolver 1.117,09/);
     expect(summary).toHaveTextContent(/diferencia de/);
     expect(screen.getByText(/Casillas que no coinciden/)).toBeInTheDocument();
   });
@@ -224,7 +224,7 @@ describe('the verdict next to the draft', () => {
     expect(await screen.findByText(verdict('explained'))).toBeInTheDocument();
     expect(
       screen.getByText(
-        verdict('explainedWhy').replace('{amount}', '1192,44 €').replace(/\s/g, ' '),
+        verdict('explainedWhy').replace('{amount}', '1.192,44 €').replace(/\s/g, ' '),
         {
           normalizer: (s) => s.replace(/\s/g, ' '),
         }

@@ -267,6 +267,23 @@ describe('ResetPasswordPage', () => {
     expect(screen.getByText('login page')).toBeInTheDocument();
   });
 
+  it('shows how strong the new password is and when the confirmation matches', () => {
+    renderReset();
+    const password = screen.getByLabelText(tr('app.auth.reset.password'));
+    expect(screen.queryByText(tr('app.auth.reset.strength.weak'))).toBeNull();
+    fireEvent.change(password, { target: { value: 'abc' } });
+    expect(screen.getByText(tr('app.auth.reset.strength.weak'))).toBeInTheDocument();
+    fireEvent.change(password, { target: { value: 'Abcdefg1' } });
+    expect(screen.getByText(tr('app.auth.reset.strength.medium'))).toBeInTheDocument();
+    fireEvent.change(password, { target: { value: STRONG } });
+    expect(screen.getByText(tr('app.auth.reset.strength.strong'))).toBeInTheDocument();
+    expect(screen.queryByText(tr('app.auth.reset.match'))).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('app.auth.reset.confirm')), {
+      target: { value: STRONG },
+    });
+    expect(screen.getByText(tr('app.auth.reset.match'))).toBeInTheDocument();
+  });
+
   it('shows errors and links back to login', async () => {
     jest.spyOn(authApi, 'resetPassword').mockRejectedValue(new Error('Enlace caducado'));
     renderReset();

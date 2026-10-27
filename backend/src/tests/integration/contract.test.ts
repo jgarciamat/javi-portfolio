@@ -190,6 +190,11 @@ describe('API contract', () => {
       contract('importResult', (await send('importPreview')).body);
     });
 
+    it('sample data', async () => {
+      contract('sampleData', (await send('sampleDataLoad')).body);
+      await send('sampleDataRemove');
+    });
+
     it('money leaks', async () => {
       // Made-up charges: a monthly gym and a shop charged twice the same day.
       for (const date of ['2025-12-05', '2026-01-05', '2026-02-05', '2026-03-05']) {

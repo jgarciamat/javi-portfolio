@@ -26,6 +26,35 @@ beforeEach(() => {
 });
 afterEach(restoreTime);
 
+describe('social links in the header', () => {
+  const phone = (matches: boolean) =>
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: jest.fn().mockImplementation(() => ({
+        matches,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })),
+    });
+  afterEach(() => delete (window as Partial<typeof window>).matchMedia);
+
+  it('sit beside the title on a computer', () => {
+    phone(false);
+    renderWithProviders(<Dashboard />, { plan: true });
+    const links = screen.getByRole('navigation', { name: tr('app.social.title') });
+    expect(links.parentElement).toHaveClass('header-brand');
+    expect(within(links).getAllByRole('link')).toHaveLength(3);
+  });
+
+  it('share the line of the Videoteca pill on a phone', () => {
+    phone(true);
+    renderWithProviders(<Dashboard />, { plan: true });
+    const links = screen.getByRole('navigation', { name: tr('app.social.title') });
+    expect(links.parentElement).toHaveClass('header');
+    expect(within(links).getAllByRole('link')).toHaveLength(3);
+  });
+});
+
 describe('menu and sections', () => {
   it('opens every section and remembers the last one', async () => {
     jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
@@ -33,10 +62,28 @@ describe('menu and sections', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalled());
     for (const section of DASHBOARD_SECTIONS) {
-      goTo(section.menuKey ?? section.labelKey);
+      goTo(section.labelKey);
       expect(screen.getByRole('region', { name: tr(section.labelKey) })).toBeInTheDocument();
     }
     expect(localStorage.getItem('mm_last_tab')).toBe('settings');
+  });
+
+  it('shows every group of the menu in two columns, the names as the screens, «Tu plan» for the tour only while open', async () => {
+    renderWithProviders(<Dashboard />, { plan: true });
+    const open = screen.getByRole('button', { name: tr('app.menu.open') });
+    expect(document.querySelector('[data-tour="plan"]')).toBeNull();
+    fireEvent.click(open);
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
+    expect(within(menu).getByRole('navigation', { name: tr('app.menu.ariaLabel') })).toBeVisible();
+    expect(
+      within(menu).getByRole('button', { name: literal(tr('app.tabs.plan')) })
+    ).toHaveAttribute('data-tour', 'plan');
+    fireEvent.click(
+      within(menu).getByRole('button', { name: literal(tr('app.tabs.automations')) })
+    );
+    const region = await screen.findByRole('region', { name: tr('app.tabs.automations') });
+    expect(region).toHaveFocus();
+    expect(open).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('closes the menu with Escape, the backdrop or the close button', () => {
@@ -206,35 +253,59 @@ describe('import', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  const freeBilling = (imports: number) =>
-    f.billing({
-      plan: 'free',
-      trialDaysLeft: 0,
-      limits: f.catalog().limits.free,
-      usage: { ...f.billing().usage, imports },
-    });
-
-  it('lets the free plan open the importer while its import is unused', async () => {
+  it('reads the balances of the accounts again after an import, not only the month', async () => {
     const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(freeBilling(0));
-    renderWithProviders(<Dashboard />, { api, plan: true });
-    await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
-    await act(async () => undefined);
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [f.transaction()] }));
+    const accounts = (principal: number) => ({
+      accounts: [
+        f.account({ id: 'a1', name: 'Principal', isDefault: true, balance: principal }),
+        f.account({ id: 'a2', name: 'Otra', balance: 1000 }),
+      ],
+      total: principal + 1000,
+    });
+    api.accountApi.getAll.mockResolvedValue(accounts(5017.96));
+    api.transactionApi.import
+      .mockResolvedValueOnce({ dryRun: true, imported: 1, duplicates: 0, invalid: 0, rows: [] })
+      .mockResolvedValueOnce({ dryRun: false, imported: 1, duplicates: 0, invalid: 0, rows: [] });
+    renderWithProviders(<Dashboard />, { api });
+    expect(await screen.findByText(/5\.017,96/)).toBeInTheDocument();
+    const calls = api.accountApi.getAll.mock.calls.length;
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
-    expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
+    const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    fireEvent.click(
+      within(dialog).getByRole('tab', { name: literal(tr('app.import.source.paste')) })
+    );
+    fireEvent.change(within(dialog).getByLabelText(tr('app.import.paste.label')), {
+      target: { value: '12/03/2026 Bar -3,00 €' },
+    });
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: literal(tr('app.import.paste.read')) })
+    );
+    fireEvent.click(await within(dialog).findByRole('button', { name: tr('app.import.preview') }));
+    api.accountApi.getAll.mockResolvedValue(accounts(5014.96));
+    fireEvent.click(
+      await within(dialog).findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })
+    );
+    await waitFor(() => expect(api.accountApi.getAll.mock.calls.length).toBeGreaterThan(calls));
+    expect(await screen.findByText(/5\.014,96/)).toBeInTheDocument();
   });
 
-  it('shows the paywall once the free import is used', async () => {
+  it('opens the importer on the free plan however many statements were imported', async () => {
     const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(freeBilling(1));
+    api.billingApi.get.mockResolvedValue(
+      f.billing({
+        plan: 'free',
+        trialDaysLeft: 0,
+        limits: f.catalog().limits.free,
+        usage: { ...f.billing().usage, imports: 7 },
+      })
+    );
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
-    const dialog = await screen.findByRole('dialog', { name: tr('billing.upgradeTitle') });
-    expect(dialog).toHaveTextContent(
-      tr('billing.reason.limit', { limit: 1, resource: tr('billing.resource.imports') })
-    );
+    // An empty month: its panel opens the importer.
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.emptyMonth.import')) }));
+    expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
   });
 });
 

@@ -11,6 +11,7 @@ import {
   type TransactionViewMode,
 } from '../../application/hooks/useTransactionView';
 import { useGettingStarted } from '../../application/hooks/useGettingStarted';
+import { useEnoughData } from '../../application/hooks/useEnoughData';
 import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
 import { useRowSelection } from '@shared/hooks/useRowSelection';
 import { TransactionBulkActions } from './TransactionBulkActions';
@@ -22,6 +23,8 @@ import { BudgetProgress } from './BudgetProgress';
 import { CapturedPayments } from './CapturedPayments';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
+import { EmptyMonthPanel } from './EmptyMonthPanel';
+import type { ImportSource } from './ImportSources';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
 import { RatePrompt } from './RatePrompt';
@@ -30,6 +33,8 @@ import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
+import { QuickAdd } from './QuickAdd';
+import { SampleDataCard } from './SampleDataCard';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
@@ -205,13 +210,40 @@ function defaultDateOf(f: ReturnType<typeof useFinances>): string {
     : (f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`);
 }
 
+/**
+ * «Do I reach the end of the month?», once there are movements enough for it to mean something;
+ * before that, a calm line instead of red warnings about data not there yet.
+ */
+function Forecast({
+  empty,
+  onOpenTab,
+}: {
+  empty: boolean;
+  onOpenTab: (tab: DashboardTab) => void;
+}) {
+  const { t } = useI18n();
+  const enough = useEnoughData();
+  if (enough) return <ForecastPanel onOpenTab={onOpenTab} />;
+  if (empty) return null;
+  return (
+    <p className="card section-hint forecast-not-yet">
+      <Icon name="sparkles" /> {t('app.forecast.notYet')}
+    </p>
+  );
+}
+
 /** Only for the current period: first steps or the recap, the rate prompt and the forecast. */
 function CurrentPeriodPanels({
   checklist,
   onOpenTab,
+  onAddMovement,
+  empty,
 }: {
   checklist: ReturnType<typeof useGettingStarted>;
   onOpenTab: (tab: DashboardTab) => void;
+  /** Opens the form of a new movement (the first step of «First steps»). */
+  onAddMovement: () => void;
+  empty: boolean;
 }) {
   const f = useFinances();
   const openStep = useOpenFirstStep(onOpenTab);
@@ -220,7 +252,7 @@ function CurrentPeriodPanels({
     <>
       <InviteeGoal onOpenStep={openStep} dismissible refreshKey={f.transactions.length} />
       {checklist.visible ? (
-        <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
+        <GettingStarted checklist={checklist} onOpenTab={onOpenTab} onAddMovement={onAddMovement} />
       ) : (
         <MonthRecap />
       )}
@@ -228,7 +260,7 @@ function CurrentPeriodPanels({
         <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
       )}
       <LeaksTeaser onOpen={() => onOpenTab('leaks')} />
-      <ForecastPanel />
+      <Forecast empty={empty} onOpenTab={onOpenTab} />
     </>
   );
 }
@@ -250,8 +282,8 @@ interface MonthlyViewProps {
   onManageCategories: () => void;
   onManageBudgets: () => void;
   onOpenTab: (tab: DashboardTab) => void;
-  /** Opens the bank statement importer (the free plan's limit is handled by the caller). */
-  onImport?: () => void;
+  /** Opens the bank statement importer (free and unlimited on every plan), on one of its tabs. */
+  onImport?: (source?: ImportSource) => void;
 }
 
 export function MonthlyView({
@@ -272,6 +304,12 @@ export function MonthlyView({
   const [accountRequest, setAccountRequest] = useState<{ id: string } | null>(null);
   // An account that was archived or deleted no longer filters anything.
   const filterId = activeAccounts.some((a) => a.id === accountFilter) ? accountFilter : null;
+  /** Nothing in the month yet: what to do first, and nothing that needs movements. */
+  const empty = f.transactions.length === 0 && !f.loading;
+  const addExpense = () => setParams({ add: 'expense' }, { replace: true });
+  const importFile = onImport && (() => onImport());
+  // Before the first movement it is an option of the empty month; then, the line of sample data.
+  const sample = <SampleDataCard onOpenLeaks={() => onOpenTab('leaks')} onImport={importFile} />;
 
   return (
     <>
@@ -287,21 +325,22 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
-        <MonthActions onImport={onImport} />
-        {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
-        {activeAccounts.length > 1 && (
-          <AccountCards
-            accounts={activeAccounts}
-            selectedId={filterId}
-            onSelect={setAccountFilter}
-            onAdd={(id) => setAccountRequest({ id })}
-            onTransfer={() => onOpenTab('accounts')}
-          />
+        {empty ? (
+          <EmptyMonthPanel onImport={onImport} onAddExpense={addExpense}>
+            {sample}
+          </EmptyMonthPanel>
+        ) : (
+          <>
+            <MonthActions onImport={importFile} />
+            {sample}
+          </>
         )}
-        <CurrentPeriodPanels checklist={checklist} onOpenTab={onOpenTab} />
-
-        <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
-        <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
+        {/* Near the top: on a phone it is the quickest way to note a movement down. */}
+        <QuickAdd
+          transactions={f.transactions}
+          defaultDate={defaultDate}
+          onAdd={f.addTransaction}
+        />
         <TransactionForm
           categories={f.categories}
           accounts={f.accounts}
@@ -314,8 +353,32 @@ export function MonthlyView({
           quickAdd={quickAdd}
           onQuickAddDone={() => setParams({}, { replace: true })}
           accountRequest={accountRequest}
+          transactions={f.transactions}
         />
-        <MovementsPanel onEdit={onEditTransaction} accountId={filterId} />
+        {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        {activeAccounts.length > 1 && (
+          <AccountCards
+            accounts={activeAccounts}
+            selectedId={filterId}
+            onSelect={setAccountFilter}
+            onAdd={(id) => setAccountRequest({ id })}
+            onTransfer={() => onOpenTab('accounts')}
+          />
+        )}
+        <CurrentPeriodPanels
+          checklist={checklist}
+          onOpenTab={onOpenTab}
+          onAddMovement={addExpense}
+          empty={empty}
+        />
+
+        <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
+        {!empty && (
+          <>
+            <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
+            <MovementsPanel onEdit={onEditTransaction} accountId={filterId} />
+          </>
+        )}
 
         {f.summary && f.transactions.length > 0 && (
           <CollapsiblePanel

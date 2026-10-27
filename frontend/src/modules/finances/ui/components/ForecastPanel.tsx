@@ -6,45 +6,15 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { useResource } from '@shared/hooks/useResource';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
-import type { Forecast, SafeToSpend } from '@modules/finances/domain/types';
+import type { Forecast } from '@modules/finances/domain/types';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/ForecastPanel.css';
 import { Icon } from '@shared/components/Icon';
+import type { DashboardTab } from '../navigation';
+import { EndOfMonthBlock } from './EndOfMonthBlock';
 
 const RANGES = [3, 6, 12];
-
-const STATUS_KEYS: Record<SafeToSpend['status'], string> = {
-  ok: 'app.forecast.status.ok',
-  tight: 'app.forecast.status.tight',
-  over: 'app.forecast.status.over',
-};
-
-/** What is left today, per day, and how the month will probably end. */
-function SafeToSpendBlock({ safe }: { safe: SafeToSpend }) {
-  const { t } = useI18n();
-  const { money } = useFormat();
-  return (
-    <div className={`forecast-safe forecast-safe--${safe.status}`}>
-      <p className="forecast-daily">
-        {safe.status === 'over' ? (
-          t('app.forecast.noneLeft')
-        ) : (
-          <>
-            <strong>{money(safe.daily)}</strong> {t('app.forecast.perDay')}
-          </>
-        )}
-      </p>
-      <p className="forecast-detail">
-        {t('app.forecast.left', { amount: money(safe.available), days: safe.daysLeft })}
-      </p>
-      <p className="forecast-detail">
-        {t('app.forecast.projectedEnd', { amount: money(safe.projectedEnd) })}
-      </p>
-      <p className="forecast-status">{t(STATUS_KEYS[safe.status])}</p>
-    </div>
-  );
-}
 
 /** The longer outlook and the scenarios, locked on the free plan. */
 function LockedOutlook() {
@@ -168,8 +138,11 @@ function Outlook({
   );
 }
 
-/** "Do I reach the end of the month?" and next month for everyone; the longer outlook is Premium. */
-export function ForecastPanel() {
+/**
+ * "Do I reach the end of the month?" and next month for everyone; the longer outlook is Premium.
+ * `onOpenTab` opens the guides of «Qué hacer con lo que sobre» without leaving the app.
+ */
+export function ForecastPanel({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => void }) {
   const { insightsApi } = useApi();
   const { t } = useI18n();
   const { available } = useFinances();
@@ -196,7 +169,7 @@ export function ForecastPanel() {
       {!data && !error && <p className="section-hint">{t('app.common.loading')}</p>}
       {data && (
         <>
-          <SafeToSpendBlock safe={data.safeToSpend} />
+          <EndOfMonthBlock plan={data.endOfMonth} onOpenTab={onOpenTab} />
           <Outlook
             forecast={data}
             months={months}

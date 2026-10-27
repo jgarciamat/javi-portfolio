@@ -33,8 +33,10 @@ const saving = f.transaction({
   date: '2026-03-10',
 });
 
-function setup(overview = f.overview({ transactions: [dinner, salary, saving] })) {
-  const api = createFakeApi();
+function setup(
+  overview = f.overview({ transactions: [dinner, salary, saving] }),
+  api = createFakeApi()
+) {
   api.monthApi.get.mockResolvedValue(overview);
   api.categoryApi.getAll.mockResolvedValue(categories);
   api.accountApi.getAll.mockResolvedValue({ accounts, total: 1000 });
@@ -206,10 +208,9 @@ describe('new movement form', () => {
     fireEvent.change(screen.getByRole('spinbutton', { name: tr('app.transaction.form.amount') }), {
       target: { value: amount },
     });
-    fireEvent.change(
-      screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
-      { target: { value: category } }
-    );
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.category') }), {
+      target: { value: category },
+    });
   };
 
   it('validates, saves and reloads the month', async () => {
@@ -264,14 +265,78 @@ describe('new movement form', () => {
     ).toHaveValue('');
   });
 
+  it('suggests the category from the concept until one is chosen', async () => {
+    const api = createFakeApi();
+    api.categoryRuleApi.getAll.mockResolvedValue([
+      { id: 'r1', pattern: 'nomina', categoryId: 'c2', categoryName: 'Salario' },
+      { id: 'r2', pattern: 'gimnasio', categoryId: 'c9', categoryName: 'Deporte' },
+    ]);
+    setup(undefined, api);
+    await screen.findByText('Cena');
+    open();
+    const description = screen.getByRole('textbox', {
+      name: tr('app.transaction.form.description'),
+    });
+    const category = screen.getByRole('combobox', { name: tr('app.transaction.form.category') });
+    const type = screen.getByRole('combobox', { name: tr('app.transaction.form.type') });
+    // One letter is not a concept yet.
+    fireEvent.change(description, { target: { value: 'N' } });
+    expect(category).toHaveValue('');
+    // A rule of the person (accents and case aside).
+    fireEvent.change(description, { target: { value: 'Nómina marzo' } });
+    await waitFor(() => expect(category).toHaveValue('Salario'));
+    expect(screen.getByText(tr('app.transaction.form.categorySuggested'))).toBeInTheDocument();
+    // A rule pointing at a category the person no longer has: the last one used instead.
+    fireEvent.change(description, { target: { value: 'Gimnasio' } });
+    await waitFor(() => expect(category).toHaveValue('Ocio'));
+    // No movement of that type yet: nothing to go by.
+    fireEvent.change(type, { target: { value: 'SAVING' } });
+    fireEvent.change(description, { target: { value: 'Algo nuevo' } });
+    await waitFor(() => expect(category).toHaveValue(''));
+    fireEvent.change(type, { target: { value: 'EXPENSE' } });
+    // Chosen by hand: the concept no longer changes it.
+    fireEvent.change(category, { target: { value: 'Salario' } });
+    fireEvent.change(description, { target: { value: 'Cena con amigos' } });
+    expect(category).toHaveValue('Salario');
+    expect(screen.queryByText(tr('app.transaction.form.categorySuggested'))).toBeNull();
+  });
+
+  it('says next to the category that it is missing, and saves once chosen', async () => {
+    const { api } = setup(f.overview({ transactions: [salary] }));
+    await screen.findByText('Nómina');
+    open();
+    fireEvent.change(
+      screen.getByRole('textbox', { name: tr('app.transaction.form.description') }),
+      { target: { value: 'Café' } }
+    );
+    fireEvent.change(screen.getByRole('spinbutton', { name: tr('app.transaction.form.amount') }), {
+      target: { value: '1.5' },
+    });
+    const category = screen.getByRole('combobox', { name: tr('app.transaction.form.category') });
+    expect(category).toHaveValue('');
+    fireEvent.click(screen.getByRole('button', { name: tr('app.transaction.form.save') }));
+    const message = await screen.findByText(tr('app.transaction.form.categoryRequired'));
+    expect(category).toHaveAttribute('aria-invalid', 'true');
+    expect(category.getAttribute('aria-describedby')).toContain(message.id);
+    expect(category).toHaveFocus();
+    expect(api.transactionApi.create).not.toHaveBeenCalled();
+    fireEvent.change(category, { target: { value: 'Ocio' } });
+    expect(screen.queryByText(tr('app.transaction.form.categoryRequired'))).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.transaction.form.save') }));
+    await waitFor(() =>
+      expect(api.transactionApi.create).toHaveBeenCalledWith(
+        expect.objectContaining({ description: 'Café', amount: 1.5, category: 'Ocio' })
+      )
+    );
+  });
+
   it('opens the category manager from the category select', async () => {
     setup();
     await screen.findByText('Cena');
     open();
-    fireEvent.change(
-      screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
-      { target: { value: '__manage__' } }
-    );
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.transaction.form.category') }), {
+      target: { value: '__manage__' },
+    });
     expect(
       await screen.findByRole('dialog', { name: tr('app.category.manager.title') })
     ).toBeInTheDocument();
@@ -351,9 +416,34 @@ describe('movements table', () => {
     restore();
   });
 
-  it('shows an empty state without movements', async () => {
+  it('shows how to start on a month without movements, and nothing that needs them', async () => {
     setup(f.overview({ transactions: [] }));
-    expect(await screen.findByText(tr('app.transaction.table.empty'))).toBeInTheDocument();
+    const panel = await screen.findByRole('region', { name: tr('app.emptyMonth.title') });
+    const option = (key: string) =>
+      within(panel).getByRole('button', { name: new RegExp(tr(key)) });
+    // No exports, recap, list or adviser yet.
+    expect(screen.queryByRole('button', { name: literal(tr('app.export.month')) })).toBeNull();
+    expect(screen.queryByRole('button', { name: literal(tr('app.recap.open')) })).toBeNull();
+    expect(screen.queryByText(tr('app.transaction.table.empty'))).toBeNull();
+    expect(screen.queryByRole('button', { name: /Analizar mes/ })).toBeNull();
+    // «Paste text or a screenshot» opens the importer on its tab.
+    fireEvent.click(option('app.emptyMonth.paste'));
+    const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    expect(
+      within(dialog).getByRole('tab', { name: new RegExp(tr('app.import.source.paste')) })
+    ).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
+    fireEvent.click(option('app.emptyMonth.import'));
+    const again = await screen.findByRole('dialog', { name: tr('app.import.title') });
+    expect(
+      within(again).getByRole('tab', { name: new RegExp(tr('app.import.source.file')) })
+    ).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(within(again).getAllByRole('button', { name: tr('app.common.close') })[0]);
+    // «Note down an expense» opens the form.
+    const form = screen.getByRole('button', { name: new RegExp(tr('app.transaction.form.title')) });
+    expect(form).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(option('app.emptyMonth.add'));
+    await waitFor(() => expect(form).toHaveAttribute('aria-expanded', 'true'));
   });
 });
 
@@ -370,11 +460,11 @@ describe('week and calendar views', () => {
     expect(screen.queryByText('Hucha')).toBeNull();
   });
 
-  it('shows the empty week view', async () => {
+  it('shows no view tabs without movements', async () => {
     setup(f.overview({ transactions: [] }));
-    await screen.findByText(tr('app.transaction.table.empty'));
+    await screen.findByRole('region', { name: tr('app.emptyMonth.title') });
     // Without movements there are no view tabs; the week view itself handles empty lists.
-    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.queryByRole('tablist', { name: tr('app.transactions.viewMode') })).toBeNull();
   });
 
   it('opens the movements of a calendar day', async () => {
@@ -485,7 +575,7 @@ describe('editing a movement', () => {
     dialog = screen.getByRole('dialog', { name: tr('app.transaction.edit.title') });
     fireEvent.change(
       within(dialog).getByRole('combobox', {
-        name: tr('app.transaction.form.category.placeholder'),
+        name: tr('app.transaction.form.category'),
       }),
       { target: { value: '__manage__' } }
     );

@@ -52,7 +52,8 @@ export default defineConfig({
       },
     },
     {
-      command: `npx vite --port ${WEB_PORT} --strictPort`,
+      // public/ocr is not in git: the receipt and screenshot reader needs it, as `npm run dev` does.
+      command: `node scripts/copy-ocr.mjs && npx vite --port ${WEB_PORT} --strictPort`,
       url: `http://localhost:${WEB_PORT}`,
       timeout: 120_000,
       env: { VITE_API_URL: `http://localhost:${API_PORT}/api` },
