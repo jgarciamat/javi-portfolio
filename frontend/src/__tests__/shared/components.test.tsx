@@ -9,6 +9,7 @@ import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 import { PublicHeader } from '@shared/components/PublicHeader';
+import { setSessionOpen } from '@shared/hooks/sessionSignal';
 import { pwaState } from '../../__mocks__/pwaRegister';
 import { renderWithI18n, renderWithProviders, tr } from '@test-utils/render';
 
@@ -251,8 +252,22 @@ describe('ConfirmDeleteModal', () => {
 });
 
 describe('UpdatePrompt', () => {
+  beforeEach(() => act(() => setSessionOpen(true)));
   afterEach(() => {
     pwaState.needRefresh = false;
+    pwaState.renders = 0;
+    act(() => setSessionOpen(false));
+  });
+
+  it('registers no service worker for visitors without a session, until they sign in', () => {
+    act(() => setSessionOpen(false));
+    pwaState.needRefresh = true;
+    renderWithI18n(<UpdatePrompt />);
+    expect(pwaState.renders).toBe(0);
+    expect(screen.queryByRole('status')).toBeNull();
+    act(() => setSessionOpen(true));
+    expect(pwaState.renders).toBeGreaterThan(0);
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('is hidden until a new version is ready', () => {

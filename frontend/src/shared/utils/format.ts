@@ -31,12 +31,14 @@ export function formatMoney(
   }).format(amount);
 }
 
+/** «7,5 %» in Spanish (a non-breaking space, as the texts and the amounts write it), «7.5%» in English. */
 export function formatPercent(value: number, locale: string, digits = 1): string {
-  return `${new Intl.NumberFormat(intlLocale(locale), {
+  const figure = new Intl.NumberFormat(intlLocale(locale), {
     ...GROUP,
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  }).format(value)}%`;
+  }).format(value);
+  return `${figure}${locale === 'en' ? '' : '\u00a0'}%`;
 }
 
 /** "marzo" / "March" (long) or "mar" / "Mar" (short). */

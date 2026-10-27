@@ -238,14 +238,23 @@
 }
 
 /* While the forecast loads, the panel keeps the height it will have with the end of the month and
-   six months ahead (measured: ~1385 px on a phone, ~1030 px on a 1280 px screen) so the content
-   below does not jump when the data arrives. */
+   six months ahead (body measured on 27-10-2026: 1324 px on a phone, 929 px on a 1280 px screen)
+   so the content below does not jump when the data arrives. The free plan shows next month only
+   and the Premium notice instead of «what if…»: 1149 px and 793 px. */
 .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
-  min-height: 1330px;
+  min-height: 1320px;
+}
+
+.forecast-panel--loading.forecast-panel--free .collapsible-body--open .collapsible-body-inner {
+  min-height: 1145px;
 }
 
 @media (min-width: 768px) {
   .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
-    min-height: 975px;
+    min-height: 925px;
+  }
+
+  .forecast-panel--loading.forecast-panel--free .collapsible-body--open .collapsible-body-inner {
+    min-height: 790px;
   }
 }

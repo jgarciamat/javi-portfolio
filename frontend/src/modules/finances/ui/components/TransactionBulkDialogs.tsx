@@ -61,7 +61,10 @@ export function BulkDeleteModal({
   const { t } = useI18n();
   const format = useFormat();
   const facts = selectionFacts(items);
-  const title = t('app.bulk.delete.title', { count: items.length });
+  const title =
+    items.length === 1
+      ? t('app.bulk.delete.titleOne')
+      : t('app.bulk.delete.title', { count: items.length });
   return (
     <Modal
       label={title}

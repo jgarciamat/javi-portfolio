@@ -111,8 +111,9 @@ export function useFormat() {
     () => ({
       locale,
       currency,
+      // «−1.371,74 €» with the typographic minus, the same sign as the list of movements.
       money: (amount: number, options?: { decimals?: boolean; signed?: boolean }) =>
-        formatMoney(amount, currency, locale, options),
+        formatMoney(amount, currency, locale, options).replace('-', '\u2212'),
       percent: (value: number, digits?: number) => formatPercent(value, locale, digits),
       monthName: (month: number, style?: 'long' | 'short') => monthName(month, locale, style),
       monthLabel: (year: number, month: number) => monthLabel(year, month, locale),

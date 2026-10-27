@@ -492,7 +492,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
   return (
     <div className="modal-body">
       <p className="section-hint">
-        {t('app.import.previewSummary', {
+        {t(preview.imported === 1 ? 'app.import.previewSummaryOne' : 'app.import.previewSummary', {
           imported: preview.imported,
           duplicates: preview.duplicates,
           invalid: preview.invalid,

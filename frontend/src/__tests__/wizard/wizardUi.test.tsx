@@ -89,7 +89,32 @@ beforeEach(() => {
   document.documentElement.className = '';
 });
 
+/** One screen that can only be answered: no skip button and no line of its own. */
+function OnlyAnswer() {
+  const controls = useWizardProgress(KEY, DEFS);
+  const screens = [{ id: 'q', title: 'Pick one', ready: false, noSkip: true, body: <p>Q</p> }];
+  return (
+    <Wizard
+      flow="test"
+      defs={DEFS}
+      steps={[
+        { id: 'one', title: 'First step', icon: 'user', badge: 'Starter', screens },
+        { id: 'two', title: 'Second step', icon: 'home', badge: 'Finisher', screens },
+      ]}
+      controls={controls}
+      onRestart={controls.restart}
+      finale={null}
+    />
+  );
+}
+
 describe('the assistant, one screen at a time', () => {
+  it('names no skip button the screen does not have', () => {
+    renderWithProviders(<OnlyAnswer />, { authenticated: false });
+    expect(screen.getByText(tr('wizard.answerFirstOnly'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('wizard.skip') })).toBeNull();
+  });
+
   it('locks the way on until the screen is answered, and the next step until this one is done', () => {
     renderWithProviders(<Harness />, { authenticated: false });
     expect(screen.getByRole('heading', { name: 'Which colour?' })).toBeInTheDocument();
@@ -152,7 +177,7 @@ describe('the assistant, one screen at a time', () => {
     expect(screen.getByRole('heading', { name: 'Just so you know' })).toBeInTheDocument();
     fireEvent.click(finish(1));
     expect(screen.getByRole('button', { name: tr('wizard.finishAll') })).toBeDisabled();
-    expect(screen.getByText(tr('wizard.answerFirst'))).toBeInTheDocument();
+    expect(screen.getByText(tr('wizard.answerFirst', { skip: 'No idea' }))).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'No idea' }));
 
     expect(screen.getByRole('heading', { name: tr('wizard.finaleTitle') })).toHaveFocus();

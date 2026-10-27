@@ -152,6 +152,8 @@ export interface AnnualSummary {
   year: number;
   openingBalance?: number;
   months: Record<number, MonthData>;
+  /** Automatic operations dated after today, already counted in `months` (said on screen). */
+  scheduled?: { count: number; income: number; expenses: number; saving: number };
 }
 
 // ─── Search ──────────────────────────────────────────────────────────────────

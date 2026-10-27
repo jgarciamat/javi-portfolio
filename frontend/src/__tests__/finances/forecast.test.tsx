@@ -51,6 +51,8 @@ describe('Forecast panel', () => {
     expect(rows).toHaveLength(3); // header + 2 projected months
     expect(within(rows[1]).getByText(/1\.?200/)).toBeInTheDocument();
     expect(api.insightsApi.forecast).toHaveBeenCalledWith(6, []);
+    // Once: it waits for the month instead of asking again when the balance arrives.
+    expect(api.insightsApi.forecast).toHaveBeenCalledTimes(1);
   });
 
   it('asks again for another range and for scenarios without a recurring expense', async () => {
@@ -69,6 +71,23 @@ describe('Forecast panel', () => {
     await waitFor(() => expect(api.insightsApi.forecast).toHaveBeenLastCalledWith(3, []));
   });
 
+  it('shows each scenario with the period of its rule, not always «/mes»', async () => {
+    const rule = (id: string, frequency: 'bimonthly' | 'quarterly' | 'yearly') => ({
+      id,
+      description: `Seguro ${id}`,
+      type: 'EXPENSE' as const,
+      amount: 180,
+      frequency,
+    });
+    setup(
+      f.forecast({ rules: [rule('a', 'yearly'), rule('b', 'quarterly'), rule('c', 'bimonthly')] })
+    );
+    const view = await panel();
+    expect(await view.findByLabelText(/Sin Seguro a \(180,00 €\/año\)/)).toBeInTheDocument();
+    expect(view.getByLabelText(/Sin Seguro b \(180,00 €\/trimestre\)/)).toBeInTheDocument();
+    expect(view.getByLabelText(/Sin Seguro c \(180,00 € cada 2 meses\)/)).toBeInTheDocument();
+  });
+
   it('warns about the month the money runs out and flags negative balances', async () => {
     const base = f.forecast();
     const projection = base.projection!.map((p, i) => (i === 1 ? { ...p, endAvailable: -50 } : p));
@@ -81,7 +100,7 @@ describe('Forecast panel', () => {
     );
     const view = await panel();
     expect(await view.findByRole('alert')).toHaveTextContent(/te quedarías sin saldo en/);
-    expect(view.getByText(/-50/).closest('td')).toHaveClass('forecast-negative');
+    expect(view.getByText(/−50/).closest('td')).toHaveClass('forecast-negative');
     expect(view.queryByRole('group', whatIf)).toBeNull();
   });
 

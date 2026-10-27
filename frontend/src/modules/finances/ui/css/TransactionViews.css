@@ -33,6 +33,16 @@
   background: color-mix(in srgb, var(--slate-800) 14%, transparent);
 }
 
+/* Three short labels: on a phone they keep their whole text instead of the «P…» of the
+   section tabs (the strip scrolls sideways if a long translation needs it). */
+@media (max-width: 600px) {
+  .tx-tabs .tab-btn {
+    max-width: none;
+    flex-shrink: 0;
+    padding: 0.5rem 0.65rem;
+  }
+}
+
 /* ─── Week view ───────────────────────────────── */
 .tx-week-list {
   display: flex;

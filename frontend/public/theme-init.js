@@ -29,6 +29,9 @@
       if (/\.css$/.test(href)) {
         link.rel = 'preload';
         link.as = 'style';
+        // Vite asks for these with crossorigin: without it the preload is not reused and the
+        // stylesheet downloads twice.
+        link.crossOrigin = '';
       } else {
         link.rel = 'modulepreload';
       }

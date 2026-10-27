@@ -4,6 +4,7 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { buildAnnualChartData, type AnnualMonthEntry } from '@modules/finances/domain/annual';
 import { isBeyondHorizon } from '@modules/finances/domain/nextMonthLogic';
+import type { AnnualSummary } from '@modules/finances/domain/types';
 import { useAction } from '@shared/hooks/useAction';
 import { useFinances } from '../../application/FinancesContext';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
@@ -130,6 +131,28 @@ function MonthTable({
   );
 }
 
+/**
+ * The automatic operations dated after today already count in the year (they are noted when
+ * their month is prepared): said in one line, so the balance is not read as money that moved.
+ */
+function ScheduledNote({ data }: { data: AnnualSummary | null | undefined }) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const scheduled = data?.scheduled;
+  if (!scheduled || scheduled.count === 0) return null;
+  const vars = {
+    count: scheduled.count,
+    expenses: money(scheduled.expenses),
+    income: money(scheduled.income),
+  };
+  return (
+    <p className="section-hint annual-scheduled">
+      <Icon name="repeat" />{' '}
+      {scheduled.count === 1 ? t('app.annual.scheduledOne', vars) : t('app.annual.scheduled', vars)}
+    </p>
+  );
+}
+
 /** Income, expenses and saving of every month of a year. */
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
   const chart = useAnnualChart(initialYear, useFinances().currentPeriod);
@@ -180,6 +203,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
           {year + 1} ›
         </button>
       </nav>
+      <ScheduledNote data={data} />
 
       {months.length > 0 && (
         <div className="month-actions" role="group" aria-label={t('app.export.options')}>

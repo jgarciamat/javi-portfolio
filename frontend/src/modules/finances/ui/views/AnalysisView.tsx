@@ -93,30 +93,33 @@ function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
           </polyline>
         ))}
       </svg>
-      {/* The same figures as text, for screen readers. */}
-      <table className="sr-only">
-        <caption>{t('app.analysis.netWorthTitle')}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{t('app.analysis.month')}</th>
-            {SERIES.map((s) => (
-              <th key={s.key} scope="col">
-                {t(s.labelKey)}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {points.map((p) => (
-            <tr key={`${p.year}-${p.month}`}>
-              <th scope="row">{monthLabel(p.year, p.month)}</th>
+      {/* The same figures as text, for screen readers. In a div: a table ignores the 1 px width
+          of .sr-only and widened the page on a phone. */}
+      <div className="sr-only">
+        <table>
+          <caption>{t('app.analysis.netWorthTitle')}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('app.analysis.month')}</th>
               {SERIES.map((s) => (
-                <td key={s.key}>{money(p[s.key])}</td>
+                <th key={s.key} scope="col">
+                  {t(s.labelKey)}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {points.map((p) => (
+              <tr key={`${p.year}-${p.month}`}>
+                <th scope="row">{monthLabel(p.year, p.month)}</th>
+                {SERIES.map((s) => (
+                  <td key={s.key}>{money(p[s.key])}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <figcaption className="chart-legend">
         {SERIES.map((s) => (
           <span key={s.key}>

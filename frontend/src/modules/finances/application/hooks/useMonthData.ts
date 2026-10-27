@@ -15,7 +15,8 @@ const keyOf = (year: number, month: number) => `${year}-${month}`;
  */
 export function useMonthData(monthApi: MonthApi, year: number, month: number, enabled: boolean) {
   const [overview, setOverview] = useState<MonthOverview | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Loading from the first paint: the month is not shown as empty while its data travels.
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const cache = useRef(new Map<string, MonthOverview>());
   const latest = useRef(0);

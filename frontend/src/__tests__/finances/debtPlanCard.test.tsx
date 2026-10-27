@@ -47,6 +47,8 @@ describe('Debt payoff plan', () => {
       .getAllByRole('listitem')
       .filter((li) => /saldada en/.test(li.textContent ?? ''));
     expect(order).toHaveLength(2);
+    // «febrero de 2028», in lower case as in Metas, not «Febrero 2028».
+    expect(order[0].textContent).toMatch(/saldada en [a-z]+ de \d{4}/);
     expect(
       view.getByPlaceholderText(tr('app.debt.minEstimated', { amount: 10 }))
     ).toBeInTheDocument();

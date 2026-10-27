@@ -188,7 +188,8 @@ describe('bulk delete', () => {
     await screen.findByText('Cena');
     fireEvent.click(box('Cena'));
     fireEvent.click(action('delete'));
-    const one = screen.getByRole('dialog', { name: tr('app.bulk.delete.title', { count: 1 }) });
+    // «¿Borrar 1 transacción?», in the singular.
+    const one = screen.getByRole('dialog', { name: tr('app.bulk.delete.titleOne') });
     expect(within(one).queryByText(/Podrás|recurrente/)).toBeInTheDocument();
     fireEvent.click(
       within(one).getByRole('button', { name: tr('app.bulk.delete.confirm', { count: 1 }) })
@@ -245,8 +246,8 @@ describe('bulk changes', () => {
       screen.getByText(`2 · ${tr('app.bulk.reason.INSUFFICIENT_BALANCE')}`)
     ).toBeInTheDocument();
     expect(screen.getByText('1 · Motivo del servidor')).toBeInTheDocument();
-    // The selection stays for another change.
-    expect(bar()).toBeInTheDocument();
+    // Applied: the selection is cleared and the bar closes, as after a delete.
+    expect(screen.queryByRole('region', { name: tr('app.bulk.region') })).toBeNull();
     await waitFor(() => expect(api.monthApi.get.mock.calls.length).toBeGreaterThan(1));
   });
 
@@ -342,6 +343,7 @@ describe('bulk changes', () => {
       })
     );
 
+    fireEvent.click(headerBox());
     fireEvent.click(action('notes'));
     dialog = screen.getByRole('dialog', { name: tr('app.bulk.edit.notes') });
     fireEvent.click(within(dialog).getByRole('radio', { name: tr('app.bulk.notes.append') }));
@@ -360,6 +362,7 @@ describe('bulk changes', () => {
       })
     );
 
+    fireEvent.click(headerBox());
     fireEvent.click(action('notes'));
     dialog = screen.getByRole('dialog', { name: tr('app.bulk.edit.notes') });
     fireEvent.click(within(dialog).getByRole('radio', { name: tr('app.bulk.notes.replace') }));

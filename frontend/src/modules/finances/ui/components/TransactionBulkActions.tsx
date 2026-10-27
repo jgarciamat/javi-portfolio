@@ -150,9 +150,10 @@ export function TransactionBulkActions({ selection, transactions, bulk, matching
           items={items}
           onCancel={close}
           onApply={(ids, changes) => {
-            // The selection stays, so another change can follow.
+            // Done with these rows: the bar closes, as after a delete (the outcome stays above).
             close();
             void bulk.update(ids, changes);
+            selection.clear();
           }}
         />
       )}

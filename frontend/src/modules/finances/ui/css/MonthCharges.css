@@ -1,0 +1,47 @@
+/* ─── «Recibos y cargos de este mes» ──────────────────────────────────────── */
+
+.month-charges-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.month-charges-facts div {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: var(--slate-800);
+}
+
+.month-charges-facts dt {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+.month-charges-facts dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.month-charges-facts small {
+  font-weight: 400;
+  color: var(--slate-400);
+}
+
+/* The amount over its state («Cobrado» / «Pendiente»), at the right of the row. */
+.month-charges-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin-left: auto;
+}
+
+.month-charges-amount .pill {
+  margin-left: 0;
+}
+
+.month-charges .section-hint:last-child {
+  margin: 0.75rem 0 0;
+}

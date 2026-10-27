@@ -101,7 +101,8 @@ describe('useFormat', () => {
     const f = result.current.format;
     expect(f.currency).toBe('EUR');
     expect(f.money(1234.5)).toMatch(/^1.234,50\s€$/);
-    expect(f.percent(12.34)).toBe('12,3%');
+    expect(f.percent(12.34)).toBe('12,3\u00a0%');
+    expect(f.money(-5)).toMatch(/^\u22125,00\s€$/);
     expect(f.monthName(3)).toBe('Marzo');
     expect(f.monthLabel(2026, 3)).toBe('Marzo 2026');
     expect(f.date('2026-03-04')).toBe('4 mar 2026');

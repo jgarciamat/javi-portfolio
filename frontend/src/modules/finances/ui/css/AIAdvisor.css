@@ -295,8 +295,13 @@
     justify-content: flex-end;
   }
 
+  /* No bottom padding while closed: it kept a 1rem slice of the hint visible, cut in half. */
   .ai-advisor-body-inner {
-    padding: 0 1rem 1rem;
+    padding: 0 1rem;
+  }
+
+  .ai-advisor-body--open .ai-advisor-body-inner {
+    padding-bottom: 1rem;
   }
 
   .ai-btn {

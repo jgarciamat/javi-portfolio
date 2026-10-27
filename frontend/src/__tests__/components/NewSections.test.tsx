@@ -438,7 +438,7 @@ describe('AnalysisView', () => {
     });
     render(<AnalysisView onOpenTab={jest.fn()} />);
     const row = (await screen.findByText('Ocio')).closest('tr')!;
-    expect(within(row).getByText(/▲ 33%/)).toBeInTheDocument();
+    expect(within(row).getByText(/▲ 33\s%/)).toBeInTheDocument();
     expect(
       await screen.findByRole('img', { name: t('app.analysis.netWorthTitle') })
     ).toBeInTheDocument();

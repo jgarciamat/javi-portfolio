@@ -61,7 +61,7 @@ describe('Financial health', () => {
     for (const id of ['saving', 'cushion', 'debt', 'budgets']) {
       expect(screen.getByText(tr(`app.health.pillar.${id}`))).toBeInTheDocument();
     }
-    expect(screen.getByText(/Ahorras el 20%/)).toBeInTheDocument();
+    expect(screen.getByText(/Ahorras el 20\s%/)).toBeInTheDocument();
     expect(screen.getByText(/cubre 6 meses de gastos/)).toBeInTheDocument();
   });
 
@@ -71,6 +71,14 @@ describe('Financial health', () => {
       previous: f.overview({ summary: f.summary({ totalExpenses: 3000 }) }),
     });
     expect(await screen.findByText(/cubre 2 meses de gastos/)).toBeInTheDocument();
+  });
+
+  it('writes the months of cushion with a decimal comma in Spanish', async () => {
+    setup({
+      overview: { summary: f.summary({ totalIncome: 2000, totalSaving: 0, totalExpenses: 50 }) },
+      previous: f.overview({ summary: f.summary({ totalExpenses: 4000 }) }),
+    });
+    expect(await screen.findByText(/cubre 1,5 meses de gastos/)).toBeInTheDocument();
   });
 
   it('says «1 month», and the points with the decimal mark of the language', async () => {
@@ -87,7 +95,7 @@ describe('Financial health', () => {
       overview: { summary: f.summary({ totalIncome: 1000, totalSaving: 0, totalExpenses: 500 }) },
       assets: [f.asset({ kind: 'debt', value: 12000 }), f.asset({ kind: 'investment', value: 99 })],
     });
-    expect(await screen.findByText(/Tus deudas son el 100%/)).toBeInTheDocument();
+    expect(await screen.findByText(/Tus deudas son el 100\s%/)).toBeInTheDocument();
     expect(screen.queryByText(tr('app.health.noDebts'))).toBeNull();
   });
 

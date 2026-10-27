@@ -612,3 +612,67 @@ describe('AI advisor', () => {
     expect(await screen.findByText(/IA caída/)).toBeInTheDocument();
   });
 });
+
+describe('«Recibos y cargos de este mes»', () => {
+  const gym = (id: string, date: string) =>
+    f.transaction({
+      id,
+      description: `Gimnasio ${date}`,
+      amount: 30,
+      category: 'Salud',
+      date,
+      recurringRuleId: 'r-gym',
+    });
+
+  it('lists the automatic expenses apart, with the total and what is still to come', async () => {
+    const payroll = f.transaction({ ...salary, id: 't9', recurringRuleId: 'r-pay' });
+    setup(
+      f.overview({
+        transactions: [dinner, payroll, gym('g1', '2026-03-05'), gym('g2', '2026-03-28')],
+      })
+    );
+    const card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    const rows = card.getAllByRole('listitem');
+    // Only the expenses (not the payroll), by date: the charged one, then the one to come.
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('Gimnasio 2026-03-05');
+    expect(rows[0]).toHaveTextContent(tr('app.charges.status.done'));
+    expect(rows[1]).toHaveTextContent(tr('app.charges.status.pending'));
+    expect(card.getByText(tr('app.charges.total')).nextSibling).toHaveTextContent(/^60,00\s€$/);
+    expect(card.getByText(tr('app.charges.pending')).nextSibling).toHaveTextContent(
+      /^30,00\s€ · 1 cargo$/
+    );
+    expect(card.getByText(tr('app.charges.pendingNote'))).toBeInTheDocument();
+    // The one still to come is not among the movements of the month; the charged one is.
+    expect(screen.getAllByText('Gimnasio 2026-03-28')).toHaveLength(1);
+    expect(screen.getAllByText('Gimnasio 2026-03-05').length).toBeGreaterThan(1);
+    // A row opens the movement, to change it or remove it this month.
+    fireEvent.click(within(rows[1]).getByRole('button'));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('counts several pending charges and is hidden without automatic expenses', async () => {
+    const { unmount } = setup(
+      f.overview({
+        transactions: [dinner, gym('g2', '2026-03-28'), gym('g3', '2026-03-29')],
+      })
+    );
+    const card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    expect(card.getByText(tr('app.charges.pending')).nextSibling).toHaveTextContent(
+      /^60,00\s€ · 2 cargos$/
+    );
+    unmount();
+    setup();
+    await screen.findAllByText('Cena');
+    expect(screen.queryByRole('region', { name: tr('app.charges.title') })).toBeNull();
+  });
+
+  it('says «del mes» in another month, where everything was already charged', async () => {
+    setup(f.overview({ transactions: [dinner, gym('g1', '2026-02-05')] }));
+    await screen.findByRole('region', { name: tr('app.charges.title') });
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.nav.prev')) }));
+    const card = within(await screen.findByRole('region', { name: tr('app.charges.titleOther') }));
+    expect(card.getByText(tr('app.charges.pending')).nextSibling).toHaveTextContent(/^0,00\s€$/);
+    expect(card.queryByText(tr('app.charges.pendingNote'))).toBeNull();
+  });
+});
