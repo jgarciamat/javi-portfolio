@@ -70,6 +70,28 @@ describe('Renta section', () => {
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 
+  it('shows the year in the accounts as a reference note that a new return keeps', async () => {
+    const api = createFakeApi();
+    api.transactionApi.getAnnual.mockResolvedValue({ year: 2025, months: { 1: month(900, 300) } });
+    renderWithProviders(<RentaView />, { api });
+    const note = await screen.findByRole('complementary', { name: tr('app.renta.figuresLabel') });
+    expect(note).toHaveClass('renta-reference-note');
+    await within(note).findByText(/en 2025 entraron .*900.* y salieron .*300.*/);
+    // A note, not a field of the return.
+    expect(within(note).queryByRole('textbox')).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.gross')), {
+      target: { value: '30000' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
+    expect(
+      within(screen.getByRole('complementary', { name: tr('app.renta.figuresLabel') })).getByText(
+        /entraron .*900/
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).not.toHaveValue('30000');
+  });
+
   it('does the calculation inside the app, without a link to the public page', async () => {
     renderWithProviders(<RentaView />);
     expect(await screen.findByText(tr('tools.renta.step1'))).toBeInTheDocument();

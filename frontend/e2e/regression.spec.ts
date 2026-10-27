@@ -176,3 +176,16 @@ test('«Recibos y cargos de este mes» lists the automatic charges apart', async
     await card.screenshot({ path: `${SHOTS}/recibos-y-cargos-${width}.png` });
   }
 });
+
+test('Renta: the year in the accounts is a reference note, apart from the return', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await signIn(page);
+  await openSection(page, 'Renta (IRPF)');
+  const note = page.getByRole('complementary', { name: 'Referencia (no es tu declaración)' });
+  await expect(note).toBeVisible();
+  await expect(note).toContainText('entraron');
+  await note.scrollIntoViewIfNeeded();
+  await note.screenshot({ path: `${SHOTS}/renta-referencia-1280.png` });
+});

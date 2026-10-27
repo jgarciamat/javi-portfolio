@@ -392,6 +392,27 @@
   color: var(--slate-400);
 }
 
+/* Renta: what the accounts recorded in the year, a side note that is not part of the return. */
+.renta-reference-note {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--slate-700);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--slate-800) 45%, transparent);
+  font-size: 0.82rem;
+  color: var(--slate-400);
+}
+
+.renta-reference-note p {
+  margin: 0.2rem 0 0;
+}
+
+.renta-reference-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--slate-300);
+}
+
 /* Two goals on one category count the same savings: said on each card. */
 .goal-shared-note {
   margin: 0.5rem 0 0;

@@ -1855,6 +1855,7 @@
   "app.renta.year": "Año de la declaración",
   "app.renta.hint": "Comprueba si tienes que declarar y prepara lo que necesitas. Es una ayuda orientativa, no asesoramiento fiscal.",
   "app.renta.brought": "Hemos traído tu actividad de autónomo de {year}. La ves en el paso 6 («Si eres autónomo»), casilla por casilla.",
+  "app.renta.figuresLabel": "Referencia (no es tu declaración)",
   "app.renta.figures": "En tus cuentas de Finanverso, en {year} entraron {income} y salieron {expenses}. Son movimientos de dinero, no lo que declaras: tu actividad de autónomo sale de la sección Autónomos.",
   "app.renta.checklist": "Qué reunir antes de declarar",
   "app.renta.campaign": "La campaña de la Renta suele ir de abril a finales de junio. Confirma las fechas de este año en la Agencia Tributaria.",

@@ -108,9 +108,14 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
         <MobileFold summary={t('app.renta.fold')}>
           <p className="section-hint">{t('app.renta.hint')}</p>
           <CampaignDates exercise={year} />
-          <p>
-            {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
-          </p>
+          {/* What the accounts recorded, for reference: not part of the return, so «Start a new
+              return» leaves it (they are the person's own movements). */}
+          <aside className="renta-reference-note" aria-label={t('app.renta.figuresLabel')}>
+            <span className="renta-reference-label">{t('app.renta.figuresLabel')}</span>
+            <p>
+              {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
+            </p>
+          </aside>
         </MobileFold>
         <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
         {removals > 0 && !broughtActivity(year) && (

@@ -1855,6 +1855,7 @@
   "app.renta.year": "Tax year",
   "app.renta.hint": "Check whether you have to file and get what you need ready. It is an indicative aid, not tax advice.",
   "app.renta.brought": "Your self-employed activity of {year} is here. You see it in step 6 («If you are self-employed»), box by box.",
+  "app.renta.figuresLabel": "For reference (not your return)",
   "app.renta.figures": "In your Finanverso accounts, {income} came in and {expenses} went out in {year}. These are money movements, not what you declare: your self-employed activity comes from the self-employed section.",
   "app.renta.checklist": "What to gather before filing",
   "app.renta.campaign": "The filing campaign usually runs from April to the end of June. Confirm this year's dates with the Tax Agency.",
