@@ -88,6 +88,18 @@ describe('ImportModal', () => {
     ]);
   });
 
+  it("chooses the file with the app's own button: the browser's field stays hidden", () => {
+    setup();
+    const input = screen.getByLabelText<HTMLInputElement>(tr('app.import.file.choose'));
+    expect(input).not.toBeVisible();
+    expect(input.accept).toContain('.xlsm');
+    const button = screen.getByRole('button', { name: tr('app.import.file.choose') });
+    expect(button).toHaveAccessibleDescription(tr('app.import.file.formats'));
+    const opened = jest.spyOn(input, 'click');
+    fireEvent.click(button);
+    expect(opened).toHaveBeenCalled();
+  });
+
   it('names an Excel with macros as Excel too, and reads its first sheet', async () => {
     const { upload } = setup();
     const workbook = buildXlsx([
@@ -322,8 +334,9 @@ describe('ImportModal', () => {
 
     // Back to the mapping, opt in to the AI (remembered) and forward again.
     fireEvent.click(screen.getByRole('button', { name: tr('app.common.back') }));
-    const ai = screen.getByRole('checkbox', { name: new RegExp(tr('app.import.useAi')) });
+    const ai = screen.getByRole('checkbox', { name: tr('app.import.useAi') });
     expect(ai).not.toBeChecked();
+    expect(ai).toHaveAccessibleDescription(tr('app.import.useAiHint'));
     fireEvent.click(ai);
     expect(localStorage.getItem('mm_import_ai')).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
@@ -393,16 +406,19 @@ describe('ImportModal', () => {
     const { api, upload } = setup();
     upload(statement('solo una línea'));
     expect(await screen.findByText(tr('app.import.error.read'))).toBeInTheDocument();
+    // The file that could not be read is named under the button.
+    expect(screen.getByText(tr('app.import.file.chosen', { name: 'extracto.csv' }))).toBeVisible();
     upload(statement(csv));
     await screen.findByText(/extracto\.csv · CSV/);
     api.transactionApi.import.mockRejectedValueOnce(new Error('Demasiadas filas'));
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     expect(await screen.findByText('Demasiadas filas')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.otherFile') }));
-    expect(screen.getByText(tr('app.import.choose'))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr('app.import.file.choose') })).toBeInTheDocument();
+    expect(screen.queryByText(/^Elegido:/)).toBeNull();
     // Choosing nothing in the file dialog does nothing.
     fireEvent.change(document.querySelector('input[type="file"]')!, { target: { files: [] } });
-    expect(screen.getByText(tr('app.import.choose'))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr('app.import.file.choose') })).toBeInTheDocument();
   });
 
   it('cannot confirm a preview without new movements', async () => {

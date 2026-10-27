@@ -12,12 +12,13 @@ import type {
 import type { BankId } from '@modules/finances/domain/bankFormats';
 import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { SharedContent } from '@core/share/sharedImport';
 import { isImage, useImport } from '../../application/hooks/useImport';
 import {
   AMOUNT_CLASS,
   EditableRows,
+  FileChooser,
   type ImportSource,
   ImportSourceTabs,
   PastePanel,
@@ -172,17 +173,14 @@ function FilePanel({ imp }: { imp: ImportState }) {
       <p className="section-hint">{t('app.leaks.importTip')}</p>
       <FormatsHelp />
       <TemplateLink />
-      <label className="file-drop">
-        <input
-          type="file"
-          accept={IMPORT_ACCEPT}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void imp.loadFile(file);
-          }}
-        />
-        <span>{t('app.import.choose')}</span>
-      </label>
+      <FileChooser
+        label={t('app.import.file.choose')}
+        icon="upload"
+        accept={IMPORT_ACCEPT}
+        formats={t('app.import.file.formats')}
+        fileName={imp.fileName}
+        onFile={(file) => void imp.loadFile(file)}
+      />
     </>
   );
 }
@@ -230,7 +228,11 @@ function FileStep({
           <PastePanel onRead={imp.loadText} initialText={shared?.text ?? ''} />
         )}
         {source === 'screenshot' && (
-          <ScreenshotPanel reading={imp.reading} onImage={(image) => void imp.loadFile(image)} />
+          <ScreenshotPanel
+            reading={imp.reading}
+            fileName={imp.fileName}
+            onImage={(image) => void imp.loadFile(image)}
+          />
         )}
       </ImportSourceTabs>
     </FileDropZone>
@@ -370,6 +372,29 @@ function ImportedRows({ imp }: { imp: ImportState }) {
   );
 }
 
+/** The AI option, its label next to the box and one line on what it does. */
+function AiOption({ imp }: { imp: ImportState }) {
+  const { t } = useI18n();
+  const hintId = useId();
+  return (
+    <div className="import-ai">
+      <label className="import-ai-check">
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={imp.useAi}
+          aria-describedby={hintId}
+          onChange={(e) => imp.setUseAi(e.target.checked)}
+        />
+        <span>{t('app.import.useAi')}</span>
+      </label>
+      <p id={hintId} className="section-hint">
+        {t('app.import.useAiHint')}
+      </p>
+    </div>
+  );
+}
+
 function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
   const { t } = useI18n();
   return (
@@ -404,18 +429,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           </select>
         </label>
       )}
-      <label className="setting-row">
-        <span>
-          <strong>{t('app.import.useAi')}</strong>
-          <small>{t('app.import.useAiHint')}</small>
-        </span>
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={imp.useAi}
-          onChange={(e) => imp.setUseAi(e.target.checked)}
-        />
-      </label>
+      <AiOption imp={imp} />
       {editable(imp) ? (
         <EditableRows
           rows={imp.rows}

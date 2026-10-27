@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type ReactNode, useId, useState } from 'react';
+import { type KeyboardEvent, type ReactNode, useId, useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
 import { ScrollRegion } from '@shared/components/ScrollRegion';
@@ -118,14 +118,76 @@ export function PastePanel({
 }
 
 /**
+ * The app's own button to choose a file: the browser's field stays hidden (its label is the
+ * button's), the chosen file is named under it and a line says which formats are read. A file can
+ * also be dropped on the importer.
+ */
+export function FileChooser({
+  label,
+  icon,
+  accept,
+  formats,
+  fileName,
+  disabled,
+  onFile,
+}: {
+  label: string;
+  icon: 'upload' | 'image';
+  accept: string;
+  formats: string;
+  /** The file chosen, if any. */
+  fileName?: string;
+  disabled?: boolean;
+  onFile: (file: File) => void;
+}) {
+  const { t } = useI18n();
+  const input = useRef<HTMLInputElement>(null);
+  const formatsId = useId();
+  return (
+    <div className="import-file">
+      <input
+        ref={input}
+        type="file"
+        accept={accept}
+        hidden
+        aria-label={label}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = '';
+          if (file) onFile(file);
+        }}
+      />
+      <button
+        type="button"
+        className="btn-secondary import-file-button"
+        disabled={disabled}
+        aria-describedby={formatsId}
+        onClick={() => input.current?.click()}
+      >
+        <Icon name={icon} /> {label}
+      </button>
+      {fileName && (
+        <p className="import-file-name">{t('app.import.file.chosen', { name: fileName })}</p>
+      )}
+      <p id={formatsId} className="section-hint import-file-formats">
+        {formats}
+      </p>
+    </div>
+  );
+}
+
+/**
  * A screenshot of the bank's list of movements, read on the device. On a computer it can also be
  * dropped on the importer or pasted with Ctrl/Cmd+V.
  */
 export function ScreenshotPanel({
   reading,
+  fileName,
   onImage,
 }: {
   reading: boolean;
+  /** The image chosen, if any. */
+  fileName?: string;
   onImage: (image: File) => void;
 }) {
   const { t } = useI18n();
@@ -135,20 +197,15 @@ export function ScreenshotPanel({
       <p className="import-private">
         <Icon name="shield" /> {t('app.import.screenshot.private')}
       </p>
-      <label className="file-drop">
-        <input
-          type="file"
-          accept="image/*"
-          disabled={reading}
-          aria-label={t('app.import.screenshot.choose')}
-          onChange={(e) => {
-            const image = e.target.files?.[0];
-            if (image) onImage(image);
-            e.target.value = '';
-          }}
-        />
-        <span>{t('app.import.screenshot.choose')}</span>
-      </label>
+      <FileChooser
+        label={t('app.import.screenshot.choose')}
+        icon="image"
+        accept="image/*"
+        formats={t('app.import.screenshot.formats')}
+        fileName={fileName}
+        disabled={reading}
+        onFile={onImage}
+      />
       {reading && (
         <p className="section-hint" role="status">
           {t('app.import.screenshot.reading')}

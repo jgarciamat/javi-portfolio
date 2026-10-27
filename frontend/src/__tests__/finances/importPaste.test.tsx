@@ -151,7 +151,11 @@ describe('pasting movements in the importer', () => {
     fireEvent.keyDown(tabs, { key: 'Home' });
     fireEvent.keyDown(tabs, { key: 'a' });
     expect(file).toHaveFocus();
-    expect(within(screen.getByRole('tabpanel')).getByText(tr('app.import.choose'))).toBeVisible();
+    expect(
+      within(screen.getByRole('tabpanel')).getByRole('button', {
+        name: tr('app.import.file.choose'),
+      })
+    ).toBeVisible();
   });
 });
 

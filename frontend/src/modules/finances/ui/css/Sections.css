@@ -594,21 +594,62 @@
   overflow-y: auto;
 }
 
-.file-drop {
+.import-file {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   border: 2px dashed var(--slate-700);
   border-radius: 12px;
-  color: var(--slate-400);
-  cursor: pointer;
   text-align: center;
 }
 
-.file-drop input {
+.import-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   max-width: 100%;
+}
+
+.import-file-name {
+  margin: 0;
+  max-width: 100%;
+  color: var(--slate-200);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.import-file-formats {
+  margin: 0;
+}
+
+/* The AI option of the importer: the label next to its box, the line on what it does under it. */
+.import-ai {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+.import-ai-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--slate-200);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.import-ai-check .toggle {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.import-ai .section-hint {
+  margin: 0;
+  padding-left: 1.85rem;
 }
 
 /* ─── Month navigator extras ──────────────────────────────────────────────── */
@@ -1371,12 +1412,8 @@ button.entity-item {
   justify-items: start;
 }
 
-.import-paste .file-drop {
+.import-paste .import-file {
   justify-self: stretch;
-}
-
-.import-paste .file-drop input {
-  min-width: 0;
 }
 
 .import-paste-text {

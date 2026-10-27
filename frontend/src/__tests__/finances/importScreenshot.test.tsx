@@ -341,6 +341,11 @@ describe('the screenshot tab of the importer', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       tr('app.import.screenshot.reading')
     );
+    // While it is read, the image is named and another one cannot be chosen.
+    expect(screen.getByText(tr('app.import.file.chosen', { name: 'captura.png' }))).toBeVisible();
+    const choose = screen.getByRole('button', { name: tr('app.import.screenshot.choose') });
+    expect(choose).toBeDisabled();
+    expect(choose).toHaveAccessibleDescription(tr('app.import.screenshot.formats'));
     await act(async () => answer(ocrAnswer(lightBlocks)));
     expect(
       await screen.findByText(literal(tr('app.import.rowsFound', { count: 9 })))
