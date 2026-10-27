@@ -16,6 +16,10 @@ import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+jest.mock('@modules/tools/ui/renta/RentaWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').rentaWithForm()
+);
+
 // These suites drive the full form: the expert mode (the guided questions have their own).
 beforeEach(() => {
   localStorage.clear();

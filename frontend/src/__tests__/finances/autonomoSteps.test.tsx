@@ -7,6 +7,10 @@ import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const entry = (date: string, concept: string, base: number) => ({
   date,
   quarter: (Math.floor((Number(date.slice(5, 7)) - 1) / 3) + 1) as 1 | 2 | 3 | 4,

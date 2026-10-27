@@ -28,13 +28,14 @@ import * as f from '@test-utils/fixtures';
 import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { toManualData } from '@modules/finances/ui/components/AutonomoManual';
 import { vatDeductible } from '@modules/finances/domain/importChecks';
-import {
-  AUTONOMO_ASSISTANT_KEY,
-  AUTONOMO_WIZARD_KEY,
-} from '@modules/finances/domain/autonomoWizard';
+import { AUTONOMO_WIZARD_KEY } from '@modules/finances/domain/autonomoWizard';
 import { NEW_PROGRESS } from '@modules/wizard/domain/wizard';
 import { YEARS } from '@modules/finances/ui/components/useAutonomoDraft';
 import { freezeTime, restoreTime } from '@test-utils/time';
+
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
 
 /**
  * The screen of an activity in módulos (invented data). The taxi of objectiveModules.test.ts:
@@ -439,7 +440,7 @@ describe('módulos in the self-employed screen', () => {
     const { unmount } = open();
     expect(screen.getAllByText(m('resultTitle', { n: 4, year })).length).toBeGreaterThan(0);
     unmount();
-    localStorage.setItem(AUTONOMO_ASSISTANT_KEY, 'expert');
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
     open(jest.fn());
     expect(screen.getByText(m('resultTitle', { n: 4, year }))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();

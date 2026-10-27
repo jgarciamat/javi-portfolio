@@ -90,16 +90,6 @@ export function useWizardPrefs(): [WizardPrefs, (patch: Partial<WizardPrefs>) =>
   return [{ big: prefs.big, contrast: prefs.contrast }, change];
 }
 
-/** Step by step (the assistant) or everything together (expert mode): remembered on this device. */
-export function useAssistantMode(key: string): [boolean, (expert: boolean) => void] {
-  const [expert, setExpert] = useState(() => storage.get(key) === 'expert');
-  const change = (on: boolean) => {
-    storage.set(key, on ? 'expert' : 'steps');
-    setExpert(on);
-  };
-  return [expert, change];
-}
-
 /** Reads a text aloud with the voice of the device, when it has one. */
 export const canSpeak = () =>
   'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';

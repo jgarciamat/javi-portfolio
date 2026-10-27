@@ -20,6 +20,10 @@ import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const money = (n: number) => formatMoney(n, 'EUR', 'es');
 /** Text as Testing Library compares it: every space a plain one. */
 const spaced = (text: string) => text.replace(/\s/g, ' ');

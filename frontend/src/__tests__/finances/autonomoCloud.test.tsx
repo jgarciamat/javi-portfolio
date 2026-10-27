@@ -22,6 +22,10 @@ import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { translate } from '@core/i18n/I18nContext';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const NOW = '2027-01-18T12:00:00.000Z';
 
 /** The form with some fields set, as the account keeps it. */

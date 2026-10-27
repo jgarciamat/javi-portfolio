@@ -22,6 +22,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 const k = (key: string, values?: Record<string, string | number>) =>
   tr(`app.autonomo.activity.${key}`, values);
 const type = (label: string, value: string) =>

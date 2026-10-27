@@ -1,5 +1,5 @@
-import { act, fireEvent, screen } from '@testing-library/react';
-import { useState } from 'react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
+import { useState, type ReactNode } from 'react';
 import { useWizardProgress, PREFS_KEY, speak } from '@modules/wizard/application/useWizard';
 import { Choice } from '@modules/wizard/ui/Choice';
 import { Wizard, type WizardStepView } from '@modules/wizard/ui/Wizard';
@@ -12,7 +12,7 @@ const DEFS = [
 const KEY = 'test_wizard';
 
 /** Two steps: the first with a question and a screen with nothing to answer, the second with one. */
-function Harness({ onExpert = jest.fn(), onRestart = jest.fn() }) {
+function Harness({ onRestart = jest.fn(), extra = null as ReactNode }) {
   const controls = useWizardProgress(KEY, DEFS);
   const [colour, setColour] = useState<string | null>(null);
   const steps: WizardStepView[] = [
@@ -69,7 +69,7 @@ function Harness({ onExpert = jest.fn(), onRestart = jest.fn() }) {
       defs={DEFS}
       steps={steps}
       controls={controls}
-      onExpert={onExpert}
+      toolbarAction={extra}
       onRestart={() => {
         onRestart();
         controls.restart();
@@ -268,14 +268,23 @@ describe('reading tools', () => {
     expect(document.documentElement).toHaveClass('wiz-contrast');
   });
 
-  it('opens the expert mode and starts again only after confirming', () => {
-    const onExpert = jest.fn();
-    const onRestart = jest.fn();
-    renderWithProviders(<Harness onExpert={onExpert} onRestart={onRestart} />, {
+  it('has no expert mode and shows the extra action at the end of the toolbar', () => {
+    renderWithProviders(<Harness extra={<button type="button">Extra tool</button>} />, {
       authenticated: false,
     });
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.expert')) }));
-    expect(onExpert).toHaveBeenCalled();
+    const tools = screen.getByRole('toolbar', { name: tr('wizard.tools') });
+    const names = within(tools)
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+    expect(names[names.length - 1]).toBe('Extra tool');
+    expect(names.join('|')).not.toMatch(/todo junto/i);
+  });
+
+  it('starts again only after confirming', () => {
+    const onRestart = jest.fn();
+    renderWithProviders(<Harness onRestart={onRestart} />, {
+      authenticated: false,
+    });
     const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.restart')) }));
     expect(onRestart).not.toHaveBeenCalled();

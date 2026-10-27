@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Choice } from '@modules/wizard/ui/Choice';
 import { Wizard, type WizardScreen, type WizardStepView } from '@modules/wizard/ui/Wizard';
-import { useAssistantMode, useWizardProgress } from '@modules/wizard/application/useWizard';
+import { useWizardProgress } from '@modules/wizard/application/useWizard';
 import type { WizardStep } from '@modules/wizard/domain/wizard';
 import type { RentaMode } from '../../application/useRentaAccess';
 import { DEFAULT_RENTA_YEAR } from '../../data/renta/ejercicios';
@@ -12,7 +12,7 @@ import { answerOf, choose, noPay, OPTIONS, type QuestionId } from '../../domain/
 import { number, propertiesOf } from '../../domain/rentaForm';
 import { reductionMissing } from '../../domain/rentaRentals';
 import { queueOf } from '../../domain/rentaReview';
-import { RentaPlanner, ResultSection, UpgradeCta } from '../RentaPlanner';
+import { ResultSection, UpgradeCta } from '../RentaPlanner';
 import { ActivitiesList } from './ActivitiesList';
 import { BringActivity } from './AutonomoBring';
 import { DeductionReview } from './DeductionReview';
@@ -59,7 +59,6 @@ const ICONS: Record<string, string> = {
 };
 
 /** Step by step or everything together: remembered on this device. */
-export const ASSISTANT_KEY = 'mm_renta_assistant';
 export const wizardKey = (year: number) => `mm_renta_wizard_${year}`;
 
 const AEAT = 'https://sede.agenciatributaria.gob.es/';
@@ -576,7 +575,6 @@ interface RentaWizardProps {
   mode: RentaMode;
   initialIncome?: string;
   year?: number;
-  onExpert: () => void;
   /** Opens the self-employed screen (in the app), to bring the activity. */
   onOpenAutonomo?: () => void;
   /** Opens a guide of «Hacienda paso a paso» (in the app). */
@@ -590,7 +588,6 @@ export function RentaWizard({
   mode,
   initialIncome = '',
   year = DEFAULT_RENTA_YEAR,
-  onExpert,
   onOpenAutonomo,
   onHowToFile,
   onYear,
@@ -621,8 +618,7 @@ export function RentaWizard({
           defs={RENTA_STEPS}
           steps={rentaSteps(ctx)}
           controls={controls}
-          onExpert={onExpert}
-          screenAction={
+          toolbarAction={
             <NewReturn
               year={year}
               hasActivity={(p.form.activities?.length ?? 0) > 0}
@@ -639,22 +635,5 @@ export function RentaWizard({
   );
 }
 
-/**
- * The Renta: step by step (the assistant, by default) or everything together (expert mode), as
- * the person chose last on this device. Both fill in the same data: nothing is lost switching.
- */
-export function RentaAssistant(props: Omit<RentaWizardProps, 'onExpert'>) {
-  const { t } = useI18n();
-  const [expert, setExpert] = useAssistantMode(ASSISTANT_KEY);
-  if (expert) {
-    return (
-      <>
-        <button type="button" className="btn-secondary wiz-switch" onClick={() => setExpert(false)}>
-          {t('wizard.backToSteps')}
-        </button>
-        <RentaPlanner mode={props.mode} initialIncome={props.initialIncome} year={props.year} />
-      </>
-    );
-  }
-  return <RentaWizard {...props} onExpert={() => setExpert(true)} />;
-}
+/** The Renta: always step by step, one short question at a time. */
+export const RentaAssistant = RentaWizard;

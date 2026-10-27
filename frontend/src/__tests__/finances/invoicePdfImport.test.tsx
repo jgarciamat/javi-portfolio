@@ -20,6 +20,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import FIXTURES from './fixtures/invoicePdfTokens.json';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 jest.mock('@modules/finances/application/taxModelPdf');
 const read = reader.readImportPdf as jest.MockedFunction<typeof reader.readImportPdf>;
 

@@ -11,7 +11,6 @@ import {
   preferredYear,
   yearCheck,
 } from '@modules/finances/ui/components/autonomoForRenta';
-import { AUTONOMO_ASSISTANT_KEY } from '@modules/finances/domain/autonomoWizard';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { wizardKey } from '@modules/tools/ui/renta/RentaWizard';
@@ -20,6 +19,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
+
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
 
 /**
  * From the self-employed screen to the Renta of the same year, end to end (invented data).
@@ -89,7 +92,7 @@ const boxRow = (box: string) =>
 beforeEach(() => {
   localStorage.clear();
   // Everything together on the self-employed screen; the Renta step by step.
-  localStorage.setItem(AUTONOMO_ASSISTANT_KEY, 'expert');
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
 });
 afterEach(restoreTime);
 

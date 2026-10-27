@@ -18,6 +18,10 @@ import { freezeTime, restoreTime } from '@test-utils/time';
 import { captureDownloads } from '@test-utils/dom';
 import { ApiError } from '@core/api/http';
 
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
+  jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
+);
+
 jest.mock('@core/notifications/notifications', () => ({
   notificationsSupported: jest.fn(() => true),
   requestNotificationPermission: jest.fn(),

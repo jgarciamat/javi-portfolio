@@ -2,14 +2,13 @@ import type { ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { PrepareRenta } from '@modules/tools/ui/renta/PrepareRenta';
-import { useAssistantMode } from '@modules/wizard/application/useWizard';
 import { Choice } from '@modules/wizard/ui/Choice';
 import { Wizard, type WizardScreen, type WizardStepView } from '@modules/wizard/ui/Wizard';
-import { AUTONOMO_ASSISTANT_KEY, AUTONOMO_STEPS } from '../../domain/autonomoWizard';
+import { AUTONOMO_STEPS } from '../../domain/autonomoWizard';
 import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { AnnualPanel } from './AutonomoAnnual';
 import { AutonomoCloudPanel } from './AutonomoCloud';
-import { AutonomoDraftCard, ExtrasPanel, PeriodPicker, PrepareGate } from './AutonomoDraftCard';
+import { ExtrasPanel, PeriodPicker, PrepareGate } from './AutonomoDraftCard';
 import { DraftResult } from './AutonomoDraftResult';
 import { AutonomoImport } from './AutonomoImport';
 import { PriorPanel, ProfilePanel, QuarterPanels, firstQuarterShown } from './AutonomoManual';
@@ -465,13 +464,12 @@ export function autonomoSteps(ctx: Ctx): WizardStepView[] {
 }
 
 interface AutonomoWizardProps {
-  onExpert: () => void;
   onHowToFile?: (slug: string) => void;
   onOpenRenta?: () => void;
 }
 
 /** The self-employed screen step by step: the same data, one short question at a time. */
-export function AutonomoWizard({ onExpert, onHowToFile, onOpenRenta }: AutonomoWizardProps) {
+export function AutonomoWizard({ onHowToFile, onOpenRenta }: AutonomoWizardProps) {
   const { t } = useI18n();
   const s = useAutonomoDraft();
   return (
@@ -491,7 +489,6 @@ export function AutonomoWizard({ onExpert, onHowToFile, onOpenRenta }: AutonomoW
           goQuarter: () => s.wizard.go(STEP_OF('quarter')),
         })}
         controls={s.wizard}
-        onExpert={onExpert}
         onRestart={s.wipeNow}
         finale={
           <>
@@ -505,22 +502,5 @@ export function AutonomoWizard({ onExpert, onHowToFile, onOpenRenta }: AutonomoW
   );
 }
 
-/**
- * Self-employed: step by step (the assistant, by default) or everything together, as the person
- * chose last on this device. Both work on the same data.
- */
-export function AutonomoAssistant(props: Omit<AutonomoWizardProps, 'onExpert'>) {
-  const { t } = useI18n();
-  const [expert, setExpert] = useAssistantMode(AUTONOMO_ASSISTANT_KEY);
-  if (expert) {
-    return (
-      <>
-        <button type="button" className="btn-secondary wiz-switch" onClick={() => setExpert(false)}>
-          {t('wizard.backToSteps')}
-        </button>
-        <AutonomoDraftCard {...props} />
-      </>
-    );
-  }
-  return <AutonomoWizard {...props} onExpert={() => setExpert(true)} />;
-}
+/** Self-employed: always step by step, one short question at a time. */
+export const AutonomoAssistant = AutonomoWizard;
