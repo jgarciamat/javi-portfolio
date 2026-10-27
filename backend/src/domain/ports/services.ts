@@ -16,6 +16,16 @@ export interface Clock {
 
 export const systemClock: Clock = { now: () => new Date() };
 
+/**
+ * A stamp of the user's money data (movements, automatic operations, categories, accounts,
+ * settings, rules and decisions) that changes on every write, so a result worked out from that
+ * data can be kept until the stamp changes. `null` means «do not keep anything now» (for example
+ * inside a database transaction, which could still be rolled back).
+ */
+export interface DataVersions {
+  of(userId: string): number | null;
+}
+
 export interface PasswordHasher {
   hash(password: string): Promise<string>;
   verify(password: string, hash: string): Promise<boolean>;

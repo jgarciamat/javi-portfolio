@@ -69,6 +69,7 @@ import { SqliteTwoFactorRepository } from './sqlite/repositories/SqliteTwoFactor
 import { SqliteAutonomoDataRepository } from './sqlite/repositories/SqliteAutonomoDataRepository';
 import { ConsoleEmailSender, ResendEmailSender } from './mail/EmailSenders';
 import { Db, SqliteUnitOfWork } from './sqlite/database';
+import { UserDataVersions, statsTracking, trackWrites } from './sqlite/dataVersions';
 import {
   SqliteAccountRepository,
   SqliteTransferRepository,
@@ -161,14 +162,20 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   const uow = new SqliteUnitOfWork(db);
 
   const funnel = new SqliteFunnelRepository(db, clock);
+  // The statistics keep their results while the user's data does not change: these repositories
+  // give the user a new data stamp on every write (see dataVersions.ts).
+  const versions = new UserDataVersions(db);
+  const tracking = statsTracking(db);
+  const tracked = <T extends object>(name: string, repo: T): T =>
+    trackWrites(repo, versions, tracking[name]);
   const repos = {
     funnel,
-    users: new SqliteUserRepository(db),
+    users: tracked('users', new SqliteUserRepository(db)),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     twoFactor: new SqliteTwoFactorRepository(db),
     autonomoData: new SqliteAutonomoDataRepository(db),
-    categories: new SqliteCategoryRepository(db),
-    categoryRules: new SqliteCategoryRuleRepository(db),
+    categories: tracked('categories', new SqliteCategoryRepository(db)),
+    categoryRules: tracked('categoryRules', new SqliteCategoryRuleRepository(db)),
     assets: new SqliteAssetRepository(db),
     digests: new SqliteDigestRepository(db),
     trialNotices: new SqliteTrialNoticeRepository(db),
@@ -182,14 +189,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     autonomoDrafts: new SqliteAutonomoUsageRepository(db),
     autonomoPdfs: new SqliteAutonomoPdfRepository(db),
     imports: new SqliteImportUsageRepository(db),
-    accounts: new SqliteAccountRepository(db),
-    transfers: new SqliteTransferRepository(db),
-    transactions: new SqliteTransactionRepository(db),
-    rules: new SqliteRecurringRuleRepository(db),
+    accounts: tracked('accounts', new SqliteAccountRepository(db)),
+    transfers: tracked('transfers', new SqliteTransferRepository(db)),
+    transactions: tracked('transactions', new SqliteTransactionRepository(db)),
+    rules: tracked('rules', new SqliteRecurringRuleRepository(db)),
     alerts: new SqliteCustomAlertRepository(db),
-    budgets: new SqliteCategoryBudgetRepository(db),
+    budgets: tracked('budgets', new SqliteCategoryBudgetRepository(db)),
     goals: new SqliteGoalRepository(db),
-    settings: new SqliteSettingsRepository(db),
+    settings: tracked('settings', new SqliteSettingsRepository(db)),
     subscriptions: new SqliteSubscriptionRepository(db),
     billingEvents: new SqliteBillingEventRepository(db),
     aiUsage: new SqliteAiUsageRepository(db),
@@ -198,7 +205,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     referrals: new SqliteReferralRepository(db),
     creators: new SqliteCreatorRepository(db),
     household: new SqliteHouseholdRepository(db),
-    leakDecisions: new SqliteLeakDecisionRepository(db),
+    leakDecisions: tracked('leakDecisions', new SqliteLeakDecisionRepository(db)),
   };
 
   const tokens = new JwtTokenService(
@@ -468,7 +475,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.rules,
       clock,
       repos.assets,
-      repos.categories
+      repos.categories,
+      versions
     ),
     moneyLeaks: new MoneyLeakService(
       repos.transactions,
@@ -477,7 +485,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.leakDecisions,
       entitlements,
       funnel,
-      clock
+      clock,
+      versions
     ),
     weeklyDigest,
     push: pushService,
