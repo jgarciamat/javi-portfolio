@@ -62,13 +62,6 @@ html {
   transform: translateY(-1px);
 }
 
-/* The header is crowded on a phone: the links stay in the login and sign-up pages. */
-@media (max-width: 760px) {
-  .header-socials {
-    display: none;
-  }
-}
-
 .header-logo {
   font-size: 1.75rem;
   line-height: 1;
@@ -149,10 +142,18 @@ html {
     min-width: 0;
   }
 
+  /* Second line: the pill takes what the three social icons leave. */
   .header-learn-btn {
     order: 3;
-    flex-basis: 100%;
+    flex: 1 1 calc(100% - 7.5rem);
+    min-width: 0;
     white-space: normal;
+  }
+
+  .header > .header-socials {
+    order: 4;
+    margin-left: 0;
+    gap: 0.1rem;
   }
 }
 

@@ -28,3 +28,21 @@ test('the forecast panel does not shift the page when its data arrives', async (
     0.1
   );
 });
+
+/** On a phone the three social links share the line of the Videoteca pill, inside the screen. */
+test('the social links show on a phone, beside the Videoteca pill', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await signIn(page);
+  const links = page.getByRole('navigation', { name: /Síguenos en|Follow us on/ });
+  await expect(links.getByRole('link')).toHaveCount(3);
+  const pill = await page.locator('.header-learn-btn').boundingBox();
+  const box = await links.boundingBox();
+  expect(pill && box).toBeTruthy();
+  expect(Math.abs((pill?.y ?? 0) - (box?.y ?? 99))).toBeLessThan(12);
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(390);
+  expect((pill?.x ?? 0) + (pill?.width ?? 0)).toBeLessThanOrEqual(box?.x ?? 0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.locator('.header').screenshot({
+    path: '../docs/auditoria-recorrido-2026-10-26/despues/movil-cabecera-redes.png',
+  });
+});

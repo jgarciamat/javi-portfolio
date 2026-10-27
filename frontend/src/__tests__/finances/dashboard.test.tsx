@@ -26,6 +26,35 @@ beforeEach(() => {
 });
 afterEach(restoreTime);
 
+describe('social links in the header', () => {
+  const phone = (matches: boolean) =>
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: jest.fn().mockImplementation(() => ({
+        matches,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })),
+    });
+  afterEach(() => delete (window as Partial<typeof window>).matchMedia);
+
+  it('sit beside the title on a computer', () => {
+    phone(false);
+    renderWithProviders(<Dashboard />, { plan: true });
+    const links = screen.getByRole('navigation', { name: tr('app.social.title') });
+    expect(links.parentElement).toHaveClass('header-brand');
+    expect(within(links).getAllByRole('link')).toHaveLength(3);
+  });
+
+  it('share the line of the Videoteca pill on a phone', () => {
+    phone(true);
+    renderWithProviders(<Dashboard />, { plan: true });
+    const links = screen.getByRole('navigation', { name: tr('app.social.title') });
+    expect(links.parentElement).toHaveClass('header');
+    expect(within(links).getAllByRole('link')).toHaveLength(3);
+  });
+});
+
 describe('menu and sections', () => {
   it('opens every section and remembers the last one', async () => {
     jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);

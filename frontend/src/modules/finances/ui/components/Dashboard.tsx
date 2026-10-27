@@ -36,6 +36,7 @@ import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
 import { BrandLogo } from '@shared/components/BrandLogo';
+import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { SocialIcons } from '@shared/components/SocialLinks';
 import { IosInstallHint } from '@shared/components/IosInstallHint';
 import '../css/Dashboard.css';
@@ -205,9 +206,13 @@ function TabContent({
   }
 }
 
+/** Phones: no room beside the title, so the social links share the line of the Videoteca pill. */
+const PHONE_SCREEN = '(max-width: 600px)';
+
 function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
   const { logout } = useAuth();
+  const phone = useMediaQuery(PHONE_SCREEN);
   return (
     <header className="header">
       <div className="header-brand">
@@ -233,7 +238,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           <h1 className="header-title">{t('app.header.title')}</h1>
           <p className="header-sub">{sectionLabel}</p>
         </div>
-        <SocialIcons />
+        {!phone && <SocialIcons />}
       </div>
       <button
         type="button"
@@ -255,6 +260,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           {t('app.header.logout')}
         </button>
       </div>
+      {phone && <SocialIcons />}
     </header>
   );
 }
