@@ -179,6 +179,13 @@
   flex-wrap: wrap;
 }
 
+/* Cuentas while the list loads: one soft block in the place the list had last time. */
+.entity-item--placeholder {
+  flex: 1;
+  background: var(--slate-900);
+  border-style: dashed;
+}
+
 .entity-item--muted {
   opacity: 0.55;
 }

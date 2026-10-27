@@ -575,6 +575,12 @@ html {
   }
 }
 
+/* A section that is still downloading: without the paragraph's margin, which would run out
+   of the section and move it 16 px when the section arrives. */
+.section-loading {
+  margin: 0;
+}
+
 /* The open section takes focus after a menu choice: no ring around the whole page. */
 .dashboard-section:focus {
   outline: none;

@@ -133,7 +133,7 @@ function PlanWithSteps({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }
 function SectionLoading() {
   const { t } = useI18n();
   return (
-    <p className="empty-block" role="status">
+    <p className="empty-block section-loading" role="status">
       {t('app.common.loading')}
     </p>
   );

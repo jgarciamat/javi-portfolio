@@ -70,6 +70,50 @@ for (const width of [390, 1280]) {
   });
 }
 
+/**
+ * Four accounts (the demo has fewer, and a fourth would hit the free plan): the answer of the
+ * server is widened, nothing is written. The list arrives 1 s late.
+ */
+async function fourAccountsLate(page: import('@playwright/test').Page) {
+  await page.route(/\/api\/accounts(\?|$)/, async (route) => {
+    if (route.request().method() !== 'GET') return route.continue();
+    const response = await route.fetch();
+    const body = await response.json();
+    const [first] = body.accounts;
+    body.accounts = [
+      first,
+      ...['Ahorro', 'Efectivo', 'Tarjeta'].map((name, i) => ({
+        ...first,
+        id: `extra-${i}`,
+        name,
+        isDefault: false,
+        type: 'savings',
+      })),
+    ];
+    await new Promise((done) => setTimeout(done, 1000));
+    await route.fulfill({ response, json: body });
+  });
+}
+
+for (const width of [390, 1280]) {
+  test(`Cuentas does not jump while it loads (${width} px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 800 });
+    await signIn(page);
+    await fourAccountsLate(page);
+    await openSection(page, 'Cuentas');
+    await expect(page.getByText('Tarjeta', { exact: true })).toBeVisible();
+    // A later visit, from the reload: the place of the list is kept from the first one.
+    await trackShifts(page);
+    await page.reload();
+    await expect(page.getByRole('list', { busy: true })).toBeVisible();
+    await expect(page.getByText('Tarjeta', { exact: true })).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
+      0.05
+    );
+  });
+}
+
 test('with «Contraste» the category labels of the table keep 4.5:1', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await signIn(page);

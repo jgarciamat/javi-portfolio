@@ -256,6 +256,82 @@ describe('AccountsView', () => {
     );
   });
 
+  describe('keeps the list in its place while it loads (A02)', () => {
+    const list = () => screen.getByRole('list', { busy: true });
+    const width = (px: number) =>
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: px });
+    beforeEach(() => {
+      localStorage.clear();
+      accountApi.getAll.mockReturnValue(new Promise(() => undefined));
+    });
+    afterEach(() => width(1024));
+
+    it('estimates the accounts the app already has, and keeps the transfer form', () => {
+      render(<AccountsView />);
+      // Two rows of 62 px and the gap between them.
+      expect(list()).toHaveStyle({ minHeight: '132px' });
+      expect(screen.getAllByPlaceholderText(t('app.transaction.form.amount'))).toHaveLength(1);
+      // The export buttons are off, without saying there is nothing to export.
+      for (const button of screen.getAllByRole('button', { name: /CSV|PDF/ })) {
+        expect(button).toBeDisabled();
+      }
+      expect(screen.queryByText(t('app.exportButtons.empty'))).toBeNull();
+    });
+
+    it('below 600 px the rows wrap, but the default account has a single button', () => {
+      width(390);
+      render(<AccountsView />);
+      expect(list()).toHaveStyle({ minHeight: `${76 + 106 + 8}px` });
+    });
+
+    it('reuses the height measured last time at the same width', () => {
+      localStorage.setItem(
+        'mm_accounts_list',
+        JSON.stringify({ width: 1024, height: 321, count: 2, canTransfer: true })
+      );
+      render(<AccountsView />);
+      expect(list()).toHaveStyle({ minHeight: '321px' });
+    });
+
+    it('estimates again when the width or the number of accounts changed', () => {
+      localStorage.setItem(
+        'mm_accounts_list',
+        JSON.stringify({ width: 1024, height: 321, count: 5, canTransfer: true })
+      );
+      render(<AccountsView />);
+      expect(list()).toHaveStyle({ minHeight: '132px' });
+    });
+
+    it('without the accounts yet, uses the number of last time, or one', () => {
+      useFinances.mockReturnValue({ ...useFinances(), accounts: [] });
+      localStorage.setItem(
+        'mm_accounts_list',
+        JSON.stringify({ width: 800, height: 999, count: 3, canTransfer: true })
+      );
+      const { unmount } = render(<AccountsView />);
+      expect(list()).toHaveStyle({ minHeight: `${3 * 62 + 2 * 8}px` });
+      expect(screen.getAllByPlaceholderText(t('app.transaction.form.amount'))).toHaveLength(1);
+      unmount();
+      localStorage.clear();
+      render(<AccountsView />);
+      expect(list()).toHaveStyle({ minHeight: '62px' });
+      expect(screen.getByText(t('app.accounts.transferNeedsTwo'))).toBeInTheDocument();
+    });
+
+    it('remembers the list once it arrives', async () => {
+      accountApi.getAll.mockResolvedValue({ accounts, total: 950 });
+      render(<AccountsView />);
+      await screen.findByText('Efectivo', { selector: '.entity-name' });
+      expect(screen.queryByRole('list', { busy: true })).toBeNull();
+      expect(JSON.parse(localStorage.getItem('mm_accounts_list') as string)).toEqual({
+        width: 1024,
+        height: 0,
+        count: 2,
+        canTransfer: true,
+      });
+    });
+  });
+
   it('shows API errors (e.g. deleting an account with movements)', async () => {
     accountApi.delete.mockRejectedValueOnce(new Error('La cuenta tiene movimientos.'));
     render(<AccountsView />);
