@@ -21,6 +21,8 @@ const RULES: { key: string; ok: (password: string) => boolean }[] = [
   { key: 'app.password.rule.symbol', ok: (p) => /[^A-Za-z0-9]/.test(p) },
 ];
 
+export const PASSWORD_RULES_COUNT = RULES.length;
+
 export function validatePassword(password: string): PasswordValidationResult {
   const errors = RULES.filter((r) => !r.ok(password)).map((r) => r.key);
   return { valid: errors.length === 0, errors };

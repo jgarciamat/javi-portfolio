@@ -7,7 +7,11 @@ import { errorMessage } from '@shared/utils/errors';
 import { validatePassword } from '../domain/passwordValidation';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { PasswordHints } from './PasswordHints';
+import { PasswordMeter } from './PasswordMeter';
 import { Icon } from '@shared/components/Icon';
+import '@shared/components/css/AuthFields.css';
+import '@shared/components/css/AuthPage.css';
+import '@shared/components/css/AuthReset.css';
 
 /** New password from the link sent by e-mail (`?token=`). */
 export function ResetPasswordPage() {
@@ -40,13 +44,13 @@ export function ResetPasswordPage() {
   };
 
   return (
-    <>
+    <div className="auth-page-root">
       <PublicHeader />
       <main className="auth-page-with-header">
         {done ? (
-          <div className="auth-card">
-            <div className="auth-logo">
-              <Icon name="checkCircle" />
+          <div className="auth-card auth-card--reset">
+            <div className="auth-badge auth-badge--ok">
+              <Icon name="checkCircle" size={30} />
             </div>
             <h1 className="auth-title">{t('app.auth.reset.success.title')}</h1>
             <p className="auth-sub auth-sub--center">{t('app.auth.reset.success.sub')}</p>
@@ -55,9 +59,9 @@ export function ResetPasswordPage() {
             </button>
           </div>
         ) : (
-          <form onSubmit={submit} className="auth-card">
-            <div className="auth-logo">
-              <Icon name="shield" />
+          <form onSubmit={submit} className="auth-card auth-card--reset">
+            <div className="auth-badge">
+              <Icon name="shield" size={30} />
             </div>
             <h1 className="auth-title">{t('app.auth.reset.title')}</h1>
             <p className="auth-note">{t('app.auth.reset.sub')}</p>
@@ -67,6 +71,7 @@ export function ResetPasswordPage() {
               placeholder={t('app.auth.reset.password')}
               autoFocus
             />
+            <PasswordMeter password={password} />
             <PasswordHints password={password} okText={t('app.auth.reset.passwordOk')} />
             <AuthPasswordInput
               value={confirm}
@@ -75,6 +80,9 @@ export function ResetPasswordPage() {
               invalid={mismatch}
             />
             {mismatch && <p className="auth-error">{t('app.auth.reset.mismatch')}</p>}
+            {confirm.length > 0 && !mismatch && (
+              <p className="auth-hint-ok">{t('app.auth.reset.match')}</p>
+            )}
             {error && (
               <p className="auth-error" role="alert">
                 {error}
@@ -95,6 +103,6 @@ export function ResetPasswordPage() {
           </form>
         )}
       </main>
-    </>
+    </div>
   );
 }

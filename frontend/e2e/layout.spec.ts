@@ -70,3 +70,24 @@ test('the N key puts the cursor in the quick entry on a computer', async ({ page
   await page.locator('body').press('n');
   await expect(page.getByLabel('Registrar transacción rápida', { exact: true })).toBeFocused();
 });
+
+/** The pages that open from an e-mail link load their own styles: a centred panel, not bare HTML. */
+for (const [url, badge] of [
+  ['/reset-password?token=abc', '.auth-badge'],
+  ['/verify-email', '.auth-badge--error'],
+] as const) {
+  test(`${url.split('?')[0]} is a styled, centred panel`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(url);
+    await expect(page.locator(badge)).toBeVisible();
+    const card = await page.locator('.auth-card').boundingBox();
+    expect(card?.width ?? 0).toBeGreaterThan(400);
+    expect(Math.abs((card?.x ?? 0) + (card?.width ?? 0) / 2 - 640)).toBeLessThan(2);
+    expect(
+      await page
+        .locator('.auth-btn')
+        .first()
+        .evaluate((e) => getComputedStyle(e).borderRadius)
+    ).not.toBe('0px');
+  });
+}
