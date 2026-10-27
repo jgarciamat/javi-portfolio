@@ -115,7 +115,17 @@ export function presentAnnual(a: AnnualOverview) {
       balance: m(v.balanceCents),
     };
   }
-  return { year: a.year, openingBalance: m(a.openingBalanceCents), months };
+  return {
+    year: a.year,
+    openingBalance: m(a.openingBalanceCents),
+    months,
+    scheduled: {
+      count: a.scheduled.count,
+      income: m(a.scheduled.incomeCents),
+      expenses: m(a.scheduled.expenseCents),
+      saving: m(a.scheduled.savingCents),
+    },
+  };
 }
 
 export function presentSearch(r: TransactionSearchResult) {

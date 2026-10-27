@@ -16,4 +16,5 @@ export const annualSummary = {
     '11': { income: 0, expenses: 0, saving: 0, balance: 0 },
     '12': { income: 0, expenses: 0, saving: 0, balance: 0 },
   },
+  scheduled: { count: 0, income: 0, expenses: 0, saving: 0 },
 } as const;

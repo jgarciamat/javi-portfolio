@@ -298,12 +298,11 @@ export class StatsService {
     const categoryNames = new Map(
       this.categories.listByUser(userId).map((c) => [c.id, c.name] as const)
     );
-    const movements = this.transactions.listAllByUser(userId).map((tx) => {
-      const { description, amountCents, date, type, recurringRuleId, categoryId } =
-        tx.toPrimitives();
-      const categoryName = categoryNames.get(categoryId);
-      return { description, amountCents, date, type, recurringRuleId, categoryName };
-    });
+    // Only the expenses the detector looks at; the first date and the count, from SQL (with
+    // tens of thousands of movements, loading them all took most of the forecast's time).
+    const movements = this.transactions
+      .listSubscriptionCandidates(userId)
+      .map(({ categoryId, ...m }) => ({ ...m, categoryName: categoryNames.get(categoryId) }));
     const coveredKeys = new Set(
       this.rules
         .listByUser(userId)
@@ -314,11 +313,12 @@ export class StatsService {
       today: todayDateOnly(this.clock.now()),
       coveredKeys,
     });
-    const firstDate = movements.reduce<string | null>(
-      (min, m) => (min === null || m.date < min ? m.date : min),
-      null
-    );
-    return { report, coveredKeys, firstDate, count: movements.length };
+    return {
+      report,
+      coveredKeys,
+      firstDate: this.transactions.firstDate(userId),
+      count: this.transactions.count(userId),
+    };
   }
 
   netWorth(userId: string, months: number): NetWorthPoint[] {

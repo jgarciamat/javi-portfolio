@@ -56,6 +56,11 @@ export interface AnnualOverview {
     number,
     { incomeCents: Cents; expenseCents: Cents; savingCents: Cents; balanceCents: Cents }
   >;
+  /**
+   * Automatic operations of the year dated after today: already in the months above (the year's
+   * balance counts them), told apart so the screen can say so.
+   */
+  scheduled: { count: number; incomeCents: Cents; expenseCents: Cents; savingCents: Cents };
 }
 
 export interface NewTransactionInput extends CategoryRef {
@@ -310,6 +315,11 @@ export class TransactionService {
         balanceCents: t.incomeCents - t.expenseCents - t.savingCents,
       };
     }
-    return { year, openingBalanceCents: this.carryover(userId, january), months };
+    return {
+      year,
+      openingBalanceCents: this.carryover(userId, january),
+      months,
+      scheduled: this.transactions.scheduledTotals(userId, year, todayDateOnly(this.clock.now())),
+    };
   }
 }

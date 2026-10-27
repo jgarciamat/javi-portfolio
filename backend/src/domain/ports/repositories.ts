@@ -13,6 +13,7 @@ import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
 import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { RuleMovement } from '@domain/services/recurring-match';
+import { SubscriptionCandidate } from '@domain/services/subscriptions';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
 import { Period } from '@domain/shared/period';
@@ -255,6 +256,21 @@ export interface TransactionRepository {
   listByRule(userId: string, ruleId: string): Transaction[];
   deleteByRule(userId: string, ruleId: string, fromPeriod?: Period): number;
   listAllByUser(userId: string): Transaction[];
+  /**
+   * The expenses not added by an automatic operation, with only what the subscription detector
+   * reads (lighter than `listAllByUser` with tens of thousands of movements).
+   */
+  listSubscriptionCandidates(userId: string): (Omit<SubscriptionCandidate, 'categoryName'> & {
+    categoryId: string;
+  })[];
+  /** Date of the first movement (YYYY-MM-DD), or null without any. */
+  firstDate(userId: string): string | null;
+  /** Movements of automatic operations of the periods of `year` dated after `today`. */
+  scheduledTotals(
+    userId: string,
+    year: number,
+    today: string
+  ): { count: number; incomeCents: Cents; expenseCents: Cents; savingCents: Cents };
   exportAll(userId: string): TransactionView[];
   earliestPeriod(userId: string): Period | null;
   /** How many movements the user has in total. */

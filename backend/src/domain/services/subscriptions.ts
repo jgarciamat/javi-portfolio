@@ -74,10 +74,19 @@ export function subscriptionKey(description: string): string {
 }
 
 function cadenceOf(dates: string[]): SubscriptionCadence | null {
-  const gaps = dates.slice(1).map((d, i) => dayNumber(d) - dayNumber(dates[i]));
+  // Each date is read once and a gap out of range stops the check (a supermarket bought from
+  // thousands of times fails at its first gap).
+  const days = dates.map(dayNumber);
+  const steady = (min: number, max: number): boolean => {
+    for (let i = 1; i < days.length; i++) {
+      const gap = days[i] - days[i - 1];
+      if (gap < min || gap > max) return false;
+    }
+    return true;
+  };
   for (const cadence of ['monthly', 'yearly'] as const) {
     const { min, max, charges } = RANGES[cadence];
-    if (dates.length >= charges && gaps.every((g) => g >= min && g <= max)) return cadence;
+    if (dates.length >= charges && steady(min, max)) return cadence;
   }
   return null;
 }
@@ -95,12 +104,16 @@ export function detectSubscriptions(
     if (item.type !== 'EXPENSE' || item.recurringRuleId !== null) continue;
     const key = subscriptionKey(item.description);
     if (key.length < 3 || options.coveredKeys.has(key)) continue;
-    groups.set(key, [...(groups.get(key) ?? []), item]);
+    // In place: copying the group on every charge was quadratic with thousands of them.
+    const group = groups.get(key);
+    if (group) group.push(item);
+    else groups.set(key, [item]);
   }
 
   const found: DetectedSubscription[] = [];
   for (const [key, group] of groups) {
-    const charges = [...group].sort((a, b) => a.date.localeCompare(b.date));
+    // YYYY-MM-DD: plain string order is date order (and much quicker than localeCompare).
+    const charges = [...group].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     const cadence = cadenceOf(charges.map((c) => c.date));
     if (!cadence) continue;
     const latest = charges[charges.length - 1];

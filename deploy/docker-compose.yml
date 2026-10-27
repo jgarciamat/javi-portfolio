@@ -85,6 +85,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3000"
+      # The month changes at midnight in Spain, not in UTC: «today», the current period and the
+      # automatic operations of the 1st follow this zone (backend/src/domain/shared/period.ts).
+      TZ: Europe/Madrid
       # The V8 heap stays under the container limit (768 MB) so Node collects before Docker kills it.
       NODE_OPTIONS: --max-old-space-size=512
       DATABASE_PATH: /data/money-manager.db

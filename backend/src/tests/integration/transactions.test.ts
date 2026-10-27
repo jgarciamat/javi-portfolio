@@ -248,6 +248,29 @@ describe('Transactions API', () => {
     expect(res.body.months[1]).toEqual({ income: 0, expenses: 40, saving: 0, balance: -40 });
     expect(res.body.months[3].expenses).toBe(10);
     expect(res.body.months[12]).toEqual({ income: 0, expenses: 0, saving: 0, balance: 0 });
+    expect(res.body.scheduled).toEqual({ count: 0, income: 0, expenses: 0, saving: 0 });
+  });
+
+  it('tells apart the automatic operations dated after today in the annual summary', async () => {
+    await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Gimnasio',
+        amount: 30,
+        type: 'EXPENSE',
+        category: 'Salud',
+        startYear: 2026,
+        startMonth: 4,
+      })
+      .expect(201);
+    const res = await request(ctx.app)
+      .get('/api/transactions/annual/2026')
+      .set(user.auth)
+      .expect(200);
+    // Today is 15 March 2026: April to December are still to come, and already in the months.
+    expect(res.body.scheduled).toEqual({ count: 9, income: 0, expenses: 270, saving: 0 });
+    expect(res.body.months[12].expenses).toBe(30);
   });
 
   it('reports malformed JSON and unknown routes cleanly', async () => {
