@@ -275,7 +275,12 @@ function ScreenNav({
           {label}
         </button>
       </div>
-      {!ok && !missing && <p className="wiz-why-locked">{t('wizard.answerFirst')}</p>}
+      {/* The button the line names is the one this screen shows (step 1 says «No lo tengo…»). */}
+      {!ok && !missing && (
+        <p className="wiz-why-locked">
+          {skip ? t('wizard.answerFirst', { skip }) : t('wizard.answerFirstOnly')}
+        </p>
+      )}
     </>
   );
 }

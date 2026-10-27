@@ -17,8 +17,24 @@ import { GoalDateLine, type LeaksForGoal } from '../components/GoalDateSheet';
 import type { YearMonth } from '../../domain/goalDate';
 import type { DashboardTab } from '../navigation';
 
+/** Two active goals on one category: the same savings fill both, said on each card. */
+function SharedCategoryNote({ goal, sharedWith }: { goal: Goal; sharedWith: string[] }) {
+  const { t, tCategory } = useI18n();
+  if (sharedWith.length === 0) return null;
+  return (
+    <p className="goal-shared-note">
+      <Icon name="alert" />{' '}
+      {t('app.goals.sharedCategory', {
+        category: tCategory(goal.categoryName),
+        goals: sharedWith.map((name) => t('app.goals.quoted', { name })).join(', '),
+      })}
+    </p>
+  );
+}
+
 function GoalCard({
   goal,
+  sharedWith,
   current,
   leaks,
   onOpenTab,
@@ -26,6 +42,8 @@ function GoalCard({
   onDelete,
 }: {
   goal: Goal;
+  /** Other active goals with the same category: their savings are the same money. */
+  sharedWith: string[];
   current: YearMonth;
   leaks: LeaksForGoal | null;
   onOpenTab: (tab: DashboardTab) => void;
@@ -71,6 +89,7 @@ function GoalCard({
           <span>{t('app.goals.monthlyNeeded', { amount: money(progress.monthlyNeeded) })}</span>
         )}
       </div>
+      <SharedCategoryNote goal={goal} sharedWith={sharedWith} />
       {!goal.archived && !progress.completed && (
         <GoalDateLine goal={goal} current={current} leaks={leaks} onOpenTab={onOpenTab} />
       )}
@@ -98,17 +117,30 @@ function GoalCard({
 
 const EMPTY_GOAL = { name: '', target: '', targetDate: '', category: '', icon: '🎯' };
 
+/** Names of the active goals of each category. */
+function goalsByCategory(goals: Goal[]): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const g of goals.filter((goal) => !goal.archived)) {
+    map.set(g.categoryName, [...(map.get(g.categoryName) ?? []), g.name]);
+  }
+  return map;
+}
+
 function GoalForm({
   categories,
+  taken,
   onCreate,
   saving,
 }: {
   categories: Category[];
+  /** Categories that already belong to an active goal (allowed, with a warning). */
+  taken: Map<string, string[]>;
   onCreate: (input: GoalInput) => Promise<boolean>;
   saving: boolean;
 }) {
   const { t, tCategory } = useI18n();
   const [form, setForm] = useState(EMPTY_GOAL);
+  const owners = form.category ? taken.get(form.category) : undefined;
   const set = (key: keyof typeof EMPTY_GOAL) => (e: { target: { value: string } }) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -185,6 +217,15 @@ function GoalForm({
             ))}
           </select>
         </span>
+        {owners && (
+          <p className="plan-note" role="status">
+            <Icon name="alert" />{' '}
+            {t('app.goals.categoryTaken', {
+              category: tCategory(form.category),
+              goals: owners.map((name) => t('app.goals.quoted', { name })).join(', '),
+            })}
+          </p>
+        )}
       </div>
       <div className="inline-form-actions">
         <button type="submit" className="btn-primary" disabled={saving}>
@@ -228,6 +269,7 @@ export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
   const all = goals.data;
   const visible = all.filter((g) => showArchived || !g.archived);
   const reached = all.some((g) => g.progress.completed);
+  const byCategory = goalsByCategory(all);
   const current = useCurrentPeriod();
   // What the user decided to cancel in «Tu dinero perdido» can go to a goal (never the rest).
   const leakData = useResource(() => insightsApi.moneyLeaks('goal'), [insightsApi]).data;
@@ -316,6 +358,9 @@ export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
             <GoalCard
               key={g.id}
               goal={g}
+              sharedWith={(byCategory.get(g.categoryName) ?? []).filter(
+                (name) => !g.archived && name !== g.name
+              )}
               current={current}
               leaks={leaks}
               onOpenTab={onOpenTab}
@@ -337,6 +382,7 @@ export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
         </h3>
         <GoalForm
           categories={categories}
+          taken={byCategory}
           saving={action.pending}
           onCreate={(input) => run(() => goalApi.create(input))}
         />

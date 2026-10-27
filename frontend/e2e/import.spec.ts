@@ -109,7 +109,7 @@ test('pastes the movements copied from the bank app, corrects one and imports th
   await amount.blur();
   await dialog.getByRole('button', { name: 'Previsualizar' }).click();
   await expect(dialog.getByText(/Se importarán 2 movimientos · 0 ya existían/)).toBeVisible();
-  await expect(dialog.getByText('-2,60 €')).toBeVisible();
+  await expect(dialog.getByText('−2,60 €')).toBeVisible();
   await dialog.getByRole('button', { name: 'Importar 2' }).click();
   await expect(
     dialog.getByRole('heading', { name: 'Listo: 2 transacciones importadas' })

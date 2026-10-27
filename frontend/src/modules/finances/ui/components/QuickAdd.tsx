@@ -40,6 +40,8 @@ function useShortcut(input: RefObject<HTMLInputElement | null>) {
 
 interface QuickAddProps {
   transactions: Transaction[];
+  /** The month is loading: the row of recent categories keeps its place until they arrive. */
+  loading?: boolean;
   defaultDate: string;
   onAdd: (dto: CreateTransactionDTO) => Promise<unknown>;
 }
@@ -119,14 +121,18 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
 function CategoryChips({
   chips,
   category,
+  loading,
   onChoose,
 }: {
   chips: string[];
   category: string | null;
+  loading?: boolean;
   onChoose: (name: string) => void;
 }) {
   const { t } = useI18n();
-  if (chips.length === 0) return null;
+  if (chips.length === 0) {
+    return loading ? <div className="quick-add-chips" aria-hidden="true" /> : null;
+  }
   return (
     <div className="quick-add-chips" role="group" aria-label={t('app.quickAdd.categories')}>
       {chips.map((name) => (
@@ -179,7 +185,12 @@ export function QuickAdd(props: QuickAddProps) {
         </button>
       </div>
       <ReceiptScanner onScanned={quick.scanned} />
-      <CategoryChips chips={quick.chips} category={category} onChoose={quick.choose} />
+      <CategoryChips
+        chips={quick.chips}
+        category={category}
+        loading={props.loading}
+        onChoose={quick.choose}
+      />
       <p id={`${id}-hint`} className="section-hint">
         {entry
           ? t('app.quickAdd.preview', {

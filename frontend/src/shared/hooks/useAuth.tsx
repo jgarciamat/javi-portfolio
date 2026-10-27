@@ -17,6 +17,7 @@ import {
 import type { Locale } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
 import { clearLocalUserData } from '@shared/utils/localData';
+import { setSessionOpen } from './sessionSignal';
 
 /** 'loading' while a stored session is being restored with the refresh token. */
 export type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
@@ -170,6 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => setSessionOpen(status !== 'anonymous'), [status]);
 
   useEffect(() => {
     registerSessionExpiredHandler(clearSession);

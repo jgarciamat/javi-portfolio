@@ -36,7 +36,7 @@ describe('format utils', () => {
   });
 
   it('formats percentages with the locale decimal separator', () => {
-    expect(formatPercent(20, 'es')).toBe('20,0%');
+    expect(formatPercent(20, 'es')).toBe('20,0\u00a0%');
     expect(formatPercent(12.345, 'en', 2)).toBe('12.35%');
   });
 

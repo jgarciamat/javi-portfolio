@@ -407,6 +407,63 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return rows.map(toEntity);
   }
 
+  listSubscriptionCandidates(
+    userId: string
+  ): ReturnType<TransactionRepository['listSubscriptionCandidates']> {
+    const rows = this.db
+      .prepare(
+        `SELECT description, amount_cents, date, category_id FROM transactions
+          WHERE user_id = ? AND type = 'EXPENSE' AND recurring_rule_id IS NULL`
+      )
+      .all(userId) as Pick<
+      TransactionRow,
+      'description' | 'amount_cents' | 'date' | 'category_id'
+    >[];
+    return rows.map((r) => ({
+      description: r.description,
+      amountCents: r.amount_cents,
+      date: r.date,
+      type: 'EXPENSE',
+      recurringRuleId: null,
+      categoryId: r.category_id,
+    }));
+  }
+
+  firstDate(userId: string): string | null {
+    const row = this.db
+      .prepare('SELECT MIN(date) AS date FROM transactions WHERE user_id = ?')
+      .get(userId) as { date: string | null };
+    return row.date;
+  }
+
+  scheduledTotals(
+    userId: string,
+    year: number,
+    today: string
+  ): ReturnType<TransactionRepository['scheduledTotals']> {
+    const row = this.db
+      .prepare(
+        `SELECT COUNT(*) AS count,
+                COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount_cents END), 0) AS income,
+                COALESCE(SUM(CASE WHEN type = 'EXPENSE' THEN amount_cents END), 0) AS expense,
+                COALESCE(SUM(CASE WHEN type = 'SAVING' THEN amount_cents END), 0) AS saving
+           FROM transactions
+          WHERE user_id = ? AND year = ? AND recurring_rule_id IS NOT NULL AND date > ?`
+      )
+      .get(userId, year, today) as {
+      count: number;
+      income: number;
+      expense: number;
+      saving: number;
+    };
+    return {
+      count: row.count,
+      incomeCents: row.income,
+      expenseCents: row.expense,
+      savingCents: row.saving,
+    };
+  }
+
   exportAll(userId: string): TransactionView[] {
     const rows = this.db
       .prepare(`${VIEW_SELECT} WHERE t.user_id = ? ORDER BY t.date, t.created_at`)

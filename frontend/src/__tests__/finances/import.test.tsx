@@ -238,6 +238,10 @@ describe('ImportModal', () => {
     expect(
       await screen.findByText(tr('app.import.coveredNoticeOne'), { exact: false })
     ).toBeInTheDocument();
+    // «Se importará 1 movimiento», not «Se importarán 1 movimientos».
+    expect(
+      screen.getByText(tr('app.import.previewSummaryOne', { duplicates: 0, invalid: 0 }))
+    ).toBeInTheDocument();
     const confirm = screen.getByRole('button', { name: tr('app.import.confirm', { count: 0 }) });
     expect(confirm).toBeDisabled();
     const anyway = screen.getByRole('checkbox', { name: /Importar igualmente/ });

@@ -434,5 +434,11 @@ html.app-big-text {
 :root.app-contrast[data-theme] {
   --slate-500: var(--slate-300);
   --slate-400: var(--slate-200);
-  --slate-700: var(--slate-500);
+  /* A literal, not var(--slate-500): that one is remapped above and would give the badges
+     (text --slate-300 on --slate-700) the same colour as their text. One step stronger, 4.5:1 kept. */
+  --slate-700: #475569;
+}
+
+:root.app-contrast[data-theme='light'] {
+  --slate-700: #a7b3c4;
 }

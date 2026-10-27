@@ -20,6 +20,8 @@ import {
   preventShiftTextSelection,
 } from '@shared/components/BulkSelection';
 import { BULK_MAX } from '@modules/finances/domain/transactionBulk';
+import { isPendingAutomatic } from '@modules/finances/domain/monthCharges';
+import { todayDateOnly } from '@shared/utils/format';
 import { totalsByType } from '@modules/finances/domain/transactionTypes';
 import { useFinances } from '../../application/FinancesContext';
 import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
@@ -192,6 +194,7 @@ function SearchResults({
 }) {
   const { t, tCategory } = useI18n();
   const { money, date } = useFormat();
+  const today = todayDateOnly();
   return (
     <div className="card">
       <div className="search-totals" aria-live="polite">
@@ -213,6 +216,9 @@ function SearchResults({
         <p className="empty-state">{t('app.search.empty')}</p>
       ) : (
         <SelectAllBar selection={selection} />
+      )}
+      {result.items.some((tx) => isPendingAutomatic(tx, today)) && (
+        <p className="section-hint">{t('app.search.scheduledNote')}</p>
       )}
       <ul className="entity-list">
         {result.items.map((tx) => (
@@ -236,6 +242,9 @@ function SearchResults({
                 <span className="entity-sub">
                   {date(tx.date)} · {tCategory(tx.category)}
                   {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
+                  {isPendingAutomatic(tx, today) && (
+                    <span className="pill pill--due">{t('app.search.scheduled')}</span>
+                  )}
                 </span>
               </span>
               <SignedAmount className="entity-amount" type={tx.type} amount={tx.amount} />

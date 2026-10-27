@@ -6,6 +6,19 @@
   margin-bottom: 1.25rem;
 }
 
+/* While the month loads: the height of the grid of cards (MonthlyView), so nothing jumps.
+   Measured on 27-10-2026: 117 px in one row on a computer, 338 px in two columns on a phone. */
+.summary-placeholder {
+  min-height: 117px;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .summary-placeholder {
+    min-height: 338px;
+  }
+}
+
 .summary-card {
   background: var(--slate-800);
   border-radius: 12px;

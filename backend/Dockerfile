@@ -17,8 +17,10 @@ RUN npm run build && npm prune --omit=dev
 
 # ── Runtime: no compilers, no dev dependencies, non-root user ─────────────────
 FROM node:24-bookworm-slim
+# TZ: the month changes at midnight in Spain (Node's ICU carries the zone data, no tzdata needed).
 ENV NODE_ENV=production \
     PORT=3000 \
+    TZ=Europe/Madrid \
     DATABASE_PATH=/data/money-manager.db \
     BACKUP_DIR=/backups
 WORKDIR /app

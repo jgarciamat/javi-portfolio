@@ -2,14 +2,21 @@ import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { isNativeApp } from '@shared/utils/platform';
+import { useSessionOpen } from '@shared/hooks/sessionSignal';
 import './css/UpdatePrompt.css';
 
 /**
  * Banner shown when a new version of the PWA is ready. The mobile apps carry their own files:
- * they register no service worker and drop the one older versions installed.
+ * they register no service worker and drop the one older versions installed. On the web the
+ * service worker registers once there is a session: the landing, the guides and the
+ * calculators are read online and do not download the offline cache of the whole app.
  */
 export function UpdatePrompt() {
-  return isNativeApp() ? <DropServiceWorker /> : <WebUpdatePrompt />;
+  return isNativeApp() ? <DropServiceWorker /> : <WebSession />;
+}
+
+function WebSession() {
+  return useSessionOpen() ? <WebUpdatePrompt /> : null;
 }
 
 function DropServiceWorker() {

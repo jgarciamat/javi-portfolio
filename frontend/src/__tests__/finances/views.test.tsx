@@ -284,6 +284,35 @@ describe('GoalsView', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.goals.hideArchived') }));
   });
 
+  it('allows two goals on one category but warns that they count the same savings', async () => {
+    setup([
+      f.goal({ id: 'g1', categoryName: 'Ahorro' }),
+      f.goal({ id: 'g2', name: 'Colchón', categoryName: 'Ahorro' }),
+      f.goal({ id: 'g3', name: 'Viejo', categoryName: 'Ahorro', archived: true }),
+      f.goal({ id: 'g4', name: 'Moto', categoryName: 'Moto', archived: true }),
+    ]);
+    expect(
+      await screen.findByText(
+        tr('app.goals.sharedCategory', { category: 'Ahorro', goals: '«Colchón»' }),
+        { exact: false }
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(tr('app.goals.sharedCategory', { category: 'Ahorro', goals: '«Viaje»' }), {
+        exact: false,
+      })
+    ).toBeInTheDocument();
+    const select = screen.getByRole('combobox', { name: tr('app.goals.category') });
+    expect(screen.queryByRole('status')).toBeNull();
+    fireEvent.change(select, { target: { value: 'Ahorro' } });
+    expect(screen.getByRole('status')).toHaveTextContent(
+      tr('app.goals.categoryTaken', { category: 'Ahorro', goals: '«Viaje», «Colchón»' })
+    );
+    // The archived goal shares nothing: no note on its card when shown.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.goals.showArchived') }));
+    expect(screen.getAllByText(/Comparte la categoría/)).toHaveLength(2);
+  });
+
   it('notes a reached goal as a good moment to ask for a review, and only then', async () => {
     localStorage.removeItem('mm_review');
     setup([f.goal({ id: 'g1' })]);
@@ -430,6 +459,32 @@ describe('SearchView', () => {
     return { ...view, onEdit };
   }
 
+  it('marks the automatic operations dated after today as scheduled', async () => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([]);
+    api.transactionApi.search.mockResolvedValue(
+      page([
+        f.transaction({
+          id: 't1',
+          description: 'Gimnasio',
+          date: '2026-04-05',
+          recurringRuleId: 'r1',
+        }),
+        f.transaction({
+          id: 't2',
+          description: 'Gimnasio',
+          date: '2026-03-05',
+          recurringRuleId: 'r1',
+        }),
+        f.transaction({ id: 't3', description: 'Cena futura', date: '2026-04-01' }),
+      ])
+    );
+    renderWithProviders(<SearchView onEdit={jest.fn()} />, { api });
+    await screen.findByText('Cena futura');
+    expect(screen.getAllByText(tr('app.search.scheduled'))).toHaveLength(1);
+    expect(screen.getByText(tr('app.search.scheduledNote'))).toBeInTheDocument();
+  });
+
   it('searches with filters and debounced text', async () => {
     const { api } = setup();
     expect(await screen.findByText('Nómina')).toBeInTheDocument();
@@ -559,8 +614,8 @@ describe('AnalysisView', () => {
     ]);
     renderWithProviders(<AnalysisView onOpenTab={jest.fn()} />, { api });
     expect(await screen.findByText(tr('app.categories.Ocio'))).toBeInTheDocument();
-    expect(screen.getByText(/▲ 50%/)).toBeInTheDocument();
-    expect(screen.getByText(/▼ 10%/)).toBeInTheDocument();
+    expect(screen.getByText(/▲ 50\s%/)).toBeInTheDocument();
+    expect(screen.getByText(/▼ 10\s%/)).toBeInTheDocument();
     expect(
       await screen.findByRole('img', { name: tr('app.analysis.netWorthTitle') })
     ).toBeInTheDocument();

@@ -40,6 +40,31 @@ describe('AnnualChart', () => {
     expect(screen.queryByRole('button', { name: 'Ene' })).toBeNull();
   });
 
+  it('says when the year counts automatic operations dated after today', async () => {
+    const api = createFakeApi();
+    api.transactionApi.getAnnual.mockResolvedValueOnce({
+      ...year2026,
+      scheduled: { count: 9, income: 0, expenses: 270, saving: 0 },
+    });
+    renderWithProviders(<AnnualChart initialYear={2026} />, { api });
+    expect(
+      await screen.findByText(/Incluye 9 operaciones automáticas con fecha posterior a hoy/)
+    ).toHaveTextContent(/270,00\s€ en gastos/);
+    api.transactionApi.getAnnual.mockResolvedValueOnce({
+      ...year2026,
+      year: 2027,
+      scheduled: { count: 1, income: 1500, expenses: 0, saving: 0 },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '2027' }));
+    expect(await screen.findByText(/Incluye 1 operación automática/)).toBeInTheDocument();
+  });
+
+  it('says nothing of scheduled operations when there are none', async () => {
+    setup();
+    await screen.findByRole('table');
+    expect(screen.queryByText(/operaciones? automáticas? con fecha posterior/)).toBeNull();
+  });
+
   it('shows a tooltip over the bars', async () => {
     setup();
     const bar = (await screen.findAllByRole('img', { name: /Ene 2026/ }))[0];

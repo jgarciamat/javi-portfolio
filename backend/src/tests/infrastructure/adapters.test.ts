@@ -22,6 +22,7 @@ import { BackupService } from '@infrastructure/backup/BackupService';
 import {
   accountExistsEmail,
   escapeHtml,
+  passwordResetEmail,
   purchaseEmail,
   verificationEmail,
 } from '@infrastructure/mail/templates';
@@ -190,6 +191,13 @@ describe('e-mail templates', () => {
   it('is localised', () => {
     expect(verificationEmail('en', 'Ann', 'u').subject).toMatch(/Verify/);
     expect(verificationEmail('es', 'Ana', 'u').subject).toMatch(/Verifica/);
+  });
+
+  it('says it is a no-reply address in the plain text too, not only in the HTML', () => {
+    expect(verificationEmail('es', 'Ana', 'u').text).toMatch(
+      /\n--\nEste mensaje es automático y esta dirección no recibe respuestas\.$/
+    );
+    expect(passwordResetEmail('en', 'Ann', 'u').text).toMatch(/does not receive replies\.$/);
   });
 });
 

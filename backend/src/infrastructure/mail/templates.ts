@@ -88,7 +88,11 @@ const NO_REPLY: Record<EmailLocale, string> = {
   en: 'This is an automatic message and this address does not receive replies.',
 };
 
-/** Shared HTML frame of every e-mail. */
+/** The text part ends with the same no-reply line as the HTML footer. */
+const withNoReply = (locale: EmailLocale, text: string): string =>
+  `${text}\n\n--\n${NO_REPLY[locale]}`;
+
+/** Shared HTML frame of every e-mail (footer #6b7280 on #f9fafb: 4.6:1). */
 function layout(locale: EmailLocale, body: string): string {
   return `<!DOCTYPE html>
 <html lang="${locale}">
@@ -102,7 +106,7 @@ function layout(locale: EmailLocale, body: string): string {
     .body { padding: 32px 40px; color: #374151; line-height: 1.6; }
     .body p { margin: 0 0 16px; }
     .btn { display: inline-block; background: #6366f1; color: #fff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 8px 0; }
-    .footer { padding: 20px 40px; background: #f9fafb; color: #9ca3af; font-size: 13px; text-align: center; }
+    .footer { padding: 20px 40px; background: #f9fafb; color: #6b7280; font-size: 13px; text-align: center; }
     .url { word-break: break-all; color: #6366f1; font-size: 13px; }
   </style>
 </head>
@@ -144,7 +148,7 @@ function render(
       <p>${c.ignore}</p>`
   );
   const text = `${c.greeting(plainName(name))}\n\n${c.intro}\n${url}\n\n${c.expires}\n${c.ignore}`;
-  return { subject: c.subject, html, text };
+  return { subject: c.subject, html, text: withNoReply(locale, text) };
 }
 
 const PURCHASE_COPY: Record<
@@ -211,7 +215,7 @@ export function purchaseEmail(
     `${c.terms} ${termsUrl}`,
     c.contact,
   ].join('\n');
-  return { subject: c.subject, html, text };
+  return { subject: c.subject, html, text: withNoReply(locale, text) };
 }
 
 const EXISTS_COPY: Record<
@@ -276,7 +280,7 @@ export function accountExistsEmail(
     c.google,
     c.ignore,
   ].join('\n');
-  return { subject: c.subject, html, text };
+  return { subject: c.subject, html, text: withNoReply(locale, text) };
 }
 
 const SECURITY_COPY: Record<
@@ -362,7 +366,7 @@ export function securityNoticeEmail(
   const text = [c.greeting(plainName(name)), '', body, `${c.check} ${settingsUrl}`, c.notYou].join(
     '\n'
   );
-  return { subject: `Finanverso: ${subject}`, html, text };
+  return { subject: `Finanverso: ${subject}`, html, text: withNoReply(locale, text) };
 }
 
 export const verificationEmail = (locale: EmailLocale, name: string, url: string): EmailContent =>
@@ -481,7 +485,7 @@ export function weeklyDigestEmail(
     `${c.open}: ${appUrl}`,
     c.off,
   ].join('\n');
-  return { subject: c.subject, html, text };
+  return { subject: c.subject, html, text: withNoReply(locale, text) };
 }
 
 const FREE = PLAN_LIMITS.free.resources;
@@ -649,5 +653,5 @@ export function trialNoticeEmail(
     '',
     c.off,
   ].join('\n');
-  return { subject: c.subject[notice.kind](date), html, text };
+  return { subject: c.subject[notice.kind](date), html, text: withNoReply(locale, text) };
 }

@@ -16,6 +16,14 @@ import { EndOfMonthBlock } from './EndOfMonthBlock';
 
 const RANGES = [3, 6, 12];
 
+/** «Sin Seguro hogar (180,00 €/año)»: the amount with the rule's own period. */
+const WITHOUT_KEY: Record<Forecast['rules'][number]['frequency'], string> = {
+  monthly: 'app.forecast.without',
+  bimonthly: 'app.forecast.withoutBimonthly',
+  quarterly: 'app.forecast.withoutQuarterly',
+  yearly: 'app.forecast.withoutYearly',
+};
+
 /** The longer outlook and the scenarios, locked on the free plan. */
 function LockedOutlook() {
   const { t } = useI18n();
@@ -129,7 +137,10 @@ function Outlook({
                 checked={excluded.includes(rule.id)}
                 onChange={() => onToggle(rule.id)}
               />{' '}
-              {t('app.forecast.without', { name: rule.description, amount: money(rule.amount) })}
+              {t(WITHOUT_KEY[rule.frequency], {
+                name: rule.description,
+                amount: money(rule.amount),
+              })}
             </label>
           ))}
         </fieldset>
@@ -145,12 +156,17 @@ function Outlook({
 export function ForecastPanel({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => void }) {
   const { insightsApi } = useApi();
   const { t } = useI18n();
-  const { available } = useFinances();
+  const { available, loading } = useFinances();
+  // Known to be free: the space kept while loading is that of next month only.
+  const free = useOptionalPlan()?.isFree;
   const [months, setMonths] = useState(6);
   const [excluded, setExcluded] = useState<string[]>([]);
+  // Asked once the month is there: before, `available` would change under it and the
+  // forecast (the heaviest request of the screen) was computed twice.
   const { data, error } = useResource(
     () => insightsApi.forecast(months, excluded),
-    [insightsApi, months, excluded.join(','), available]
+    [insightsApi, months, excluded.join(','), available],
+    { enabled: !loading }
   );
   const toggle = (id: string) =>
     setExcluded((list) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]));
@@ -163,7 +179,9 @@ export function ForecastPanel({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) =
         </>
       }
       tourId="forecast"
-      className={data || error ? undefined : 'forecast-panel--loading'}
+      className={
+        data || error ? undefined : `forecast-panel--loading${free ? ' forecast-panel--free' : ''}`
+      }
     >
       {error && <p className="form-error">{error}</p>}
       {!data && !error && <p className="section-hint">{t('app.common.loading')}</p>}

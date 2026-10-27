@@ -9,6 +9,19 @@ import { useFinances } from '../../application/FinancesContext';
 import { MonthRecapDialog } from './MonthRecap';
 import '../css/MonthActions.css';
 
+/**
+ * Which buttons the month shows. While it loads they are already there (disabled): the page
+ * does not jump when the movements arrive.
+ */
+function buttonsOf(f: ReturnType<typeof useFinances>) {
+  const waiting = f.loading && f.transactions.length === 0;
+  return {
+    waiting,
+    hasMovements: f.transactions.length > 0 || waiting,
+    hasSummary: (f.summary?.transactionCount ?? 0) > 0 || waiting,
+  };
+}
+
 /** What can be done with the month: export it (CSV or PDF), read its recap, import a statement. */
 export function MonthActions({ onImport }: { onImport?: () => void }) {
   const { t } = useI18n();
@@ -18,8 +31,7 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
   const pdf = useAction(t('app.exportButtons.error'));
   const f = useFinances();
   const [recapOpen, setRecapOpen] = useState(false);
-  const hasMovements = f.transactions.length > 0;
-  const hasSummary = !!f.summary && f.summary.transactionCount > 0;
+  const { waiting, hasMovements, hasSummary } = buttonsOf(f);
 
   /** The movements of the month with its totals, free on every plan. */
   const exportMonthPdf = () =>
@@ -55,6 +67,7 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
           <button
             type="button"
             className="month-action"
+            disabled={waiting}
             onClick={() => exportMonthCSV(f.transactions, f.summary, f.year, f.month)}
           >
             <Icon name="download" /> {t('app.export.month')}
@@ -62,7 +75,7 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
           <button
             type="button"
             className="month-action"
-            disabled={pdf.pending}
+            disabled={waiting || pdf.pending}
             aria-busy={pdf.pending}
             onClick={() => void exportMonthPdf()}
           >
@@ -72,7 +85,12 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
         </>
       )}
       {hasSummary && (
-        <button type="button" className="month-action" onClick={() => setRecapOpen(true)}>
+        <button
+          type="button"
+          className="month-action"
+          disabled={waiting}
+          onClick={() => setRecapOpen(true)}
+        >
           <Icon name="sparkles" /> {t('app.recap.open')}
         </button>
       )}

@@ -5,6 +5,7 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
+import { isPendingAutomatic } from '@modules/finances/domain/monthCharges';
 import { useFinances } from '../../application/FinancesContext';
 import {
   useTransactionView,
@@ -31,6 +32,7 @@ import { RatePrompt } from './RatePrompt';
 import { MonthRecap } from './MonthRecap';
 import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
+import { MonthCharges } from './MonthCharges';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
 import { QuickAdd } from './QuickAdd';
@@ -117,10 +119,15 @@ function MovementsPanel({
   const f = useFinances();
   const showAccount = f.accounts.filter((a) => !a.archived).length > 1;
   const bulk = useTransactionBulk();
+  // The automatic operations still to come are in «Recibos y cargos», not among what happened.
   const transactions = useMemo(() => {
     const hidden = new Set(bulk.hidden);
+    const today = todayDateOnly();
     return f.transactions.filter(
-      (tx) => !hidden.has(tx.id) && (!accountId || tx.accountId === accountId)
+      (tx) =>
+        !hidden.has(tx.id) &&
+        !isPendingAutomatic(tx, today) &&
+        (!accountId || tx.accountId === accountId)
     );
   }, [f.transactions, accountId, bulk.hidden]);
   const range = useMemo(
@@ -265,6 +272,13 @@ function CurrentPeriodPanels({
   );
 }
 
+/** The figures of the month, or their place while they load (no jump when they arrive). */
+function MonthFigures() {
+  const f = useFinances();
+  if (f.summary) return <SummaryCards summary={f.summary} carryover={f.carryover} />;
+  return f.loading ? <div className="summary-placeholder" aria-hidden="true" /> : null;
+}
+
 /** Spinner over the month while it loads. */
 function MonthLoading() {
   const { t } = useI18n();
@@ -322,8 +336,6 @@ export function MonthlyView({
       <div className="month-content">
         {f.loading && <MonthLoading />}
 
-        <MonthAlerts alerts={f.alerts} />
-        <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
         {empty ? (
           <EmptyMonthPanel onImport={onImport} onAddExpense={addExpense}>
@@ -338,6 +350,7 @@ export function MonthlyView({
         {/* Near the top: on a phone it is the quickest way to note a movement down. */}
         <QuickAdd
           transactions={f.transactions}
+          loading={f.loading}
           defaultDate={defaultDate}
           onAdd={f.addTransaction}
         />
@@ -355,7 +368,11 @@ export function MonthlyView({
           accountRequest={accountRequest}
           transactions={f.transactions}
         />
-        {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        <MonthFigures />
+        {/* Under the figures: they only exist once the month arrives, and above everything they
+            pushed the whole screen down when they did (and kept the figures far down on a computer). */}
+        <MonthAlerts alerts={f.alerts} />
+        <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {activeAccounts.length > 1 && (
           <AccountCards
             accounts={activeAccounts}
@@ -375,6 +392,7 @@ export function MonthlyView({
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
         {!empty && (
           <>
+            <MonthCharges onEdit={onEditTransaction} />
             <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
             <MovementsPanel onEdit={onEditTransaction} accountId={filterId} />
           </>

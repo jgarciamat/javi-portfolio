@@ -91,7 +91,7 @@ function periodLabel(t: ReturnType<typeof useI18n>['t'], months: number): string
 /** How and when the debts get paid, with the avalanche or the snowball method. */
 export function DebtPlanCard({ debts, onChanged }: { debts: Asset[]; onChanged: () => void }) {
   const { t } = useI18n();
-  const { money, monthLabel } = useFormat();
+  const { money, monthYear } = useFormat();
   const [extra, setExtra] = useState('');
   const [strategy, setStrategy] = useState<Strategy>('avalanche');
   const extraAmount = Math.max(0, Number.isFinite(parseDecimal(extra)) ? parseDecimal(extra) : 0);
@@ -107,7 +107,7 @@ export function DebtPlanCard({ debts, onChanged }: { debts: Asset[]; onChanged: 
   const now = new Date();
   const dateOf = (months: number) => {
     const d = new Date(now.getFullYear(), now.getMonth() + months, 1);
-    return monthLabel(d.getFullYear(), d.getMonth() + 1);
+    return monthYear(d.getFullYear(), d.getMonth() + 1);
   };
 
   return (

@@ -55,12 +55,14 @@ function ScoreRing({ health }: { health: Health }) {
 function Pillars({ health }: { health: Health }) {
   const { t, locale } = useI18n();
   const { percent } = useFormat();
+  // «4,1/25» and «16,3 meses» with the decimal mark of the language, like every other figure.
+  const points = (value: number) => value.toLocaleString(intlLocale(locale));
   const text = (id: string, value: number) =>
     id === 'cushion' && value === 1
       ? t('app.health.detail.cushionOne')
-      : t(`app.health.detail.${id}`, { value: id === 'cushion' ? value : percent(value, 0) });
-  // «4,1/25» with the decimal mark of the language, like every other figure.
-  const points = (value: number) => value.toLocaleString(intlLocale(locale));
+      : t(`app.health.detail.${id}`, {
+          value: id === 'cushion' ? points(value) : percent(value, 0),
+        });
   return (
     <ul className="health-pillars">
       {health.pillars.map((p) => (
