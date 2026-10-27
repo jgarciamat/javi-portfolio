@@ -78,13 +78,30 @@ describe('ImportModal', () => {
       },
     ]);
     upload(statement(workbook, 'extracto.xlsx'));
-    expect(await screen.findByText(/extracto\.xlsx · CSV/)).toBeInTheDocument();
+    expect(await screen.findByText(/extracto\.xlsx · Excel ·/)).toBeInTheDocument();
+    expect(screen.queryByText(/· CSV/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     await waitFor(() => expect(api.transactionApi.import).toHaveBeenCalled());
     expect(api.transactionApi.import.mock.calls[0][0]).toEqual([
       expect.objectContaining({ date: '2026-03-02', description: 'MERCADONA', amount: -54.3 }),
       expect.objectContaining({ date: '2026-03-03', description: 'NOMINA', amount: 1800 }),
     ]);
+  });
+
+  it('names an Excel with macros as Excel too, and reads its first sheet', async () => {
+    const { upload } = setup();
+    const workbook = buildXlsx([
+      {
+        name: 'Movimientos',
+        rows: [
+          ['Fecha', 'Concepto', 'Importe'],
+          ['02/03/2026', 'BAR', -3],
+        ],
+      },
+    ]);
+    upload(statement(workbook, 'Extracto.XLSM'));
+    expect(await screen.findByText(/Extracto\.XLSM · Excel ·/)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: tr('app.import.col.date') })).toBeInTheDocument();
   });
 
   it('says how it understood the columns and keeps them folded, open only when one is missing', async () => {

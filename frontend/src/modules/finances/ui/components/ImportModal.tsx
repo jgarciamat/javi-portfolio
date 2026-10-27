@@ -124,15 +124,19 @@ function missingColumns(mapping: ColumnMapping): string[] {
 /** Files keep their format's name; pasted text and screenshots are named in the person's language. */
 const FORMAT_NAMES: Record<ImportState['format'], string> = {
   csv: 'CSV',
+  excel: 'Excel',
   norma43: 'Norma 43',
   pdf: 'PDF',
   text: 'app.import.source.paste',
   image: 'app.import.source.screenshot',
 };
-const editable = (imp: ImportState): boolean => imp.format === 'text' || imp.format === 'image';
+/** Read from the bank's app (pasted or a screenshot), not from a file. */
+const fromApp = (imp: ImportState): boolean => imp.format === 'text' || imp.format === 'image';
+/** Movements read without columns from the bank's app: each row can be corrected. */
+const editable = (imp: ImportState): boolean => fromApp(imp) && !imp.columns;
 
 const IMPORT_ACCEPT =
-  '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*';
+  '.csv,.xlsx,.xlsm,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,image/*';
 
 /** An image pasted with Ctrl/Cmd+V while the importer is open is read as a screenshot. */
 function usePastedImage(onImage: (image: File) => void) {
@@ -372,7 +376,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
     <div className="modal-body">
       <p className="section-hint">
         {imp.fileName && `${imp.fileName} · `}
-        {editable(imp) ? t(FORMAT_NAMES[imp.format]) : FORMAT_NAMES[imp.format]} ·{' '}
+        {fromApp(imp) ? t(FORMAT_NAMES[imp.format]) : FORMAT_NAMES[imp.format]} ·{' '}
         {t('app.import.rowsFound', { count: imp.rows.length })}
         {imp.skipped.length > 0 &&
           ` · ${t('app.import.rowsSkipped', { count: imp.skipped.length })}`}
@@ -383,7 +387,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
         </p>
       )}
       {imp.format === 'pdf' && <PdfNotes imp={imp} />}
-      {imp.format === 'csv' && <ColumnMappingFields imp={imp} />}
+      {imp.columns && <ColumnMappingFields imp={imp} />}
       {accounts.length > 1 && (
         <label className="field">
           <span className="field-label">{t('app.transaction.form.account')}</span>
@@ -591,7 +595,7 @@ function Footer({ imp, onClose }: { imp: ImportState; onClose: () => void }) {
     return (
       <div className="modal-footer">
         <button className="btn-secondary" onClick={imp.reset}>
-          {t(editable(imp) ? 'app.import.otherSource' : 'app.import.otherFile')}
+          {t(fromApp(imp) ? 'app.import.otherSource' : 'app.import.otherFile')}
         </button>
         <button
           className="btn-primary"

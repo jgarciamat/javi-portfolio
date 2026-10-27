@@ -29,7 +29,8 @@ import { readSpreadsheet, sheetAsText } from '../spreadsheet';
 
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
 /** Where the movements come from: a file, text pasted from the bank's app or a screenshot of it. */
-export type ImportFormat = 'csv' | 'norma43' | 'pdf' | 'text' | 'image';
+/** Where the movements came from: the kind of file, the pasted text or a screenshot. */
+export type ImportFormat = 'csv' | 'excel' | 'norma43' | 'pdf' | 'text' | 'image';
 /** What a row of pasted movements can be corrected in, before the preview. */
 export type RowChanges = Partial<Pick<ImportRowDTO, 'date' | 'description' | 'amount'>>;
 
@@ -190,13 +191,13 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     read.load(rowsFromCSV(tableRows, next));
   };
 
-  /** A statement as a table of text: find the bank, the header row and the columns. */
-  const loadTable = (parsedTable: string[][]) => {
+  /** A statement as a table of text (CSV, Excel, pasted): find the bank, header row and columns. */
+  const loadTable = (parsedTable: string[][], source: 'csv' | 'excel' | 'text') => {
     if (parsedTable.length < 2) throw new Error('empty');
     // Banks put account details above the header and some split their columns.
     const found = detectBank(parsedTable);
     const bankTable = normalizeBankTable(parsedTable.slice(found.headerRow), found.bank);
-    setFormat('csv');
+    setFormat(source);
     setBank(found.bank);
     setPdfBank(null);
     setBalanceMismatches(0);
@@ -208,7 +209,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   /** Movements already read, without columns to map (Norma 43, PDF, pasted text, screenshot). */
   const loadRows = (
     parsed: ParsedRows,
-    source: Exclude<ImportFormat, 'csv'>,
+    source: Exclude<ImportFormat, 'csv' | 'excel'>,
     pdf: { bank: string | null; balanceMismatches: number } = { bank: null, balanceMismatches: 0 }
   ) => {
     setFormat(source);
@@ -225,7 +226,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setError(null);
     setFileName('');
     const table = looksLikeTable(text) ? parseCSV(text) : [];
-    if (table.length > 1) return loadTable(table);
+    if (table.length > 1) return loadTable(table, 'text');
     const parsed = parsePastedMovements(text, todayDateOnly());
     if (parsed.rows.length === 0) setError('app.import.paste.nothing');
     else loadRows(parsed, 'text');
@@ -238,11 +239,11 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setFileName(file.name);
     if (isImage(file)) return screenshot.load(file);
     try {
-      if (/\.xlsx?$/i.test(file.name)) {
+      if (/\.xls[xm]?$/i.test(file.name)) {
         // A spreadsheet export: its first sheet with data is the table, as a CSV would be.
         const sheet = (await readSpreadsheet(file)).find((sh) => sh.rows.length >= 2);
         if (!sheet) throw new Error('empty');
-        return loadTable(sheetAsText(sheet));
+        return loadTable(sheetAsText(sheet), 'excel');
       }
       if (/\.pdf$/i.test(file.name) || file.type === 'application/pdf') {
         const parsed = await readBankPdf(file);
@@ -250,7 +251,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
       }
       const text = await readStatement(file);
       if (looksLikeNorma43(text)) loadRows(parseNorma43(text), 'norma43');
-      else loadTable(parseCSV(text));
+      else loadTable(parseCSV(text), 'csv');
     } catch (e) {
       setError(
         e instanceof BankPdfError ? `app.import.error.pdf.${e.code}` : 'app.import.error.read'
@@ -306,6 +307,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     pdfBank,
     balanceMismatches,
     headers: table[0] ?? [],
+    /** The movements come from a table whose columns can be chosen. */
+    columns: table.length > 0,
     mapping,
     // rows, skipped, review and their corrections.
     ...read,

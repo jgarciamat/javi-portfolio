@@ -112,13 +112,17 @@ describe('pasting movements in the importer', () => {
     expect(screen.getByText(tr('app.import.paste.nothing'))).toBeInTheDocument();
   });
 
-  it('reads a pasted table with a header with its columns, as a CSV', async () => {
+  it('reads a pasted table with a header with its columns, named as pasted text', async () => {
     setup();
     paste('Fecha\tConcepto\tImporte\n02/03/2026\tMERCADONA\t-54,30');
     expect(
-      await screen.findByText(literal(tr('app.import.rowsFound', { count: 1 })))
-    ).toBeVisible();
+      await screen.findByText(literal(tr('app.import.rowsFound', { count: 1 })), { exact: false })
+    ).toHaveTextContent(`${tr('app.import.source.paste')} ·`);
+    expect(screen.queryByText(/· CSV/)).toBeNull();
     expect(screen.getByRole('combobox', { name: tr('app.import.col.date') })).toBeInTheDocument();
+    // The rows come from columns: they are not edited one by one, and the way back starts again.
+    expect(screen.queryByLabelText(/^Importe /)).toBeNull();
+    expect(screen.getByRole('button', { name: tr('app.import.otherSource') })).toBeInTheDocument();
   });
 
   it('moves between the tabs with the arrows, Home and End', () => {
