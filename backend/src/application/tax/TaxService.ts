@@ -65,7 +65,19 @@ export class TaxService {
   }
 
   yearly(userId: string, year: number): YearTax {
-    return yearlyTax(year, this.movements(userId));
+    // Only that year's professional movements, from SQL: the estimate adds up whole cents, so the
+    // order they come in does not change it (with tens of thousands of movements, loading them all
+    // took most of the time).
+    const rates = new Map(this.business.listByUser(userId).map((b) => [b.categoryId, b.vatRate]));
+    const movements = this.transactions
+      .listTaxMovements(userId, [...rates.keys()], year)
+      .map((t) => ({
+        date: t.date,
+        type: t.type,
+        amountCents: t.amountCents,
+        vatRate: rates.get(t.categoryId) as VatRate,
+      }));
+    return yearlyTax(year, movements);
   }
 
   /**

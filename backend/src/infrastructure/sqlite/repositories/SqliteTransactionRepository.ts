@@ -429,6 +429,30 @@ export class SqliteTransactionRepository implements TransactionRepository {
     }));
   }
 
+  listTaxMovements(
+    userId: string,
+    categoryIds: string[],
+    year: number
+  ): ReturnType<TransactionRepository['listTaxMovements']> {
+    const prefix = `${year}-`;
+    const found: ReturnType<TransactionRepository['listTaxMovements']> = [];
+    inChunks(categoryIds, 500, (chunk) => {
+      const rows = this.db
+        .prepare(
+          `SELECT date, type, amount_cents AS amountCents, category_id AS categoryId
+             FROM transactions
+            WHERE user_id = ? AND type IN ('INCOME', 'EXPENSE')
+              AND category_id IN (${placeholders(chunk.length)})
+              AND substr(date, 1, ?) = ?`
+        )
+        .all(userId, ...chunk, prefix.length, prefix) as ReturnType<
+        TransactionRepository['listTaxMovements']
+      >;
+      found.push(...rows);
+    });
+    return found;
+  }
+
   firstDate(userId: string): string | null {
     const row = this.db
       .prepare('SELECT MIN(date) AS date FROM transactions WHERE user_id = ?')

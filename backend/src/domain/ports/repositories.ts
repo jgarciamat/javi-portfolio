@@ -263,6 +263,15 @@ export interface TransactionRepository {
   listSubscriptionCandidates(userId: string): (Omit<SubscriptionCandidate, 'categoryName'> & {
     categoryId: string;
   })[];
+  /**
+   * Income and expenses of the given categories dated in `year`, with only what the quarterly
+   * tax estimate reads (lighter than `listAllByUser` with tens of thousands of movements).
+   */
+  listTaxMovements(
+    userId: string,
+    categoryIds: string[],
+    year: number
+  ): { date: string; type: 'INCOME' | 'EXPENSE'; amountCents: Cents; categoryId: string }[];
   /** Date of the first movement (YYYY-MM-DD), or null without any. */
   firstDate(userId: string): string | null;
   /** Movements of automatic operations of the periods of `year` dated after `today`. */
