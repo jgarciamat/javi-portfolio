@@ -138,6 +138,8 @@ test('reads a screenshot of the bank app on the device and imports its movements
   page,
   context,
 }) => {
+  // Reading an image on a slow runner can take longer than the default 30 s.
+  test.setTimeout(120_000);
   const painter = await context.newPage();
   await painter.setViewportSize({ width: 390, height: 600 });
   await painter.setContent(bankApp);
