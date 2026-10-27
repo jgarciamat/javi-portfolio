@@ -28,7 +28,8 @@ function useShortcut(input: RefObject<HTMLInputElement | null>) {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (!SHORTCUT_KEYS.includes(event.key) || typingIn(event.target)) return;
-      if (document.querySelector('[role="dialog"]')) return;
+      // The closed menu stays in the page as a hidden dialog: only an open one blocks the key.
+      if (document.querySelector('[role="dialog"]:not([aria-hidden="true"])')) return;
       event.preventDefault();
       input.current?.focus();
     };

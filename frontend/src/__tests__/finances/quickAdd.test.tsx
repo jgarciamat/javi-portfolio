@@ -114,8 +114,14 @@ describe('QuickAdd', () => {
     fireEvent.keyDown(other, { key: 'N' });
     expect(field).not.toHaveFocus();
     dialog.remove();
+    // A closed menu is a hidden dialog still in the page: it does not block the key.
+    const closed = document.createElement('aside');
+    closed.setAttribute('role', 'dialog');
+    closed.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(closed);
     fireEvent.keyDown(other, { key: 'N' });
     expect(field).toHaveFocus();
+    closed.remove();
   });
 
   it('is on the month view, where a quick movement is saved like any other', async () => {

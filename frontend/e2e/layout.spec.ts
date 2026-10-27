@@ -62,3 +62,11 @@ test('the menu fits a 1280x720 screen without scrolling and spaces its first tit
   const head = await page.locator('.burger-panel-header').boundingBox();
   expect((title?.y ?? 0) - ((head?.y ?? 0) + (head?.height ?? 0))).toBeGreaterThanOrEqual(12);
 });
+
+/** The N key jumps to «Registrar transacción rápida» (the closed menu is a hidden dialog in the page). */
+test('the N key puts the cursor in the quick entry on a computer', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await signIn(page);
+  await page.locator('body').press('n');
+  await expect(page.getByLabel('Registrar transacción rápida', { exact: true })).toBeFocused();
+});
