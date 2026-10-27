@@ -10,6 +10,12 @@ import { freezeTime, restoreTime } from '@test-utils/time';
 import {
   darkDayBelow,
   dayColumnBalance,
+  headerGreeting,
+  headerGreetingWide,
+  headerHolderAvailable,
+  headerLightSignedWide,
+  headerNoGreeting,
+  headerTabs,
   lightBlocks,
   webListBalances,
 } from './fixtures/ocrScreenshots';
@@ -149,6 +155,73 @@ describe('a web bank list with the balance under each amount (reported case)', (
       ).rows;
       expect(row).toMatchObject({ amount: -50, type: 'EXPENSE', description: 'BIZUM ENVIADO' });
     }
+  });
+});
+
+/** The 10 movements of the invented bank app of the videos, newest first. */
+const BANK_APP: [string, string, number][] = [
+  ['2026-10-26', 'Supermercado Los Olivos', -38.45],
+  ['2026-10-26', 'Café del Parque', -1.8],
+  ['2026-10-25', 'Cine Mirador', -17],
+  ['2026-10-24', 'Panadería La Espiga', -3.2],
+  ['2026-10-24', 'Gasolinera Ruta 9', -52.1],
+  ['2026-10-23', 'Transferencia de Marta R.', 25],
+  ['2026-10-22', 'Recibo luz Hogar Eléctrica', -64.38],
+  ['2026-10-21', 'Nómina Estudio Aurora', 1450],
+  ['2026-10-21', 'Farmacia Central', -12.45],
+  ['2026-10-20', 'Suscripción Música Plus', -9.99],
+];
+
+describe('a screenshot with the header of the bank app above the movements (reported case)', () => {
+  it.each([
+    ['a greeting, the account, the big balance and «Saldo disponible»', headerGreeting],
+    ['the same 2000 px wide', headerGreetingWide],
+    ['no greeting', headerNoGreeting],
+    ['the holder, «Saldo», the balance, «disponible» and a search box', headerHolderAvailable],
+    ['the tab «Movimientos | Tarjetas» and «Fraccionar pago»', headerTabs],
+    [
+      'a light header with a signed balance, tabs and «Buscar», 2000 px wide',
+      headerLightSignedWide,
+    ],
+  ])('reads the 10 movements and nothing of the header: %s', (_name, lines) => {
+    const parsed = parsePastedMovements(textFromOcrLines(lines), TODAY);
+    expect(parsed.rows.map((r) => [r.date, r.description, r.amount])).toEqual(BANK_APP);
+    expect(parsed.skipped).toEqual([]);
+    expect(parsed.review).toEqual([]);
+  });
+
+  it('leaves out the big balance even without a label around it', () => {
+    const bare = headerHolderAvailable.filter(
+      (l) => !['Saldo', 'disponible', 'Tarjetas Recibos', 'Buscar movimientos'].includes(l.text)
+    );
+    expect(textFromOcrLines(bare)).not.toContain('2.186,32 €\nLunes');
+    expect(brief(textFromOcrLines(bare))).toEqual(BANK_APP);
+  });
+
+  it('the same header copied as text is not a movement either', () => {
+    const header = ['Hola, Lucía', 'Cuenta corriente ···· 4821', '+2.186,32 €', 'Saldo disponible'];
+    for (const tabs of [[], ['Movimientos | Tarjetas'], ['Buscar']]) {
+      const text = [...header, ...tabs, '26/10/2026', 'Cine Mirador', '-17,00 €'].join('\n');
+      expect(brief(text)).toEqual([['2026-10-26', 'Cine Mirador', -17]]);
+    }
+    // An amount alone at the top, with nothing above it, is no movement.
+    expect(brief('2.186,32 €\nLunes, 26 de octubre\nCine Mirador -17,00 €')).toEqual([
+      ['2026-10-26', 'Cine Mirador', -17],
+    ]);
+  });
+
+  it('keeps the first movement when its day is written under it, or its concept above the day', () => {
+    expect(brief('Hola, Lucía\nGlovo\n-18,40 €\n24/10/2026\nLidl\n-3,00 €\n23/10/2026')).toEqual([
+      ['2026-10-24', 'Glovo', -18.4],
+      ['2026-10-23', 'Lidl', -3],
+    ]);
+    expect(brief('Cuentas\nWWW.AMAZON\n25/10/2026\n-38,84 €')).toEqual([
+      ['2026-10-25', 'WWW.AMAZON', -38.84],
+    ]);
+    // Below the first day, a concept may start like the header.
+    expect(brief('26/10/2026\nCuenta nómina comisión -2,00 €')).toEqual([
+      ['2026-10-26', 'Cuenta nómina comisión', -2],
+    ]);
   });
 });
 

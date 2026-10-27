@@ -66,6 +66,14 @@ const NOT_A_MOVEMENT =
   /^(saldo|balance|disponible|available|total|retenido|pendiente de|movimientos|transactions|fecha(?! de operacion)|date)\b/;
 
 /**
+ * The header of the bank's app above the movements: a greeting, the account and its holder, the
+ * tabs and the search box («Hola, Lucía», «Cuenta corriente ···· 4821», «Tarjetas», «Buscar»).
+ * Only read as such above the first day: below it, a concept may start with any of these words.
+ */
+const HEADER =
+  /^(hola|hello|hi|buen[oa]s? (dias|tardes|noches)|bienvenid[oa]|welcome|good (morning|afternoon|evening)|cuentas?|accounts?|tarjetas|cards|recibos|buscar|search|inicio|home)\b/;
+
+/**
  * «Fecha de operación: 23-10-2026»: the day the payment was made, under the day it was booked. The
  * label goes; the day stays (it is the one taken: it comes before the booked one in the rules).
  */
@@ -316,6 +324,32 @@ interface ReadLine {
   line: number;
 }
 
+interface TextLine extends ReadLine {
+  /** About the account, not a movement («Saldo disponible»): never read. */
+  label: boolean;
+  /** A greeting, the account, a tab: part of the header when above the first day. */
+  header: boolean;
+}
+
+/**
+ * What is above the first day is the header of the app (the greeting, the account, the big balance,
+ * «Saldo disponible», the tabs): it is not read, but for the movement just above that day, when the
+ * app writes the day under each movement («Glovo -18,40 €» or «Glovo» / «-18,40 €», then
+ * «24/10/2026») or the concept above the day («WWW.AMAZON», then «25 Oct 2026»). An amount alone
+ * under a greeting or a label has no concept of a movement: it is the balance, not one.
+ */
+function withoutHeader(lines: TextLine[]): ReadLine[] {
+  const first = lines.findIndex((l) => !l.label && l.parts.date);
+  const movement = (l: TextLine | undefined): l is TextLine => !!l && !l.label && !l.header;
+  const concept = (l: TextLine | undefined) =>
+    movement(l) && !l.parts.date && l.parts.amounts.length === 0 && !!l.parts.text;
+  let from = Math.max(first, 0);
+  const above = lines[first - 1];
+  if (movement(above) && (above.parts.amounts.length === 0 || above.parts.text)) from = first - 1;
+  else if (movement(above) && concept(lines[first - 2])) from = first - 2;
+  return lines.slice(from).filter((l) => !l.label);
+}
+
 const near = (a: number, b: number): boolean => Math.abs(a - b) < 0.005;
 
 /**
@@ -399,12 +433,19 @@ function readDrafts(text: string, today: string): { drafts: Draft[]; skipped: nu
   };
   const normalized = text.normalize('NFC').replace(DASHES, '-');
   // Without a letter or a digit a line is a stray mark of the OCR («;»), not part of a movement.
-  const lines = joinSplitDays(normalized.split(/\r?\n/)).flatMap((raw, index) =>
-    !/[\p{L}\d]/u.test(raw) || NOT_A_MOVEMENT.test(fold(raw.trim()))
-      ? []
-      : [{ parts: splitLine(raw, today), line: index + 1 }]
-  );
-  for (const { parts, line } of withoutBalances(lines)) {
+  const lines = joinSplitDays(normalized.split(/\r?\n/)).flatMap((raw, index) => {
+    if (!/[\p{L}\d]/u.test(raw)) return [];
+    const folded = fold(raw.trim());
+    return [
+      {
+        parts: splitLine(raw, today),
+        line: index + 1,
+        label: NOT_A_MOVEMENT.test(folded),
+        header: HEADER.test(folded),
+      },
+    ];
+  });
+  for (const { parts, line } of withoutBalances(withoutHeader(lines))) {
     if (parts.amounts.length === 0) readOtherLine(st, parts);
     else readMovementLine(st, parts, line);
   }
@@ -427,10 +468,25 @@ export interface OcrLine {
  */
 const ICON_NOISE = /^(?:(?:\([^)]{0,4}\)|\p{L}|[^\p{L}\p{N}\s]+)\s+)+(?=\p{L}{2})/u;
 
+/** A piece that is only an amount («+2.186,32 €»), nothing else. */
+const AMOUNT_ALONE = /^[+\-\u2010-\u2015\u2212]?\s?[€$£]?\s?\d[\d.,\s]*\d\s?(?:€|eur)?$/i;
+
+/**
+ * The big balance at the top of the app: an amount alone, written half as tall again as the usual
+ * line. It is the balance of the account, never a movement.
+ */
+function withoutBigBalance(lines: OcrLine[]): OcrLine[] {
+  const height = (l: OcrLine) => l.y1 - l.y0;
+  const heights = lines.map(height).sort((a, b) => a - b);
+  const usual = heights[Math.floor(heights.length / 2)];
+  return lines.filter((l) => !(height(l) > 1.5 * usual && AMOUNT_ALONE.test(l.text.trim())));
+}
+
 /**
  * The text of a screenshot as rows, the way they look: the OCR often reads the concepts and the
  * amounts as two columns, so the pieces that sit side by side are put back on one line (an amount
- * goes with the piece it overlaps most, if it overlaps it by a third of its height).
+ * goes with the piece it overlaps most, if it overlaps it by a third of its height). The big
+ * balance of the header is left out.
  */
 export function textFromOcrLines(lines: OcrLine[]): string {
   const rows: OcrLine[][] = [];
@@ -438,7 +494,8 @@ export function textFromOcrLines(lines: OcrLine[]): string {
     (Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0)) / Math.min(a.y1 - a.y0, b.y1 - b.y0);
   const sideBySide = (row: OcrLine[], line: OcrLine): boolean =>
     row.every((piece) => line.x0 >= piece.x1 || line.x1 <= piece.x0);
-  for (const line of [...lines].filter((l) => l.text.trim()).sort((a, b) => a.y0 - b.y0)) {
+  const pieces = withoutBigBalance(lines.filter((l) => l.text.trim()));
+  for (const line of pieces.sort((a, b) => a.y0 - b.y0)) {
     let best: OcrLine[] | null = null;
     let bestOverlap = 1 / 3;
     for (const row of rows) {

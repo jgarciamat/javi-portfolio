@@ -83,12 +83,12 @@ Gasolinera Repsol **** 5402 14:32
     expect(parsed.review).toEqual([]);
   });
 
-  it('skips amounts it cannot place and ignores what is not a movement', () => {
+  it('ignores what is not a movement, and an amount alone above the first day (the header)', () => {
     const parsed = read(
       'Fecha Concepto Importe\n-12,00 €\n\nSaldo disponible 900,00 €\n5402 2026\n12/10/2026 Cuota 0,00 €'
     );
     expect(parsed.rows).toEqual([]);
-    expect(parsed.skipped).toEqual([2]);
+    expect(parsed.skipped).toEqual([]);
   });
 
   it('does not take numbers without decimals nor a currency as amounts, nor bad days', () => {

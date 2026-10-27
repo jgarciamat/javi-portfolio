@@ -39,6 +39,13 @@ Tesseract y datos que la app. Las líneas que devolvió el OCR están en
 | Claro, día encima de cada bloque, importe a la derecha           | 9           | 9           | —                                        |
 | Oscuro con iconos, fecha debajo del concepto                     | 6           | 6           | Un concepto con una letra mal («Maptre») |
 | Columna de día partida («25» / «OCT») y saldo debajo del importe | 6           | 6           | El saldo se reconoce porque cuadra       |
+| Lista con cabecera de la app (saludo, saldo grande, pestañas)    | 10          | 10          | 6 cabeceras, 390 px (3x) y 2000 px       |
+
+Lo que hay por encima del primer día (saludo, cuenta, titular, saldo grande, «Saldo disponible»,
+pestañas, buscador) es la cabecera de la app y no se lee: solo cuenta el movimiento justo encima de
+ese día cuando la app pone el día debajo. Un importe solo, sin concepto encima, y el saldo grande de
+la cabecera (un importe solo, la mitad más alto que una línea normal) no son movimientos. Antes, una
+captura con cabecera daba 7 de 10 y una fila falsa («Hola, Lucía +2186,32»).
 
 Sin el paso a gris e invertido, la captura oscura daba 0 de 6 (el OCR leía iconos y texto como
 basura), y sin volver a juntar las columnas, 0 de 6 en el diseño oscuro y 0 de 6 en el de saldo.
