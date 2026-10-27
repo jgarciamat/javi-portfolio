@@ -57,7 +57,7 @@ export function EmptyMonthPanel({
         <Icon name="rocket" /> {t('app.emptyMonth.title')}
       </h2>
       <p className="section-hint">{t('app.emptyMonth.body')}</p>
-      <div className="empty-month-options">
+      <div className="empty-month-options" data-tour="month-actions">
         {onImport && (
           <>
             <EmptyMonthOption

@@ -65,10 +65,22 @@ async function ensureTour(page: Page): Promise<void> {
   ).toBeVisible();
 }
 
+/** The forecast and the month actions wait for a few transactions: whoever walks the full tour has them. */
+async function addFewTransactions(page: Page): Promise<void> {
+  await openSection(page, 'Resumen mensual');
+  const quick = page.getByLabel('Registrar transacción rápida', { exact: true });
+  for (const n of [1, 2, 3, 4, 5]) {
+    await quick.fill(`café ${n},50`);
+    await quick.press('Enter');
+    await expect(page.getByRole('status').filter({ hasText: `${n},50` })).toBeVisible();
+  }
+}
+
 /** Opens the full tour from Settings (the short one is closed first if it opened). */
 async function openFullTour(page: Page): Promise<void> {
   await ensureTour(page);
   await page.getByRole('dialog').getByRole('button', { name: 'Saltar el tour' }).click();
+  await addFewTransactions(page);
   await openSection(page, 'Ajustes');
   await page.getByRole('button', { name: 'Ver el recorrido completo' }).click();
   await expect(
