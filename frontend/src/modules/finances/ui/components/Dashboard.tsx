@@ -412,7 +412,7 @@ export function Dashboard() {
         )}
       </div>
 
-      <main className={`main${dash.tab === 'crypto' ? ' main--wide' : ''}`}>
+      <main className="main">
         <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
         <HouseholdJoinPrompt />
         <div

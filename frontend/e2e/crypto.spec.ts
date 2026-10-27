@@ -421,6 +421,24 @@ test('fits a phone upright and on its side without sideways scrolling', async ({
   }
 });
 
+test('keeps the console as wide and centred as the other screens, without sideways scrolling', async ({
+  page,
+}) => {
+  const box = () => page.locator('main.main').boundingBox();
+  for (const width of [1280, 1920, 2560]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(page.getByRole('img', { name: /Gráfica de Bitcoin/ })).toBeVisible();
+    const crypto = await box();
+    // The same container as «Resumen mensual»: at most ~1.2k px, equal margins either side.
+    expect(crypto!.width).toBeLessThanOrEqual(1250);
+    expect(Math.abs(crypto!.x - (width - crypto!.x - crypto!.width))).toBeLessThanOrEqual(20);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  }
+});
+
 test('season, practice portfolio, ranking and Premium comforts', async ({ page, pageErrors }) => {
   // The official season of this month, with its countdown; no commission notice before typing an
   // amount (it appears in «Before opening») and no free CSV.

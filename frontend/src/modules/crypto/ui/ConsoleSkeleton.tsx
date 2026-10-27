@@ -113,58 +113,52 @@ export function ConsoleSkeleton() {
   return (
     <div className="cc-skeleton" role="status" aria-busy="true">
       <span className="sr-only">{t('app.crypto.skeleton.label')}</span>
-      {/* Laid out like the console: the chart takes the same room, nothing moves when it arrives. */}
-      <div className="cc-desk">
-        <div className="cc-desk-chart">
-          <div className="card cc-market cc-skel" aria-hidden="true">
-            <Bar w="8rem" className="cc-skel-title" />
-            <div className="cc-market-grid">
-              <div className="cc-coins">
-                <div className="cc-coins-title">
-                  <Bar w="4rem" />
-                </div>
-                <ul className="cc-coins-list">
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <CoinRow key={i} />
-                  ))}
-                </ul>
+      <div className="card cc-market cc-skel" aria-hidden="true">
+        <Bar w="8rem" className="cc-skel-title" />
+        <div className="cc-market-grid">
+          <div className="cc-coins">
+            <div className="cc-coins-title">
+              <Bar w="4rem" />
+            </div>
+            <ul className="cc-coins-list">
+              {Array.from({ length: 12 }, (_, i) => (
+                <CoinRow key={i} />
+              ))}
+            </ul>
+          </div>
+          <div className="cc-market-top">
+            <div className="cc-market-head">
+              <div className="cc-skel-quote">
+                <span className="cc-skel-dot cc-skel-dot--big" />
+                <Bar w="9rem" />
+                <span className="cc-skel-price" />
+                <Bar w="11rem" className="cc-skel-changes" />
               </div>
-              <div className="cc-market-top">
-                <div className="cc-market-head">
-                  <div className="cc-skel-quote">
-                    <span className="cc-skel-dot cc-skel-dot--big" />
-                    <Bar w="9rem" />
-                    <span className="cc-skel-price" />
-                    <Bar w="11rem" className="cc-skel-changes" />
-                  </div>
-                  <div className="cc-market-controls">
-                    <div className="cc-segmented cc-intervals">
-                      {CHART_INTERVALS.map((i) => (
-                        <span key={i} className="cc-skel-seg" />
-                      ))}
-                    </div>
-                    <div className="cc-segmented cc-currency">
-                      <span className="cc-skel-seg cc-skel-seg--wide" />
-                      <span className="cc-skel-seg cc-skel-seg--wide" />
-                    </div>
-                  </div>
-                </div>
-                <div className="cc-stats">
-                  {Array.from({ length: 6 }, (_, i) => (
-                    <div key={i}>
-                      <Bar w="60%" />
-                      <Bar w="80%" />
-                    </div>
+              <div className="cc-market-controls">
+                <div className="cc-segmented cc-intervals">
+                  {CHART_INTERVALS.map((i) => (
+                    <span key={i} className="cc-skel-seg" />
                   ))}
                 </div>
-              </div>
-              <div className="cc-market-chart">
-                <ChartColumn />
+                <div className="cc-segmented cc-currency">
+                  <span className="cc-skel-seg cc-skel-seg--wide" />
+                  <span className="cc-skel-seg cc-skel-seg--wide" />
+                </div>
               </div>
             </div>
+            <div className="cc-stats">
+              {Array.from({ length: 6 }, (_, i) => (
+                <div key={i}>
+                  <Bar w="60%" />
+                  <Bar w="80%" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="cc-market-chart">
+            <ChartColumn />
           </div>
         </div>
-        <div className="cc-desk-side" />
       </div>
     </div>
   );

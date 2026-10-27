@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { ReferralSummary } from '@modules/billing/domain/types';
@@ -148,39 +148,29 @@ function SimulatorBody({
   symbol,
   coin,
   onGlossary,
-  chart,
 }: {
   portfolio: SimPortfolio;
   sim: Simulator;
   symbol: string;
   coin: CryptoCoin | undefined;
   onGlossary: () => void;
-  /** The chart of the market: on a computer the order box goes next to it, both in view. */
-  chart: ReactNode;
 }) {
   const busy = sim.action.pending;
   return (
     <>
-      <div className="cc-desk">
-        <div className="cc-desk-chart">{chart}</div>
-        <div className="cc-desk-side">
-          <OrderBox
-            symbol={symbol}
-            coinName={coin?.name ?? symbol}
-            price={coin?.price ?? null}
-            portfolio={portfolio}
-            busy={busy}
-            onPlace={sim.place}
-            onGuide={onGlossary}
-            practice={
-              outOfBalance(portfolio) ? (
-                <PracticeOffer portfolio={portfolio} sim={sim} />
-              ) : undefined
-            }
-          />
-          <GlossaryButton onOpen={onGlossary} />
-        </div>
-      </div>
+      <OrderBox
+        symbol={symbol}
+        coinName={coin?.name ?? symbol}
+        price={coin?.price ?? null}
+        portfolio={portfolio}
+        busy={busy}
+        onPlace={sim.place}
+        onGuide={onGlossary}
+        practice={
+          outOfBalance(portfolio) ? <PracticeOffer portfolio={portfolio} sim={sim} /> : undefined
+        }
+      />
+      <GlossaryButton onOpen={onGlossary} />
       <OpenPanel
         trades={portfolio.open}
         pending={portfolio.pending}
@@ -390,27 +380,25 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
       <SeasonPanel portfolio={sim.portfolio} sim={sim} />
       <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral.data} />
       <SimulatorHead portfolio={sim.portfolio} sim={sim} />
+      <MarketPanel
+        view={view}
+        market={market}
+        coin={coin}
+        lines={lines}
+        layers={layers}
+        currency={currency.chosen}
+        onChange={change}
+        onCurrency={currency.choose}
+        onToggleLayer={toggleLayer}
+        guide={guide}
+        premium={premium}
+      />
       <SimulatorBody
         portfolio={sim.portfolio}
         sim={sim}
         symbol={view.symbol}
         coin={coin}
         onGlossary={() => guide.show('glossary')}
-        chart={
-          <MarketPanel
-            view={view}
-            market={market}
-            coin={coin}
-            lines={lines}
-            layers={layers}
-            currency={currency.chosen}
-            onChange={change}
-            onCurrency={currency.choose}
-            onToggleLayer={toggleLayer}
-            guide={guide}
-            premium={premium}
-          />
-        }
       />
       <SeasonExtras
         portfolio={sim.portfolio}

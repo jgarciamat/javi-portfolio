@@ -570,13 +570,6 @@ html {
   }
 }
 
-/* The crypto console is a work table: on large screens it takes more width, chart and order side by side. */
-@media (min-width: 1500px) {
-  .main--wide {
-    max-width: 1640px;
-  }
-}
-
 /* Opening the menu stops the page from scrolling: its scroll bar keeps its room, nothing jumps. */
 html {
   scrollbar-gutter: stable;
