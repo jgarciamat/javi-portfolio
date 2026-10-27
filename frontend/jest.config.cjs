@@ -22,6 +22,10 @@ module.exports = {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@locales/(.*)$': '<rootDir>/src/locales/$1',
+    // The two parts of the texts (vite.config.ts builds them): here the core is the whole language
+    // and the rest is empty, so every test has every text (the split is checked in i18nSplit.test).
+    '^virtual:locale/(es|en)/core$': '<rootDir>/src/locales/$1.json',
+    '^virtual:locale/(es|en)/rest$': '<rootDir>/src/__mocks__/localeRest-$1.json',
     '^@test-utils/(.*)$': '<rootDir>/src/test-utils/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],

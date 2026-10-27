@@ -116,7 +116,7 @@ describe('English on demand', () => {
   it('keeps Spanish texts when English cannot be downloaded', async () => {
     let i18n!: typeof import('@core/i18n/I18nContext');
     jest.isolateModules(() => {
-      jest.doMock('@locales/en.json', () => {
+      jest.doMock('virtual:locale/en/core', () => {
         throw new Error('offline');
       });
       i18n = require('@core/i18n/I18nContext');
@@ -124,6 +124,89 @@ describe('English on demand', () => {
     await i18n.loadLocale('en');
     expect(i18n.isLocaleLoaded('en')).toBe(false);
     expect(i18n.translate('en', 'app.common.save')).toBe(translate('es', 'app.common.save'));
-    jest.dontMock('@locales/en.json');
+    jest.dontMock('virtual:locale/en/core');
+  });
+});
+
+/** The app's i18n with small texts: `core` in the main bundle, `rest` downloaded on demand. */
+function splitTexts(rest: { es?: () => object; en?: () => object } = {}) {
+  let mods!: {
+    i18n: typeof import('@core/i18n/I18nContext');
+    rtl: typeof import('@testing-library/react/pure');
+  };
+  const part = (messages: object) => ({ __esModule: true, default: messages });
+  jest.isolateModules(() => {
+    jest.doMock('virtual:locale/es/core', () => part({ 'a.core': 'núcleo' }));
+    jest.doMock('virtual:locale/es/rest', () => part(rest.es?.() ?? { 'a.rest': 'resto' }));
+    jest.doMock('virtual:locale/en/core', () => part({ 'a.core': 'core' }));
+    jest.doMock('virtual:locale/en/rest', () => part(rest.en?.() ?? { 'a.rest': 'rest' }));
+    mods = { i18n: require('@core/i18n/I18nContext'), rtl: require('@testing-library/react/pure') };
+  });
+  return mods;
+}
+
+describe('Texts in two parts', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    // A part imported by an earlier test would stay in the registry.
+    jest.resetModules();
+  });
+  // The parts are imported when asked for: the mocks stay until the test ends.
+  afterEach(() => {
+    for (const name of ['es/core', 'es/rest', 'en/core', 'en/rest']) {
+      jest.dontMock(`virtual:locale/${name}`);
+    }
+  });
+
+  it('never shows a key of the rest raw: blank until it arrives, then the text', async () => {
+    const { i18n, rtl } = splitTexts();
+    const Probe = () => <p>[{i18n.useI18n().t('a.rest')}]</p>;
+    rtl.render(
+      <i18n.I18nProvider>
+        <Probe />
+      </i18n.I18nProvider>
+    );
+    expect(rtl.screen.getByText('[]')).toBeInTheDocument();
+    expect(await rtl.screen.findByText('[resto]')).toBeInTheDocument();
+    // Once the rest is here, a key that does not exist is shown as it is.
+    expect(i18n.translate('es', 'no.such.key')).toBe('no.such.key');
+    rtl.cleanup();
+  });
+
+  it('makes a page wait for every text, and a later language brings them all', async () => {
+    const { i18n } = splitTexts();
+    const page = i18n.withAllTexts(() => Promise.resolve('page'));
+    expect(i18n.translate('es', 'a.rest')).toBe('');
+    await expect(page()).resolves.toBe('page');
+    expect(i18n.translate('es', 'a.rest')).toBe('resto');
+    expect(i18n.isLocaleLoaded('en')).toBe(false);
+    await i18n.loadLocale('en');
+    expect(i18n.translate('en', 'a.rest')).toBe('rest');
+  });
+
+  it('falls back to the Spanish rest when the English one cannot arrive', async () => {
+    localStorage.setItem('mm_locale', 'en');
+    const { i18n, rtl } = splitTexts({
+      en: () => {
+        throw new Error('offline');
+      },
+    });
+    rtl.render(<i18n.I18nProvider>{null}</i18n.I18nProvider>);
+    await i18n.loadAllTexts();
+    expect(i18n.translate('en', 'a.core')).toBe('core');
+    expect(i18n.translate('en', 'a.rest')).toBe('resto');
+    rtl.cleanup();
+  });
+
+  it('fails the page (its error screen offers to retry) when no rest can arrive', async () => {
+    const offline = () => {
+      throw new Error('offline');
+    };
+    const { i18n } = splitTexts({ es: offline, en: offline });
+    await expect(i18n.withAllTexts(() => Promise.resolve('page'))()).rejects.toThrow(
+      'the texts could not be downloaded'
+    );
+    // The blank stays (never the raw key), and nobody is told twice.
+    expect(i18n.translate('es', 'a.rest')).toBe('');
   });
 });
