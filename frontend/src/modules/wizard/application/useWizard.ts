@@ -54,14 +54,14 @@ export interface WizardPrefs {
 
 export const PREFS_KEY = 'mm_wizard_prefs';
 
-/** What is saved: `contrastChosen` tells «turned off by the person» from «never chose». */
+/** What is saved: `contrastChosen` tells «chosen by the person» from «never chose». */
 interface SavedPrefs extends WizardPrefs {
   contrastChosen?: boolean;
 }
 
 /**
- * The preferences of the device. High contrast is on until the person turns it off (then that
- * choice stays); copies saved before without a choice of contrast count as no choice.
+ * The preferences of the device. High contrast is off until the person turns it on (then that
+ * choice stays); copies saved before without a choice of contrast count as no choice (off).
  */
 export function useWizardPrefs(): [WizardPrefs, (patch: Partial<WizardPrefs>) => void] {
   const [prefs, setPrefs] = useState<SavedPrefs>(() => {
@@ -69,7 +69,7 @@ export function useWizardPrefs(): [WizardPrefs, (patch: Partial<WizardPrefs>) =>
     const chosen = saved?.contrastChosen === true;
     return {
       big: saved?.big === true,
-      contrast: chosen ? saved?.contrast === true : true,
+      contrast: chosen && saved?.contrast === true,
       ...(chosen ? { contrastChosen: true } : {}),
     };
   });
