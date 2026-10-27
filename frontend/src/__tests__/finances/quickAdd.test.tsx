@@ -6,6 +6,9 @@ import * as f from '@test-utils/fixtures';
 import type { CategoryRule } from '@modules/finances/domain/types';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
+const worker = { recognize: jest.fn(), terminate: jest.fn() };
+jest.mock('tesseract.js', () => ({ createWorker: jest.fn(async () => worker) }));
+
 const history = [
   f.transaction({ description: 'Café', category: 'Desayunos', date: '2026-03-02' }),
   f.transaction({ description: 'Super', category: 'Alimentación', date: '2026-03-05' }),
@@ -134,5 +137,45 @@ describe('QuickAdd', () => {
         expect.objectContaining({ description: 'Café', amount: 1.5, category: 'Otros' })
       )
     );
+  });
+
+  describe('with a ticket photo', () => {
+    const scan = async (text: string) => {
+      worker.recognize.mockResolvedValue({ data: { text } });
+      worker.terminate.mockResolvedValue(undefined);
+      const ctx = setup();
+      expect(screen.getByRole('button', { name: literal(tr('app.receipt.scan')) })).toBeVisible();
+      fireEvent.change(screen.getByLabelText(tr('app.receipt.file'), { selector: 'input' }), {
+        target: { files: [new File(['x'], 'ticket.jpg')] },
+      });
+      return ctx;
+    };
+
+    it('fills the concept and the amount, and the entry keeps the day of the ticket', async () => {
+      const { onAdd, field } = await scan('MERCADONA S.A.\n15/03/2026 18:42\nTOTAL (EUR) 5,84');
+      await waitFor(() => expect(field).toHaveValue('Mercadona 5,84'));
+      expect(field).toHaveFocus();
+      fireEvent.submit(field);
+      await waitFor(() =>
+        expect(onAdd).toHaveBeenCalledWith(
+          expect.objectContaining({ description: 'Mercadona', amount: 5.84, date: '2026-03-15' })
+        )
+      );
+      type(field, 'café 1,50');
+      fireEvent.submit(field);
+      await waitFor(() =>
+        expect(onAdd).toHaveBeenLastCalledWith(expect.objectContaining({ date: '2026-03-15' }))
+      );
+    });
+
+    it('names a ticket without a shop and leaves the amount to type when it has none', async () => {
+      const { field } = await scan('1234\n5,00');
+      await waitFor(() => expect(field).toHaveValue('Ticket 5'));
+      worker.recognize.mockResolvedValue({ data: { text: 'Farmacia Luna\n01/02/2026' } });
+      fireEvent.change(screen.getByLabelText(tr('app.receipt.file'), { selector: 'input' }), {
+        target: { files: [new File(['x'], 'otro.jpg')] },
+      });
+      await waitFor(() => expect(field).toHaveValue('Farmacia luna'));
+    });
   });
 });

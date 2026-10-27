@@ -10,7 +10,9 @@ import {
   quickCategory,
   recentCategories,
 } from '@modules/finances/domain/quickEntry';
+import type { ScannedReceipt } from '@modules/finances/domain/receiptParser';
 import type { CreateTransactionDTO, Transaction } from '@modules/finances/domain/types';
+import { ReceiptScanner } from './ReceiptScanner';
 import '../css/QuickAdd.css';
 
 /** Keys that jump to the quick entry on a computer (not while typing somewhere else). */
@@ -53,6 +55,7 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
+  const [scannedDate, setScannedDate] = useState<string | null>(null);
 
   const entry = parseQuickEntry(text);
   const category = entry ? (chosen ?? quickCategory(entry, rules.data, transactions)) : chosen;
@@ -62,7 +65,7 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
     event.preventDefault();
     setAdded(null);
     if (!entry) return setError(t('app.quickAdd.invalid'));
-    const dto = { ...entry, category: category as string, date: defaultDate };
+    const dto = { ...entry, category: category as string, date: scannedDate ?? defaultDate };
     setBusy(true);
     setError(null);
     try {
@@ -73,6 +76,7 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
       );
       setText('');
       setChosen(null);
+      setScannedDate(null);
       input.current?.focus();
     } catch (e) {
       setError(errorMessage(e, t('app.quickAdd.error')));
@@ -81,9 +85,20 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
     }
   };
 
+  /** A ticket photo fills the concept and the amount (and the day) of the entry to confirm. */
+  const scanned = (receipt: ScannedReceipt) => {
+    const amount = receipt.total === null ? '' : String(receipt.total).replace('.', ',');
+    setText(`${receipt.merchant ?? t('app.quickAdd.ticket')} ${amount}`.trim());
+    setScannedDate(receipt.date);
+    setError(null);
+    setAdded(null);
+    input.current?.focus();
+  };
+
   return {
     input,
     text,
+    scanned,
     setText: (value: string) => {
       setText(value);
       setError(null);
@@ -162,6 +177,7 @@ export function QuickAdd(props: QuickAddProps) {
           {quick.busy ? t('app.transaction.form.saving') : t('app.quickAdd.add')}
         </button>
       </div>
+      <ReceiptScanner onScanned={quick.scanned} />
       <CategoryChips chips={quick.chips} category={category} onChoose={quick.choose} />
       <p id={`${id}-hint`} className="section-hint">
         {entry

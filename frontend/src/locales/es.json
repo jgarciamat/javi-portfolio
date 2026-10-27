@@ -6099,5 +6099,6 @@
   "app.quickAdd.categories": "Categorías recientes",
   "app.quickAdd.invalid": "Escribe un concepto y un importe, por ejemplo «café 1,50».",
   "app.quickAdd.added": "Añadido: {description}, {amount} en {category}.",
-  "app.quickAdd.error": "No se ha podido añadir. Vuelve a probarlo."
+  "app.quickAdd.error": "No se ha podido añadir. Vuelve a probarlo.",
+  "app.quickAdd.ticket": "Ticket"
 }

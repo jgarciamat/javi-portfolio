@@ -6110,5 +6110,6 @@
   "app.quickAdd.categories": "Recent categories",
   "app.quickAdd.invalid": "Type a description and an amount, for example «coffee 1.50».",
   "app.quickAdd.added": "Added: {description}, {amount} in {category}.",
-  "app.quickAdd.error": "It could not be added. Please try again."
+  "app.quickAdd.error": "It could not be added. Please try again.",
+  "app.quickAdd.ticket": "Receipt"
 }
