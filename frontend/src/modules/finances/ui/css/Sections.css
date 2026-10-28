@@ -1318,6 +1318,44 @@ button.entity-item {
   margin-top: 0;
 }
 
+/* The title of the section, its note, and the dates and what to gather folded above the
+   assistant: short lines, close together. */
+.renta-head,
+.renta-fold {
+  margin-bottom: 0.75rem;
+}
+.renta-head .section-hint {
+  margin-bottom: 0;
+}
+.renta-fold .collapsible-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.renta-fold .renta-campaign {
+  margin-top: 0;
+}
+
+/* The year of the return, at the head of the assistant's card, as wide as its toolbar. */
+.renta-year-pick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-800);
+  font-weight: 700;
+}
+.renta-year-pick select {
+  flex: 0 1 11rem;
+  width: auto;
+  min-width: 7rem;
+  min-height: 2.75rem;
+}
+.renta-tools > .wiz {
+  margin-top: 0;
+}
+
 .renta-checklist {
   display: grid;
   gap: 0.5rem;

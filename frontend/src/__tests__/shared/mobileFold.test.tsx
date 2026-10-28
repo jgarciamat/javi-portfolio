@@ -1,7 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { MobileFold, PHONE } from '@shared/components/MobileFold';
-import { RentaView } from '@modules/finances/ui/views/RentaView';
-import { renderWithProviders, tr } from '@test-utils/render';
+import { renderWithProviders } from '@test-utils/render';
 
 /** A screen of the given width for the media queries. */
 const screenOf = (phone: boolean) =>
@@ -17,7 +16,6 @@ const screenOf = (phone: boolean) =>
 
 afterEach(() => {
   delete (window as Partial<typeof window>).matchMedia;
-  localStorage.clear();
 });
 
 describe('what comes before the task, folded on a phone', () => {
@@ -33,23 +31,19 @@ describe('what comes before the task, folded on a phone', () => {
     expect(screen.queryByText('More')).toBeNull();
   });
 
-  it('folds the dates and the help of the Renta so the question comes first', () => {
+  it('folds it under its line on a phone, closed until opened', () => {
     screenOf(true);
-    renderWithProviders(<RentaView />);
-    const summary = screen.getByText(tr('app.renta.fold'));
+    renderWithProviders(
+      <MobileFold summary="More">
+        <p>Dates</p>
+      </MobileFold>,
+      { authenticated: false }
+    );
+    const summary = screen.getByText('More');
     const fold = summary.closest('details') as HTMLDetailsElement;
     expect(fold.open).toBe(false);
-    expect(fold).toHaveTextContent(tr('app.renta.hint'));
+    expect(fold).toHaveTextContent('Dates');
     fireEvent.click(summary);
     expect(fold.open).toBe(true);
-  });
-
-  it('folds what to gather under its title, so it does not push the assistant down', () => {
-    screenOf(true);
-    renderWithProviders(<RentaView />);
-    expect(screen.getByRole('heading', { name: tr('app.renta.checklist') })).toBeVisible();
-    const fold = screen.getByText(tr('app.renta.checklistFold')).closest('details');
-    expect((fold as HTMLDetailsElement).open).toBe(false);
-    expect(fold).toHaveTextContent(tr('app.renta.check.data'));
   });
 });

@@ -14,7 +14,7 @@ import { AUTONOMO_ACTIVITY } from '@modules/tools/domain/rentaFromAutonomo';
 import { AnnualFigures } from '@modules/tools/ui/renta/AutonomoBring';
 import { autonomoOnDevice } from '../components/autonomoForRenta';
 import { Icon } from '@shared/components/Icon';
-import { MobileFold } from '@shared/components/MobileFold';
+import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import type { DashboardTab } from '../navigation';
@@ -85,66 +85,78 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
 
   return (
     <div className="section-view">
-      <div className="card">
-        <div className="section-header">
-          <h2 className="section-title">
-            <Icon name="file" /> {t('app.renta.title')}
-          </h2>
-          <select
-            className="tx-input select-compact"
-            aria-label={t('app.renta.year')}
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* The expert mode puts «Start a new return» here, under the year. */}
-        <div className="renta-year-actions" id={YEAR_ACTIONS_ID} />
-        <MobileFold summary={t('app.renta.fold')}>
-          <p className="section-hint">{t('app.renta.hint')}</p>
-          <CampaignDates exercise={year} />
-          {/* What the accounts recorded, for reference: not part of the return, so «Start a new
-              return» leaves it (they are the person's own movements). */}
-          <aside className="renta-reference-note" aria-label={t('app.renta.figuresLabel')}>
-            <span className="renta-reference-label">{t('app.renta.figuresLabel')}</span>
-            <p>
-              {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
-            </p>
-          </aside>
-        </MobileFold>
-      </div>
-      {/* What to gather and how to file, first: before the assistant, so it is seen before starting
-          (folded on a phone, so the assistant is not pushed far down). */}
-      <div className="card">
+      <div className="card renta-head">
         <h2 className="section-title">
-          <Icon name="clipboard" /> {t('app.renta.checklist')}
+          <Icon name="file" /> {t('app.renta.title')}
         </h2>
-        <MobileFold summary={t('app.renta.checklistFold')}>
-          <p className="section-hint">{t('app.renta.campaign')}</p>
-          <ul className="renta-checklist">
-            {CHECKLIST.map((item) => (
-              <li key={item}>{t(`app.renta.check.${item}`)}</li>
-            ))}
-          </ul>
-          <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
-            {t('app.renta.aeat')}
-          </a>
-          {onOpenTab && <HowToFile slugs={['renta-web', 'antes-de-empezar']} onOpen={howToFile} />}
-        </MobileFold>
+        <p className="section-hint">{t('app.renta.hint')}</p>
       </div>
-      <div className="card">
-        <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
-        {removals > 0 && !broughtActivity(year) && (
-          <p className="renta-recovered" role="status">
-            {t('tools.renta.removeActivity.removed')}
+      {/* The dates and what to gather, folded: the assistant under them is seen at once. */}
+      <CollapsiblePanel
+        className="renta-fold"
+        defaultOpen={false}
+        title={
+          <>
+            <Icon name="calendar" /> {t('app.renta.datesTitle', { year })}
+          </>
+        }
+      >
+        <CampaignDates exercise={year} />
+        {/* What the accounts recorded, for reference: not part of the return, so «Start a new
+            return» leaves it (they are the person's own movements). */}
+        <aside className="renta-reference-note" aria-label={t('app.renta.figuresLabel')}>
+          <span className="renta-reference-label">{t('app.renta.figuresLabel')}</span>
+          <p>
+            {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
           </p>
-        )}
+        </aside>
+      </CollapsiblePanel>
+      <CollapsiblePanel
+        className="renta-fold"
+        defaultOpen={false}
+        title={
+          <>
+            <Icon name="clipboard" /> {t('app.renta.checklist')}
+          </>
+        }
+      >
+        <p className="section-hint">{t('app.renta.campaign')}</p>
+        <ul className="renta-checklist">
+          {CHECKLIST.map((item) => (
+            <li key={item}>{t(`app.renta.check.${item}`)}</li>
+          ))}
+        </ul>
+        <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
+          {t('app.renta.aeat')}
+        </a>
+        {onOpenTab && <HowToFile slugs={['renta-web', 'antes-de-empezar']} onOpen={howToFile} />}
+      </CollapsiblePanel>
+      <div className="card">
         <div className="tools-main renta-tools">
+          {/* The year of the return, at the head of the assistant: above its toolbar, as wide. */}
+          <label className="renta-year-pick" data-tour="renta-year">
+            <span>{t('app.renta.year')}</span>
+            <select
+              className="tx-input select-compact"
+              aria-label={t('app.renta.year')}
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+            >
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </label>
+          {/* The expert mode puts «Start a new return» here, under the year. */}
+          <div className="renta-year-actions" id={YEAR_ACTIONS_ID} />
+          <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
+          {removals > 0 && !broughtActivity(year) && (
+            <p className="renta-recovered" role="status">
+              {t('tools.renta.removeActivity.removed')}
+            </p>
+          )}
           <RentaAssistant
             key={`${year}-${Math.round(income)}-${removals}`}
             mode="account"

@@ -109,15 +109,40 @@ describe('Renta section', () => {
     );
   });
 
-  it('puts what to gather above the assistant, so it is seen before starting', async () => {
+  it('folds the dates and what to gather above the assistant, both closed at first', async () => {
     renderWithProviders(<RentaView />);
     const step = await screen.findByText(tr('tools.renta.step1'));
-    const gather = screen.getByRole('heading', { name: tr('app.renta.checklist') });
-    expect(gather.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const dates = screen.getByRole('button', { name: tr('app.renta.datesTitle', { year: 2025 }) });
+    const gather = screen.getByRole('button', { name: tr('app.renta.checklist') });
+    for (const fold of [dates, gather]) {
+      expect(fold).toHaveAttribute('aria-expanded', 'false');
+      expect(document.getElementById(fold.getAttribute('aria-controls') as string)).toHaveAttribute(
+        'inert'
+      );
+      expect(fold.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
     expect(
-      screen.getByRole('heading', { name: tr('app.renta.title') }).compareDocumentPosition(gather) &
+      screen.getByRole('heading', { name: tr('app.renta.title') }).compareDocumentPosition(dates) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
+    fireEvent.click(gather);
+    expect(gather).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      document.getElementById(gather.getAttribute('aria-controls') as string)
+    ).not.toHaveAttribute('inert');
+    expect(screen.getByText(tr('app.renta.check.data'))).toBeInTheDocument();
+  });
+
+  it('puts the year at the head of the assistant, and its title follows the year', async () => {
+    renderWithProviders(<RentaView />);
+    const year = await screen.findByLabelText(tr('app.renta.year'));
+    const step = await screen.findByText(tr('tools.renta.step1'));
+    expect(year.closest('[data-tour="renta-year"]')).toBeInTheDocument();
+    expect(year.closest('.card')).toContainElement(step);
+    fireEvent.change(year, { target: { value: '2024' } });
+    expect(
+      screen.getByRole('button', { name: tr('app.renta.datesTitle', { year: 2024 }) })
+    ).toBeInTheDocument();
   });
 });
 

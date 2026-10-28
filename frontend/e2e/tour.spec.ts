@@ -32,6 +32,7 @@ const EXPECTED_TITLES = [
   /Importa tu extracto/,
   /Invita a un amigo/,
   /Tu perfil/,
+  /El año de tu Renta/,
   /Los pasos de la Renta/,
   /Tu resultado/,
   /Qué trimestre abre/,

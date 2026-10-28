@@ -227,6 +227,9 @@ test('Renta: the year in the accounts is a reference note, apart from the return
   await page.setViewportSize({ width: 1280, height: 900 });
   await signIn(page);
   await openSection(page, 'Renta (IRPF)');
+  const dates = page.getByRole('button', { name: /^Fechas de la campaña de la Renta \d{4}$/ });
+  await dates.click();
+  await expect(dates).toHaveAttribute('aria-expanded', 'true');
   const note = page.getByRole('complementary', { name: 'Referencia (no es tu declaración)' });
   await expect(note).toBeVisible();
   await expect(note).toContainText('entraron');
@@ -235,7 +238,7 @@ test('Renta: the year in the accounts is a reference note, apart from the return
 });
 
 for (const width of [390, 1280]) {
-  test(`Renta: what to gather comes first, above the assistant, without a jump (${width} px)`, async ({
+  test(`Renta: the dates and what to gather folded, the year at the head of the assistant, without a jump (${width} px)`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
@@ -248,21 +251,25 @@ for (const width of [390, 1280]) {
     await trackShifts(page);
     await openSection(page, 'Renta (IRPF)');
     await page.evaluate(() => ((window as unknown as { __cls: number }).__cls = 0));
-    const gather = page.getByRole('heading', { name: 'Qué reunir antes de declarar' });
-    const assistant = page.locator('.renta-tools');
-    await expect(gather).toBeVisible();
-    await expect(assistant).toBeVisible();
-    const top = async (l: import('@playwright/test').Locator) => (await l.boundingBox())!.y;
-    expect(await top(gather)).toBeLessThan(await top(assistant));
-    const card = page.locator('.card', { has: gather });
-    if (width === 390) {
-      // Folded on a phone: one line, so the assistant is not pushed far down.
-      await expect(card.getByRole('link', { name: 'Abrir la Agencia Tributaria' })).toBeHidden();
-      await page.screenshot({ path: `${SHOTS}/renta-que-reunir-arriba-${width}.png` });
-      await card.getByText('Ver la lista y cómo presentarla').click();
-    }
-    await expect(card.getByRole('link', { name: 'Abrir la Agencia Tributaria' })).toBeVisible();
-    await expect(card.getByText('¿Cómo lo presento en Hacienda?')).toBeVisible();
+    const dates = page.getByRole('button', { name: /^Fechas de la campaña de la Renta \d{4}$/ });
+    const gather = page.getByRole('button', { name: 'Qué reunir antes de declarar' });
+    const year = page.getByRole('combobox', { name: 'Año de la declaración' });
+    const tools = page.getByRole('toolbar');
+    const route = page.getByRole('navigation', { name: 'Pasos' });
+    for (const fold of [dates, gather])
+      await expect(fold).toHaveAttribute('aria-expanded', 'false');
+    // Closed, nothing inside is reachable: the link of the Agencia is out of the keyboard's way.
+    const aeat = page.getByRole('link', { name: 'Abrir la Agencia Tributaria' });
+    expect(await aeat.evaluate((e) => e.closest('[inert]') !== null)).toBe(true);
+    await expect(route).toBeVisible();
+    const box = async (l: import('@playwright/test').Locator) => (await l.boundingBox())!;
+    // The assistant and its steps on the first screen, the year right above its toolbar.
+    expect((await box(route)).y).toBeLessThan(width === 390 ? 844 : 900);
+    const [pick, row] = [await box(page.locator('.renta-year-pick')), await box(tools)];
+    expect(pick.y + pick.height).toBeLessThanOrEqual(row.y);
+    expect(Math.abs(pick.width - row.width)).toBeLessThanOrEqual(1);
+    expect(Math.abs(pick.x - row.x)).toBeLessThanOrEqual(1);
+    expect((await box(year)).height).toBeGreaterThanOrEqual(44);
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
       0.1
@@ -270,9 +277,26 @@ for (const width of [390, 1280]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       width
     );
-    if (width === 1280)
-      await page.screenshot({ path: `${SHOTS}/renta-que-reunir-arriba-${width}.png` });
-    else await card.screenshot({ path: `${SHOTS}/renta-que-reunir-abierto-${width}.png` });
+    await page.screenshot({ path: `${SHOTS}/renta-plegados-arriba-${width}.png` });
+
+    // Opened with the keyboard, one at a time.
+    await gather.focus();
+    await page.keyboard.press('Enter');
+    await expect(gather).toHaveAttribute('aria-expanded', 'true');
+    const card = page.locator('.card', { has: gather });
+    await expect(card.getByRole('link', { name: 'Abrir la Agencia Tributaria' })).toBeVisible();
+    await expect(card.getByText('¿Cómo lo presento en Hacienda?')).toBeVisible();
+    await dates.focus();
+    await page.keyboard.press(' ');
+    await expect(dates).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.getByRole('complementary', { name: 'Referencia (no es tu declaración)' })
+    ).toBeVisible();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: `${SHOTS}/renta-plegados-abiertos-${width}.png`,
+      fullPage: width === 390,
+    });
   });
 }
 

@@ -48,7 +48,12 @@ export function CollapsiblePanel({
           ›
         </span>
       </button>
-      <div id={bodyId} className={`collapsible-body${open ? ' collapsible-body--open' : ''}`}>
+      {/* Closed, what is inside is out of reach of the keyboard and the screen readers too. */}
+      <div
+        id={bodyId}
+        className={`collapsible-body${open ? ' collapsible-body--open' : ''}`}
+        inert={!open}
+      >
         <div className="collapsible-body-inner">{children}</div>
       </div>
     </div>
