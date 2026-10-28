@@ -233,3 +233,45 @@ test('Renta: the year in the accounts is a reference note, apart from the return
   await note.scrollIntoViewIfNeeded();
   await note.screenshot({ path: `${SHOTS}/renta-referencia-1280.png` });
 });
+
+for (const width of [390, 1280]) {
+  test(`Renta: what to gather comes first, above the assistant, without a jump (${width} px)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await signIn(page);
+    // A slow year: the section paints first and the figures of the accounts arrive later.
+    await page.route('**/api/transactions/annual**', async (route) => {
+      await new Promise((done) => setTimeout(done, 1000));
+      await route.continue();
+    });
+    await trackShifts(page);
+    await openSection(page, 'Renta (IRPF)');
+    await page.evaluate(() => ((window as unknown as { __cls: number }).__cls = 0));
+    const gather = page.getByRole('heading', { name: 'Qué reunir antes de declarar' });
+    const assistant = page.locator('.renta-tools');
+    await expect(gather).toBeVisible();
+    await expect(assistant).toBeVisible();
+    const top = async (l: import('@playwright/test').Locator) => (await l.boundingBox())!.y;
+    expect(await top(gather)).toBeLessThan(await top(assistant));
+    const card = page.locator('.card', { has: gather });
+    if (width === 390) {
+      // Folded on a phone: one line, so the assistant is not pushed far down.
+      await expect(card.getByRole('link', { name: 'Abrir la Agencia Tributaria' })).toBeHidden();
+      await page.screenshot({ path: `${SHOTS}/renta-que-reunir-arriba-${width}.png` });
+      await card.getByText('Ver la lista y cómo presentarla').click();
+    }
+    await expect(card.getByRole('link', { name: 'Abrir la Agencia Tributaria' })).toBeVisible();
+    await expect(card.getByText('¿Cómo lo presento en Hacienda?')).toBeVisible();
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
+      0.1
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      width
+    );
+    if (width === 1280)
+      await page.screenshot({ path: `${SHOTS}/renta-que-reunir-arriba-${width}.png` });
+    else await card.screenshot({ path: `${SHOTS}/renta-que-reunir-abierto-${width}.png` });
+  });
+}

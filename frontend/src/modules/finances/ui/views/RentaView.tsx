@@ -117,6 +117,27 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             </p>
           </aside>
         </MobileFold>
+      </div>
+      {/* What to gather and how to file, first: before the assistant, so it is seen before starting
+          (folded on a phone, so the assistant is not pushed far down). */}
+      <div className="card">
+        <h2 className="section-title">
+          <Icon name="clipboard" /> {t('app.renta.checklist')}
+        </h2>
+        <MobileFold summary={t('app.renta.checklistFold')}>
+          <p className="section-hint">{t('app.renta.campaign')}</p>
+          <ul className="renta-checklist">
+            {CHECKLIST.map((item) => (
+              <li key={item}>{t(`app.renta.check.${item}`)}</li>
+            ))}
+          </ul>
+          <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
+            {t('app.renta.aeat')}
+          </a>
+          {onOpenTab && <HowToFile slugs={['renta-web', 'antes-de-empezar']} onOpen={howToFile} />}
+        </MobileFold>
+      </div>
+      <div className="card">
         <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
         {removals > 0 && !broughtActivity(year) && (
           <p className="renta-recovered" role="status">
@@ -135,21 +156,6 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             onHowToFile={onOpenTab && howToFile}
           />
         </div>
-      </div>
-      <div className="card">
-        <h2 className="section-title">
-          <Icon name="clipboard" /> {t('app.renta.checklist')}
-        </h2>
-        <p className="section-hint">{t('app.renta.campaign')}</p>
-        <ul className="renta-checklist">
-          {CHECKLIST.map((item) => (
-            <li key={item}>{t(`app.renta.check.${item}`)}</li>
-          ))}
-        </ul>
-        <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
-          {t('app.renta.aeat')}
-        </a>
-        {onOpenTab && <HowToFile slugs={['renta-web', 'antes-de-empezar']} onOpen={howToFile} />}
       </div>
     </div>
   );

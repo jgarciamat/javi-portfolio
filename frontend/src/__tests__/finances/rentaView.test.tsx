@@ -108,6 +108,17 @@ describe('Renta section', () => {
       'https://sede.agenciatributaria.gob.es/'
     );
   });
+
+  it('puts what to gather above the assistant, so it is seen before starting', async () => {
+    renderWithProviders(<RentaView />);
+    const step = await screen.findByText(tr('tools.renta.step1'));
+    const gather = screen.getByRole('heading', { name: tr('app.renta.checklist') });
+    expect(gather.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { name: tr('app.renta.title') }).compareDocumentPosition(gather) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
 });
 
 describe('Renta section, step by step', () => {

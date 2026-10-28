@@ -43,4 +43,13 @@ describe('what comes before the task, folded on a phone', () => {
     fireEvent.click(summary);
     expect(fold.open).toBe(true);
   });
+
+  it('folds what to gather under its title, so it does not push the assistant down', () => {
+    screenOf(true);
+    renderWithProviders(<RentaView />);
+    expect(screen.getByRole('heading', { name: tr('app.renta.checklist') })).toBeVisible();
+    const fold = screen.getByText(tr('app.renta.checklistFold')).closest('details');
+    expect((fold as HTMLDetailsElement).open).toBe(false);
+    expect(fold).toHaveTextContent(tr('app.renta.check.data'));
+  });
 });

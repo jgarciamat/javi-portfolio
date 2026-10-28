@@ -1313,6 +1313,11 @@ button.entity-item {
   margin-top: 1rem;
 }
 
+/* The assistant opens its own card (the checklist goes above it). */
+.card > .renta-tools:first-child {
+  margin-top: 0;
+}
+
 .renta-checklist {
   display: grid;
   gap: 0.5rem;

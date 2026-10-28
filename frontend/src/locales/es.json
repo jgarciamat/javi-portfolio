@@ -5319,6 +5319,7 @@
   "wizard.autonomo.finale": "Tu trimestre está preparado. Cópialo en la web de la Agencia Tributaria dentro de plazo (te lo decimos en el paso 4, junto al resultado).",
   "wizard.autonomo.notFiled": "Es una ayuda orientativa: Finanverso no presenta nada en la Agencia Tributaria. Si tienes dudas, revísalo con un profesional.",
   "app.renta.fold": "Plazos de la campaña y cómo funciona",
+  "app.renta.checklistFold": "Ver la lista y cómo presentarla",
   "tools.renta.campaign.fold": "Fechas de la campaña de la Renta",
   "wizard.autonomo.hint.amountsNext": "Ahora el trimestre {n}. Si es igual que el anterior, pulsa «Copiar el {prev}.º trimestre».",
   "app.drop.here": "Suelta el archivo aquí",

@@ -5319,6 +5319,7 @@
   "wizard.autonomo.finale": "Your quarter is ready. Copy it on the Tax Agency's website within the deadline (shown in step 4, next to the result).",
   "wizard.autonomo.notFiled": "This is guidance only: Finanverso does not file anything with the Tax Agency. If in doubt, have it checked by a professional.",
   "app.renta.fold": "Campaign dates and how it works",
+  "app.renta.checklistFold": "See the list and how to file it",
   "tools.renta.campaign.fold": "Dates of the income tax campaign",
   "wizard.autonomo.hint.amountsNext": "Now quarter {n}. If it is the same as the one before, press “Copy quarter {prev}”.",
   "app.drop.here": "Drop the file here",
