@@ -294,7 +294,7 @@ async function contrastOf(target: import('@playwright/test').Locator) {
 }
 
 for (const width of [390, 1280]) {
-  test(`Renta: «No lo tengo, sigo sin él» as big as «Subir mi borrador», under it, in green (${width} px)`, async ({
+  test(`Renta: «Continuar sin borrador» as big as «Subir mi borrador», under it, in emerald (${width} px)`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
@@ -302,7 +302,7 @@ for (const width of [390, 1280]) {
     await openSection(page, 'Renta (IRPF)');
     const card = page.locator('.wiz-step');
     const upload = card.getByRole('button', { name: 'Subir mi borrador' });
-    const skip = card.getByRole('button', { name: 'No lo tengo, sigo sin él' });
+    const skip = card.getByRole('button', { name: 'Continuar sin borrador' });
     const paste = card.getByText('O pega aquí el texto del borrador');
     const next = card.getByRole('button', { name: 'Siguiente →' });
     await expect(skip).toBeVisible();
@@ -323,13 +323,13 @@ for (const width of [390, 1280]) {
     await expect(
       card.locator('.wiz-nav').getByRole('button', { name: 'Siguiente →' })
     ).toBeVisible();
-    await expect(card.locator('.wiz-nav').getByRole('button', { name: /No lo tengo/ })).toHaveCount(
-      0
-    );
+    await expect(
+      card.locator('.wiz-nav').getByRole('button', { name: /Continuar sin/ })
+    ).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       width
     );
-    // The upload, the pasted text, «No lo tengo» and «Siguiente», under the sticky header.
+    // The upload, the pasted text, «Continuar sin borrador» and «Siguiente», under the sticky header.
     await page.evaluate(
       (y) => window.scrollTo(0, y - 200),
       u.y + (await page.evaluate(() => scrollY))

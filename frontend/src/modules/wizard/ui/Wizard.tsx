@@ -280,7 +280,7 @@ function ScreenNav({
           {label}
         </button>
       </div>
-      {/* The button the line names is the one this screen shows (step 1 says «No lo tengo…»). */}
+      {/* The button the line names is the one this screen shows (step 1 says «Continuar sin borrador»). */}
       {!ok && !missing && (
         <p className="wiz-why-locked">
           {skip ? t('wizard.answerFirst', { skip }) : t('wizard.answerFirstOnly')}

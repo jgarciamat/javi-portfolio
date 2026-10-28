@@ -5177,7 +5177,7 @@
   "wizard.renta.opt.others.yes": "Sí, enséñamela",
   "wizard.renta.opt.others.no": "No, prefiero que me preguntéis las mías",
   "wizard.renta.q.draft": "¿Tienes el borrador de la Renta en PDF?",
-  "wizard.renta.skip.draft": "No lo tengo, sigo sin él",
+  "wizard.renta.skip.draft": "Continuar sin borrador",
   "wizard.renta.q.review": "Vamos a buscar deducciones para ti",
   "wizard.renta.q.result": "¿Te sale a pagar o a devolver?",
   "wizard.renta.skip.result": "Ahora no",

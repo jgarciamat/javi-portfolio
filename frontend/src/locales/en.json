@@ -5177,7 +5177,7 @@
   "wizard.renta.opt.others.yes": "Yes, show it to me",
   "wizard.renta.opt.others.no": "No, I'd rather you asked me about mine",
   "wizard.renta.q.draft": "Do you have the draft of your return as a PDF?",
-  "wizard.renta.skip.draft": "I don't have it, go on",
+  "wizard.renta.skip.draft": "Continue without the draft",
   "wizard.renta.q.review": "Let's look for deductions for you",
   "wizard.renta.q.result": "Do you pay or get money back?",
   "wizard.renta.skip.result": "Not now",
