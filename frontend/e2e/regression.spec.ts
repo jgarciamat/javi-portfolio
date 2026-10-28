@@ -275,3 +275,95 @@ for (const width of [390, 1280]) {
     else await card.screenshot({ path: `${SHOTS}/renta-que-reunir-abierto-${width}.png` });
   });
 }
+
+/** The text against the background of an element, as WCAG measures it. */
+async function contrastOf(target: import('@playwright/test').Locator) {
+  return target.evaluate((e) => {
+    const rgb = (c: string) => (c.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+    const lum = (c: number[]) => {
+      const [r, g, b] = c.map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const style = getComputedStyle(e);
+    const [a, b] = [lum(rgb(style.color)), lum(rgb(style.backgroundColor))];
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  });
+}
+
+for (const width of [390, 1280]) {
+  test(`Renta: «No lo tengo, sigo sin él» as big as «Subir mi borrador», under it, in green (${width} px)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await signIn(page);
+    await openSection(page, 'Renta (IRPF)');
+    const card = page.locator('.wiz-step');
+    const upload = card.getByRole('button', { name: 'Subir mi borrador' });
+    const skip = card.getByRole('button', { name: 'No lo tengo, sigo sin él' });
+    const paste = card.getByText('O pega aquí el texto del borrador');
+    const next = card.getByRole('button', { name: 'Siguiente →' });
+    await expect(skip).toBeVisible();
+    const [u, s, p, n] = await Promise.all(
+      [upload, skip, paste, next].map(async (l) => (await l.boundingBox())!)
+    );
+    expect(Math.abs(s.width - u.width)).toBeLessThanOrEqual(1);
+    expect(Math.abs(s.height - u.height)).toBeLessThanOrEqual(1);
+    const type = (l: import('@playwright/test').Locator) =>
+      l.evaluate((e) => {
+        const style = getComputedStyle(e);
+        return [style.fontSize, style.fontWeight, style.fontFamily];
+      });
+    expect(await type(skip)).toEqual(await type(upload));
+    // Under the upload and the pasted text, and above «Siguiente», which keeps its row.
+    expect(s.y).toBeGreaterThan(p.y + p.height - 1);
+    expect(n.y).toBeGreaterThan(s.y + s.height - 1);
+    await expect(
+      card.locator('.wiz-nav').getByRole('button', { name: 'Siguiente →' })
+    ).toBeVisible();
+    await expect(card.locator('.wiz-nav').getByRole('button', { name: /No lo tengo/ })).toHaveCount(
+      0
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      width
+    );
+    // The upload, the pasted text, «No lo tengo» and «Siguiente», under the sticky header.
+    await page.evaluate(
+      (y) => window.scrollTo(0, y - 200),
+      u.y + (await page.evaluate(() => scrollY))
+    );
+    const shot = async (name: string) => {
+      const [top, bottom] = [(await upload.boundingBox())!, (await next.boundingBox())!];
+      const left = Math.max(0, top.x - 16);
+      await page.screenshot({
+        path: `${SHOTS}/renta-borrador-sin-el-${name}${width}.png`,
+        clip: {
+          x: left,
+          y: top.y - 16,
+          width: Math.min(width - left, top.width + 32),
+          height: bottom.y + bottom.height - top.y + 32,
+        },
+      });
+    };
+
+    // AA in both themes, with and without «Contraste».
+    for (const theme of ['dark', 'light']) {
+      for (const contrast of [false, true]) {
+        await page.evaluate(
+          ([t, c]) => {
+            document.documentElement.setAttribute('data-theme', t as string);
+            document.documentElement.classList.toggle('wiz-contrast', c as boolean);
+          },
+          [theme, contrast]
+        );
+        // The colours fade in (0.15 s): measured once they have settled.
+        await page.waitForTimeout(300);
+        expect(await contrastOf(skip), `${theme} ${contrast}`).toBeGreaterThanOrEqual(4.5);
+        if (!contrast || width === 390)
+          await shot(`${theme === 'light' ? 'claro-' : ''}${contrast ? 'contraste-' : ''}`);
+      }
+    }
+  });
+}
