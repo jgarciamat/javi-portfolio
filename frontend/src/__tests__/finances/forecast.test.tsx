@@ -3,6 +3,7 @@ import { Dashboard } from '@modules/finances/ui/components/Dashboard';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
+import { endOfMonthLikely } from '@modules/finances/domain/enoughData';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
 beforeEach(() => {
@@ -187,6 +188,23 @@ describe('Forecast panel', () => {
     expect(screen.queryByText(tr('app.forecast.notYet'))).toBeNull();
   });
 
+  it('keeps the space of «not enough data yet» while a new account loads, else the whole month', async () => {
+    const api = createFakeApi();
+    api.insightsApi.forecast.mockReturnValue(new Promise(() => undefined));
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: HISTORY }));
+    const first = renderWithProviders(<Dashboard />, { api });
+    const loading = async () =>
+      (await screen.findByRole('button', titleButton)).closest('.card') as HTMLElement;
+    // One movement in the whole account: the server will say there is not enough yet.
+    expect(await loading()).toHaveClass('forecast-panel--loading', 'forecast-panel--few');
+    first.unmount();
+    // Movements older than the month: an account in use, the end of the month is coming.
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    const panelBox = await loading();
+    expect(panelBox).toHaveClass('forecast-panel--loading');
+    expect(panelBox).not.toHaveClass('forecast-panel--few');
+  });
+
   it('only appears for the current month', async () => {
     setup();
     await panel();
@@ -194,5 +212,27 @@ describe('Forecast panel', () => {
     await waitFor(() => expect(prev).toBeEnabled());
     fireEvent.click(prev);
     await waitFor(() => expect(screen.queryByRole('button', titleButton)).toBeNull());
+  });
+});
+
+describe('endOfMonthLikely', () => {
+  const day = (date: string) => ({ date });
+  // The first movement in the middle of the list (it comes in any order).
+  const five = (first: string) => [
+    day('2026-03-15'),
+    day('2026-03-14'),
+    day(first),
+    day('2026-03-15'),
+    day('2026-03-15'),
+  ];
+
+  it('follows the rule of the server: five movements and the first one seven days back', () => {
+    expect(endOfMonthLikely(five('2026-03-09'), null, '2026-03-15')).toBe(true);
+    expect(endOfMonthLikely(five('2026-03-10T09:00:00'), 5, '2026-03-15')).toBe(false);
+    expect(endOfMonthLikely([day('2026-03-01')], 4, '2026-03-15')).toBe(false);
+  });
+
+  it('takes movements older than the period for an account in use', () => {
+    expect(endOfMonthLikely([day('2026-03-15')], 6, '2026-03-15')).toBe(true);
   });
 });

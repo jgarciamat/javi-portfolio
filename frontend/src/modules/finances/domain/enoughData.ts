@@ -28,3 +28,21 @@ export function hasEnoughData(
   const first = movements.reduce((min, m) => (m.date < min ? m.date : min), movements[0].date);
   return daysBetween(first.slice(0, 10), today) >= ENOUGH_DAYS;
 }
+
+/**
+ * Whether the server will work out «¿Llegas a fin de mes?» (its rule is stricter: 5 movements
+ * AND the first one at least 7 days back, both days counted), from what the app knows before
+ * asking: the movements of the period and every movement of the account. Movements older than
+ * the period mean an account in use for a while. Only for the space kept while it loads.
+ */
+export function endOfMonthLikely(
+  movements: { date: string }[],
+  totalMovements: number | null,
+  today: string
+): boolean {
+  const total = Math.max(totalMovements ?? 0, movements.length);
+  if (total < ENOUGH_MOVEMENTS) return false;
+  if (total > movements.length) return true;
+  const first = movements.reduce((min, m) => (m.date < min ? m.date : min), movements[0].date);
+  return daysBetween(first.slice(0, 10), today) + 1 >= ENOUGH_DAYS;
+}
