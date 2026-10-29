@@ -239,6 +239,14 @@ mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
   de referencia en cada pintado).
 - **Colores**: variables `--cc-draw-*` por tema (contraste de 4,5:1 o más en claro y oscuro);
   «Neutro» es blanco en oscuro y casi negro en claro.
+- **Grosor** (líneas y zonas; las notas no tienen): Fino 1 px, Normal 2 px, Grueso 4 px y Muy
+  grueso 6 px, botones con `aria-pressed` y una vista previa del trazo en el color elegido. Se
+  aplica a los dibujos nuevos (la consola no tiene selección de un dibujo ya hecho), se recuerda
+  en el dispositivo (`mm_crypto_draw_width`) y se guarda con cada dibujo (`width`, opcional: solo
+  1, 2, 4 o 6, nunca en notas; los guardados antes no lo tienen y se dibujan con el normal, así
+  que las horizontales y zonas antiguas pasan de 1,5 a 2 px). Píxeles de pantalla: el zoom no lo
+  cambia. La zona de acierto de la goma sigue siendo de 16 px aunque la línea sea de 1 px.
+  Deshacer y la exportación de datos lo incluyen.
 - **Por moneda y en el servidor**: cada moneda tiene su lista (`GET`/`PUT
 /crypto/drawings/:symbol`, la lista entera; vacía borra la fila). La app pide una moneda la
   primera vez que se ve, guarda 0,6 s después de cada cambio y otra vez al salir de la página;

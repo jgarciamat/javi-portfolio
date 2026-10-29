@@ -71,6 +71,17 @@
   gap: 0.25rem;
 }
 
+/* The thicknesses: the stroke itself as the icon, in the colour chosen. */
+.cc-draw-widths {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.cc-draw-width svg {
+  width: 20px;
+  height: 16px;
+}
+
 .cc-draw-color {
   width: 26px;
   height: 26px;

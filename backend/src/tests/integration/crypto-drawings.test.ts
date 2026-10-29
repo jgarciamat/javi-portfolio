@@ -141,10 +141,53 @@ describe('Crypto console chart drawings', () => {
     ['a long note', 'BTC', { drawings: [{ ...note, text: 'a'.repeat(DRAWING_TEXT_MAX + 1) }] }],
     ['a note with a line break', 'BTC', { drawings: [{ ...note, text: 'a\nb' }] }],
     ['text on a line', 'BTC', { drawings: [trend('d1', { text: 'hola' })] }],
+    ['a width not offered', 'BTC', { drawings: [trend('d1', { width: 3 })] }],
+    ['a width of zero', 'BTC', { drawings: [trend('d1', { width: 0 })] }],
+    ['a huge width', 'BTC', { drawings: [trend('d1', { width: 600 })] }],
+    ['a width with decimals', 'BTC', { drawings: [trend('d1', { width: 2.5 })] }],
+    ['a width as text', 'BTC', { drawings: [trend('d1', { width: '2' })] }],
+    ['a null width', 'BTC', { drawings: [trend('d1', { width: null })] }],
+    ['a width on a note', 'BTC', { drawings: [{ ...note, width: 2 }] }],
   ])('refuses %s', async (_what, symbol, body) => {
     const res = await put(user, symbol, body).expect(400);
     expect(res.body.code).toBe('VALIDATION_ERROR');
     expect((await get(user, 'BTC').expect(200)).body.drawings).toEqual([]);
+  });
+
+  it('keeps the width of each line and zone, and those saved before without one', async () => {
+    const zone = {
+      id: 'z1',
+      kind: 'rect',
+      color: 'cyan',
+      width: 6,
+      points: [
+        { time: T, price: 47_000 },
+        { time: T + 7_200_000, price: 49_000 },
+      ],
+    };
+    const level = {
+      id: 'h1',
+      kind: 'horizontal',
+      color: 'pink',
+      width: 1,
+      points: [{ time: T, price: 48_500 }],
+    };
+    await put(user, 'BTC', { drawings: [trend('d1', { width: 4 }), zone, level, note] }).expect(
+      200
+    );
+    const saved = (await get(user, 'BTC').expect(200)).body.drawings;
+    expect(saved.map((d: { width?: number }) => d.width)).toEqual([4, 6, 1, undefined]);
+    // A row written before the width existed reads exactly as it was (no width: the normal one).
+    const old = [trend('o1'), { ...note, id: 'o2', text: 'Antes' }];
+    ctx.container.db
+      .prepare('UPDATE crypto_drawings SET drawings = ? WHERE user_id = ?')
+      .run(JSON.stringify(old), user.id);
+    const read = (await get(user, 'BTC').expect(200)).body.drawings;
+    expect(read).toEqual(old);
+    expect('width' in read[0]).toBe(false);
+    // And it can be saved back as it came (an app that does not know the width yet).
+    await put(user, 'BTC', { drawings: read }).expect(200);
+    expect((await get(user, 'BTC').expect(200)).body.drawings).toEqual(old);
   });
 
   it('accepts the most drawings and the longest note', async () => {
@@ -167,13 +210,13 @@ describe('Crypto console chart drawings', () => {
   });
 
   it('exports the drawings and deletes them with the account', async () => {
-    await put(user, 'BTC', { drawings: [note] }).expect(200);
+    await put(user, 'BTC', { drawings: [note, trend('d1', { width: 6 })] }).expect(200);
     const exported = (await request(ctx.app).get('/api/export').set(user.auth).expect(200)).body;
     expect(exported.cryptoDrawings).toEqual([
       {
         symbol: 'BTC',
         updatedAt: '2026-03-15T12:00:00.000Z',
-        drawings: [{ ...note, text: 'Soporte de la semana' }],
+        drawings: [{ ...note, text: 'Soporte de la semana' }, trend('d1', { width: 6 })],
       },
     ]);
     ctx.container.db.prepare('DELETE FROM users WHERE id = ?').run(user.id);

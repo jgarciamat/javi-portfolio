@@ -282,6 +282,7 @@ add('cryptoDrawings', () =>
         { time: 1773561600000, price: 48000 },
         { time: 1773565200000, price: 50500.25 },
       ],
+      width: 4,
     },
     {
       id: 'd2',

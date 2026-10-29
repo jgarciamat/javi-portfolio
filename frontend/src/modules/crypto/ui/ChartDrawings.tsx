@@ -7,20 +7,25 @@ import {
   type PointerEvent,
 } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { storage } from '@shared/utils/storage';
 import type { Drawings } from '../application/useDrawings';
 import {
   COLOR_TONES,
   DRAWING_COLORS,
   DRAWING_TEXT_MAX,
+  DRAWING_WIDTHS,
   DRAW_TOOLS,
   anchor,
   keyboardPoints,
   newDrawingId,
+  savedWidth,
   twoPoints,
+  widthOf,
   type Drawing,
   type DrawingColor,
   type DrawingKind,
   type DrawingPoint,
+  type DrawingWidth,
   type DrawTool,
 } from '../domain/drawings';
 import type { Candle } from '../domain/types';
@@ -28,11 +33,17 @@ import { useMoney } from './money';
 import type { Projection } from './useCandleChart';
 import './css/Drawings.css';
 
+/** The thickness last chosen, kept on this device (a convenience). */
+export const WIDTH_KEY = 'mm_crypto_draw_width';
+
 /** The tool chosen, the colour, the note being written, and what Enter and Ctrl+Z do. */
 export interface DrawControl {
   /** The tool in use; null: the chart moves and zooms as always. */
   tool: DrawTool | null;
   color: DrawingColor;
+  /** Thickness of the next lines and zones (notes have none). */
+  width: DrawingWidth;
+  setWidth: (width: DrawingWidth) => void;
   /** Where a note is being written (its input is open). */
   editing: DrawingPoint | null;
   allowed: (tool: DrawTool) => boolean;
@@ -60,6 +71,7 @@ export function useDrawTools(
 ): DrawControl {
   const [picked, setPicked] = useState<DrawTool | null>(null);
   const [color, setColor] = useState<DrawingColor>('yellow');
+  const [width, setWidth] = useState<DrawingWidth>(() => savedWidth(storage.get(WIDTH_KEY)));
   const [editing, setEditing] = useState<DrawingPoint | null>(null);
   const note = useRef<DrawingPoint | null>(null);
   note.current = editing;
@@ -92,7 +104,7 @@ export function useDrawTools(
   }, [tool, editing]);
 
   const place = (kind: DrawingKind, points: DrawingPoint[]) => {
-    drawings!.add({ id: newDrawingId(), kind, color, points });
+    drawings!.add({ id: newDrawingId(), kind, color, points, width });
     leave();
   };
 
@@ -104,6 +116,11 @@ export function useDrawTools(
   return {
     tool,
     color,
+    width,
+    setWidth: (next) => {
+      setWidth(next);
+      storage.set(WIDTH_KEY, String(next));
+    },
     editing,
     allowed,
     choose: (next) => {
@@ -210,6 +227,36 @@ export function DrawBar({ control, drawings }: { control: DrawControl; drawings?
         ))}
       </span>
       <span className="cc-draw-sep" aria-hidden="true" />
+      <span className="cc-draw-widths" role="group" aria-label={t('app.crypto.draw.width')}>
+        {DRAWING_WIDTHS.map((width) => {
+          const name = t(`app.crypto.draw.widths.${width}`, { px: width });
+          return (
+            <button
+              key={width}
+              type="button"
+              className="cc-draw-btn cc-draw-width"
+              aria-label={name}
+              title={name}
+              aria-pressed={control.width === width}
+              onClick={() => control.setWidth(width)}
+            >
+              {/* The stroke itself, in the colour chosen: what the next line will look like. */}
+              <svg viewBox="0 0 20 16" aria-hidden="true">
+                <line
+                  x1="3"
+                  y1="8"
+                  x2="17"
+                  y2="8"
+                  style={{ stroke: COLOR_TONES[control.color] }}
+                  strokeWidth={width}
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          );
+        })}
+      </span>
+      <span className="cc-draw-sep" aria-hidden="true" />
       <button
         type="button"
         className="cc-draw-btn"
@@ -282,6 +329,8 @@ function Shape({
   const [a, b] = at as Spot[];
   // Inline styles (presentation attributes take no CSS variables): the tone follows the theme.
   const tone = COLOR_TONES[drawing.color];
+  // Screen pixels: the SVG is the pane's size, so the zoom never makes it thicker or thinner.
+  const stroke = widthOf(drawing);
   const line = { stroke: tone };
   const ink = { fill: tone };
   const label = t(`app.crypto.draw.erase.${drawing.kind}`, {
@@ -293,14 +342,14 @@ function Shape({
     body = (
       <>
         <line className="cc-draw-hit" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
-        <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} style={line} strokeWidth={2} />
+        <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} style={line} strokeWidth={stroke} />
       </>
     );
   } else if (drawing.kind === 'horizontal') {
     body = (
       <>
         <line className="cc-draw-hit" x1={0} y1={a.y} x2={width} y2={a.y} />
-        <line x1={0} y1={a.y} x2={width} y2={a.y} style={line} strokeWidth={1.5} />
+        <line x1={0} y1={a.y} x2={width} y2={a.y} style={line} strokeWidth={stroke} />
         <text className="cc-draw-price" x={4} y={a.y - 4} style={ink}>
           {money.price(drawing.points[0].price)}
         </text>
@@ -316,7 +365,7 @@ function Shape({
         height={Math.abs(b.y - a.y)}
         style={{ ...line, ...ink }}
         fillOpacity={0.15}
-        strokeWidth={1.5}
+        strokeWidth={stroke}
       />
     );
   } else {
@@ -504,7 +553,8 @@ function DrawLayer({
         onPointerCancel={gesture.onPointerCancel}
       >
         {drawings.items.map((d) => shape(d, erasing))}
-        {draft && shape({ id: 'draft', color: control.color, ...draft }, false)}
+        {draft &&
+          shape({ id: 'draft', color: control.color, width: control.width, ...draft }, false)}
       </svg>
       {editor && <NoteInput control={control} at={editor} />}
       <p className="cc-draw-hint" aria-live="polite">

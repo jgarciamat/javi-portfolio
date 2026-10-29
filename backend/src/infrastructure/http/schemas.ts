@@ -16,6 +16,8 @@ import {
   DRAWING_TEXT_MAX,
   DRAWING_TIME_MAX,
   DRAWING_TIME_MIN,
+  DRAWING_WIDTHS,
+  DrawingWidth,
 } from '@domain/services/crypto-drawings';
 import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
@@ -1206,10 +1208,18 @@ const drawing = z
     color: z.enum(DRAWING_COLORS),
     points: z.array(drawingPoint).min(1).max(2),
     text: drawingText.optional(),
+    // One of the few thicknesses offered (px), never any number.
+    width: z
+      .number()
+      .refine((w): w is DrawingWidth => (DRAWING_WIDTHS as readonly number[]).includes(w), {
+        message: 'Grosor no válido',
+      })
+      .optional(),
   })
   .strict()
   .refine((d) => d.points.length === DRAWING_POINTS[d.kind], 'Puntos no válidos para el dibujo')
-  .refine((d) => (d.kind === 'text') === (d.text !== undefined), 'Solo las notas llevan texto');
+  .refine((d) => (d.kind === 'text') === (d.text !== undefined), 'Solo las notas llevan texto')
+  .refine((d) => d.kind !== 'text' || d.width === undefined, 'Las notas no llevan grosor');
 
 /** The whole list of drawings of a coin (it replaces the saved one). */
 export const cryptoDrawingsBody = z

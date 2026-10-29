@@ -23,6 +23,15 @@ export type DrawingKind = (typeof DRAWING_KINDS)[number];
 export const DRAWING_COLORS = ['yellow', 'cyan', 'pink', 'orange', 'white'] as const;
 export type DrawingColor = (typeof DRAWING_COLORS)[number];
 
+/**
+ * Thickness of the stroke of lines and zones, in screen pixels (it does not grow with the zoom):
+ * fine, normal, thick and very thick. Notes have none; a drawing saved before there was a choice
+ * has none either and is drawn with the normal one.
+ */
+export const DRAWING_WIDTHS = [1, 2, 4, 6] as const;
+export type DrawingWidth = (typeof DRAWING_WIDTHS)[number];
+export const DRAWING_WIDTH_DEFAULT: DrawingWidth = 2;
+
 /** Two points for a trend line or a zone; one for a horizontal line or a note. */
 export const DRAWING_POINTS: Record<DrawingKind, number> = {
   trend: 2,
@@ -45,4 +54,6 @@ export interface CryptoDrawing {
   points: DrawingPoint[];
   /** Only on notes. */
   text?: string;
+  /** Px of the stroke (lines and zones; absent: DRAWING_WIDTH_DEFAULT). */
+  width?: DrawingWidth;
 }

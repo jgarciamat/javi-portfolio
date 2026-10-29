@@ -35,6 +35,23 @@ export const COLOR_TONES: Record<DrawingColor, string> = {
   white: 'var(--cc-draw-white)',
 };
 
+/**
+ * Thickness of the stroke of lines and zones, in screen pixels (the zoom never changes it): fine,
+ * normal, thick and very thick. Notes have none; a drawing saved before there was a choice has
+ * none either and is drawn with the normal one.
+ */
+export type DrawingWidth = 1 | 2 | 4 | 6;
+export const DRAWING_WIDTHS: DrawingWidth[] = [1, 2, 4, 6];
+export const DEFAULT_WIDTH: DrawingWidth = 2;
+
+/** The stroke of a drawing (the normal one when it has none). */
+export const widthOf = (drawing: Pick<Drawing, 'width'>): DrawingWidth =>
+  drawing.width ?? DEFAULT_WIDTH;
+
+/** A thickness kept on this device, if it is one of those offered. */
+export const savedWidth = (value: string | null): DrawingWidth =>
+  DRAWING_WIDTHS.find((w) => String(w) === value) ?? DEFAULT_WIDTH;
+
 export interface DrawingPoint {
   /** Milliseconds since 1970, UTC. */
   time: number;
@@ -49,6 +66,8 @@ export interface Drawing {
   points: DrawingPoint[];
   /** Only on notes. */
   text?: string;
+  /** Px of the stroke, on lines and zones (absent: DEFAULT_WIDTH). */
+  width?: DrawingWidth;
 }
 
 /** The answer of the API for a coin. */
