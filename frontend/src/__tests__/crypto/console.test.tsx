@@ -239,11 +239,14 @@ describe('Crypto console: market', () => {
         disconnect() {}
       },
     });
-    let height = 300;
+    let height = 310;
     const tall = jest
       .spyOn(Element.prototype, 'clientHeight', 'get')
       .mockImplementation(() => height);
-    const row = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(44);
+    // Rows of 44,4 px: six fit in 310 (taken as 44, seven would be counted and the last cut).
+    const row = jest
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ height: 44.4 } as DOMRect);
     const { unmount } = setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
     await screen.findByRole('button', { name: /Coin 0/ });
     expect(shownCoins()).toHaveLength(6);

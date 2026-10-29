@@ -19,8 +19,9 @@ export function rowsThatFit(height: number, row: number, gap: number): number {
 const px = (value: string) => parseFloat(value) || 0;
 
 /**
- * Rows that fit in the list as tall as the price and the chart, measured again when it resizes
- * and once there are coins to measure.
+ * Rows that fit in the list as tall as the price and the chart, measured again when it or a row
+ * resizes and once there are coins to measure. The row is measured with its fractions of a pixel
+ * (offsetHeight rounds 44,4 down to 44, and the error adds up row after row).
  */
 function useRowsPerPage(
   list: RefObject<HTMLUListElement | null>,
@@ -33,7 +34,7 @@ function useRowsPerPage(
     if (!paged) return;
     const measure = () => {
       const style = getComputedStyle(box);
-      const row = (box.firstElementChild as HTMLElement | null)?.offsetHeight ?? 0;
+      const row = box.firstElementChild?.getBoundingClientRect().height ?? 0;
       const inner = box.clientHeight - px(style.paddingTop) - px(style.paddingBottom);
       setRows(rowsThatFit(inner, row, px(style.rowGap)));
     };
@@ -41,6 +42,7 @@ function useRowsPerPage(
     window.addEventListener('resize', measure);
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
     observer?.observe(box);
+    if (box.firstElementChild) observer?.observe(box.firstElementChild);
     return () => {
       window.removeEventListener('resize', measure);
       observer?.disconnect();
