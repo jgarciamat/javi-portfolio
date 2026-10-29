@@ -114,6 +114,10 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       security: this.security(userId),
       autonomoData: this.autonomoData(userId),
       cryptoSimulator: this.cryptoSimulator(userId),
+      cryptoDrawings: this.all(
+        'SELECT symbol, drawings, updated_at AS updatedAt FROM crypto_drawings WHERE user_id = ? ORDER BY symbol',
+        userId
+      ).map((d) => ({ ...d, drawings: parseJson(d.drawings as string) })),
     };
   }
 

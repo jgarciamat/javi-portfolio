@@ -58,6 +58,7 @@ const STEPS: TourStep[] = [
   { id: 'profile', tab: 'monthly', target: '[data-tour="menu"]' },
   { id: 'learn', tab: 'monthly', target: '[data-tour="learn-btn"]' },
   { id: 'rentaIntro', tab: 'renta' },
+  { id: 'rentaYear', tab: 'renta', target: '[data-tour="renta-year"]' },
   { id: 'rentaSteps', tab: 'renta', target: WIZARD_ROUTE },
   { id: 'rentaTools', tab: 'renta', target: '[data-tour="wizard-tools"]' },
   { id: 'rentaResult', tab: 'renta', target: WIZARD_ROUTE },

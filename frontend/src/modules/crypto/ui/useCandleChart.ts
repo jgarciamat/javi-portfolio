@@ -9,6 +9,8 @@ import {
   type IChartApi,
   type IPriceLine,
   type ISeriesApi,
+  type ISeriesPrimitive,
+  type Logical,
   type LogicalRange,
   type MouseEventParams,
   type Time,
@@ -16,6 +18,7 @@ import {
 } from 'lightweight-charts';
 import type { Locale } from '@core/i18n/I18nContext';
 import { RECENT_CANDLES } from '../domain/chart';
+import { logicalToTime, timeToLogical } from '../domain/drawings';
 import { formatDateTime, formatPlain, formatTick, intlTag } from '../domain/format';
 import { LAYER_COLORS } from '../domain/indicators';
 import type { LayerLevel, LayerLine } from '../domain/layers';
@@ -224,9 +227,58 @@ function useLayerDrawing(
   }, [current, layerLevels, locale]);
 }
 
+/**
+ * Data ↔ pixels of the chart's pane, for the drawings on top: a time (ms) and a price in the
+ * display currency to x and y, and back. Null where the chart cannot say (nothing drawn yet).
+ */
+export interface Projection {
+  width: number;
+  height: number;
+  x: (time: number) => number | null;
+  y: (price: number) => number | null;
+  time: (x: number) => number | null;
+  price: (y: number) => number | null;
+}
+
+/** Where a few reference points land: when it changes, whatever is drawn on top must move. */
+function signature({ chart, candles }: Engine, data: Candle[]): string {
+  const timeScale = chart.timeScale();
+  const { width, height } = chart.paneSize();
+  const ref = data[data.length - 1]?.close ?? 1;
+  return [
+    timeScale.logicalToCoordinate(0 as Logical),
+    timeScale.logicalToCoordinate(1 as Logical),
+    candles.priceToCoordinate(ref),
+    candles.priceToCoordinate(ref * 2),
+    width,
+    height,
+  ].join();
+}
+
+function project(engine: Engine, data: Candle[]): Projection {
+  const timeScale = engine.chart.timeScale();
+  const { width, height } = engine.chart.paneSize();
+  return {
+    width,
+    height,
+    x: (time) => {
+      const logical = timeToLogical(data, time);
+      return logical === null ? null : timeScale.logicalToCoordinate(logical as Logical);
+    },
+    y: (price) => engine.candles.priceToCoordinate(price),
+    time: (x) => {
+      const logical = timeScale.coordinateToLogical(x);
+      return logical === null ? null : logicalToTime(data, logical);
+    },
+    price: (y) => engine.candles.coordinateToPrice(y),
+  };
+}
+
 export interface CandleChart {
   /** The candle under the pointer, if any. */
   hovered: Candle | null;
+  /** Pixels of the pane for the drawings (the hook renders again whenever they move). */
+  projection: Projection | null;
   zoomIn: () => void;
   zoomOut: () => void;
   scroll: (bars: number) => void;
@@ -271,6 +323,9 @@ export function useCandleChart(
   const [look, setLook] = useState(0);
   const rangeListener = useRef(onRange);
   rangeListener.current = onRange;
+  // Bumped whenever the chart is painted with its pane moved, zoomed or rescaled: the drawings
+  // on top are placed again.
+  const [, setFrame] = useState(0);
 
   useEffect(() => {
     const built = build(container.current!, locale);
@@ -282,6 +337,17 @@ export function useCandleChart(
     const setRange = (range: LogicalRange | null) => rangeListener.current(range);
     built.chart.subscribeCrosshairMove(onCrosshair);
     built.chart.timeScale().subscribeVisibleLogicalRangeChange(setRange);
+    // Called by the chart on every paint (drag, zoom, the price scale stretched, new data).
+    let seen = '';
+    const watcher: ISeriesPrimitive = {
+      updateAllViews: () => {
+        const next = signature(built, data.current);
+        if (next === seen) return;
+        seen = next;
+        setFrame((n) => n + 1);
+      },
+    };
+    built.candles.attachPrimitive(watcher);
     const observer = new MutationObserver(() => {
       recolor(built);
       setLook((n) => n + 1);
@@ -292,6 +358,7 @@ export function useCandleChart(
     });
     return () => {
       observer.disconnect();
+      built.candles.detachPrimitive(watcher);
       built.chart.unsubscribeCrosshairMove(onCrosshair);
       built.chart.timeScale().unsubscribeVisibleLogicalRangeChange(setRange);
       built.chart.remove();
@@ -364,6 +431,7 @@ export function useCandleChart(
 
   return {
     hovered,
+    projection: engine.current ? project(engine.current, candles) : null,
     zoomIn: () => zoom(ZOOM),
     zoomOut: () => zoom(1 / ZOOM),
     scroll: (bars) => timeScale().scrollToPosition(timeScale().scrollPosition() + bars, false),

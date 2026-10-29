@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 const NEXT = /^(Siguiente →|Terminar el paso \d+ ✓)/;
-const NOT_APPLICABLE = /^(No tengo|No sé|No soy|No hay|No)/;
+const NOT_APPLICABLE = /^(No tengo|No sé|No soy|No hay|No|Continuar sin)/;
 
 /** The card of the question on screen: the one that holds the «Siguiente» button. */
 function card(page: Page): Locator {

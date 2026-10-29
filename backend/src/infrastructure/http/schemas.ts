@@ -7,6 +7,16 @@ import {
   PURCHASE_OPS,
   SALE_OPS,
 } from '@domain/services/autonomo-vat-data';
+import {
+  DRAWINGS_MAX,
+  DRAWING_COLORS,
+  DRAWING_ID_MAX,
+  DRAWING_KINDS,
+  DRAWING_POINTS,
+  DRAWING_TEXT_MAX,
+  DRAWING_TIME_MAX,
+  DRAWING_TIME_MIN,
+} from '@domain/services/crypto-drawings';
 import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
@@ -1166,6 +1176,49 @@ export const cryptoRankingBody = z
 
 export const cryptoSeasonParams = z
   .object({ season: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Temporada no válida') })
+  .strict();
+
+export const cryptoDrawingParams = z.object({ symbol: cryptoSymbol }).strict();
+
+const drawingPoint = z
+  .object({
+    time: z.number().int().min(DRAWING_TIME_MIN).max(DRAWING_TIME_MAX),
+    price: cryptoPrice,
+  })
+  .strict();
+
+/** Letters, figures, punctuation and spaces: no control characters, no line breaks. */
+const drawingText = z
+  .string()
+  .trim()
+  .min(1)
+  .max(DRAWING_TEXT_MAX)
+  .refine((text) => !/\p{Cc}/u.test(text), 'Texto no válido');
+
+const drawing = z
+  .object({
+    id: z
+      .string()
+      .min(1)
+      .max(DRAWING_ID_MAX)
+      .regex(/^[\w-]+$/),
+    kind: z.enum(DRAWING_KINDS),
+    color: z.enum(DRAWING_COLORS),
+    points: z.array(drawingPoint).min(1).max(2),
+    text: drawingText.optional(),
+  })
+  .strict()
+  .refine((d) => d.points.length === DRAWING_POINTS[d.kind], 'Puntos no válidos para el dibujo')
+  .refine((d) => (d.kind === 'text') === (d.text !== undefined), 'Solo las notas llevan texto');
+
+/** The whole list of drawings of a coin (it replaces the saved one). */
+export const cryptoDrawingsBody = z
+  .object({
+    drawings: z
+      .array(drawing)
+      .max(DRAWINGS_MAX, `Como máximo ${DRAWINGS_MAX} dibujos por moneda`)
+      .refine((list) => new Set(list.map((d) => d.id)).size === list.length, 'Dibujos repetidos'),
+  })
   .strict();
 
 export const cryptoAlertBody = z

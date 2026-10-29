@@ -13,7 +13,7 @@ test('the Renta assistant goes through the nine steps, in order, to the official
 
   // Steps are locked until the one before is done.
   await expect(steps.getByRole('button', { name: /^Paso 2:/ })).toBeDisabled();
-  await page.getByRole('button', { name: 'No lo tengo, sigo sin él' }).click();
+  await page.getByRole('button', { name: 'Continuar sin borrador' }).click();
 
   const last = page.getByRole('button', { name: 'Terminar ✓', exact: true });
   const asked = await walkWizard(page, { until: last });

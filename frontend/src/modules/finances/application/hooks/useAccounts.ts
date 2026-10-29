@@ -32,6 +32,8 @@ export function useAccounts() {
     total: resource.data?.total ?? 0,
     transfers: resource.data?.transfers ?? [],
     loading: resource.loading,
+    /** False until the first answer: the screen keeps the list's place meanwhile. */
+    loaded: resource.data !== undefined,
     error: action.error ?? resource.error,
     create: (input: AccountInput) => run(() => accountApi.create(input)),
     update: (id: string, input: Partial<AccountInput>) => run(() => accountApi.update(id, input)),

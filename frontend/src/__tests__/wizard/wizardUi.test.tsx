@@ -108,11 +108,49 @@ function OnlyAnswer() {
   );
 }
 
+/** One screen with a file to bring: «I don't have it» goes under the answer, not in the row. */
+function FileToBring() {
+  const controls = useWizardProgress(KEY, DEFS);
+  const screens = [
+    {
+      id: 'file',
+      title: 'Your file',
+      ready: false,
+      skipLabel: 'I have none',
+      skipBelow: true,
+      body: <button type="button">Upload it</button>,
+    },
+  ];
+  return (
+    <Wizard
+      flow="test"
+      defs={DEFS}
+      steps={[
+        { id: 'one', title: 'First step', icon: 'user', badge: 'Starter', screens },
+        { id: 'two', title: 'Second step', icon: 'home', badge: 'Finisher', screens },
+      ]}
+      controls={controls}
+      finale={null}
+    />
+  );
+}
+
 describe('the assistant, one screen at a time', () => {
   it('names no skip button the screen does not have', () => {
     renderWithProviders(<OnlyAnswer />, { authenticated: false });
     expect(screen.getByText(tr('wizard.answerFirstOnly'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('wizard.skip') })).toBeNull();
+  });
+
+  it("puts «I don't have it» of a file under the answer, out of the row of the way on", () => {
+    const { container } = renderWithProviders(<FileToBring />, { authenticated: false });
+    const skip = screen.getByRole('button', { name: 'I have none' });
+    expect(skip).toHaveClass('wiz-skip-below');
+    expect(container.querySelector('.wiz-body + .wiz-skip-below')).toBe(skip);
+    expect(container.querySelector('.wiz-nav')).not.toContainElement(skip);
+    expect(screen.getByText(tr('wizard.answerFirst', { skip: 'I have none' }))).toBeInTheDocument();
+    fireEvent.click(skip);
+    expect(screen.getByText(tr('wizard.badgeWon', { badge: 'Starter' }))).toBeInTheDocument();
   });
 
   it('locks the way on until the screen is answered, and the next step until this one is done', () => {

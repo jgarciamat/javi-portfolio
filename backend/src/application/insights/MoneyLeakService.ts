@@ -5,11 +5,12 @@ import {
   RecurringRuleRepository,
   TransactionRepository,
 } from '@domain/ports/repositories';
-import { Clock, FunnelRecorder } from '@domain/ports/services';
+import { Clock, DataVersions, FunnelRecorder } from '@domain/ports/services';
 import {
   ALLOWED_DECISIONS,
   LEAK_MAX_ROWS,
   LeakCoverage,
+  LeakDecision,
   LeakDecisionStatus,
   LeakFinding,
   LeakReport,
@@ -22,6 +23,7 @@ import {
 import { FREE_LEAKS_SHOWN } from '@domain/services/plans';
 import { todayDateOnly } from '@domain/shared/period';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import { VersionedCache } from '@application/shared/VersionedCache';
 
 /** «Tu dinero perdido» as the screen shows it; on the free plan only part of the findings. */
 export interface MoneyLeaksView extends LeakSummary {
@@ -46,6 +48,9 @@ const foundBucket = (count: number): string => (count <= 2 ? '1-2' : count <= 5 
  * full the most expensive findings and every possible double charge, the rest needs Premium.
  */
 export class MoneyLeakService {
+  /** The findings of each user and day, kept until their data (or decisions) change. */
+  private readonly reports: VersionedCache<LeakReport>;
+
   constructor(
     private readonly transactions: TransactionRepository,
     private readonly rules: RecurringRuleRepository,
@@ -53,26 +58,18 @@ export class MoneyLeakService {
     private readonly decisions: LeakDecisionRepository,
     private readonly entitlements: EntitlementService,
     private readonly funnel: FunnelRecorder,
-    private readonly clock: Clock
-  ) {}
+    private readonly clock: Clock,
+    versions: DataVersions
+  ) {
+    this.reports = new VersionedCache(versions);
+  }
 
   /** The findings with the decisions applied; checked cancellations are saved as recovered. */
   private analyse(userId: string): LeakReport {
     const now = this.clock.now();
     const today = todayDateOnly(now);
-    const aliases = this.categoryRules.listByUser(userId).map((r) => r.pattern);
-    const coveredKeys = new Set(
-      this.rules
-        .listByUser(userId)
-        .filter((r) => r.active)
-        .map((r) => merchantKey(r.description, aliases))
-        .filter((key): key is string => key !== null)
-    );
     const decisions = this.decisions.listByUser(userId);
-    const report = detectMoneyLeaks(
-      this.transactions.listSince(userId, windowStart(today), LEAK_MAX_ROWS),
-      { today, coveredKeys, aliases, decisions }
-    );
+    const report = this.reports.get(userId, today, () => this.detect(userId, today, decisions));
 
     const byId = new Map(decisions.map((d) => [d.findingId, d]));
     for (const finding of report.findings) {
@@ -99,6 +96,22 @@ export class MoneyLeakService {
       );
     }
     return report;
+  }
+
+  /** The findings of the movements of the window, deterministically (no writes). */
+  private detect(userId: string, today: string, decisions: LeakDecision[]): LeakReport {
+    const aliases = this.categoryRules.listByUser(userId).map((r) => r.pattern);
+    const coveredKeys = new Set(
+      this.rules
+        .listByUser(userId)
+        .filter((r) => r.active)
+        .map((r) => merchantKey(r.description, aliases))
+        .filter((key): key is string => key !== null)
+    );
+    return detectMoneyLeaks(
+      this.transactions.listSince(userId, windowStart(today), LEAK_MAX_ROWS),
+      { today, coveredKeys, aliases, decisions }
+    );
   }
 
   /** The findings the plan shows: on the free one the 3 most expensive plus double charges. */

@@ -8,16 +8,18 @@ import { AppSplash } from '@shared/components/AppSplash';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { OfflineBanner } from '@shared/components/OfflineBanner';
 import { ApiProvider } from '@core/context/ApiContext';
-import { I18nProvider } from '@core/i18n/I18nContext';
+import { I18nProvider, withAllTexts } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 import { SettingsProvider } from '@core/settings/SettingsContext';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import { routerBasename } from '@core/i18n/localeUrl';
 
 // Every page is its own chunk: the login screen does not download the dashboard and vice versa.
+// The landing, the login and the plans only need the core of the texts; every other page waits for
+// the rest with `withAllTexts` (scripts/i18n/split.cjs builds the two parts from these calls).
 const AuthPage = lazyNamed(() => import('@shared/components/AuthPage'), 'AuthPage');
 const DashboardPage = lazyNamed(
-  () => import('./modules/finances/ui/components/DashboardPage'),
+  withAllTexts(() => import('./modules/finances/ui/components/DashboardPage')),
   'DashboardPage'
 );
 const VerifyEmailPage = lazyNamed(
@@ -29,59 +31,68 @@ const ResetPasswordPage = lazyNamed(
   'ResetPasswordPage'
 );
 const PrivacyPolicyPage = lazyNamed(
-  () => import('./modules/auth/ui/PrivacyPolicyPage'),
+  withAllTexts(() => import('./modules/auth/ui/PrivacyPolicyPage')),
   'PrivacyPolicyPage'
 );
 const PricingPage = lazyNamed(() => import('./modules/billing/ui/PricingPage'), 'PricingPage');
-const TermsPage = lazyNamed(() => import('./modules/billing/ui/TermsPage'), 'TermsPage');
+const TermsPage = lazyNamed(
+  withAllTexts(() => import('./modules/billing/ui/TermsPage')),
+  'TermsPage'
+);
 const BudgetRulePage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'BudgetRulePage'
 );
 const GuidesIndexPage = lazyNamed(
-  () => import('./modules/guides/ui/GuidePages'),
+  withAllTexts(() => import('./modules/guides/ui/GuidePages')),
   'GuidesIndexPage'
 );
-const GuidePage = lazyNamed(() => import('./modules/guides/ui/GuidePages'), 'GuidePage');
+const GuidePage = lazyNamed(
+  withAllTexts(() => import('./modules/guides/ui/GuidePages')),
+  'GuidePage'
+);
 const HaciendaIndexPage = lazyNamed(
-  () => import('./modules/guides/ui/HaciendaPages'),
+  withAllTexts(() => import('./modules/guides/ui/HaciendaPages')),
   'HaciendaIndexPage'
 );
 const HaciendaGuidePage = lazyNamed(
-  () => import('./modules/guides/ui/HaciendaPages'),
+  withAllTexts(() => import('./modules/guides/ui/HaciendaPages')),
   'HaciendaGuidePage'
 );
-const VideosPage = lazyNamed(() => import('./modules/guides/ui/VideosPage'), 'VideosPage');
+const VideosPage = lazyNamed(
+  withAllTexts(() => import('./modules/guides/ui/VideosPage')),
+  'VideosPage'
+);
 const LoanCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'LoanCalculatorPage'
 );
 const VatCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'VatCalculatorPage'
 );
 const InflationCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'InflationCalculatorPage'
 );
 const RentaCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'RentaCalculatorPage'
 );
 const SalaryCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/SalaryCalculator'),
+  withAllTexts(() => import('./modules/tools/ui/SalaryCalculator')),
   'SalaryCalculatorPage'
 );
 const RetaCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/RetaCalculator'),
+  withAllTexts(() => import('./modules/tools/ui/RetaCalculator')),
   'RetaCalculatorPage'
 );
 const GoalCalculatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'GoalCalculatorPage'
 );
 const SavingsSimulatorPage = lazyNamed(
-  () => import('./modules/tools/ui/CalculatorPages'),
+  withAllTexts(() => import('./modules/tools/ui/CalculatorPages')),
   'SavingsSimulatorPage'
 );
 

@@ -8,11 +8,15 @@
     document.documentElement.setAttribute('data-theme', theme);
     // People with a session never see the text search engines read (see scripts/prerender.mjs),
     // and their dashboard downloads with the main chunk instead of after it.
+    // The texts come in two parts (vite.config.ts): the dashboard needs the rest of them too.
+    var english =
+      localStorage.getItem('mm_locale') === 'en' || /^\/en(\/|$)/.test(location.pathname);
     if (localStorage.getItem('mm_user')) {
       document.documentElement.classList.add('has-session');
       preload('session-preload');
+      preload(english ? 'texts-preload-en' : 'texts-preload');
     }
-    if (localStorage.getItem('mm_locale') === 'en') preload('locale-preload');
+    if (english) preload('locale-preload');
     var bar = document.querySelector('meta[name="theme-color"]');
     if (bar) bar.setAttribute('content', theme === 'light' ? '#ffffff' : '#0f172a');
   } catch (e) {

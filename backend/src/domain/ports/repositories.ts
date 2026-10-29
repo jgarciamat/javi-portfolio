@@ -11,6 +11,7 @@ import { User } from '@domain/model/User';
 import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
+import { CryptoDrawing } from '@domain/services/crypto-drawings';
 import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { RuleMovement } from '@domain/services/recurring-match';
 import { SubscriptionCandidate } from '@domain/services/subscriptions';
@@ -263,6 +264,15 @@ export interface TransactionRepository {
   listSubscriptionCandidates(userId: string): (Omit<SubscriptionCandidate, 'categoryName'> & {
     categoryId: string;
   })[];
+  /**
+   * Income and expenses of the given categories dated in `year`, with only what the quarterly
+   * tax estimate reads (lighter than `listAllByUser` with tens of thousands of movements).
+   */
+  listTaxMovements(
+    userId: string,
+    categoryIds: string[],
+    year: number
+  ): { date: string; type: 'INCOME' | 'EXPENSE'; amountCents: Cents; categoryId: string }[];
   /** Date of the first movement (YYYY-MM-DD), or null without any. */
   firstDate(userId: string): string | null;
   /** Movements of automatic operations of the periods of `year` dated after `today`. */
@@ -769,6 +779,14 @@ export interface CryptoPriceAlert {
   price: number;
   createdAt: string;
   triggeredAt: string | null;
+}
+
+/** Chart drawings of the crypto console: one list per person and coin (migration 043). */
+export interface CryptoDrawingRepository {
+  get(userId: string, symbol: string): { drawings: CryptoDrawing[]; updatedAt: string } | null;
+  /** Replaces the list of that coin. */
+  save(userId: string, symbol: string, drawings: CryptoDrawing[], updatedAt: string): void;
+  remove(userId: string, symbol: string): void;
 }
 
 export interface CryptoSimRepository {

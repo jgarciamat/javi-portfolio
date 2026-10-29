@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { parseDecimal } from '@shared/utils/numbers';
+import { storage } from '@shared/utils/storage';
 import type { Account, AccountType } from '@modules/finances/domain/types';
 import { useAccounts } from '../../application/hooks/useAccounts';
+import { useFinances } from '../../application/FinancesContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { todayDateOnly } from '@shared/utils/format';
@@ -17,6 +19,72 @@ const ACCOUNT_TYPES: { value: AccountType; icon: string }[] = [
   { value: 'investment', icon: '📈' },
   { value: 'other', icon: '📦' },
 ];
+
+/** What the list of accounts looked like last time on this device (A02: no jump while it loads). */
+const LIST_KEY = 'mm_accounts_list';
+interface ListPlace {
+  /** Screen width it was measured at, and the height of the list then. */
+  width: number;
+  height: number;
+  count: number;
+  /** At least two active accounts: the transfer form, not its hint. */
+  canTransfer: boolean;
+}
+const ROW_GAP = 8;
+
+/**
+ * The list's height for `count` accounts, as measured: a row is 62 px, but below 600 px its buttons
+ * wrap (106 px) except on the default account, which only has «Edit» (76 px).
+ */
+function estimatedHeight(count: number): number {
+  const narrow = window.innerWidth < 600;
+  const rows = narrow ? 76 + (count - 1) * 106 : count * 62;
+  return rows + (count - 1) * ROW_GAP;
+}
+
+/**
+ * The height to keep for the list while it loads: the one measured last time at this width, else
+ * an estimate from the accounts the app already has (or had last time), else one account.
+ */
+function reservedPlace(known: Account[]): { height: number; canTransfer: boolean } {
+  const last = storage.getJSON<ListPlace | null>(LIST_KEY, null);
+  if (last && last.width === window.innerWidth && (!known.length || known.length === last.count)) {
+    return last;
+  }
+  // Everybody has an account: none means the app has not got them yet.
+  if (known.length) {
+    const canTransfer = known.filter((a) => !a.archived).length >= 2;
+    return { height: estimatedHeight(known.length), canTransfer };
+  }
+  return { height: estimatedHeight(last?.count ?? 1), canTransfer: !!last?.canTransfer };
+}
+
+/**
+ * The place of the list while it loads (`place`, and `listProps` for the list), measured once it
+ * is there for the next visit (only when it has just arrived or its number of accounts changed).
+ */
+function useListPlace(loaded: boolean, accounts: Account[]) {
+  // The month view may have brought the accounts already (without the transfers).
+  const { accounts: known } = useFinances();
+  const [place] = useState(() => reservedPlace(known));
+  const list = useRef<HTMLUListElement>(null);
+  const active = accounts.filter((a) => !a.archived).length;
+  useLayoutEffect(() => {
+    if (!loaded) return;
+    storage.setJSON(LIST_KEY, {
+      width: window.innerWidth,
+      height: (list.current as HTMLUListElement).offsetHeight,
+      count: accounts.length,
+      canTransfer: active >= 2,
+    } satisfies ListPlace);
+  }, [loaded, accounts.length, active]);
+  const listProps = {
+    ref: list,
+    'aria-busy': !loaded,
+    style: loaded ? undefined : { minHeight: place.height },
+  };
+  return { place, listProps };
+}
 
 function AccountForm({
   initial,
@@ -103,9 +171,12 @@ function AccountForm({
 
 function TransferForm({
   accounts,
+  waiting,
   onSubmit,
 }: {
   accounts: Account[];
+  /** The accounts are on their way and there were two or more: the form keeps its place. */
+  waiting: boolean;
   onSubmit: (input: {
     fromAccountId: string;
     toAccountId: string;
@@ -126,7 +197,7 @@ function TransferForm({
   const from = isActive(fromChoice) ? fromChoice : (active[0]?.id ?? '');
   const to = isActive(toChoice) ? toChoice : (active.find((a) => a.id !== from)?.id ?? '');
 
-  if (active.length < 2)
+  if (active.length < 2 && !waiting)
     return <p className="section-hint">{t('app.accounts.transferNeedsTwo')}</p>;
 
   return (
@@ -287,6 +358,7 @@ export function AccountsView() {
   const { money, date, currency } = useFormat();
   const acc = useAccounts();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const { place, listProps } = useListPlace(acc.loaded, acc.accounts);
   const yesNo = (v: boolean) => t(v ? 'app.export.csv.yes' : 'app.export.csv.no');
   const accountsTable = () => ({
     head: [
@@ -338,10 +410,14 @@ export function AccountsView() {
           what={t('app.accounts.title')}
           count={acc.accounts.length}
           table={accountsTable}
+          waiting={!acc.loaded}
           pdf
         />
         {acc.error && <p className="form-error">{acc.error}</p>}
-        <ul className="entity-list">
+        <ul className="entity-list" {...listProps}>
+          {!acc.loaded && (
+            <li className="entity-item entity-item--placeholder" aria-hidden="true" />
+          )}
           {acc.accounts.map((a) => (
             <li key={a.id} className={`entity-item${a.archived ? ' entity-item--muted' : ''}`}>
               {editingId === a.id ? (
@@ -376,12 +452,17 @@ export function AccountsView() {
         <h2 className="section-title">
           <Icon name="repeat" /> {t('app.accounts.transfers')}
         </h2>
-        <TransferForm accounts={acc.accounts} onSubmit={(input) => acc.createTransfer(input)} />
+        <TransferForm
+          accounts={acc.accounts}
+          waiting={!acc.loaded && place.canTransfer}
+          onSubmit={(input) => acc.createTransfer(input)}
+        />
         <ExportButtons
           name="transferencias"
           what={t('app.accounts.transfers')}
           count={acc.transfers.length}
           table={transfersTable}
+          waiting={!acc.loaded}
           pdf
         />
         {acc.transfers.length > 0 && (

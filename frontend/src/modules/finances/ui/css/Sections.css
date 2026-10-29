@@ -179,6 +179,13 @@
   flex-wrap: wrap;
 }
 
+/* Cuentas while the list loads: one soft block in the place the list had last time. */
+.entity-item--placeholder {
+  flex: 1;
+  background: var(--slate-900);
+  border-style: dashed;
+}
+
 .entity-item--muted {
   opacity: 0.55;
 }
@@ -390,6 +397,27 @@
   gap: 0.75rem;
   font-size: 0.78rem;
   color: var(--slate-400);
+}
+
+/* Renta: what the accounts recorded in the year, a side note that is not part of the return. */
+.renta-reference-note {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--slate-700);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--slate-800) 45%, transparent);
+  font-size: 0.82rem;
+  color: var(--slate-400);
+}
+
+.renta-reference-note p {
+  margin: 0.2rem 0 0;
+}
+
+.renta-reference-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--slate-300);
 }
 
 /* Two goals on one category count the same savings: said on each card. */
@@ -1283,6 +1311,49 @@ button.entity-item {
 .renta-tools {
   padding: 0;
   margin-top: 1rem;
+}
+
+/* The assistant opens its own card (the checklist goes above it). */
+.card > .renta-tools:first-child {
+  margin-top: 0;
+}
+
+/* The title of the section, its note, and the dates and what to gather folded above the
+   assistant: short lines, close together. */
+.renta-head,
+.renta-fold {
+  margin-bottom: 0.75rem;
+}
+.renta-head .section-hint {
+  margin-bottom: 0;
+}
+.renta-fold .collapsible-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.renta-fold .renta-campaign {
+  margin-top: 0;
+}
+
+/* The year of the return, at the head of the assistant's card, as wide as its toolbar. */
+.renta-year-pick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-800);
+  font-weight: 700;
+}
+.renta-year-pick select {
+  flex: 0 1 11rem;
+  width: auto;
+  min-width: 7rem;
+  min-height: 2.75rem;
+}
+.renta-tools > .wiz {
+  margin-top: 0;
 }
 
 .renta-checklist {

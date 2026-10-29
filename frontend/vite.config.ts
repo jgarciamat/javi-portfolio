@@ -1,9 +1,19 @@
-import { realpathSync } from 'fs';
+import { readFileSync, realpathSync } from 'fs';
+import { createRequire } from 'module';
 import { defineConfig, searchForWorkspaceRoot, type Plugin } from 'vite';
 import type { OutputBundle, OutputChunk } from 'rollup';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+
+const require = createRequire(import.meta.url);
+const { coreKeys, splitMessages } = require('./scripts/i18n/split.cjs') as {
+  coreKeys: (root: string, messages: Record<string, string>) => Set<string>;
+  splitMessages: (
+    messages: Record<string, string>,
+    core: Set<string>
+  ) => Record<'core' | 'rest', Record<string, string>>;
+};
 
 /** Libraries jsPDF imports on demand for .html() and SVG, which the app never calls. */
 const JSPDF_OPTIONAL = ['html2canvas', 'canvg', 'dompurify'];
@@ -30,11 +40,52 @@ function chunkFiles(bundle: OutputBundle, endsWith: string): string[] {
     .map((file) => `/${file}`);
 }
 
+const LOCALE_PARTS = 'virtual:locale/';
+
 /**
- * Writes into index.html the hashed files of the dashboard and of the English texts, as meta
- * tags. public/theme-init.js preloads the first ones when there is a session and the second
- * ones when the language is English, so they download in parallel with the main chunk instead
- * of after it. The landing page and Spanish visitors download nothing more.
+ * The texts of each language in two parts (A04): `virtual:locale/es/core` (in the main chunk),
+ * `virtual:locale/en/core` and the `rest` of each, chunks of their own. scripts/i18n/split.cjs
+ * decides which keys are core from the code; src/core/i18n/I18nContext.tsx loads them.
+ */
+function localeParts(): Plugin {
+  type Parts = Record<string, Record<string, Record<string, string>>>;
+  let parts: Parts | null = null;
+  const read = (lang: string) =>
+    JSON.parse(readFileSync(path.resolve(__dirname, `src/locales/${lang}.json`), 'utf8'));
+  const build = (): Parts => {
+    const es = read('es');
+    const en = read('en');
+    const core = coreKeys(__dirname, { ...es, ...en });
+    return { es: splitMessages(es, core), en: splitMessages(en, core) };
+  };
+  return {
+    name: 'locale-parts',
+    resolveId: (id) => (id.startsWith(LOCALE_PARTS) ? `\0${id}` : undefined),
+    load(id) {
+      if (!id.startsWith(`\0${LOCALE_PARTS}`)) return;
+      const [lang, part] = id.slice(LOCALE_PARTS.length + 1).split('/');
+      parts ??= build();
+      // A string parsed at runtime: faster than an object literal of 6,000 keys.
+      return `export default JSON.parse(${JSON.stringify(JSON.stringify(parts[lang][part]))});`;
+    },
+    // `npm run dev`: a change in the code or in the texts may move keys between the parts.
+    configureServer(server) {
+      server.watcher.on('change', (file) => {
+        if (!/[\\/]src[\\/].*\.(tsx?|json)$/.test(file)) return;
+        parts = null;
+        server.moduleGraph.idToModuleMap.forEach((mod, id) => {
+          if (id.startsWith(`\0${LOCALE_PARTS}`)) server.moduleGraph.invalidateModule(mod);
+        });
+      });
+    },
+  };
+}
+
+/**
+ * Writes into index.html the hashed files of the dashboard and of the texts, as meta tags.
+ * public/theme-init.js preloads the dashboard and the rest of the texts when there is a session,
+ * and the English core when the language is English, so they download in parallel with the main
+ * chunk instead of after it. The landing page and Spanish visitors download nothing more.
  */
 function preloadHints(): Plugin {
   return {
@@ -51,7 +102,9 @@ function preloadHints(): Plugin {
         });
         return [
           meta('session-preload', chunkFiles(ctx.bundle, '/DashboardPage.tsx')),
-          meta('locale-preload', chunkFiles(ctx.bundle, '/locales/en.json')),
+          meta('texts-preload', chunkFiles(ctx.bundle, `${LOCALE_PARTS}es/rest`)),
+          meta('locale-preload', chunkFiles(ctx.bundle, `${LOCALE_PARTS}en/core`)),
+          meta('texts-preload-en', chunkFiles(ctx.bundle, `${LOCALE_PARTS}en/rest`)),
         ];
       },
     },
@@ -61,6 +114,7 @@ function preloadHints(): Plugin {
 export default defineConfig({
   plugins: [
     react(),
+    localeParts(),
     preloadHints(),
     VitePWA({
       registerType: 'prompt',
@@ -112,6 +166,11 @@ export default defineConfig({
       output: {
         // Libraries change less often than the app: their own chunk survives deploys in the cache.
         manualChunks(id) {
+          // The texts loaded on demand, by name (the Spanish core stays in the main chunk).
+          const texts = id.match(/^\0virtual:locale\/(es|en)\/(core|rest)$/);
+          if (texts && id !== `\0${LOCALE_PARTS}es/core`) {
+            return texts[2] === 'core' ? `texts-${texts[1]}` : `texts-${texts[1]}-rest`;
+          }
           // Its own named chunk, so the offline precache can leave it out (globIgnores above).
           if (/taxforms\/data\/100\.json/.test(id)) return 'form-layout-100';
           if (

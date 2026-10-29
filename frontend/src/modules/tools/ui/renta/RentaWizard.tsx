@@ -180,6 +180,7 @@ function youStep(ctx: Ctx): WizardScreen[] {
       help: t(w('help.draft')),
       ready: p.draft.reading !== null,
       skipLabel: t(w('skip.draft')),
+      skipBelow: true,
       body: (
         <DraftStep
           key={p.wipes}
@@ -292,6 +293,7 @@ function importScreen(ctx: Ctx): WizardScreen {
     help: t(w('help.investImport')),
     ready: p.form.savingsDetail?.imported !== undefined,
     skipLabel: t(w('skip.investImport')),
+    skipBelow: true,
     body: <InvestCard form={p.form} set={p.set} input={p.input} />,
   };
 }

@@ -9,6 +9,7 @@ import type {
   SeasonReport,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
+import type { CryptoDrawings, Drawing } from '@modules/crypto/domain/drawings';
 import { apiRequest, jsonBody, query } from './http';
 
 /**
@@ -84,6 +85,17 @@ export const cryptoApi = {
   deleteAlert(id: string) {
     return apiRequest<PriceAlerts>(`/crypto/alerts/${encodeURIComponent(id)}`, {
       method: 'DELETE',
+    });
+  },
+  /** The person's drawings on the chart of a coin. */
+  drawings(symbol: string) {
+    return apiRequest<CryptoDrawings>(`/crypto/drawings/${encodeURIComponent(symbol)}`);
+  },
+  /** Replaces the drawings of a coin with this list (an empty one removes them). */
+  saveDrawings(symbol: string, drawings: Drawing[]) {
+    return apiRequest<CryptoDrawings>(`/crypto/drawings/${encodeURIComponent(symbol)}`, {
+      method: 'PUT',
+      body: jsonBody({ drawings }),
     });
   },
 };

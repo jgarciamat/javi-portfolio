@@ -272,6 +272,26 @@ add('cryptoAlert', () =>
   cryptoApi.createAlert({ symbol: 'BTC', condition: 'above', price: 60000 })
 );
 add('cryptoDeleteAlert', () => cryptoApi.deleteAlert('{alert}'));
+add('cryptoDrawings', () =>
+  cryptoApi.saveDrawings('BTC', [
+    {
+      id: 'd1',
+      kind: 'trend',
+      color: 'yellow',
+      points: [
+        { time: 1773561600000, price: 48000 },
+        { time: 1773565200000, price: 50500.25 },
+      ],
+    },
+    {
+      id: 'd2',
+      kind: 'text',
+      color: 'white',
+      points: [{ time: 1773561600000, price: 49000 }],
+      text: 'Soporte',
+    },
+  ])
+);
 
 describe('what the app sends', () => {
   const mockFetch = jest.fn();

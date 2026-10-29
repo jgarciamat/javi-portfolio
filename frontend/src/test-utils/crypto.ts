@@ -7,6 +7,7 @@ import type {
   PriceAlerts,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
+import type { CryptoDrawings, Drawing } from '@modules/crypto/domain/drawings';
 
 /** Made-up market and simulator data for the crypto console tests (no real prices). */
 export const MARKET = {
@@ -213,5 +214,15 @@ export function portfolio(overrides: Partial<SimPortfolio> = {}): SimPortfolio {
     fills: [],
     limits: { pending: 20, open: 50, operations: 1000, pendingDays: 30, perCoin: 2 },
     ...overrides,
+  };
+}
+
+/** The saved drawings of a coin (none unless given). */
+export function drawings(symbol: string, list: Drawing[] = []): CryptoDrawings {
+  return {
+    symbol,
+    drawings: list,
+    max: 50,
+    updatedAt: list.length ? '2026-03-15T12:00:00.000Z' : null,
   };
 }

@@ -64,6 +64,26 @@ function CoinRow() {
   );
 }
 
+/**
+ * The drawing bar: the same pieces and sizes (five tools, five colours, «Undo» and «Delete all»),
+ * so it wraps where the real one does.
+ */
+function DrawRow() {
+  const squares = (n: number) =>
+    Array.from({ length: n }, (_, i) => <span key={i} className="cc-skel-chip cc-skel-tool" />);
+  return (
+    <div className="cc-skel-draw">
+      {squares(5)}
+      <i />
+      {Array.from({ length: 5 }, (_, i) => (
+        <span key={i} className="cc-skel-chip cc-skel-swatch" />
+      ))}
+      <i />
+      {squares(2)}
+    </div>
+  );
+}
+
 /** The chart column: its header, the layer chips, «Learn», the frame, the zoom bar and the notes. */
 function ChartColumn() {
   const hint = storage.get(HINT_KEY) !== '1';
@@ -82,6 +102,7 @@ function ChartColumn() {
         )}
       </div>
       <span className="cc-skel-box cc-skel-learn" />
+      <DrawRow />
       <ChartFrame />
       <div className="cc-skel-row cc-skel-tools">
         {['4.5rem', '4.5rem', '5rem', '3.5rem', '7.5rem'].map((w, i) => (

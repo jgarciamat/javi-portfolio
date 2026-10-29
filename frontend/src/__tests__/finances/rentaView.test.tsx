@@ -70,6 +70,28 @@ describe('Renta section', () => {
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 
+  it('shows the year in the accounts as a reference note that a new return keeps', async () => {
+    const api = createFakeApi();
+    api.transactionApi.getAnnual.mockResolvedValue({ year: 2025, months: { 1: month(900, 300) } });
+    renderWithProviders(<RentaView />, { api });
+    const note = await screen.findByRole('complementary', { name: tr('app.renta.figuresLabel') });
+    expect(note).toHaveClass('renta-reference-note');
+    await within(note).findByText(/en 2025 entraron .*900.* y salieron .*300.*/);
+    // A note, not a field of the return.
+    expect(within(note).queryByRole('textbox')).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.gross')), {
+      target: { value: '30000' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
+    expect(
+      within(screen.getByRole('complementary', { name: tr('app.renta.figuresLabel') })).getByText(
+        /entraron .*900/
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).not.toHaveValue('30000');
+  });
+
   it('does the calculation inside the app, without a link to the public page', async () => {
     renderWithProviders(<RentaView />);
     expect(await screen.findByText(tr('tools.renta.step1'))).toBeInTheDocument();
@@ -85,6 +107,42 @@ describe('Renta section', () => {
       'href',
       'https://sede.agenciatributaria.gob.es/'
     );
+  });
+
+  it('folds the dates and what to gather above the assistant, both closed at first', async () => {
+    renderWithProviders(<RentaView />);
+    const step = await screen.findByText(tr('tools.renta.step1'));
+    const dates = screen.getByRole('button', { name: tr('app.renta.datesTitle', { year: 2025 }) });
+    const gather = screen.getByRole('button', { name: tr('app.renta.checklist') });
+    for (const fold of [dates, gather]) {
+      expect(fold).toHaveAttribute('aria-expanded', 'false');
+      expect(document.getElementById(fold.getAttribute('aria-controls') as string)).toHaveAttribute(
+        'inert'
+      );
+      expect(fold.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+    expect(
+      screen.getByRole('heading', { name: tr('app.renta.title') }).compareDocumentPosition(dates) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    fireEvent.click(gather);
+    expect(gather).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      document.getElementById(gather.getAttribute('aria-controls') as string)
+    ).not.toHaveAttribute('inert');
+    expect(screen.getByText(tr('app.renta.check.data'))).toBeInTheDocument();
+  });
+
+  it('puts the year at the head of the assistant, and its title follows the year', async () => {
+    renderWithProviders(<RentaView />);
+    const year = await screen.findByLabelText(tr('app.renta.year'));
+    const step = await screen.findByText(tr('tools.renta.step1'));
+    expect(year.closest('[data-tour="renta-year"]')).toBeInTheDocument();
+    expect(year.closest('.card')).toContainElement(step);
+    fireEvent.change(year, { target: { value: '2024' } });
+    expect(
+      screen.getByRole('button', { name: tr('app.renta.datesTitle', { year: 2024 }) })
+    ).toBeInTheDocument();
   });
 });
 

@@ -28,6 +28,8 @@ export interface WizardScreen {
   missing?: string;
   /** Another label for «I don't know / it does not apply» where one fits better. */
   skipLabel?: string;
+  /** «I don't have it» of a file to bring (the draft): under the answer, as big as its button. */
+  skipBelow?: boolean;
   /** Nothing to answer here: no «I don't know». */
   noSkip?: boolean;
   /** A soft warning (an amount that looks odd): it never blocks. */
@@ -240,6 +242,7 @@ export function Confetti() {
 function ScreenNav({
   canBack,
   skip,
+  skipBelow,
   ok,
   missing,
   label,
@@ -249,6 +252,8 @@ function ScreenNav({
 }: {
   canBack: boolean;
   skip: string | null;
+  /** The skip button is already under the answer: only its name is said here. */
+  skipBelow: boolean;
   ok: boolean;
   /** The screen says itself what is missing: the general line is not repeated. */
   missing: boolean;
@@ -266,7 +271,7 @@ function ScreenNav({
             ← {t('wizard.back')}
           </button>
         )}
-        {skip && (
+        {skip && !skipBelow && (
           <button type="button" className="btn-secondary wiz-skip" onClick={onSkip}>
             {skip}
           </button>
@@ -275,7 +280,7 @@ function ScreenNav({
           {label}
         </button>
       </div>
-      {/* The button the line names is the one this screen shows (step 1 says «No lo tengo…»). */}
+      {/* The button the line names is the one this screen shows (step 1 says «Continuar sin borrador»). */}
       {!ok && !missing && (
         <p className="wiz-why-locked">
           {skip ? t('wizard.answerFirst', { skip }) : t('wizard.answerFirstOnly')}
@@ -411,6 +416,7 @@ function ScreenCard({
     controls.answer(screen.id, UNKNOWN);
     next();
   };
+  const skipLabel = !screen.noSkip && !screen.ready ? (screen.skipLabel ?? t('wizard.skip')) : null;
   const titleId = `${flow}-screen-title`;
   return (
     <section className="wiz-step" aria-labelledby={titleId}>
@@ -421,10 +427,16 @@ function ScreenCard({
       {screen.hint && <p className="wiz-hint">{screen.hint}</p>}
       <HelpRow flow={flow} screen={screen} />
       <div className="wiz-body">{screen.body}</div>
+      {skipLabel && screen.skipBelow && (
+        <button type="button" className="wiz-skip-below" onClick={skip}>
+          {skipLabel}
+        </button>
+      )}
       <Notes screen={screen} unknown={unknown} ok={ok} />
       <ScreenNav
         canBack={n > 1 || index > 0}
-        skip={!screen.noSkip && !screen.ready ? (screen.skipLabel ?? t('wizard.skip')) : null}
+        skip={skipLabel}
+        skipBelow={Boolean(screen.skipBelow)}
         ok={ok}
         missing={Boolean(screen.missing)}
         label={nextLabel(t, last, lastStep, n)}

@@ -1,8 +1,12 @@
 import '@testing-library/jest-dom';
-import { loadLocale } from '@core/i18n/I18nContext';
+import { loadAllTexts, loadLocale } from '@core/i18n/I18nContext';
 
-// The app downloads English on demand; tests render it straight away (i18n.test covers the wait).
-beforeAll(() => loadLocale('en'));
+// The app downloads English and the rest of the texts on demand; tests render them straight away
+// (i18n.test covers the wait).
+beforeAll(async () => {
+  await loadAllTexts();
+  await loadLocale('en');
+});
 
 // Suppress act() warnings caused by async state updates in hooks.
 // @testing-library/react already wraps assertions in act() via waitFor,

@@ -4,6 +4,8 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   cryptoAlertBody,
   cryptoCandlesQuery,
+  cryptoDrawingParams,
+  cryptoDrawingsBody,
   cryptoExitsBody,
   cryptoOrderBody,
   cryptoOrderParams,
@@ -29,6 +31,8 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
     });
   const reads = byUser(120);
   const writes = byUser(30);
+  // Drawings are saved a moment after each change (undo included): their own, wider budget.
+  const drawingWrites = byUser(60);
 
   router.get(
     '/crypto/coins',
@@ -117,6 +121,28 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
     authed(async (req, res) =>
       res.json(
         await c.cryptoSim.deletePractice(req.userId, cryptoPortfolioParams.parse(req.params).id)
+      )
+    )
+  );
+
+  // Drawings on the chart of each coin (trend lines, levels, zones, notes): free for everybody.
+  router.get(
+    '/crypto/drawings/:symbol',
+    reads,
+    authed(async (req, res) =>
+      res.json(c.cryptoDrawings.list(req.userId, cryptoDrawingParams.parse(req.params).symbol))
+    )
+  );
+  router.put(
+    '/crypto/drawings/:symbol',
+    drawingWrites,
+    authed(async (req, res) =>
+      res.json(
+        c.cryptoDrawings.save(
+          req.userId,
+          cryptoDrawingParams.parse(req.params).symbol,
+          cryptoDrawingsBody.parse(req.body).drawings
+        )
       )
     )
   );

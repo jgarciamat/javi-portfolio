@@ -31,7 +31,7 @@ import {
   madridDay,
   planEndOfMonth,
 } from '@domain/services/end-of-month';
-import { Clock, FinancialAdvisor } from '@domain/ports/services';
+import { Clock, DataVersions, FinancialAdvisor } from '@domain/ports/services';
 import {
   Advice,
   AdviceContext,
@@ -57,6 +57,7 @@ import {
 } from '@domain/shared/period';
 import { AiAllowance, AiDenial, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import { VersionedCache } from '@application/shared/VersionedCache';
 import { TransactionService } from '@application/transactions/TransactionService';
 
 // ─── Stats ───────────────────────────────────────────────────────────────────
@@ -118,7 +119,21 @@ export interface AnnualReport {
   expensesByCategory: { categoryName: string; cents: Cents }[];
 }
 
+interface DetectedSubscriptions {
+  report: SubscriptionReport;
+  coveredKeys: Set<string>;
+  firstDate: string | null;
+  count: number;
+}
+
 export class StatsService {
+  /**
+   * With tens of thousands of movements the outlook and the subscriptions take a good part of a
+   * second to work out: they are kept until the user's data changes (or the day, or the plan).
+   */
+  private readonly forecasts: VersionedCache<ForecastResult>;
+  private readonly detected: VersionedCache<DetectedSubscriptions>;
+
   constructor(
     private readonly transactions: TransactionRepository,
     private readonly accounts: AccountRepository,
@@ -128,8 +143,12 @@ export class StatsService {
     private readonly rules: RecurringRuleRepository,
     private readonly clock: Clock,
     private readonly assets: AssetRepository,
-    private readonly categories: CategoryRepository
-  ) {}
+    private readonly categories: CategoryRepository,
+    versions: DataVersions
+  ) {
+    this.forecasts = new VersionedCache(versions);
+    this.detected = new VersionedCache(versions);
+  }
 
   /**
    * "Can I reach the end of the month?" and next month's outlook for everyone; the longer
@@ -137,9 +156,28 @@ export class StatsService {
    * one month, without scenarios, and `locked` says the rest needs Premium.
    */
   forecast(userId: string, options: { months: number; exclude: string[] }): ForecastResult {
+    const now = this.clock.now();
+    const locked = !this.entitlements.limits(userId).features.forecast;
+    // Everything else the outlook depends on is the user's data (see VersionedCache).
+    const key = [
+      madridDay(now),
+      todayDateOnly(now),
+      locked ? 'free' : `${options.months}|${JSON.stringify(options.exclude)}`,
+    ].join('|');
+    return this.forecasts.get(userId, key, () =>
+      this.computeForecast(userId, options, locked, now)
+    );
+  }
+
+  private computeForecast(
+    userId: string,
+    options: { months: number; exclude: string[] },
+    locked: boolean,
+    now: Date
+  ): ForecastResult {
     const startDay = this.settings.get(userId).monthStartDay;
     // The day in Spain, so the month does not end an hour or two early on a UTC server.
-    const today = madridDay(this.clock.now());
+    const today = madridDay(now);
     const period = periodOfDate(today, startDay);
     const month = this.transactionService.getMonth(userId, period);
     const past = Array.from({ length: Math.max(VARIABLE_HISTORY, HISTORY_MONTHS) }, (_, i) =>
@@ -156,7 +194,7 @@ export class StatsService {
       variable,
     });
     const rules = this.rules.listByUser(userId).filter((r) => r.active);
-    const detected = this.detectSubscriptions(userId);
+    const detected = this.detectSubscriptions(userId, now);
     const endOfMonth = planEndOfMonth({
       availableCents: month.availableCents,
       today,
@@ -174,7 +212,6 @@ export class StatsService {
       firstDate: detected.firstDate,
       totalMovements: detected.count,
     });
-    const locked = !this.entitlements.limits(userId).features.forecast;
     const projection = projectMonths({
       from: addMonths(period, 1),
       months: locked ? FREE_FORECAST_MONTHS : options.months,
@@ -275,7 +312,7 @@ export class StatsService {
    * plan sees how many there are, what they cost and the most expensive ones; Premium, all.
    */
   subscriptions(userId: string): SubscriptionsView {
-    const { report } = this.detectSubscriptions(userId);
+    const { report } = this.detectSubscriptions(userId, this.clock.now());
     const locked = !this.entitlements.limits(userId).features.insights;
     return {
       ...report,
@@ -289,12 +326,12 @@ export class StatsService {
   }
 
   /** Every detected subscription (no plan cut), with what else the forecast needs of the movements. */
-  private detectSubscriptions(userId: string): {
-    report: SubscriptionReport;
-    coveredKeys: Set<string>;
-    firstDate: string | null;
-    count: number;
-  } {
+  private detectSubscriptions(userId: string, now: Date): DetectedSubscriptions {
+    const today = todayDateOnly(now);
+    return this.detected.get(userId, today, () => this.computeSubscriptions(userId, today));
+  }
+
+  private computeSubscriptions(userId: string, today: string): DetectedSubscriptions {
     const categoryNames = new Map(
       this.categories.listByUser(userId).map((c) => [c.id, c.name] as const)
     );
@@ -309,10 +346,7 @@ export class StatsService {
         .filter((r) => r.active)
         .map((r) => subscriptionKey(r.description))
     );
-    const report = detectSubscriptions(movements, {
-      today: todayDateOnly(this.clock.now()),
-      coveredKeys,
-    });
+    const report = detectSubscriptions(movements, { today, coveredKeys });
     return {
       report,
       coveredKeys,

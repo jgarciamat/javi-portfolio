@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { CryptoMarket } from '../application/useCryptoMarket';
+import { useDrawings, type Drawings } from '../application/useDrawings';
 import { CHART_INTERVALS } from '../domain/chart';
 import { DISPLAY_CURRENCIES, convertCandles, type DisplayCurrency } from '../domain/currency';
 import { formatChange, formatDateTime, pnl } from '../domain/format';
@@ -224,6 +225,7 @@ function ChartArea({
   layerExtra,
   fullBar,
   onVisibleChange,
+  drawings,
 }: {
   market: CryptoMarket;
   candles: Candle[];
@@ -236,6 +238,7 @@ function ChartArea({
   layerExtra: ReactNode;
   fullBar: ReactNode;
   onVisibleChange: (percent: number | null) => void;
+  drawings: Drawings;
 }) {
   const { t } = useI18n();
   const waiting = useWaiting(market);
@@ -264,6 +267,7 @@ function ChartArea({
           layerExtra={layerExtra}
           fullBar={fullBar}
           onVisibleChange={onVisibleChange}
+          drawings={drawings}
         />
       )}
     </>
@@ -305,6 +309,8 @@ export function MarketPanel({
   const { t } = useI18n();
   const money = useMoney();
   const [change, setChange] = useState<number | null>(null);
+  // The drawings of the coin on screen: changing it (also in full screen) brings its own.
+  const drawings = useDrawings(view.symbol);
   const coins = market.coins?.coins ?? [];
   const label = t('app.crypto.chart.label', {
     coin: coinName(coin, view.symbol),
@@ -360,6 +366,7 @@ export function MarketPanel({
               />
             }
             onVisibleChange={setChange}
+            drawings={drawings}
           />
           <ChartTable candles={candles} label={label} />
         </div>

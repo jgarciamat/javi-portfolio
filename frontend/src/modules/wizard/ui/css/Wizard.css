@@ -395,6 +395,50 @@ html.wiz-big-text {
   box-shadow: none;
   cursor: not-allowed;
 }
+/* «I don't have it» of a file to bring: as big as the button to upload it, in a clear emerald
+   (white text 7:1). The line is a shadow, not a border, so it keeps the height of the one above. */
+.wiz-skip-below {
+  --skip-bg: #066548;
+  --skip-bg-hover: #04563d;
+  --skip-ink: #ffffff;
+  --skip-line: #10b981;
+  --skip-ring: #34d399;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--skip-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--skip-line),
+    0 4px 14px rgba(5, 150, 105, 0.25);
+  color: var(--skip-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.wiz-skip-below:hover {
+  background: var(--skip-bg-hover);
+  box-shadow:
+    inset 0 0 0 1px var(--skip-line),
+    0 6px 18px rgba(5, 150, 105, 0.38);
+}
+.wiz-skip-below:focus-visible {
+  outline: 3px solid var(--skip-ring);
+  outline-offset: 2px;
+}
+:root[data-theme='light'] .wiz-skip-below {
+  --skip-line: #065f46;
+  --skip-ring: #047857;
+}
+/* The investments: as big as the button to bring the files. */
+.wiz-body:has(.renta-invest-card) + .wiz-skip-below {
+  min-height: 3.1rem;
+  font-size: 1.05rem;
+}
 
 /* ── The end ─────────────────────────────────── */
 .wiz-finale {
@@ -507,6 +551,12 @@ html.wiz-contrast .wiz-link {
 }
 html.wiz-contrast .wiz-route-item.is-locked button {
   opacity: 1;
+}
+html.wiz-contrast .wiz-skip-below,
+:root.app-contrast .wiz-skip-below {
+  --skip-bg: #04563d;
+  --skip-bg-hover: #033f2d;
+  box-shadow: inset 0 0 0 2px var(--slate-200);
 }
 
 @keyframes wiz-in {
