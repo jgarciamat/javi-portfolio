@@ -15,8 +15,20 @@ export class FakeSeries {
   ) {
     this.options = options;
   }
+  /** Every setData (the whole series drawn again) and every update (one bar, in place). */
+  sets = 0;
+  updates: unknown[] = [];
   setData(data: unknown[]) {
     this.data = data;
+    this.sets += 1;
+  }
+  /** Like the library: replaces the last bar with the same time or appends a newer one. */
+  update(bar: { time: number }) {
+    this.updates.push(bar);
+    const last = this.data[this.data.length - 1] as { time: number } | undefined;
+    if (last && last.time === bar.time) this.data = [...this.data.slice(0, -1), bar];
+    else if (!last || bar.time > last.time) this.data = [...this.data, bar];
+    else throw new Error('Cannot update oldest data');
   }
   applyOptions(options: Record<string, unknown>) {
     this.options = { ...this.options, ...options };

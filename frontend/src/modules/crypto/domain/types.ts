@@ -65,6 +65,19 @@ export interface CryptoCandles {
 }
 
 /**
+ * The live tick of the chart (every 2 s while it is on screen): the last price and the candle in
+ * progress with the one before (oldest first), in the same currency and rate as the candles.
+ */
+export interface CryptoLive {
+  symbol: string;
+  interval: CryptoInterval;
+  quote: Quote;
+  price: number;
+  candles: Candle[];
+  market: MarketStatus;
+}
+
+/**
  * Number of an operation among those of its coin (#1, #2: two at most at once), the same on its
  * card and on the chart; it stays while the operation lives and is free again once it ends. Null
  * on the oldest closed ones.

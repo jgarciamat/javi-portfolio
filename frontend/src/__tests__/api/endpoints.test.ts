@@ -409,6 +409,12 @@ const cases: Case[] = [
     'GET',
     '/crypto/candles?symbol=BTC&interval=1h',
   ],
+  [
+    'crypto live tick',
+    () => cryptoApi.live('BTC', '5m'),
+    'GET',
+    '/crypto/live?symbol=BTC&interval=5m',
+  ],
   ['crypto portfolio', () => cryptoApi.portfolio(), 'GET', '/crypto/sim'],
   [
     'crypto order',

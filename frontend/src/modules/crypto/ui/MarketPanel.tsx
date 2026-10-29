@@ -226,6 +226,7 @@ function ChartArea({
   fullBar,
   onVisibleChange,
   drawings,
+  onScreen,
 }: {
   market: CryptoMarket;
   candles: Candle[];
@@ -239,6 +240,7 @@ function ChartArea({
   fullBar: ReactNode;
   onVisibleChange: (percent: number | null) => void;
   drawings: Drawings;
+  onScreen?: (visible: boolean) => void;
 }) {
   const { t } = useI18n();
   const waiting = useWaiting(market);
@@ -268,6 +270,8 @@ function ChartArea({
           fullBar={fullBar}
           onVisibleChange={onVisibleChange}
           drawings={drawings}
+          onScreen={onScreen}
+          live={market.live}
         />
       )}
     </>
@@ -292,6 +296,7 @@ export function MarketPanel({
   onToggleLayer,
   guide,
   premium,
+  onChartScreen,
 }: {
   view: View;
   market: CryptoMarket;
@@ -305,6 +310,8 @@ export function MarketPanel({
   guide: Guide;
   /** Whether the person has Premium (for the «Free and Premium» tab of the guide). */
   premium: boolean;
+  /** Told whether the chart is on screen (the live tick runs only then). */
+  onChartScreen?: (visible: boolean) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -367,6 +374,7 @@ export function MarketPanel({
             }
             onVisibleChange={setChange}
             drawings={drawings}
+            onScreen={onChartScreen}
           />
           <ChartTable candles={candles} label={label} />
         </div>

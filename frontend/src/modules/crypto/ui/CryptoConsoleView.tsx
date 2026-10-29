@@ -333,7 +333,14 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
   const [view, setView] = useState(savedView);
   const guide = useGuide();
   const [layers, toggleLayer] = useLayers();
-  const market = useCryptoMarket(view.symbol, view.interval, t('app.crypto.market.error'));
+  // The live tick (every 2 s) only while the chart is on screen.
+  const [chartOnScreen, setChartOnScreen] = useState(false);
+  const market = useCryptoMarket(
+    view.symbol,
+    view.interval,
+    t('app.crypto.market.error'),
+    chartOnScreen
+  );
   const sim = useSimulator(t('app.crypto.sim.error'));
   // Asked for once the portfolio of the month is there (the server starts it on the first visit).
   const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
@@ -392,6 +399,7 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
         onToggleLayer={toggleLayer}
         guide={guide}
         premium={premium}
+        onChartScreen={setChartOnScreen}
       />
       <SimulatorBody
         portfolio={sim.portfolio}

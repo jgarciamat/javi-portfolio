@@ -3,6 +3,7 @@ import type {
   CryptoCandles,
   CryptoCoins,
   CryptoInterval,
+  CryptoLive,
   CryptoRanking,
   PriceAlerts,
   SimPortfolio,
@@ -80,6 +81,49 @@ export function candles(symbol = 'BTC', interval: CryptoInterval = '1h', count =
     quote: symbol === 'BTC' || symbol === 'ETH' ? 'EUR' : 'USDT',
     candles: candleList(count),
     market: { ...MARKET, usdPerEur: symbol === 'BTC' || symbol === 'ETH' ? null : 1.1 },
+  };
+}
+
+/**
+ * A live tick of `candles(symbol, interval)`: its last candle moved to `close` (and, with `next`,
+ * a new candle opened after it), as the server would answer `seconds` later.
+ */
+export function live(
+  close: number,
+  {
+    symbol = 'BTC',
+    interval = '1h',
+    next = false,
+    seconds = 2,
+  }: { symbol?: string; interval?: CryptoInterval; next?: boolean; seconds?: number } = {}
+): CryptoLive {
+  const { candles: series, quote, market } = candles(symbol, interval);
+  const last = series[series.length - 1];
+  const moved = {
+    ...last,
+    close,
+    high: Math.max(last.high, close),
+    low: Math.min(last.low, close),
+    volume: last.volume + 1,
+  };
+  const opened = {
+    time: last.time + 3_600_000,
+    open: close,
+    high: close,
+    low: close,
+    close,
+    volume: 0.5,
+  };
+  return {
+    symbol,
+    interval,
+    quote,
+    price: close,
+    candles: next ? [moved, opened] : [series[series.length - 2], moved],
+    market: {
+      ...market,
+      updatedAt: new Date(Date.parse(MARKET.updatedAt) + seconds * 1000).toISOString(),
+    },
   };
 }
 

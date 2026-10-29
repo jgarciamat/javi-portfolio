@@ -18,6 +18,7 @@ import {
 } from 'lightweight-charts';
 import type { Locale } from '@core/i18n/I18nContext';
 import { RECENT_CANDLES } from '../domain/chart';
+import { chartTail } from '../domain/live';
 import { logicalToTime, timeToLogical } from '../domain/drawings';
 import { formatDateTime, formatPlain, formatTick, intlTag } from '../domain/format';
 import { LAYER_COLORS } from '../domain/indicators';
@@ -92,6 +93,18 @@ function lineLook(line: ChartLine, colors: Palette) {
 }
 
 const toTime = (ms: number) => (ms / 1000) as UTCTimestamp;
+const bar = (c: Candle) => ({
+  time: toTime(c.time),
+  open: c.open,
+  high: c.high,
+  low: c.low,
+  close: c.close,
+});
+const volumeBar = (c: Candle, colors: Palette) => ({
+  time: toTime(c.time),
+  value: c.volume,
+  color: `${c.close >= c.open ? colors.up : colors.down}66`,
+});
 const fromTime = (time: Time) => (time as number) * 1000;
 const ZOOM = 1.4;
 const MIN_SPACING = 2;
@@ -244,7 +257,9 @@ export interface Projection {
 function signature({ chart, candles }: Engine, data: Candle[]): string {
   const timeScale = chart.timeScale();
   const { width, height } = chart.paneSize();
-  const ref = data[data.length - 1]?.close ?? 1;
+  // A price that does not move with the live tick (the first candle's), so only a real change of
+  // the scale places the drawings again.
+  const ref = data[0]?.close ?? 1;
   return [
     timeScale.logicalToCoordinate(0 as Logical),
     timeScale.logicalToCoordinate(1 as Logical),
@@ -316,6 +331,12 @@ export function useCandleChart(
 ): CandleChart {
   const engine = useRef<Engine | null>(null);
   const shownKey = useRef('');
+  // What the series hold now: the next candles that only move its end are updated in place.
+  const drawn = useRef<{ engine: Engine | null; key: string; candles: Candle[] }>({
+    engine: null,
+    key: '',
+    candles: [],
+  });
   const data = useRef(candles);
   data.current = candles;
   const [hovered, setHovered] = useState<Candle | null>(null);
@@ -376,25 +397,27 @@ export function useCandleChart(
     });
   };
 
+  // The live tick moves the last candle (or opens a new one) every couple of seconds: those are
+  // updated in place, so the view, the zoom and what is drawn stay where the person left them.
+  // Anything else (another coin or size, the full refresh changing older candles) is drawn again.
   useEffect(() => {
-    const { candles: candleSeries, volume } = engine.current!;
+    const current = engine.current!;
     const colors = palette();
-    candleSeries.setData(
-      candles.map((c) => ({
-        time: toTime(c.time),
-        open: c.open,
-        high: c.high,
-        low: c.low,
-        close: c.close,
-      }))
-    );
-    volume.setData(
-      candles.map((c) => ({
-        time: toTime(c.time),
-        value: c.volume,
-        color: `${c.close >= c.open ? colors.up : colors.down}66`,
-      }))
-    );
+    const before = drawn.current;
+    const tail =
+      before.engine === current && before.key === viewKey
+        ? chartTail(before.candles, candles)
+        : null;
+    if (tail) {
+      tail.forEach((c) => {
+        current.candles.update(bar(c));
+        current.volume.update(volumeBar(c, colors));
+      });
+    } else {
+      current.candles.setData(candles.map(bar));
+      current.volume.setData(candles.map((c) => volumeBar(c, colors)));
+    }
+    drawn.current = { engine: current, key: viewKey, candles };
     if (shownKey.current !== viewKey) {
       shownKey.current = viewKey;
       showRecent();

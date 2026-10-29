@@ -2,6 +2,7 @@ import type {
   CryptoCandles,
   CryptoCoins,
   CryptoInterval,
+  CryptoLive,
   CryptoRanking,
   ExitsRequest,
   PortfolioOrder,
@@ -22,6 +23,10 @@ export const cryptoApi = {
   },
   candles(symbol: string, interval: CryptoInterval) {
     return apiRequest<CryptoCandles>(`/crypto/candles${query({ symbol, interval })}`);
+  },
+  /** The price and the candle in progress, light (a few hundred bytes): the chart's live tick. */
+  live(symbol: string, interval: CryptoInterval) {
+    return apiRequest<CryptoLive>(`/crypto/live${query({ symbol, interval })}`);
   },
   /** A portfolio of the person (the official one of the month when not given). */
   portfolio(portfolioId?: string) {

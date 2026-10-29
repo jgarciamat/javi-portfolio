@@ -2,7 +2,7 @@ import type { IApiContext } from '@core/context/ApiContext';
 import * as f from './fixtures';
 import { PREMIUM_TERMS, premiumContent } from './learn';
 import * as crypto from './crypto';
-import type { CryptoInterval } from '@modules/crypto/domain/types';
+import type { CryptoInterval, CryptoLive } from '@modules/crypto/domain/types';
 import type { Drawing } from '@modules/crypto/domain/drawings';
 
 type Mocked<T> = {
@@ -76,6 +76,10 @@ function fakeBusinessApi(): FakeApi['businessApi'] {
   };
 }
 
+/** The live tick never answers unless a test says so: the console stays as the full answers left it. */
+const silentLive = () =>
+  jest.fn<Promise<CryptoLive>, [string, CryptoInterval]>(() => new Promise(() => undefined));
+
 /** The crypto console answered with made-up prices and a portfolio with one purchase. */
 function fakeCryptoApi(): FakeApi['cryptoApi'] {
   return {
@@ -83,6 +87,7 @@ function fakeCryptoApi(): FakeApi['cryptoApi'] {
     candles: jest.fn((symbol: string, interval: CryptoInterval) =>
       Promise.resolve(crypto.candles(symbol, interval))
     ),
+    live: silentLive(),
     portfolio: ok(crypto.portfolio()),
     placeOrder: ok(crypto.portfolio()),
     cancelOrder: ok(crypto.portfolio()),

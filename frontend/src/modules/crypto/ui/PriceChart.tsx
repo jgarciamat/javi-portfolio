@@ -21,8 +21,9 @@ import {
   summarize,
   untilClose,
 } from '../domain/chart';
-import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/format';
+import { formatChange, formatClock, formatDateTime, formatVolume, pnl } from '../domain/format';
 import type { Drawings } from '../application/useDrawings';
+import type { LiveState } from '../application/useLiveMarket';
 import type { LayerId } from '../domain/indicators';
 import { layerLevels, layerLines, legend } from '../domain/layers';
 import type { Candle, CryptoInterval } from '../domain/types';
@@ -58,6 +59,10 @@ interface PriceChartProps {
   loading?: boolean;
   /** The person's drawings on this coin: with them come the drawing bar and its tools. */
   drawings?: Drawings;
+  /** Told whether the chart is on screen (the live tick only runs while it is). */
+  onScreen?: (visible: boolean) => void;
+  /** The live tick: on, paused or off, and when its last price arrived. */
+  live?: { state: LiveState; at: string | null };
 }
 
 const PORTRAIT_PHONE = '(orientation: portrait) and (max-width: 719px)';
@@ -91,15 +96,54 @@ function Readout({ candle }: { candle: Candle | null }) {
   );
 }
 
+/**
+ * «● En vivo 12:03:45» while the live tick runs (the time of its last price), «En pausa» after a
+ * long while without the person: its place is kept either way, so nothing moves when it changes.
+ * Not a live region: a screen reader would read it every two seconds.
+ */
+function LiveMark({ live }: { live: { state: LiveState; at: string | null } }) {
+  const { t, locale } = useI18n();
+  const on = live.state === 'live';
+  const label = on
+    ? t('app.crypto.live.at', { time: formatClock(live.at!, locale) })
+    : t('app.crypto.live.paused');
+  return (
+    <span
+      className={`cc-live cc-live--${live.state}`}
+      title={live.state === 'paused' ? t('app.crypto.live.pausedHint') : undefined}
+      aria-hidden={live.state === 'off' ? true : undefined}
+    >
+      {live.state !== 'off' && (
+        <>
+          <i aria-hidden="true" />
+          <span className="sr-only">{label}</span>
+          <span aria-hidden="true">
+            {on ? (
+              <>
+                {t('app.crypto.live.on')}{' '}
+                <time dateTime={live.at!}>{formatClock(live.at!, locale)}</time>
+              </>
+            ) : (
+              t('app.crypto.live.paused')
+            )}
+          </span>
+        </>
+      )}
+    </span>
+  );
+}
+
 /** Time left until the last candle closes (ticking every second) and how many are on screen. */
 function CandlePill({
   opened,
   interval,
   count,
+  live,
 }: {
   opened: number;
   interval: CryptoInterval;
   count: number;
+  live?: { state: LiveState; at: string | null };
 }) {
   const { t } = useI18n();
   const [now, setNow] = useState(Date.now);
@@ -114,6 +158,7 @@ function CandlePill({
         <b>{formatCountdown(untilClose(opened, interval, now))}</b>
       </span>
       <span>{t('app.crypto.market.inView', { count })}</span>
+      {live && <LiveMark live={live} />}
     </p>
   );
 }
@@ -370,6 +415,31 @@ function Stage({ loading, children }: { loading?: boolean; children: ReactNode }
 const dialogProps = (expanded: boolean, name: string) =>
   expanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': name } : {};
 
+/**
+ * Tells `onScreen` whether the chart is in the viewport (also in full screen, where it is the
+ * element shown); without IntersectionObserver it counts as on screen. Off when it goes.
+ */
+function useOnScreen(
+  root: RefObject<HTMLDivElement | null>,
+  onScreen?: (visible: boolean) => void
+) {
+  useEffect(() => {
+    if (!onScreen) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      onScreen(true);
+      return () => onScreen(false);
+    }
+    const observer = new IntersectionObserver((entries) =>
+      onScreen(entries[entries.length - 1].isIntersecting)
+    );
+    observer.observe(root.current!);
+    return () => {
+      observer.disconnect();
+      onScreen(false);
+    };
+  }, [root, onScreen]);
+}
+
 /** Full screen: the browser's own when it allows it, turned sideways on phones that let us. */
 function useFullScreen(root: RefObject<HTMLDivElement | null>) {
   const [expanded, setExpanded] = useState(false);
@@ -445,6 +515,8 @@ export function PriceChart({
   onVisibleChange,
   loading,
   drawings,
+  onScreen,
+  live,
 }: PriceChartProps) {
   const { t, locale } = useI18n();
   const money = useMoney();
@@ -469,6 +541,7 @@ export function PriceChart({
     onRange: setRange,
   });
   const full = useFullScreen(root);
+  useOnScreen(root, onScreen);
   const draw = useDrawTools(drawings, candles, money.display.rate, () =>
     container.current?.focus()
   );
@@ -514,6 +587,7 @@ export function PriceChart({
             opened={last.time}
             interval={interval}
             count={inView(candles.length, shown)}
+            live={live}
           />
         )}
       </div>
