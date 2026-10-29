@@ -42,6 +42,19 @@ export interface CryptoCandlesView {
   market: MarketStatusView;
 }
 
+/**
+ * The live tick of the chart: the last price and the candle in progress with the one before
+ * (oldest first), a few hundred bytes. Same currency and rate as the candles.
+ */
+export interface CryptoLiveView {
+  symbol: CryptoSymbol;
+  interval: CryptoInterval;
+  quote: MarketQuote;
+  price: number;
+  candles: MarketCandle[];
+  market: MarketStatusView;
+}
+
 const stamp = ({ source, updatedAt, stale, usdPerEur }: MarketStamp): MarketStatusView => ({
   available: true,
   source,
@@ -93,6 +106,18 @@ export class CryptoMarketService {
       interval,
       quote: this.market.quoteOf(symbol),
       candles: feed.data.slice(-CHART_CANDLES),
+      market: stamp(feed),
+    };
+  }
+
+  async live(symbol: CryptoSymbol, interval: CryptoInterval): Promise<CryptoLiveView> {
+    const feed = await this.market.live(symbol, interval);
+    return {
+      symbol,
+      interval,
+      quote: this.market.quoteOf(symbol),
+      price: feed.data[feed.data.length - 1].close,
+      candles: feed.data,
       market: stamp(feed),
     };
   }

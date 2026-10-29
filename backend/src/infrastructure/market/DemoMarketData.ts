@@ -5,6 +5,7 @@ import {
   CryptoInterval,
   CryptoSymbol,
   INTERVAL_MS,
+  LIVE_CANDLES,
   MarketCandle,
   MarketFeed,
   MarketQuote,
@@ -42,8 +43,10 @@ const seedOf = (symbol: string): number =>
   [...symbol].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 997, 7);
 
 /**
- * Made-up but smooth price of a coin at any moment: a few slow waves around its base price.
- * The same moment always gives the same price, so candles of every size agree with each other.
+ * Made-up but smooth price of a coin at any moment: a few slow waves around its base price and
+ * two quick ripples (about a minute and a quarter of a minute), so the live chart moves every
+ * couple of seconds as a real one does. The same moment always gives the same price, so candles
+ * of every size agree with each other.
  */
 export function demoPrice(symbol: CryptoSymbol, at: number): number {
   const s = seedOf(symbol);
@@ -52,8 +55,39 @@ export function demoPrice(symbol: CryptoSymbol, at: number): number {
     0.08 * Math.sin(h / (90 + s / 10) + s) +
     0.03 * Math.sin(h / (11 + (s % 7)) + s / 3) +
     0.01 * Math.sin(h / 1.3 + s / 5) +
-    0.004 * Math.sin(h * 7.7 + s);
+    0.004 * Math.sin(h * 7.7 + s) +
+    0.0012 * Math.sin(at / 9_000 + s) +
+    0.0005 * Math.sin(at / 2_300 + s / 2);
   return BASE[symbol] * Math.exp(wave);
+}
+
+/** Prices looked at inside a candle: its opening, this many moments evenly spread, and now. */
+const SAMPLES = 60;
+
+/**
+ * One made-up candle from `time` (its opening) up to `now` at most: the prices on a fixed grid
+ * of moments of the candle plus the last one, so a candle in progress keeps its high and low
+ * (bar a hair between two moments of the grid) and every tick agrees with the full series.
+ */
+export function demoCandle(
+  symbol: CryptoSymbol,
+  time: number,
+  size: number,
+  now: number
+): MarketCandle {
+  const end = Math.min(time + size, now);
+  const step = size / SAMPLES;
+  const prices: number[] = [];
+  for (let at = time; at < end; at += step) prices.push(demoPrice(symbol, at));
+  prices.push(demoPrice(symbol, end));
+  return {
+    time,
+    open: prices[0],
+    high: Math.max(...prices),
+    low: Math.min(...prices),
+    close: prices[prices.length - 1],
+    volume: Math.round((1 + Math.abs(Math.sin(time / HOUR))) * 1000 * ((end - time) / size)) / 10,
+  };
 }
 
 /**
@@ -74,25 +108,21 @@ export class DemoMarketData implements CryptoMarketData {
     symbol: CryptoSymbol,
     interval: CryptoInterval
   ): Promise<MarketFeed<MarketCandle[]>> {
+    return this.feed(this.series(symbol, interval, CANDLES_PER_SERIES));
+  }
+
+  async live(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>> {
+    return this.feed(this.series(symbol, interval, LIVE_CANDLES));
+  }
+
+  /** The last `count` candles of a size, the last one in progress. */
+  private series(symbol: CryptoSymbol, interval: CryptoInterval, count: number): MarketCandle[] {
     const size = INTERVAL_MS[interval];
-    const last = Math.floor(this.now() / size) * size;
-    const candles: MarketCandle[] = [];
-    for (let i = CANDLES_PER_SERIES - 1; i >= 0; i--) {
-      const time = last - i * size;
-      const end = Math.min(time + size, this.now());
-      const samples = [0, 0.25, 0.5, 0.75, 1].map((f) =>
-        demoPrice(symbol, time + f * (end - time))
-      );
-      candles.push({
-        time,
-        open: samples[0],
-        high: Math.max(...samples),
-        low: Math.min(...samples),
-        close: samples[4],
-        volume: Math.round((1 + Math.abs(Math.sin(time / HOUR))) * 1000) / 10,
-      });
-    }
-    return this.feed(candles);
+    const now = this.now();
+    const last = Math.floor(now / size) * size;
+    return Array.from({ length: count }, (_, i) =>
+      demoCandle(symbol, last - (count - 1 - i) * size, size, now)
+    );
   }
 
   async tickers(): Promise<MarketFeed<MarketTicker[]>> {
