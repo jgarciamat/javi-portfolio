@@ -1,7 +1,11 @@
 import {
   BINANCE_HOSTS,
   BinanceMarketData,
+  CallBudget,
+  LIVE_CALLS_PER_MINUTE,
+  LIVE_TTL,
   RATE_KEPT_FOR_MS,
+  RATE_RETRY_MS,
   ReferenceRate,
   THIN_EURO_VOLUME,
   convertCandle,
@@ -11,7 +15,7 @@ import {
   parseTicker,
   toEuros,
 } from '@infrastructure/market/BinanceMarketData';
-import { DemoMarketData, demoPrice } from '@infrastructure/market/DemoMarketData';
+import { DemoMarketData, demoCandle, demoPrice } from '@infrastructure/market/DemoMarketData';
 import { MarketCache, STALE_FOR_MS } from '@infrastructure/market/MarketCache';
 import {
   CRYPTO_SYMBOLS,
@@ -165,11 +169,167 @@ describe('ReferenceRate', () => {
     fail = true;
     now += RATE_KEPT_FOR_MS - 1;
     expect(await rate.usdPerEur()).toBe(1.12);
-    now += 1;
+    now += RATE_RETRY_MS;
     await expect(rate.usdPerEur()).rejects.toThrow('down');
     await expect(new ReferenceRate({ rate: async () => 0 }).usdPerEur()).rejects.toThrow(
       'rate missing'
     );
+  });
+});
+
+describe('ReferenceRate after a failure', () => {
+  it('leaves a service that is down alone for a minute instead of asking it every time', async () => {
+    let now = 0;
+    let fail = false;
+    let calls = 0;
+    const rates: ExchangeRates = {
+      rate: async () => {
+        calls++;
+        if (fail) throw new Error('down');
+        return 1.1;
+      },
+    };
+    const rate = new ReferenceRate(rates, () => now);
+    await rate.usdPerEur();
+    fail = true;
+    now += 1000;
+    expect(await rate.usdPerEur()).toBe(1.1);
+    expect(calls).toBe(2);
+    // Resting: the last rate, without asking.
+    for (let i = 0; i < 5; i++) expect(await rate.usdPerEur()).toBe(1.1);
+    expect(calls).toBe(2);
+    now += RATE_RETRY_MS;
+    fail = false;
+    expect(await rate.usdPerEur()).toBe(1.1);
+    expect(calls).toBe(3);
+    // Without any rate, the rest throws the last error at once.
+    const none = new ReferenceRate({ rate: async () => Promise.reject(new Error('off')) }, () => 0);
+    await expect(none.usdPerEur()).rejects.toThrow('off');
+    await expect(none.usdPerEur()).rejects.toThrow('off');
+  });
+});
+
+describe('CallBudget', () => {
+  it('allows so many calls a window and starts again with the next', () => {
+    let now = 0;
+    const budget = new CallBudget(2, 60_000, () => now);
+    expect([budget.take(), budget.take(), budget.take()]).toEqual([true, true, false]);
+    now += 59_999;
+    expect(budget.take()).toBe(false);
+    now += 1;
+    expect(budget.take()).toBe(true);
+    expect(LIVE_CALLS_PER_MINUTE).toBe(600);
+    expect(new CallBudget(1, 1000).take()).toBe(true);
+  });
+});
+
+describe('BinanceMarketData live tick', () => {
+  const live = (time: number, close: string) => kline(time, '10', '12', '9', close, '1.5');
+
+  it('asks for two candles, shared by everybody for a moment, with a short timeout', async () => {
+    const http = jest.fn().mockResolvedValue(reply([live(2000, '11.5'), live(1000, '10')]));
+    let now = 0;
+    const market = new BinanceMarketData(http, ['https://a.test'], () => now, quiet);
+    const [a, b] = await Promise.all([market.live('BTC', '1m'), market.live('BTC', '1m')]);
+    expect(http).toHaveBeenCalledTimes(1);
+    expect(http.mock.calls[0][0]).toBe('https://a.test/klines?symbol=BTCEUR&interval=1m&limit=2');
+    expect(a.data.map((c) => [c.time, c.close])).toEqual([
+      [1000, 10],
+      [2000, 11.5],
+    ]);
+    expect(b).toEqual(a);
+    expect(a).toMatchObject({ source: 'binance', stale: false });
+    now += LIVE_TTL - 1;
+    await market.live('BTC', '1m');
+    expect(http).toHaveBeenCalledTimes(1);
+    now += 1;
+    await market.live('BTC', '1m');
+    // Another size or coin is its own tick.
+    await market.live('BTC', '5m');
+    await market.live('ETH', '1m');
+    expect(http).toHaveBeenCalledTimes(4);
+  });
+
+  it('converts a USDT coin with the same rate as its candles', async () => {
+    const http = jest
+      .fn()
+      .mockResolvedValue(reply([kline(1000, '10', '12.5', '9', '11.25', '40')]));
+    const market = new BinanceMarketData(http, ['https://a.test'], () => 0, quiet, {
+      rates: fixedRate(),
+    });
+    const tick = await market.live('NEAR', '1h');
+    const series = await market.candles('NEAR', '1h');
+    expect(http.mock.calls[0][0]).toBe('https://a.test/klines?symbol=NEARUSDT&interval=1h&limit=2');
+    expect(tick.data).toEqual(series.data);
+    expect(tick.usdPerEur).toBe(1.25);
+    expect(tick.data[0].close).toBe(9);
+  });
+
+  it('stops asking the source past the budget: the last tick kept, or the cached series if newer', async () => {
+    let now = 0;
+    const http = jest
+      .fn()
+      .mockImplementation(async (url: unknown) =>
+        reply(String(url).includes('limit=2') ? [live(1000, '11')] : [kline(0), live(1000, '10.5')])
+      );
+    const warn = jest.fn();
+    const market = new BinanceMarketData(
+      http,
+      ['https://a.test'],
+      () => now,
+      { warn },
+      { liveCallsPerMinute: 1 }
+    );
+    expect((await market.live('BTC', '1m')).data.at(-1)!.close).toBe(11);
+    now += LIVE_TTL;
+    // Over the budget: the tick kept (from 0) is older than the series asked now, so its tail.
+    const tail = await market.live('BTC', '1m');
+    expect(tail.data.map((c) => c.close)).toEqual([11, 10.5]);
+    expect(tail.stale).toBe(false);
+    expect(http.mock.calls.filter(([u]) => String(u).includes('limit=2'))).toHaveLength(1);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the cached series when the source fails, and fails with nothing at all', async () => {
+    const http = jest.fn().mockResolvedValue(reply([kline(0), live(1000, '10.5')]));
+    const warn = jest.fn();
+    const market = new BinanceMarketData(http, ['https://a.test'], () => 0, { warn });
+    await market.candles('BTC', '1h');
+    http.mockRejectedValue(new Error('timeout'));
+    const tick = await market.live('BTC', '1h');
+    expect(tick.data.map((c) => c.time)).toEqual([0, 1000]);
+    // A failing tick is not logged (the series logs the outage).
+    expect(warn).not.toHaveBeenCalled();
+    await expect(market.live('ETH', '1h')).rejects.toMatchObject({ code: 'MARKET_UNAVAILABLE' });
+    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/^\[market\] candles:ETHEUR:1h/));
+  });
+
+  it('keeps the last tick (stale) when the source fails and it is newer than the series', async () => {
+    let now = 0;
+    const http = jest.fn().mockResolvedValueOnce(reply([kline(0), live(1000, '10.5')]));
+    const market = new BinanceMarketData(http, ['https://a.test'], () => now, quiet);
+    await market.candles('BTC', '1d');
+    now += 1000;
+    http.mockResolvedValueOnce(reply([live(1000, '12')]));
+    await market.live('BTC', '1d');
+    http.mockRejectedValue(new Error('down'));
+    now += LIVE_TTL;
+    const kept = await market.live('BTC', '1d');
+    expect(kept).toMatchObject({ stale: true, updatedAt: new Date(1000).toISOString() });
+    expect(kept.data[0].close).toBe(12);
+    // Without the series either, the tick still answers.
+    const other = new BinanceMarketData(
+      jest
+        .fn()
+        .mockResolvedValueOnce(reply([live(1000, '12')]))
+        .mockRejectedValue(new Error('x')),
+      ['https://a.test'],
+      () => now,
+      quiet
+    );
+    await other.live('ETH', '1m');
+    now += LIVE_TTL;
+    expect((await other.live('ETH', '1m')).stale).toBe(true);
   });
 });
 
@@ -405,6 +565,32 @@ describe('DemoMarketData', () => {
       expect(c.low).toBeLessThanOrEqual(Math.min(c.open, c.close));
     }
     expect(feed.data[1].time - feed.data[0].time).toBe(INTERVAL_MS['1h']);
+  });
+
+  it('gives a live tick that moves every couple of seconds and agrees with the series', async () => {
+    let at = Date.parse('2026-03-15T12:34:10Z');
+    const ticking = new DemoMarketData(() => at);
+    const tick = await ticking.live('BTC', '1m');
+    expect(tick.data).toHaveLength(2);
+    expect(tick.data.map((c) => c.time)).toEqual([
+      Date.parse('2026-03-15T12:33:00Z'),
+      Date.parse('2026-03-15T12:34:00Z'),
+    ]);
+    expect(tick.data).toEqual((await ticking.candles('BTC', '1m')).data.slice(-2));
+    const before = tick.data[1];
+    at += 2000;
+    const after = (await ticking.live('BTC', '1m')).data[1];
+    expect(after.close).not.toBe(before.close);
+    expect(Math.abs(after.close / before.close - 1)).toBeLessThan(0.002);
+    expect(after.high).toBeGreaterThanOrEqual(before.high);
+    expect(after.low).toBeLessThanOrEqual(before.low);
+    expect(after.volume).toBeGreaterThan(before.volume);
+    // At the minute, a new candle opens where the last one closed.
+    at = Date.parse('2026-03-15T12:35:00Z');
+    const turned = (await ticking.live('BTC', '1m')).data;
+    expect(turned[1].time).toBe(at);
+    expect(turned[1].open).toBe(turned[0].close);
+    expect(demoCandle('BTC', at, 60_000, at)).toMatchObject({ open: turned[1].close, volume: 0 });
   });
 
   it('gives a price and a daily change for every coin', async () => {

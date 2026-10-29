@@ -134,6 +134,7 @@ export class FakeCryptoMarket implements CryptoMarketData {
   stale = false;
   down = false;
   candleCalls: string[] = [];
+  liveCalls: string[] = [];
   usdPerEur = 1.1;
 
   constructor(private readonly clock: Clock) {}
@@ -154,6 +155,14 @@ export class FakeCryptoMarket implements CryptoMarketData {
     this.candleCalls.push(`${symbol}:${interval}`);
     if (this.down) throw new UnavailableError('down', 'MARKET_UNAVAILABLE');
     return this.feed(this.series.get(symbol) ?? [], this.quoteOf(symbol) === 'USDT');
+  }
+
+  /** The last two candles of the coin's series, like the source's live tick. */
+  async live(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>> {
+    this.liveCalls.push(`${symbol}:${interval}`);
+    const series = this.series.get(symbol) ?? [];
+    if (this.down || !series.length) throw new UnavailableError('down', 'MARKET_UNAVAILABLE');
+    return this.feed(series.slice(-2), this.quoteOf(symbol) === 'USDT');
   }
 
   async tickers(): Promise<MarketFeed<MarketTicker[]>> {

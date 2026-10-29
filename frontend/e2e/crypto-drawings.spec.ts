@@ -150,6 +150,45 @@ test.describe('with the mouse', () => {
     await expect(drawn(page)).toHaveCount(4);
   });
 
+  test('draws with two thicknesses and keeps them after a reload', async ({ page }) => {
+    const widths = bar(page).getByRole('group', { name: 'Grosor de la línea' });
+    await widths.getByRole('button', { name: 'Fino (1 px)' }).click();
+    await tool(page, 'Línea de tendencia').click();
+    await mouseDrag(page, [0.2, 0.7], [0.5, 0.4]);
+    await widths.getByRole('button', { name: 'Muy grueso (6 px)' }).click();
+    await expect(widths.getByRole('button', { name: 'Muy grueso (6 px)' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    await tool(page, 'Línea de tendencia').click();
+    await saving(page, 'BTC', () => mouseDrag(page, [0.5, 0.75], [0.8, 0.35]));
+    const strokes = () =>
+      drawn(page, 'trend').evaluateAll((all) =>
+        all.map((g) => g.querySelectorAll('line')[1].getAttribute('stroke-width'))
+      );
+    await expect.poll(strokes).toEqual(['1', '6']);
+    // In screen pixels: a zoom moves the lines, never makes them thicker.
+    await page.getByRole('button', { name: 'Acercar' }).click();
+    expect(await strokes()).toEqual(['1', '6']);
+    await shot(page, 'pc-grosores');
+    await page.reload();
+    await openSection(page, 'Consola crypto');
+    await expect(drawn(page, 'trend')).toHaveCount(2);
+    expect(await strokes()).toEqual(['1', '6']);
+    // The thickness last chosen stays on this device.
+    await expect(
+      bar(page)
+        .getByRole('group', { name: 'Grosor de la línea' })
+        .getByRole('button', { name: 'Muy grueso (6 px)' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    // A thin line is still easy to erase (its hit area is wider than the stroke).
+    await tool(page, 'Goma: borrar un dibujo').click();
+    const thin = drawn(page, 'trend').first().locator('line').nth(1);
+    const box = (await thin.boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2 + 5, box.y + box.height / 2);
+    await expect(drawn(page, 'trend')).toHaveCount(1);
+  });
+
   test('changes the coin in full screen and brings the drawings of each one', async ({ page }) => {
     let btc = 0;
     let eth = 0;

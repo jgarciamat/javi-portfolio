@@ -56,6 +56,12 @@ export const INTERVAL_MS: Record<CryptoInterval, number> = {
 /** Candles kept per coin and size (the most the public source gives in one request). */
 export const CANDLES_PER_SERIES = 1000;
 
+/**
+ * Candles of the live tick: the one in progress and the one before, so the chart sees the close
+ * of a candle that has just ended and the opening of the next.
+ */
+export const LIVE_CANDLES = 2;
+
 /** The market a coin's prices come from: its pair in euros or in USDT (a dollar stablecoin). */
 export type MarketQuote = 'EUR' | 'USDT';
 

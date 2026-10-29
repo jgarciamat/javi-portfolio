@@ -310,6 +310,75 @@ describe('Drawing on the chart', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('draws with the thickness chosen, shows it, keeps it on this device and undoes it too', async () => {
+    const { api } = await setup({ saved: [line('old')] });
+    jest.useFakeTimers();
+    const widths = within(bar()).getByRole('group', { name: 'Grosor de la línea' });
+    const width = (name: string) => within(widths).getByRole('button', { name });
+    // The normal one by default; a drawing saved without a width is drawn with it.
+    expect(width('Normal (2 px)')).toHaveAttribute('aria-pressed', 'true');
+    expect(shapes('horizontal')[0].querySelectorAll('line')[1]).toHaveAttribute(
+      'stroke-width',
+      '2'
+    );
+    // Each choice is a preview of the stroke, in the colour chosen.
+    expect(width('Muy grueso (6 px)').querySelector('line')).toHaveAttribute('stroke-width', '6');
+    fireEvent.click(tool('Rosa'));
+    expect(width('Fino (1 px)').querySelector('line')).toHaveAttribute(
+      'style',
+      'stroke: var(--cc-draw-pink);'
+    );
+    fireEvent.click(width('Muy grueso (6 px)'));
+    expect(width('Muy grueso (6 px)')).toHaveAttribute('aria-pressed', 'true');
+    expect(width('Normal (2 px)')).toHaveAttribute('aria-pressed', 'false');
+    expect(localStorage.getItem('mm_crypto_draw_width')).toBe('6');
+    fireEvent.click(tool('Línea de tendencia'));
+    fireEvent.pointerDown(layer(), at(10, 200));
+    fireEvent.pointerMove(layer(), at(25, 195));
+    // The line being drawn already has it.
+    expect(shapes('trend')[0].querySelectorAll('line')[1]).toHaveAttribute('stroke-width', '6');
+    fireEvent.pointerUp(layer(), at(30, 190));
+    fireEvent.click(width('Fino (1 px)'));
+    fireEvent.click(tool('Zona'));
+    drag([40, 150], [60, 170]);
+    expect(shapes('rect')[0].querySelector('rect')).toHaveAttribute('stroke-width', '1');
+    // A note takes no thickness.
+    fireEvent.click(tool('Nota de texto'));
+    tap(50, 120);
+    const input = screen.getByRole('textbox', { name: 'Texto de la nota' });
+    fireEvent.change(input, { target: { value: 'Ojo' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    act(() => jest.advanceTimersByTime(SAVE_MS));
+    expect(saved(api).map((d) => [d.kind, d.width])).toEqual([
+      ['horizontal', undefined],
+      ['trend', 6],
+      ['rect', 1],
+      ['text', undefined],
+    ]);
+    fireEvent.click(tool('Deshacer'));
+    fireEvent.click(tool('Deshacer'));
+    expect(shapes('rect')).toHaveLength(0);
+    expect(shapes('trend')[0].querySelectorAll('line')[1]).toHaveAttribute('stroke-width', '6');
+    // The hit area of a thin line stays wide (CSS: 16 px).
+    expect(shapes('trend')[0].querySelector('.cc-draw-hit')).not.toBeNull();
+    cleanup();
+    // Back on this device: the last thickness chosen; a value not offered is ignored.
+    await setup();
+    expect(
+      within(screen.getByRole('group', { name: 'Grosor de la línea' })).getByRole('button', {
+        name: 'Fino (1 px)',
+      })
+    ).toHaveAttribute('aria-pressed', 'true');
+    cleanup();
+    localStorage.setItem('mm_crypto_draw_width', '3');
+    await setup();
+    expect(
+      within(screen.getByRole('group', { name: 'Grosor de la línea' })).getByRole('button', {
+        name: 'Normal (2 px)',
+      })
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('erases one drawing by touch or keyboard, deletes them all and undoes', async () => {
     const note: Drawing = { ...line('n1'), kind: 'text', color: 'white', text: 'Hola' };
     const zone: Drawing = {

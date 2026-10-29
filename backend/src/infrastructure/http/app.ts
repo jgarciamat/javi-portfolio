@@ -8,7 +8,7 @@ import { businessDataRoutes } from './routes/business-data.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
 import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
-import { cryptoRoutes } from './routes/crypto.routes';
+import { LIVE_PER_NETWORK, cryptoRoutes, isLiveTick } from './routes/crypto.routes';
 import { financeRoutes } from './routes/finance.routes';
 import { funnelRoutes } from './routes/funnel.routes';
 import { householdRoutes } from './routes/household.routes';
@@ -55,7 +55,16 @@ export function createApp(c: Container): Express {
     }
   });
 
-  api.use(limiter({ windowMs: 60 * 1000, limit: 300 }));
+  // The chart's live tick (every 2 s) has its own limit per network, wider, so a few people
+  // behind one IP watching the chart never use up the general one; per person it has another.
+  api.use(limiter({ windowMs: 60 * 1000, limit: 300, skip: isLiveTick }));
+  api.use(
+    limiter({
+      windowMs: 60 * 1000,
+      limit: LIVE_PER_NETWORK,
+      skip: (req) => !isLiveTick(req),
+    })
+  );
   api.use('/auth', authRoutes(c, limiter));
   api.use(publicBillingRoutes(c));
   api.use(clientErrorRoutes(limiter));

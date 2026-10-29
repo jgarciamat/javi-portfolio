@@ -16,6 +16,16 @@ import {
   cryptoSimQuery,
 } from '../schemas';
 
+/** Live ticks a person may ask for per minute (the chart asks 30: one every 2 s). */
+export const LIVE_PER_MINUTE = 60;
+
+/** Live ticks per minute from one network (an office or a home behind one IP). */
+export const LIVE_PER_NETWORK = 1200;
+
+/** The live tick is counted apart from the API's general limit per network (see app.ts). */
+export const isLiveTick = (req: { method: string; path: string }): boolean =>
+  req.method === 'GET' && req.path === '/crypto/live';
+
 /**
  * «Consola crypto»: public market data through the server (the app never calls the source
  * directly: one cache for everybody, no keys, no third party in the browser) and the
@@ -33,6 +43,9 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
   const writes = byUser(30);
   // Drawings are saved a moment after each change (undo included): their own, wider budget.
   const drawingWrites = byUser(60);
+  // The live tick of the chart (every 2 s while it is on screen): its own budget, so it never
+  // takes the reads of the rest of the console. Two windows at once still fit.
+  const liveReads = byUser(LIVE_PER_MINUTE);
 
   router.get(
     '/crypto/coins',
@@ -49,6 +62,16 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
       const { symbol, interval } = cryptoCandlesQuery.parse(req.query);
       res.set('Cache-Control', 'private, max-age=15');
       res.json(await c.cryptoMarket.candles(symbol, interval));
+    })
+  );
+
+  router.get(
+    '/crypto/live',
+    liveReads,
+    authed(async (req, res) => {
+      const { symbol, interval } = cryptoCandlesQuery.parse(req.query);
+      res.set('Cache-Control', 'no-store');
+      res.json(await c.cryptoMarket.live(symbol, interval));
     })
   );
 

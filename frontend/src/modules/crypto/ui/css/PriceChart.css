@@ -53,6 +53,48 @@
   border-left: 1px solid var(--slate-700);
 }
 
+/* «● En vivo 12:03:45» / «En pausa»: its place is kept while it is off, so nothing moves. */
+.cc-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 17.5ch;
+  white-space: nowrap;
+}
+
+.cc-live--off {
+  visibility: hidden;
+}
+
+.cc-live--live {
+  color: var(--cc-text);
+}
+
+.cc-live i {
+  flex: 0 0 auto;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--slate-500);
+}
+
+.cc-live--live i {
+  background: var(--green-500);
+  animation: cc-live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cc-live-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-live--live i {
+    animation: none;
+  }
+}
+
 /* The drawing and, while other candles load, the blue frame over it. */
 .cc-chart-stage {
   position: relative;

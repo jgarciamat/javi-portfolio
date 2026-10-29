@@ -6,6 +6,7 @@ import {
   CryptoInterval,
   CryptoSymbol,
   EURO_PAIRS,
+  LIVE_CANDLES,
   MarketCandle,
   MarketFeed,
   MarketQuote,
@@ -16,6 +17,8 @@ import { FrankfurterRates } from '@infrastructure/rates/FrankfurterRates';
 import { MarketCache } from './MarketCache';
 
 const TIMEOUT_MS = 5000;
+/** A live tick later than this is of no use (the next one is on its way): give up sooner. */
+const LIVE_TIMEOUT_MS = 2000;
 /**
  * Binance's public market data (no key, no account): the host meant for public data first,
  * the main API as the fallback.
@@ -37,9 +40,22 @@ const CANDLE_TTL: Record<CryptoInterval, number> = {
   '1w': 600_000,
 };
 const TICKER_TTL = 15_000;
+/**
+ * The live tick of a coin and size is asked to the source at most once in this time, whatever
+ * the number of people looking at it (they share the answer).
+ */
+export const LIVE_TTL = 1500;
+/**
+ * Most live ticks asked to the source per minute, all coins and sizes together: 600 requests of
+ * weight 2 are 1.200 of the 6.000 a minute Binance allows an IP, so the live chart can never
+ * starve the rest. Beyond it the last tick kept is given (or the tail of the cached series).
+ */
+export const LIVE_CALLS_PER_MINUTE = 600;
 const DAY = 24 * 60 * 60 * 1000;
 /** The last reference rate stands in this long while the rates service does not answer. */
 export const RATE_KEPT_FOR_MS = 7 * DAY;
+/** After a failure the rates service is not asked again for this long (the last rate stands in). */
+export const RATE_RETRY_MS = 60_000;
 /**
  * A coin kept in euros trading less than this in 24 hours is reported in the logs (once a day),
  * as a hint to move it to USDT. Never switched on the fly: see EURO_PAIRS.
@@ -94,6 +110,7 @@ export function convertTicker(t: MarketTicker, usdPerEur: number): MarketTicker 
  */
 export class ReferenceRate {
   private last: { rate: number; at: number } | null = null;
+  private failed: { error: unknown; at: number } | null = null;
 
   constructor(
     private readonly rates: ExchangeRates,
@@ -101,15 +118,50 @@ export class ReferenceRate {
   ) {}
 
   async usdPerEur(): Promise<number> {
+    // Asked on every market answer (the live tick too): a service that is down is left alone for
+    // a minute instead of being called, and waited for, every time.
+    const resting = this.failed && this.now() - this.failed.at < RATE_RETRY_MS;
     try {
+      if (resting) throw this.failed!.error;
       const rate = await this.rates.rate('EUR', 'USD');
       if (!(rate > 0)) throw new Error('rate missing');
       this.last = { rate, at: this.now() };
+      this.failed = null;
       return rate;
     } catch (error) {
+      if (!resting) this.failed = { error, at: this.now() };
       if (this.last && this.now() - this.last.at < RATE_KEPT_FOR_MS) return this.last.rate;
       throw error;
     }
+  }
+}
+
+/** Calls allowed per window (fixed windows): a ceiling on what is asked of the source. */
+export class CallBudget {
+  private start = -Infinity;
+  private used = 0;
+
+  constructor(
+    private readonly limit: number,
+    private readonly windowMs: number,
+    private readonly now: () => number = Date.now
+  ) {}
+
+  take(): boolean {
+    if (this.now() - this.start >= this.windowMs) {
+      this.start = this.now();
+      this.used = 0;
+    }
+    if (this.used >= this.limit) return false;
+    this.used++;
+    return true;
+  }
+}
+
+/** The live budget is spent: the source is not asked (and nothing is logged). */
+class OverBudget extends Error {
+  constructor() {
+    super('live budget spent');
   }
 }
 
@@ -170,6 +222,8 @@ export interface BinanceOptions {
   rates?: ExchangeRates;
   /** Coins kept on their euro pair (EURO_PAIRS unless configured otherwise). */
   euroPairs?: readonly CryptoSymbol[];
+  /** Live ticks asked to the source per minute at most (LIVE_CALLS_PER_MINUTE). */
+  liveCallsPerMinute?: number;
 }
 
 /**
@@ -185,17 +239,26 @@ export class BinanceMarketData implements CryptoMarketData {
   private readonly plan: ReadonlyMap<CryptoSymbol, string>;
   private readonly rate: ReferenceRate;
   private readonly thinSince = new Map<CryptoSymbol, number>();
+  private readonly liveBudget: CallBudget;
 
   constructor(
     private readonly http: typeof fetch = fetch,
     private readonly hosts: string[] = BINANCE_HOSTS,
     private readonly now: () => number = Date.now,
     private readonly logger: Pick<Console, 'warn'> = console,
-    { rates = new FrankfurterRates(now), euroPairs = EURO_PAIRS }: BinanceOptions = {}
+    {
+      rates = new FrankfurterRates(now),
+      euroPairs = EURO_PAIRS,
+      liveCallsPerMinute = LIVE_CALLS_PER_MINUTE,
+    }: BinanceOptions = {}
   ) {
-    this.cache = new MarketCache('binance', now, (key, error) =>
-      logger.warn(`[market] ${key} unavailable: ${(error as Error).message}`)
-    );
+    // A live tick that fails is not logged: it is asked every second or two, and the outage
+    // already shows in the logs of the full series.
+    this.cache = new MarketCache('binance', now, (key, error) => {
+      if (!key.startsWith('live:'))
+        logger.warn(`[market] ${key} unavailable: ${(error as Error).message}`);
+    });
+    this.liveBudget = new CallBudget(liveCallsPerMinute, 60_000, now);
     this.pairs = pairsOf(euroPairs);
     this.plan = new Map([...this.pairs].map(([pair, { symbol }]) => [symbol, pair]));
     this.rate = new ReferenceRate(rates, now);
@@ -211,21 +274,60 @@ export class BinanceMarketData implements CryptoMarketData {
   ): Promise<MarketFeed<MarketCandle[]>> {
     const pair = this.plan.get(symbol)!;
     // Keyed by pair: a series of the other market is never reused after a change of plan.
-    const feed = await this.cache.get(
-      `candles:${pair}:${interval}`,
-      CANDLE_TTL[interval],
-      async () => {
-        const rows = await this.request(
-          `/klines?symbol=${pair}&interval=${interval}&limit=${CANDLES_PER_SERIES}`
-        );
-        const candles = (Array.isArray(rows) ? rows : [])
-          .map(parseKline)
-          .filter((c): c is MarketCandle => c !== null)
-          .sort((a, b) => a.time - b.time);
-        if (!candles.length) throw new Error('no candles');
-        return candles;
-      }
+    const feed = await this.cache.get(`candles:${pair}:${interval}`, CANDLE_TTL[interval], () =>
+      this.klines(pair, interval, CANDLES_PER_SERIES, TIMEOUT_MS)
     );
+    return this.inEuros(symbol, feed);
+  }
+
+  /**
+   * The candle in progress and the one before: one light request (weight 2) shared by everybody
+   * looking at the same coin and size, at most once every LIVE_TTL and within the live budget.
+   * Over the budget or with the source down, the newer of the last tick kept (marked stale) and
+   * the tail of the cached full series.
+   */
+  async live(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>> {
+    const pair = this.plan.get(symbol)!;
+    const tick = await this.cache
+      .get(`live:${pair}:${interval}`, LIVE_TTL, () => {
+        if (!this.liveBudget.take()) throw new OverBudget();
+        return this.klines(pair, interval, LIVE_CANDLES, LIVE_TIMEOUT_MS);
+      })
+      .catch(() => null);
+    if (tick && !tick.stale) return this.inEuros(symbol, tick);
+    const series = await this.candles(symbol, interval).catch((error: unknown) => {
+      if (!tick) throw error;
+      return null;
+    });
+    if (tick && (!series || tick.updatedAt > series.updatedAt)) return this.inEuros(symbol, tick);
+    // Only null when there is a tick (see above).
+    const tail = series!;
+    return { ...tail, data: tail.data.slice(-LIVE_CANDLES) };
+  }
+
+  private async klines(
+    pair: string,
+    interval: CryptoInterval,
+    limit: number,
+    timeout: number
+  ): Promise<MarketCandle[]> {
+    const rows = await this.request(
+      `/klines?symbol=${pair}&interval=${interval}&limit=${limit}`,
+      timeout
+    );
+    const candles = (Array.isArray(rows) ? rows : [])
+      .map(parseKline)
+      .filter((c): c is MarketCandle => c !== null)
+      .sort((a, b) => a.time - b.time);
+    if (!candles.length) throw new Error('no candles');
+    return candles;
+  }
+
+  /** Candles of the pair in euros: those of a USDT pair converted at the rate of the moment. */
+  private async inEuros(
+    symbol: CryptoSymbol,
+    feed: MarketFeed<MarketCandle[]>
+  ): Promise<MarketFeed<MarketCandle[]>> {
     if (this.quoteOf(symbol) === 'EUR') return feed;
     const usdPerEur = await this.usdPerEur();
     if (usdPerEur === null) throw unavailable();
@@ -239,7 +341,7 @@ export class BinanceMarketData implements CryptoMarketData {
   async tickers(): Promise<MarketFeed<MarketTicker[]>> {
     const feed = await this.cache.get('tickers', TICKER_TTL, async () => {
       const symbols = encodeURIComponent(JSON.stringify([...this.pairs.keys()]));
-      const items = await this.request(`/ticker/24hr?symbols=${symbols}`);
+      const items = await this.request(`/ticker/24hr?symbols=${symbols}`, TIMEOUT_MS);
       const tickers = (Array.isArray(items) ? items : [])
         .map((item) => parseTicker(item, this.pairs))
         .filter((t): t is MarketTicker => t !== null);
@@ -284,12 +386,12 @@ export class BinanceMarketData implements CryptoMarketData {
   }
 
   /** Asks each host in turn; the last error is thrown when none answers. */
-  private async request(path: string): Promise<unknown> {
+  private async request(path: string, timeout: number): Promise<unknown> {
     let last: unknown = new Error('no hosts');
     for (const host of this.hosts) {
       try {
         const res = await this.http(`${host}${path}`, {
-          signal: AbortSignal.timeout(TIMEOUT_MS),
+          signal: AbortSignal.timeout(timeout),
           headers: { Accept: 'application/json' },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

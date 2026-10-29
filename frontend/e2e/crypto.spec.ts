@@ -254,6 +254,29 @@ test('pages the coins, zooms from the bar and opens the words of the console', a
   await expect(words).toBeHidden();
 });
 
+test('keeps every coin on one line, so the pages fit with a wider font too', async ({ page }) => {
+  // The fonts of Linux are wider than those of a Mac: «SHIB / EUR» wrapped onto a second line,
+  // its row was taller and the last row of the page stuck out of the column.
+  await page.addStyleTag({
+    content: `.cc { --cc-num: Verdana, 'DejaVu Sans', sans-serif; font-family: Verdana, 'DejaVu Sans', sans-serif; }`,
+  });
+  const coins = page.getByRole('navigation', { name: 'Monedas' });
+  await expect(
+    page
+      .getByRole('img', { name: /Gráfica de Bitcoin/ })
+      .locator('canvas')
+      .first()
+  ).toBeVisible();
+  await coins.getByRole('button', { name: /^Sig\./ }).click();
+  const heights = await coins
+    .getByRole('listitem')
+    .evaluateAll((rows) => rows.map((r) => Math.round(r.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
+  const list = await coins.getByRole('list').boundingBox();
+  const last = await coins.getByRole('listitem').last().boundingBox();
+  expect(last!.y + last!.height).toBeLessThanOrEqual(list!.y + list!.height + 1);
+});
+
 test('keeps candle sizes, currency, coin and zoom in the full screen chart', async ({ page }) => {
   for (const size of [
     { width: 1440, height: 900 },

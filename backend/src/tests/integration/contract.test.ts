@@ -314,6 +314,7 @@ describe('API contract', () => {
       contract('cryptoCoins', (await get('/crypto/coins')).body);
       ctx.market.prices.delete('NEAR');
       contract('cryptoCandles', (await get('/crypto/candles?symbol=ETH&interval=1h')).body);
+      contract('cryptoLive', (await get('/crypto/live?symbol=ETH&interval=1h')).body);
       const position = (await send('cryptoBuyMarket')).body.open[0].id as string;
       await send('cryptoSellLimit', { position });
       await send('cryptoBuyMarket');

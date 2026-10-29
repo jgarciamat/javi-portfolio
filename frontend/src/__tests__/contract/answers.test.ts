@@ -33,6 +33,7 @@ import type {
 import type { AutonomoSaved } from '@modules/finances/ui/components/autonomoSync';
 import type {
   CryptoCandles,
+  CryptoLive,
   CryptoCoins,
   CryptoRanking,
   PriceAlerts,
@@ -46,6 +47,7 @@ import { cryptoRanking } from './fixtures/cryptoRanking';
 import { cryptoReport } from './fixtures/cryptoReport';
 import { contract } from './exact';
 import { cryptoCandles } from './fixtures/cryptoCandles';
+import { cryptoLive } from './fixtures/cryptoLive';
 import { cryptoCoins } from './fixtures/cryptoCoins';
 import { cryptoSim } from './fixtures/cryptoSim';
 import { cryptoSimFilled } from './fixtures/cryptoSimFilled';
@@ -130,6 +132,7 @@ describe('API answers fit the types of the app', () => {
   it('crypto console', () => {
     contract<CryptoCoins>()(cryptoCoins);
     contract<CryptoCandles>()(cryptoCandles);
+    contract<CryptoLive>()(cryptoLive);
     contract<SimPortfolio>()(cryptoSim);
     contract<SimPortfolio>()(cryptoSimFilled);
     contract<CryptoRanking>()(cryptoRanking);

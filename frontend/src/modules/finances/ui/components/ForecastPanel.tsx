@@ -9,6 +9,8 @@ import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import type { Forecast } from '@modules/finances/domain/types';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
+import { endOfMonthLikely } from '../../domain/enoughData';
+import { todayDateOnly } from '@shared/utils/format';
 import '../css/ForecastPanel.css';
 import { Icon } from '@shared/components/Icon';
 import type { DashboardTab } from '../navigation';
@@ -150,6 +152,25 @@ function Outlook({
 }
 
 /**
+ * A new account (its first week) gets «not enough data yet» instead of the end of the month: the
+ * space kept while loading is that one's, much shorter.
+ */
+function useFewData(): boolean {
+  const { transactions } = useFinances();
+  const total = useOptionalPlan()?.overview?.usage.movements ?? null;
+  return !endOfMonthLikely(transactions, total, todayDateOnly());
+}
+
+/**
+ * The space kept while the forecast loads: the whole end of the month, next month only on the
+ * free plan, or «not enough data yet» on a new account (see ForecastPanel.css).
+ */
+const loadingClass = (free: boolean | undefined, few: boolean): string =>
+  ['forecast-panel--loading', free && 'forecast-panel--free', few && 'forecast-panel--few']
+    .filter(Boolean)
+    .join(' ');
+
+/**
  * "Do I reach the end of the month?" and next month for everyone; the longer outlook is Premium.
  * `onOpenTab` opens the guides of «Qué hacer con lo que sobre» without leaving the app.
  */
@@ -159,6 +180,7 @@ export function ForecastPanel({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) =
   const { available, loading } = useFinances();
   // Known to be free: the space kept while loading is that of next month only.
   const free = useOptionalPlan()?.isFree;
+  const few = useFewData();
   const [months, setMonths] = useState(6);
   const [excluded, setExcluded] = useState<string[]>([]);
   // Asked once the month is there: before, `available` would change under it and the
@@ -179,9 +201,7 @@ export function ForecastPanel({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) =
         </>
       }
       tourId="forecast"
-      className={
-        data || error ? undefined : `forecast-panel--loading${free ? ' forecast-panel--free' : ''}`
-      }
+      className={data || error ? undefined : loadingClass(free, few)}
     >
       {error && <p className="form-error">{error}</p>}
       {!data && !error && <p className="section-hint">{t('app.common.loading')}</p>}

@@ -657,6 +657,16 @@
   white-space: nowrap;
 }
 
+/* One line per row, whatever the font: the pages count on rows of one height (a pair or a price
+   that wrapped made its row taller and the last one stuck out of the column). */
+.cc-coin-name small,
+.cc-coin-price b,
+.cc-coin-price small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cc-coin small,
 .cc-quote-name small {
   color: var(--cc-text-3);

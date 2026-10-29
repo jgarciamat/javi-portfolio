@@ -355,6 +355,11 @@ export interface CryptoMarketData {
   quoteOf(symbol: CryptoSymbol): MarketQuote;
   candles(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>>;
   tickers(): Promise<MarketFeed<MarketTicker[]>>;
+  /**
+   * The candle in progress and the one before it (oldest first), fresher than `candles`: the
+   * chart's live tick. The close of the last one is the last price.
+   */
+  live(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>>;
 }
 
 /** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */

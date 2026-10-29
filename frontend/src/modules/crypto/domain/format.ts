@@ -89,6 +89,15 @@ export function formatVolume(volume: number, locale: Locale): string {
 }
 
 /** Date and time of a candle or an operation, in the person's time zone. */
+/** «12:03:45»: the time of a live price, with its seconds. */
+export function formatClock(iso: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(tag(locale), {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(iso));
+}
+
 export function formatDateTime(iso: string | number, locale: Locale): string {
   return new Intl.DateTimeFormat(tag(locale), {
     day: 'numeric',

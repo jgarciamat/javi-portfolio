@@ -249,6 +249,19 @@
   min-height: 1145px;
 }
 
+/* A new account (fewer than 5 movements or its first one less than 7 days back): «not enough data
+   yet» and the outlook, no end of the month. Body measured on 29-10-2026 with 5 movements of the
+   day: 636 px on a phone and 451 px on a 1280 px screen; on the free plan 461 px and 316 px. */
+.forecast-panel--loading.forecast-panel--few .collapsible-body--open .collapsible-body-inner {
+  min-height: 632px;
+}
+
+.forecast-panel--loading.forecast-panel--free.forecast-panel--few
+  .collapsible-body--open
+  .collapsible-body-inner {
+  min-height: 458px;
+}
+
 @media (min-width: 768px) {
   .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
     min-height: 925px;
@@ -256,5 +269,15 @@
 
   .forecast-panel--loading.forecast-panel--free .collapsible-body--open .collapsible-body-inner {
     min-height: 790px;
+  }
+
+  .forecast-panel--loading.forecast-panel--few .collapsible-body--open .collapsible-body-inner {
+    min-height: 448px;
+  }
+
+  .forecast-panel--loading.forecast-panel--free.forecast-panel--few
+    .collapsible-body--open
+    .collapsible-body-inner {
+    min-height: 312px;
   }
 }

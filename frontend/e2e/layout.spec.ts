@@ -1,7 +1,50 @@
+import type { Page } from '@playwright/test';
+import { API_URL, DEMO_USER } from '../playwright.config';
 import { test, expect, signIn } from './fixtures';
 
-/** The forecast panel keeps its height while it loads: no layout jump (CLS < 0.1) on a phone. */
-test('the forecast panel does not shift the page when its data arrives', async ({ page }) => {
+/** A movement of the demo user `daysBack` days ago, through the API (euros). */
+const movement = (daysBack: number, i: number) => ({
+  description: `Gasto de prueba ${i}`,
+  amount: 10 * i,
+  type: 'EXPENSE',
+  category: 'Alimentación',
+  date: new Date(Date.now() - daysBack * 86_400_000).toISOString().slice(0, 10),
+});
+
+/**
+ * The forecast panel keeps its height while it loads: no layout jump (CLS < 0.1) on a phone. It
+ * only shows with five movements or more, so each case brings its own (and takes them away
+ * after) instead of relying on what the tests before it happened to leave: a new account (five
+ * movements of today: «not enough data yet» instead of the end of the month) and one in use for
+ * a while (the first movement ten days back: the whole end of the month).
+ */
+for (const [name, firstDaysBack] of [
+  ['a new account', 0],
+  ['an account in use', 10],
+] as const)
+  test(`the forecast panel does not shift the page when its data arrives (${name})`, async ({
+    page,
+    request,
+  }) => {
+    const login = await request.post(`${API_URL}/auth/login`, { data: DEMO_USER });
+    const headers = { Authorization: `Bearer ${(await login.json()).accessToken}` };
+    const ids: string[] = [];
+    for (let i = 1; i <= 5; i++) {
+      const made = await request.post(`${API_URL}/transactions`, {
+        headers,
+        data: movement(i === 1 ? firstDaysBack : 0, i),
+      });
+      expect(made.status()).toBe(201);
+      ids.push((await made.json()).id);
+    }
+    try {
+      await forecastStaysPut(page);
+    } finally {
+      await request.post(`${API_URL}/transactions/bulk-delete`, { headers, data: { ids } });
+    }
+  });
+
+async function forecastStaysPut(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.route('**/forecast*', async (route) => {
     await new Promise((done) => setTimeout(done, 1200));
@@ -27,7 +70,7 @@ test('the forecast panel does not shift the page when its data arrives', async (
   expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
     0.1
   );
-});
+}
 
 /** On a phone the three social links share the line of the Videoteca pill, inside the screen. */
 test('the social links show on a phone, beside the Videoteca pill', async ({ page }) => {

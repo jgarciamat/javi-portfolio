@@ -239,6 +239,14 @@ mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
   de referencia en cada pintado).
 - **Colores**: variables `--cc-draw-*` por tema (contraste de 4,5:1 o más en claro y oscuro);
   «Neutro» es blanco en oscuro y casi negro en claro.
+- **Grosor** (líneas y zonas; las notas no tienen): Fino 1 px, Normal 2 px, Grueso 4 px y Muy
+  grueso 6 px, botones con `aria-pressed` y una vista previa del trazo en el color elegido. Se
+  aplica a los dibujos nuevos (la consola no tiene selección de un dibujo ya hecho), se recuerda
+  en el dispositivo (`mm_crypto_draw_width`) y se guarda con cada dibujo (`width`, opcional: solo
+  1, 2, 4 o 6, nunca en notas; los guardados antes no lo tienen y se dibujan con el normal, así
+  que las horizontales y zonas antiguas pasan de 1,5 a 2 px). Píxeles de pantalla: el zoom no lo
+  cambia. La zona de acierto de la goma sigue siendo de 16 px aunque la línea sea de 1 px.
+  Deshacer y la exportación de datos lo incluyen.
 - **Por moneda y en el servidor**: cada moneda tiene su lista (`GET`/`PUT
 /crypto/drawings/:symbol`, la lista entera; vacía borra la fila). La app pide una moneda la
   primera vez que se ve, guarda 0,6 s después de cada cambio y otra vez al salir de la página;
@@ -248,6 +256,35 @@ mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
   de la app (`[\w-]{1,40}`), 1 o 2 puntos según el tipo, horas entre 2009 y 2100, precio
   positivo; `zod` estricto. Guardados: 60 por minuto y persona (lecturas aparte, 120).
 - Capturas en `docs/consola-dibujo/`.
+
+## Precio y vela en vivo (octubre de 2026)
+
+Mientras la gráfica está en pantalla, la pestaña visible y la persona activa (sin ratón, teclado ni
+toques durante 10 min se pausa: «En pausa»), la app pide cada 2 s `GET /crypto/live`: el último
+precio y la vela en curso con la anterior (para ver el cierre y la apertura de la siguiente). La vela
+se actualiza **en sitio** (`series.update`): ni el zoom, ni el desplazamiento, ni los dibujos se
+mueven; un intervalo nuevo añade su vela. El precio de la cabecera y de la lista de la moneda activa
+lo sigue (variación 24 h recalculada desde la apertura implícita; ofertas y volumen siguen siendo
+los del sondeo de 30 s, que se mantiene como red de seguridad). Marca discreta «● En vivo hh:mm:ss»
+junto a la cuenta atrás de la vela (no es región viva: no se lee cada 2 s).
+
+- **Servidor**: `klines limit=2` (peso 2) por par y tamaño, caché compartida de 1,5 s (las peticiones
+  concurrentes comparten la llamada), tiempo de espera 2 s, tope global de 600 llamadas/min a Binance
+  (1.200 de peso de los 6.000/min por IP). Pasado el tope o con la fuente caída: el último tick o la
+  cola de la serie en caché, la más reciente. Mismo tipo de cambio BCE que las velas.
+- **Límites**: 60/min por persona (aparte de las 120 lecturas) y 1.200/min por red; no cuenta para
+  el límite general de 300/min por IP.
+- **Cliente**: una petición cada vez (la siguiente tras la respuesta), reintentos 4 s, 8 s… hasta
+  30 s; descarta respuestas de otra moneda o tamaño y ticks más antiguos que la serie.
+- **Coste medido** (demo, sin compresión): sondeo completo ≈78 KB cada 30 s (velas 69 KB, monedas
+  5 KB, cartera 1 KB, cabeceras ~3 KB) = 156 KB y 6 peticiones/min; el vivo añade 30 peticiones y
+  ≈44 KB/min (472 B de cuerpo + ~1 KB de cabeceras). Con 100 personas: +3.000 peticiones/min al
+  servidor (respuestas de caché en memoria, ~2 ms), y a Binance como mucho 40 llamadas/min por
+  moneda y tamaño en uso, sin depender del número de personas, con un techo de 600/min.
+- **Demo** (`CRYPTO_MARKET=demo`): dos ondas rápidas (≈1 min y ≈15 s) mueven el precio; las velas
+  se calculan en una rejilla fija de 60 momentos y coinciden con el tick.
+- Capturas con hora en `docs/consola-vivo/` (demo y Binance real, incluido el cambio de vela de las
+  11:15). e2e: `e2e/crypto-live.spec.ts` (`LIVE_SHOTS=1` guarda las capturas).
 
 ## Panel «Aprende antes de jugar»
 
@@ -619,6 +656,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
 | `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium)                                                                      |
 | `GET /crypto/drawings/:symbol`, `PUT /crypto/drawings/:symbol`           | Dibujos de la gráfica de una moneda (`{ drawings }`, la lista entera; gratis)                    |
+| `GET /crypto/live?symbol=&interval=`                                     | Tick en vivo: último precio y vela en curso con la anterior (≈470 B; `no-store`)                 |
 
 ## Interfaz
 
