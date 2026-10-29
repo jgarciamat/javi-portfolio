@@ -338,6 +338,8 @@ describe('API contract', () => {
         .send({ symbol: 'BTC', condition: 'above', price: 60_000 })
         .expect(201);
       contract('cryptoAlerts', (await get('/crypto/alerts')).body);
+      await send('cryptoDrawings');
+      contract('cryptoDrawings', (await get('/crypto/drawings/BTC')).body);
       contract('cryptoReport', (await get('/crypto/seasons/2026-03/report')).body);
     });
 
@@ -360,6 +362,7 @@ describe('API contract', () => {
       await send('cryptoRanking');
       const alert = (await send('cryptoAlert')).body.alerts[0].id as string;
       await send('cryptoDeleteAlert', { alert });
+      await send('cryptoDrawings');
     });
   });
 

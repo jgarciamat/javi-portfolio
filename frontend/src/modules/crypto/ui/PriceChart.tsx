@@ -22,9 +22,11 @@ import {
   untilClose,
 } from '../domain/chart';
 import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/format';
+import type { Drawings } from '../application/useDrawings';
 import type { LayerId } from '../domain/indicators';
 import { layerLevels, layerLines, legend } from '../domain/layers';
 import type { Candle, CryptoInterval } from '../domain/types';
+import { DrawBar, DrawSummary, DrawSurface, useDrawTools } from './ChartDrawings';
 import { ChartFrame, HINT_KEY } from './ConsoleSkeleton';
 import { LayerBar } from './LayerBar';
 import { useMoney } from './money';
@@ -54,6 +56,8 @@ interface PriceChartProps {
   onVisibleChange: (percent: number | null) => void;
   /** Other candles are on their way: a blue frame covers the empty chart until they arrive. */
   loading?: boolean;
+  /** The person's drawings on this coin: with them come the drawing bar and its tools. */
+  drawings?: Drawings;
 }
 
 const PORTRAIT_PHONE = '(orientation: portrait) and (max-width: 719px)';
@@ -376,7 +380,8 @@ function useFullScreen(root: RefObject<HTMLDivElement | null>) {
     const opener = document.activeElement as HTMLElement | null;
     root.current?.querySelector<HTMLElement>('.cc-chart-canvas')?.focus();
     const onKey = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') setExpanded(false);
+      // Unless the drawing mode took it first (it leaves the tool, not the full screen).
+      if (event.key === 'Escape' && !event.defaultPrevented) setExpanded(false);
       if (event.key === 'Tab') trapFocus(event, root.current!);
     };
     const onChange = () => {
@@ -439,6 +444,7 @@ export function PriceChart({
   fullBar,
   onVisibleChange,
   loading,
+  drawings,
 }: PriceChartProps) {
   const { t, locale } = useI18n();
   const money = useMoney();
@@ -463,10 +469,14 @@ export function PriceChart({
     onRange: setRange,
   });
   const full = useFullScreen(root);
+  const draw = useDrawTools(drawings, candles, money.display.rate, () =>
+    container.current?.focus()
+  );
   const dialog = dialogProps(full.expanded, t('app.crypto.chart.fullDialog'));
   const helpId = useId();
   const summaryId = useId();
   const linesId = useId();
+  const drawId = useId();
 
   const visible = shown ? summarize(candles, shown.from, shown.to) : null;
   const change = visible ? visible.changePercent : null;
@@ -484,6 +494,7 @@ export function PriceChart({
     End: chart.showRecent,
   };
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (draw.onKey(event)) return;
     const act = keys[event.key];
     if (!act) return;
     event.preventDefault();
@@ -512,6 +523,7 @@ export function PriceChart({
         onToggle={onToggleLayer}
       />
       <Unless hide={full.expanded}>{layerExtra}</Unless>
+      <DrawBar control={draw} drawings={drawings} />
       <Stage loading={loading}>
         <div
           ref={container}
@@ -520,9 +532,15 @@ export function PriceChart({
           role="img"
           aria-roledescription={t('app.crypto.chart.role')}
           aria-label={label}
-          aria-describedby={`${summaryId} ${linesId} ${helpId}`}
+          aria-describedby={`${summaryId} ${linesId} ${drawId} ${helpId}`}
           aria-busy={loading}
           onKeyDown={onKeyDown}
+        />
+        <DrawSurface
+          control={draw}
+          drawings={drawings}
+          projection={chart.projection}
+          rate={money.display.rate}
         />
       </Stage>
       <p id={summaryId} className="sr-only">
@@ -540,6 +558,7 @@ export function PriceChart({
       </p>
       <ThinNote candles={candles} shown={shown} interval={interval} />
       <LinesKey id={linesId} lines={lines} />
+      <DrawSummary id={drawId} drawings={drawings} />
       <Tools chart={chart} expanded={full.expanded} onExpand={full.toggle} />
       <p id={helpId} className="cc-chart-help">
         {t('app.crypto.chart.help')}

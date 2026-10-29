@@ -458,6 +458,14 @@ const cases: Case[] = [
     { symbol: 'BTC', condition: 'below', price: 1 },
   ],
   ['crypto alert delete', () => cryptoApi.deleteAlert('a 1'), 'DELETE', '/crypto/alerts/a%201'],
+  ['crypto drawings', () => cryptoApi.drawings('BTC'), 'GET', '/crypto/drawings/BTC'],
+  [
+    'crypto drawings save',
+    () => cryptoApi.saveDrawings('BTC', []),
+    'PUT',
+    '/crypto/drawings/BTC',
+    { drawings: [] },
+  ],
   ['plans', () => billingApi.plans(), 'GET', '/billing/plans'],
   [
     'checkout',

@@ -32,6 +32,22 @@ export class FakeSeries {
   removePriceLine(line: { removed: boolean }) {
     line.removed = true;
   }
+  /** Set by a test: the scale cannot say where a price is (as before anything is drawn). */
+  blind = false;
+  /** Prices to pixels: one pixel per unit, 300 at the bottom (0 € → y 300). */
+  priceToCoordinate(price: number) {
+    return this.blind ? null : 300 - price;
+  }
+  coordinateToPrice(y: number) {
+    return this.blind ? null : 300 - y;
+  }
+  primitives: { updateAllViews?: () => void }[] = [];
+  attachPrimitive(primitive: { updateAllViews?: () => void }) {
+    this.primitives.push(primitive);
+  }
+  detachPrimitive(primitive: { updateAllViews?: () => void }) {
+    this.primitives = this.primitives.filter((p) => p !== primitive);
+  }
 }
 
 export class FakeChart {
@@ -42,6 +58,8 @@ export class FakeChart {
   ranges: Listener<{ from: number; to: number } | null>[] = [];
   visibleRange: { from: number; to: number } | null = null;
   barSpacing = 6;
+  /** Set by a test: the time scale cannot say which candle a pixel is. */
+  blind = false;
   position = 0;
   fitted = 0;
   constructor(
@@ -70,8 +88,15 @@ export class FakeChart {
   remove() {
     this.removed = true;
   }
+  paneSize() {
+    return { width: 600, height: 300 };
+  }
   timeScale() {
+    // Ten pixels per candle, from the first one on screen.
+    const from = () => this.visibleRange?.from ?? 0;
     return {
+      logicalToCoordinate: (logical: number) => (logical - from()) * 10,
+      coordinateToLogical: (x: number) => (this.blind ? null : x / 10 + from()),
       subscribeVisibleLogicalRangeChange: (fn: Listener<{ from: number; to: number } | null>) =>
         this.ranges.push(fn),
       unsubscribeVisibleLogicalRangeChange: (fn: Listener<{ from: number; to: number } | null>) => {
@@ -100,6 +125,11 @@ export class FakeChart {
   /** Changes the candles on screen, like a drag or a zoom. */
   show(range: { from: number; to: number } | null) {
     this.ranges.forEach((fn) => fn(range));
+    this.paint();
+  }
+  /** The chart paints itself: what is attached to its series is told. */
+  paint() {
+    this.series.forEach((s) => s.primitives.forEach((p) => p.updateAllViews?.()));
   }
 }
 

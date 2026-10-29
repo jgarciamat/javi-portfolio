@@ -39,7 +39,9 @@ import type {
   SeasonReport,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
+import type { CryptoDrawings } from '@modules/crypto/domain/drawings';
 import { cryptoAlerts } from './fixtures/cryptoAlerts';
+import { cryptoDrawings } from './fixtures/cryptoDrawings';
 import { cryptoRanking } from './fixtures/cryptoRanking';
 import { cryptoReport } from './fixtures/cryptoReport';
 import { contract } from './exact';
@@ -132,6 +134,7 @@ describe('API answers fit the types of the app', () => {
     contract<SimPortfolio>()(cryptoSimFilled);
     contract<CryptoRanking>()(cryptoRanking);
     contract<PriceAlerts>()(cryptoAlerts);
+    contract<CryptoDrawings>()(cryptoDrawings);
     contract<SeasonReport>()(cryptoReport);
     expect(cryptoSim.pending.length).toBeGreaterThan(0);
     expect(cryptoSimFilled.fills).toHaveLength(1);

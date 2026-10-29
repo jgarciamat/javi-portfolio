@@ -1,0 +1,205 @@
+/* The palette of the drawings, per theme (the chart's background is dark or white). */
+:root {
+  --cc-draw-yellow: #facc15;
+  --cc-draw-cyan: #22d3ee;
+  --cc-draw-pink: #f472b6;
+  --cc-draw-orange: #fb923c;
+  --cc-draw-white: #f8fafc;
+  --cc-draw-halo: #0f172a;
+}
+
+:root[data-theme='light'] {
+  --cc-draw-yellow: #a16207;
+  --cc-draw-cyan: #0e7490;
+  --cc-draw-pink: #be185d;
+  --cc-draw-orange: #c2410c;
+  --cc-draw-white: #0f172a;
+  --cc-draw-halo: #ffffff;
+}
+
+/* The drawing bar: square icon buttons, the colours as swatches, always the same size. */
+.cc-draw {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cc-draw-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--slate-700);
+  border-radius: 6px;
+  background: var(--slate-800);
+  color: var(--cc-text);
+  cursor: pointer;
+}
+
+.cc-draw-btn:hover:not(:disabled) {
+  border-color: var(--accent-400);
+}
+
+.cc-draw-btn[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.cc-draw-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cc-draw-btn:focus-visible,
+.cc-draw-color:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.cc-draw-sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 0.2rem;
+  background: var(--slate-700);
+}
+
+.cc-draw-colors {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.cc-draw-color {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 2px solid var(--slate-700);
+  border-radius: 50%;
+  background: var(--cc-draw);
+  cursor: pointer;
+}
+
+/* The chosen colour: a ring around it, not only its tone. */
+.cc-draw-color[aria-pressed='true'] {
+  border-color: var(--slate-950);
+  box-shadow: 0 0 0 2px var(--cc-draw);
+}
+
+.cc-draw-error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cc-text);
+}
+
+/*
+ * Over the chart's pane (inside its 1px border) and above the chart's own canvases (which have
+ * their z-index): off, every touch goes through to the chart.
+ */
+.cc-draw-layer {
+  position: absolute;
+  z-index: 3;
+  top: 1px;
+  left: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cc-draw-layer--on {
+  pointer-events: auto;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.cc-draw-layer--erase {
+  cursor: default;
+}
+
+/* A wide, invisible stroke around each line: easy to hit with a finger. */
+.cc-draw-hit {
+  stroke: transparent;
+  stroke-width: 16px;
+}
+
+.cc-draw-erasable {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.cc-draw-erasable:hover,
+.cc-draw-erasable:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 3px #fff);
+}
+
+.cc-draw-note,
+.cc-draw-price {
+  font:
+    600 13px/1 system-ui,
+    sans-serif;
+  paint-order: stroke;
+  stroke: var(--cc-draw-halo);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  dominant-baseline: hanging;
+}
+
+.cc-draw-price {
+  font-size: 11px;
+  dominant-baseline: auto;
+}
+
+.cc-draw-input {
+  position: absolute;
+  z-index: 5;
+  width: min(16rem, 70%);
+  min-height: 32px;
+  margin: 1px 0 0 1px;
+  padding: 0 0.5rem;
+  border: 2px solid var(--accent-400);
+  border-radius: 6px;
+  background: var(--slate-900);
+  color: var(--slate-50);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+/* What the tool in use expects, over the top left of the chart: nothing below moves. */
+.cc-draw-hint {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  z-index: 4;
+  max-width: calc(100% - 5rem);
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--accent-400);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--slate-900) 92%, transparent);
+  font-size: 0.75rem;
+  color: var(--cc-strong, var(--slate-50));
+  pointer-events: none;
+}
+
+.cc-draw-hint:empty {
+  display: none;
+}
+
+/* A phone on its side in full screen: the bar in one row that scrolls sideways if it must. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-chart--expanded .cc-draw {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .cc-chart--expanded .cc-draw-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+html.wiz-contrast .cc-draw-btn {
+  border: 2px solid var(--slate-100);
+}

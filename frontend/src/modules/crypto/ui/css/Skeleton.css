@@ -224,6 +224,31 @@
   height: 2.75rem;
 }
 
+/* The drawing bar, piece by piece as in Drawings.css (it wraps on the same widths). */
+.cc-skel-draw {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cc-skel-draw .cc-skel-tool {
+  width: 32px;
+  height: 32px;
+}
+
+.cc-skel-draw .cc-skel-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.cc-skel-draw i {
+  width: 1px;
+  height: 20px;
+  margin: 0 0.2rem;
+}
+
 .cc-skel-rotate {
   display: none;
   height: 11.9375rem;

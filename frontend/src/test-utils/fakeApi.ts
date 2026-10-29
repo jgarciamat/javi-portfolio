@@ -3,6 +3,7 @@ import * as f from './fixtures';
 import { PREMIUM_TERMS, premiumContent } from './learn';
 import * as crypto from './crypto';
 import type { CryptoInterval } from '@modules/crypto/domain/types';
+import type { Drawing } from '@modules/crypto/domain/drawings';
 
 type Mocked<T> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R ? jest.Mock<R, A> : T[K];
@@ -124,6 +125,10 @@ function fakeCryptoApi(): FakeApi['cryptoApi'] {
     alerts: ok(crypto.alerts()),
     createAlert: ok(crypto.alerts()),
     deleteAlert: ok(crypto.alerts()),
+    drawings: jest.fn((symbol: string) => Promise.resolve(crypto.drawings(symbol))),
+    saveDrawings: jest.fn((symbol: string, list: Drawing[]) =>
+      Promise.resolve(crypto.drawings(symbol, list))
+    ),
   };
 }
 
