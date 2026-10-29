@@ -212,6 +212,43 @@ resistencias** (giros con 3 velas a cada lado, agrupados al 0,5 %, hasta 3 de ca
 `aria-pressed`, su color, su valor (dentro del chip o en el `title`) y preferencia en
 `mm_crypto_layers`. Nada de flechas, señales ni proyecciones.
 
+## Herramientas de dibujo (octubre de 2026)
+
+Barra fija encima de la gráfica (también en pantalla completa): **línea de tendencia** (arrastrar
+o dos toques), **línea horizontal** (un toque, con su precio), **zona** (rectángulo: arrastrar o
+dos toques), **nota de texto** (toque y escribir, 60 caracteres), **goma** (borra el dibujo que
+se toque o, con teclado, cada dibujo es un botón), **deshacer** (también Ctrl+Z / ⌘Z, 30 pasos
+por moneda mientras la consola está abierta), **borrar todo** (se puede deshacer) y una paleta
+de 5 colores con nombre (`aria-pressed`). Botones de 32 px con `aria-label` y `title`; la barra
+mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
+
+- **Modo dibujo explícito**: solo con una herramienta pulsada la capa SVG toma el ratón o el dedo
+  (`touch-action: none`); sin herramienta no toca nada y la gráfica se arrastra y amplía como
+  siempre. Tras cada dibujo se vuelve al modo normal (la goma sigue hasta salir). Escape o volver
+  a pulsar la herramienta salen; Escape con herramienta no cierra la pantalla completa (salvo la
+  pantalla completa nativa del navegador, que se queda la tecla). Con el foco en la gráfica,
+  Intro dibuja la herramienta en las últimas velas.
+- **Anclaje a datos**: cada punto es `{ time, price }`: hora en ms UTC y precio en **euros** (la
+  moneda en la que llegan todos los precios de la consola, como el simulador y las alertas). El
+  dólar es solo una conversión de pantalla con el mismo cambio que las velas, así que un dibujo
+  queda sobre las mismas velas en EUR y en USD. La hora se convierte en índice lógico de la
+  gráfica interpolando entre velas (y extrapolando fuera de ellas), por lo que el dibujo sigue en
+  su sitio al ampliar, desplazar o cambiar de temporalidad.
+- **Rendimiento**: un único SVG del tamaño del panel (máx. 50 dibujos); se recoloca solo cuando
+  la gráfica se pinta con otra escala (una primitiva de la serie compara unas pocas coordenadas
+  de referencia en cada pintado).
+- **Colores**: variables `--cc-draw-*` por tema (contraste de 4,5:1 o más en claro y oscuro);
+  «Neutro» es blanco en oscuro y casi negro en claro.
+- **Por moneda y en el servidor**: cada moneda tiene su lista (`GET`/`PUT
+/crypto/drawings/:symbol`, la lista entera; vacía borra la fila). La app pide una moneda la
+  primera vez que se ve, guarda 0,6 s después de cada cambio y otra vez al salir de la página;
+  gana el último guardado. Si no se pueden cargar, las herramientas quedan desactivadas (no se
+  pisa lo guardado) con «Reintentar». Gratis para todos, como las capas.
+- **Límites**: 50 dibujos por moneda, notas de 1 a 60 caracteres sin caracteres de control, ids
+  de la app (`[\w-]{1,40}`), 1 o 2 puntos según el tipo, horas entre 2009 y 2100, precio
+  positivo; `zod` estricto. Guardados: 60 por minuto y persona (lecturas aparte, 120).
+- Capturas en `docs/consola-dibujo/`.
+
 ## Panel «Aprende antes de jugar»
 
 Ya no es un modal: es un **panel desplegable** bajo la gráfica (`ui/Learn.tsx`, `css/Learn.css`)
@@ -552,6 +589,11 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   operaciones en curso (posiciones abiertas y pendientes de entrada) se numeran por cartera y
   moneda en el orden en que empezaron; las cerradas y el TP/SL vinculados quedan en `NULL`.
 
+## Migración 043
+
+- `crypto_drawings (user_id, symbol, drawings JSON, updated_at)`, clave `(user_id, symbol)`,
+  `ON DELETE CASCADE`. Aditiva.
+
 ## Persistencia y datos personales
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
@@ -559,6 +601,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   pendientes y patrimonio diario), `ranking` (alias elegido y contador de prácticas),
   `seasonResults`, `badges` y
   `priceAlerts`.
+- Los dibujos de la gráfica salen aparte, en `cryptoDrawings` (moneda, dibujos y fecha).
 
 ## API
 
@@ -575,6 +618,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `PUT /crypto/ranking/settings`                                           | `{ alias }` (cambia el alias; `optIn` de apps antiguas se acepta y se ignora)                    |
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
 | `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium)                                                                      |
+| `GET /crypto/drawings/:symbol`, `PUT /crypto/drawings/:symbol`           | Dibujos de la gráfica de una moneda (`{ drawings }`, la lista entera; gratis)                    |
 
 ## Interfaz
 
