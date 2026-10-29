@@ -57,8 +57,10 @@ import { FrankfurterRates } from './rates/FrankfurterRates';
 import { BinanceMarketData } from './market/BinanceMarketData';
 import { DemoMarketData } from './market/DemoMarketData';
 import { SqliteCryptoSimRepository } from './sqlite/repositories/SqliteCryptoSimRepository';
+import { SqliteCryptoDrawingRepository } from './sqlite/repositories/SqliteCryptoDrawingRepository';
 import { CryptoMarketService } from '@application/crypto/CryptoMarketService';
 import { CryptoAlertService } from '@application/crypto/CryptoAlertService';
+import { CryptoDrawingService } from '@application/crypto/CryptoDrawingService';
 import { CryptoRankingService } from '@application/crypto/CryptoRankingService';
 import { CryptoSimService } from '@application/crypto/CryptoSimService';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
@@ -182,6 +184,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
     cryptoSim: new SqliteCryptoSimRepository(db),
+    cryptoDrawings: new SqliteCryptoDrawingRepository(db),
     push: new SqlitePushRepository(db),
     inbox: new SqliteInboxRepository(db),
     renta: new SqliteRentaUsageRepository(db),
@@ -393,6 +396,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       uow,
       clock
     ),
+    cryptoDrawings: new CryptoDrawingService(repos.cryptoDrawings, clock),
     cryptoAlerts: new CryptoAlertService(
       repos.cryptoSim,
       market,

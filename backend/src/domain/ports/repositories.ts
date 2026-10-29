@@ -11,6 +11,7 @@ import { User } from '@domain/model/User';
 import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
+import { CryptoDrawing } from '@domain/services/crypto-drawings';
 import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { RuleMovement } from '@domain/services/recurring-match';
 import { SubscriptionCandidate } from '@domain/services/subscriptions';
@@ -778,6 +779,14 @@ export interface CryptoPriceAlert {
   price: number;
   createdAt: string;
   triggeredAt: string | null;
+}
+
+/** Chart drawings of the crypto console: one list per person and coin (migration 043). */
+export interface CryptoDrawingRepository {
+  get(userId: string, symbol: string): { drawings: CryptoDrawing[]; updatedAt: string } | null;
+  /** Replaces the list of that coin. */
+  save(userId: string, symbol: string, drawings: CryptoDrawing[], updatedAt: string): void;
+  remove(userId: string, symbol: string): void;
 }
 
 export interface CryptoSimRepository {
