@@ -505,6 +505,66 @@
   font-weight: 600;
 }
 
+/* «Registrada»: a trade registered by hand at a chosen entry (practice), told apart in words. */
+.cc-recorded {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.45rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--amber-300);
+  border: 1px dashed var(--amber-400);
+  background: color-mix(in srgb, var(--amber-500) 10%, transparent);
+  cursor: help;
+}
+
+/* «Register a trade I already opened» (practice): the same fields as an order, plus the moment. */
+.cc-mode {
+  margin: 0 0 0.6rem;
+}
+
+/* The two ways of opening can be long words on a phone: they wrap inside their button. */
+.cc-mode label {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.cc-record-intro {
+  margin: 0 0 0.6rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--cc-text);
+}
+
+.cc-record-time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cc-record-time input {
+  min-width: 0;
+  flex: 1 1 12rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background-color: var(--cc-field);
+  color: var(--cc-strong);
+  font: inherit;
+}
+
+.cc-check-warn {
+  color: var(--amber-300);
+}
+
+.cc-check-warn::before {
+  content: '⚠';
+}
+
 /* ─── Market ─── */
 
 /* Coins at the side of the price and the chart; the panel of the guide below, full width. The
@@ -2052,6 +2112,12 @@ html.wiz-contrast .cc-slot-note {
 
 html.wiz-contrast .cc-slot-note.is-full {
   color: var(--amber-300);
+}
+
+html.wiz-contrast .cc-recorded,
+html.wiz-contrast .cc-record-time input {
+  border-width: 2px;
+  color: var(--slate-50);
 }
 
 html.wiz-contrast .cc-layer[aria-pressed='true'] {

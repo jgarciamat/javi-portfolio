@@ -111,10 +111,13 @@ function entryProblems(i: OpenCheck): OrderProblem[] {
   return problems;
 }
 
-function exitProblems(i: OpenCheck, entry: number | null): OrderProblem[] {
+function exitProblems(
+  i: Pick<OpenCheck, 'direction' | 'takeProfit' | 'stopLoss'>,
+  entry: number | null
+): ('takeProfitSide' | 'stopLossSide')[] {
   if (entry === null) return [];
   const long = i.direction === 'long';
-  const problems: OrderProblem[] = [];
+  const problems: ('takeProfitSide' | 'stopLossSide')[] = [];
   if (
     !Number.isNaN(i.takeProfit) &&
     !(i.takeProfit > 0 && (long ? i.takeProfit > entry : i.takeProfit < entry))
@@ -203,3 +206,113 @@ export function exitProblem(
   const side = direction === 'long' ? 'sell' : 'buy';
   return fillsNow(side, kind === 'takeProfit' ? 'limit' : 'stop', price, current) ? 'side' : null;
 }
+
+/** «Register a trade I already opened»: how far back its entry may be (the same as the API). */
+export const RECORDED_MAX_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** A clock a few minutes ahead of the server's still counts as now (the same as the API). */
+const CLOCK_SKEW_MS = 5 * 60 * 1000;
+/** Share away from the current price past which a registered entry is pointed out (not refused). */
+export const RECORDED_FAR_SHARE = 0.5;
+/** The API refuses an entry further than this from the price (×100 either way), as any order. */
+const RANGE = 100;
+
+export type RecordProblem =
+  | Exclude<OrderProblem, 'fillsNow'>
+  | 'range'
+  | 'takeProfitReached'
+  | 'stopLossReached'
+  | 'liquidated'
+  | 'future'
+  | 'tooOld';
+
+export interface RecordCheck {
+  direction: Direction;
+  /** NaN when empty; every number in the same currency. */
+  amount: number;
+  entry: number;
+  current: number | null;
+  takeProfit: number;
+  stopLoss: number;
+  cash: number;
+  bps: number;
+  /** When it was opened (ms); null for now. */
+  openedAt: number | null;
+  now: number;
+}
+
+/** Problems of the moment of entry: never ahead of now, and no further back than 30 days. */
+function momentProblems(openedAt: number | null, now: number): RecordProblem[] {
+  if (openedAt === null) return [];
+  if (Number.isNaN(openedAt)) return ['future'];
+  if (openedAt > now + CLOCK_SKEW_MS) return ['future'];
+  return openedAt < now - RECORDED_MAX_DAYS * DAY_MS ? ['tooOld'] : [];
+}
+
+/**
+ * Entered now, what the price has already passed cannot be: a take profit or stop loss reached,
+ * or a short whose guarantee is used up. Entered before, the API checks it with the candles.
+ */
+function reachedProblems(
+  i: RecordCheck,
+  entry: number,
+  wrongSide: RecordProblem[]
+): RecordProblem[] {
+  if (i.openedAt !== null || i.current === null) return [];
+  const problems: RecordProblem[] = [];
+  // One on the wrong side of the entry already says what to change.
+  const reached = (kind: ExitKind, price: number) =>
+    !Number.isNaN(price) &&
+    !wrongSide.includes(`${kind}Side`) &&
+    exitProblem(i.direction, kind, price, i.current) === 'side';
+  if (reached('takeProfit', i.takeProfit)) problems.push('takeProfitReached');
+  if (reached('stopLoss', i.stopLoss)) problems.push('stopLossReached');
+  if (i.direction === 'short' && i.current >= liquidationPrice(entry)) problems.push('liquidated');
+  return problems;
+}
+
+/** Problems of the price, amount and entry (any price, though not absurdly far from now). */
+function recordEntryProblems(i: RecordCheck, entry: number | null): RecordProblem[] {
+  const problems: RecordProblem[] = [];
+  if (i.current === null) problems.push('noPrice');
+  if (!(i.amount >= 1)) problems.push('amount');
+  if (entry === null) problems.push('needPrice');
+  else if (i.current !== null && (entry < i.current / RANGE || entry > i.current * RANGE)) {
+    problems.push('range');
+  }
+  return problems;
+}
+
+/**
+ * Live checks of «Register a trade I already opened» and its figures: what it costs, what it
+ * gives at its take profit and stop loss and how it is doing now (the result it shows once
+ * registered). The entry may be any price: far from the current one it is only pointed out.
+ */
+export function checkRecord(i: RecordCheck) {
+  const entry = i.entry > 0 ? i.entry : null;
+  const problems = [...recordEntryProblems(i, entry), ...momentProblems(i.openedAt, i.now)];
+  const estimate = entry !== null && i.amount >= 1 ? buyEstimate(i.amount, entry, i.bps) : null;
+  if (estimate && estimate.total > i.cash) problems.push('cash');
+  const wrongSide = exitProblems(i, entry);
+  problems.push(...wrongSide);
+  if (entry !== null) problems.push(...reachedProblems(i, entry, wrongSide));
+  const short = i.direction === 'short' && entry !== null ? { entry, amount: i.amount } : undefined;
+  const exit = (price: number | null) =>
+    estimate && price !== null && price > 0
+      ? saleEstimate(estimate.quantity, price, estimate.total, i.bps, short)
+      : null;
+  return {
+    problems,
+    estimate,
+    far: isFar(entry, i.current),
+    liquidation: short ? liquidationPrice(short.entry) : null,
+    takeProfit: exit(i.takeProfit),
+    stopLoss: exit(i.stopLoss),
+    /** How it would be doing at the current price. */
+    now: exit(i.current),
+  };
+}
+
+/** An entry more than half away from the price now: pointed out, never refused. */
+const isFar = (entry: number | null, current: number | null): boolean =>
+  entry !== null && current !== null && Math.abs(entry / current - 1) > RECORDED_FAR_SHARE;

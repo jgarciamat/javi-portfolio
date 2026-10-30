@@ -3,7 +3,13 @@ import { useApi } from '@core/context/ApiContext';
 import { useAction, type Action } from '@shared/hooks/useAction';
 import { errorMessage } from '@shared/utils/errors';
 import { storage } from '@shared/utils/storage';
-import type { ExitsRequest, OrderRequest, SimFill, SimPortfolio } from '../domain/types';
+import type {
+  ExitsRequest,
+  OrderRequest,
+  RecordRequest,
+  SimFill,
+  SimPortfolio,
+} from '../domain/types';
 import { MARKET_REFRESH_MS } from './useCryptoMarket';
 import { usePolling } from './usePolling';
 
@@ -19,6 +25,11 @@ export interface Simulator {
   /** Another portfolio is on its way (the console waits for it whole, as on the first visit). */
   switching: boolean;
   place: (order: OrderRequest) => Promise<boolean>;
+  /**
+   * «Register a trade I already opened» in the practice portfolio on screen: the fills of the
+   * answer (its take profit or stop loss reached since the entry), or null when it was refused.
+   */
+  record: (trade: RecordRequest) => Promise<SimFill[] | null>;
   cancel: (id: string) => Promise<boolean>;
   /** Take profit and stop loss of an open position (null removes it). */
   setExits: (positionId: string, exits: ExitsRequest) => Promise<boolean>;
@@ -100,6 +111,15 @@ export function useSimulator(fallback: string): Simulator {
           portfolio?.portfolio.kind === 'practice' ? { ...order, portfolioId: current() } : order
         )
       ),
+    record: async (trade) => {
+      let fills: SimFill[] = [];
+      const done = await run(async () => {
+        const next = await cryptoApi.recordTrade(current(), trade);
+        fills = next.fills;
+        return next;
+      });
+      return done ? fills : null;
+    },
     cancel: (id) => run(() => cryptoApi.cancelOrder(id)),
     setExits: (id, exits) => run(() => cryptoApi.setExits(id, exits)),
     select: (id) => swap(() => cryptoApi.portfolio(id)),
