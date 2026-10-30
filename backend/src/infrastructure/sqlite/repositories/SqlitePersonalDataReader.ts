@@ -166,7 +166,7 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
           `SELECT p.id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents,
                   entry_fee_cents, open_type AS openType, opened_at AS openedAt,
                   exit_price AS exitPrice, exit_fee_cents, proceeds_cents, pnl_cents,
-                  close_type AS closeType, closed_at AS closedAt,
+                  close_type AS closeType, closed_at AS closedAt, recorded,
                   x.transaction_id AS addedAsMovementId, x.created_at AS addedToAccountAt
            FROM crypto_sim_positions p
            LEFT JOIN crypto_sim_transfers x ON x.position_id = p.id
@@ -174,8 +174,17 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
           userId,
           id
         ).map(
-          ({ amount_cents, entry_fee_cents, exit_fee_cents, proceeds_cents, pnl_cents, ...o }) => ({
+          ({
+            amount_cents,
+            entry_fee_cents,
+            exit_fee_cents,
+            proceeds_cents,
+            pnl_cents,
+            recorded,
+            ...o
+          }) => ({
             ...o,
+            recordedByHand: recorded === 1,
             invested: money(amount_cents),
             entryFee: money(entry_fee_cents),
             exitFee: money(exit_fee_cents),

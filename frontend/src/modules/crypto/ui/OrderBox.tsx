@@ -3,12 +3,24 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatQuantity, intlTag, pnl } from '../domain/format';
 import { AMOUNT_SHARES, amountForShare, checkOpen, coinSlots, feeOf } from '../domain/orders';
-import type { Direction, OrderRequest, SimPortfolio, TradeType } from '../domain/types';
+import type {
+  Direction,
+  OrderRequest,
+  RecordRequest,
+  SimFill,
+  SimPortfolio,
+  TradeType,
+} from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
+import { ExitFields, Segmented, UnitField } from './OrderFields';
+import { RecordForm } from './RecordTrade';
 
 const DIRECTIONS: Direction[] = ['long', 'short'];
 const TYPES: TradeType[] = ['market', 'limit', 'stop'];
+/** A practice portfolio also takes trades opened somewhere else, at the entry the person gives. */
+type Mode = 'order' | 'record';
+const MODES: Mode[] = ['order', 'record'];
 
 /** No play money left: the history stays (and the season offers a practice portfolio). */
 function EmptyCash({ practice }: { practice?: ReactNode }) {
@@ -33,84 +45,8 @@ interface OrderBoxProps {
   onGuide: () => void;
   /** What to do when the money ran out (the official season offers a practice portfolio). */
   practice?: ReactNode;
-}
-
-function Segmented<T extends string>({
-  name,
-  legend,
-  options,
-  value,
-  label,
-  title,
-  onChange,
-}: {
-  name: string;
-  legend: string;
-  options: T[];
-  value: T;
-  label: (option: T) => ReactNode;
-  title?: (option: T) => string;
-  onChange: (option: T) => void;
-}) {
-  return (
-    <fieldset className={`cc-segmented cc-segmented--wide cc-${name}`}>
-      <legend className="cc-label">{legend}</legend>
-      {options.map((option) => (
-        <label
-          key={option}
-          className={option === value ? `is-on cc-${option}` : `cc-${option}`}
-          title={title?.(option)}
-        >
-          <input
-            type="radio"
-            name={`cc-${name}`}
-            value={option}
-            checked={option === value}
-            onChange={() => onChange(option)}
-          />
-          {label(option)}
-        </label>
-      ))}
-    </fieldset>
-  );
-}
-
-/** A number field with its unit (€ or $) shown inside. */
-function UnitField({
-  label,
-  unit,
-  value,
-  onChange,
-  hint,
-  children,
-}: {
-  label: string;
-  unit: string;
-  value: string;
-  onChange: (value: string) => void;
-  hint?: string;
-  children?: ReactNode;
-}) {
-  const id = useId();
-  return (
-    <div className="cc-field">
-      <label className="cc-label" htmlFor={id}>
-        {label}
-      </label>
-      <div className="cc-unit-input">
-        <input
-          id={id}
-          inputMode="decimal"
-          autoComplete="off"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        <span aria-hidden="true">{unit}</span>
-      </div>
-      {hint && <p className="cc-hint">{hint}</p>}
-      {children}
-    </div>
-  );
+  /** «Register a trade I already opened» (practice portfolios only). */
+  onRecord?: (trade: RecordRequest) => Promise<SimFill[] | null>;
 }
 
 interface Line {
@@ -215,42 +151,6 @@ function FeeInfo({ fee, bps, onGuide }: { fee: number; bps: number; onGuide: () 
           {t('app.crypto.order.fee.guide')}
         </button>
       </div>
-    </div>
-  );
-}
-
-/** Take profit and stop loss, both optional, with where each one goes for the direction. */
-function ExitFields({
-  direction,
-  takeProfit,
-  stopLoss,
-  onTakeProfit,
-  onStopLoss,
-}: {
-  direction: Direction;
-  takeProfit: string;
-  stopLoss: string;
-  onTakeProfit: (value: string) => void;
-  onStopLoss: (value: string) => void;
-}) {
-  const { t } = useI18n();
-  const money = useMoney();
-  return (
-    <div className="cc-order-fields cc-exits">
-      <UnitField
-        label={t('app.crypto.order.takeProfit')}
-        unit={money.symbol}
-        value={takeProfit}
-        onChange={onTakeProfit}
-        hint={t(`app.crypto.order.takeProfitHint.${direction}`)}
-      />
-      <UnitField
-        label={t('app.crypto.order.stopLoss')}
-        unit={money.symbol}
-        value={stopLoss}
-        onChange={onStopLoss}
-        hint={t(`app.crypto.order.stopLossHint.${direction}`)}
-      />
     </div>
   );
 }
@@ -395,7 +295,44 @@ function SlotNote({
  * Positions are closed from the «Open» panel.
  */
 export function OrderBox(props: OrderBoxProps) {
-  const { symbol, coinName, price, portfolio, busy, onPlace, onGuide, practice } = props;
+  const { symbol, coinName, price, portfolio, busy, onRecord } = props;
+  const { t } = useI18n();
+  const [mode, setMode] = useState<Mode>('order');
+  const recording = !!onRecord && portfolio.portfolio.kind === 'practice';
+  return (
+    <section className="card cc-order" aria-labelledby="cc-order-title">
+      <OrderHead symbol={symbol} coinName={coinName} price={price} />
+      <Strips portfolio={portfolio} />
+      {portfolio.account.cash < 1 && <EmptyCash practice={props.practice} />}
+      {recording && (
+        <Segmented
+          name="mode"
+          legend={t('app.crypto.record.mode')}
+          options={MODES}
+          value={mode}
+          label={(o) => t(`app.crypto.record.modes.${o}`)}
+          onChange={setMode}
+        />
+      )}
+      {recording && mode === 'record' ? (
+        <RecordForm
+          symbol={symbol}
+          coinName={coinName}
+          price={price}
+          portfolio={portfolio}
+          busy={busy}
+          onRecord={onRecord}
+        />
+      ) : (
+        <OrderForm {...props} />
+      )}
+    </section>
+  );
+}
+
+/** A new order against the market: now, at a limit or at a stop. */
+function OrderForm(props: OrderBoxProps) {
+  const { symbol, coinName, price, portfolio, busy, onPlace, onGuide } = props;
   const { t } = useI18n();
   const money = useMoney();
   const [direction, setDirection] = useState<Direction>('long');
@@ -447,106 +384,100 @@ export function OrderBox(props: OrderBoxProps) {
   };
 
   return (
-    <section className="card cc-order" aria-labelledby="cc-order-title">
-      <OrderHead symbol={symbol} coinName={coinName} price={price} />
-      <Strips portfolio={portfolio} />
-      {account.cash < 1 && <EmptyCash practice={practice} />}
-
-      <form onSubmit={(e) => void submit(e)} noValidate>
-        <div className="cc-order-controls">
-          <Segmented
-            name="direction"
-            legend={t('app.crypto.order.direction')}
-            options={DIRECTIONS}
-            value={direction}
-            label={(o) => (
-              <>
-                <span aria-hidden="true">{o === 'long' ? '▲' : '▼'}</span>{' '}
-                {t(`app.crypto.order.directions.${o}`)}
-              </>
-            )}
-            title={(o) => t(`app.crypto.order.directionHint.${o}`)}
-            onChange={setDirection}
-          />
-          <Segmented
-            name="type"
-            legend={t('app.crypto.order.type')}
-            options={TYPES}
-            value={type}
-            label={(o) => t(`app.crypto.order.types.${o}`)}
-            onChange={setType}
-          />
-        </div>
-        <p className="cc-hint">{t(`app.crypto.order.directionHint.${direction}`)}</p>
-        <p className="cc-helps">
-          <Help term={type} label={t(`app.crypto.help.${type}`)} />
-          {direction === 'short' && <Help term="short" label={t('app.crypto.help.short')} />}
-        </p>
-
-        <div className="cc-order-fields">
-          <UnitField
-            label={t('app.crypto.order.capital')}
-            unit={money.symbol}
-            value={amount}
-            onChange={setAmount}
-            hint={t('app.crypto.order.available', { amount: money.amount(account.cash) })}
-          >
-            <div className="cc-quick" role="group" aria-label={t('app.crypto.order.quick')}>
-              {AMOUNT_SHARES.map((share) => (
-                <button
-                  key={share}
-                  type="button"
-                  className="cc-chip"
-                  onClick={() => setAmount(String(amountForShare(cash, share, bps)))}
-                >
-                  {share} %
-                </button>
-              ))}
-            </div>
-          </UnitField>
-          {pending ? (
-            <UnitField
-              label={t(`app.crypto.order.priceLabel.${direction}.${type}`)}
-              unit={money.symbol}
-              value={limit}
-              onChange={setLimit}
-            />
-          ) : (
-            <div className="cc-field">
-              <span className="cc-label">{t('app.crypto.order.entry')}</span>
-              <p className="cc-auto">
-                {price === null ? '—' : money.price(price)}{' '}
-                <small>{t('app.crypto.order.automatic')}</small>
-              </p>
-            </div>
+    <form onSubmit={(e) => void submit(e)} noValidate>
+      <div className="cc-order-controls">
+        <Segmented
+          name="direction"
+          legend={t('app.crypto.order.direction')}
+          options={DIRECTIONS}
+          value={direction}
+          label={(o) => (
+            <>
+              <span aria-hidden="true">{o === 'long' ? '▲' : '▼'}</span>{' '}
+              {t(`app.crypto.order.directions.${o}`)}
+            </>
           )}
-        </div>
-
-        <ExitFields
-          direction={direction}
-          takeProfit={takeProfit}
-          stopLoss={stopLoss}
-          onTakeProfit={setTakeProfit}
-          onStopLoss={setStopLoss}
+          title={(o) => t(`app.crypto.order.directionHint.${o}`)}
+          onChange={setDirection}
         />
+        <Segmented
+          name="type"
+          legend={t('app.crypto.order.type')}
+          options={TYPES}
+          value={type}
+          label={(o) => t(`app.crypto.order.types.${o}`)}
+          onChange={setType}
+        />
+      </div>
+      <p className="cc-hint">{t(`app.crypto.order.directionHint.${direction}`)}</p>
+      <p className="cc-helps">
+        <Help term={type} label={t(`app.crypto.help.${type}`)} />
+        {direction === 'short' && <Help term="short" label={t('app.crypto.help.short')} />}
+      </p>
 
-        <BeforeOpening {...{ check, symbol, direction, bps, onGuide }} />
-
-        <button
-          type="submit"
-          className={`cc-submit cc-submit--${direction}`}
-          disabled={busy || check.problems.length > 0 || slots.full}
-          aria-describedby={slots.used > 0 ? noteId : undefined}
+      <div className="cc-order-fields">
+        <UnitField
+          label={t('app.crypto.order.capital')}
+          unit={money.symbol}
+          value={amount}
+          onChange={setAmount}
+          hint={t('app.crypto.order.available', { amount: money.amount(account.cash) })}
         >
-          {t(`app.crypto.order.submit.${direction}`)}
-        </button>
-        <SlotNote id={noteId} symbol={symbol} slots={slots} />
-        {done && (
-          <p className="section-success" role="status">
-            {done}
-          </p>
+          <div className="cc-quick" role="group" aria-label={t('app.crypto.order.quick')}>
+            {AMOUNT_SHARES.map((share) => (
+              <button
+                key={share}
+                type="button"
+                className="cc-chip"
+                onClick={() => setAmount(String(amountForShare(cash, share, bps)))}
+              >
+                {share} %
+              </button>
+            ))}
+          </div>
+        </UnitField>
+        {pending ? (
+          <UnitField
+            label={t(`app.crypto.order.priceLabel.${direction}.${type}`)}
+            unit={money.symbol}
+            value={limit}
+            onChange={setLimit}
+          />
+        ) : (
+          <div className="cc-field">
+            <span className="cc-label">{t('app.crypto.order.entry')}</span>
+            <p className="cc-auto">
+              {price === null ? '—' : money.price(price)}{' '}
+              <small>{t('app.crypto.order.automatic')}</small>
+            </p>
+          </div>
         )}
-      </form>
-    </section>
+      </div>
+
+      <ExitFields
+        direction={direction}
+        takeProfit={takeProfit}
+        stopLoss={stopLoss}
+        onTakeProfit={setTakeProfit}
+        onStopLoss={setStopLoss}
+      />
+
+      <BeforeOpening {...{ check, symbol, direction, bps, onGuide }} />
+
+      <button
+        type="submit"
+        className={`cc-submit cc-submit--${direction}`}
+        disabled={busy || check.problems.length > 0 || slots.full}
+        aria-describedby={slots.used > 0 ? noteId : undefined}
+      >
+        {t(`app.crypto.order.submit.${direction}`)}
+      </button>
+      <SlotNote id={noteId} symbol={symbol} slots={slots} />
+      {done && (
+        <p className="section-success" role="status">
+          {done}
+        </p>
+      )}
+    </form>
   );
 }

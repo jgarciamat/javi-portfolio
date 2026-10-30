@@ -90,6 +90,7 @@ function fakeCryptoApi(): FakeApi['cryptoApi'] {
     live: silentLive(),
     portfolio: ok(crypto.portfolio()),
     placeOrder: ok(crypto.portfolio()),
+    recordTrade: ok(crypto.portfolio()),
     cancelOrder: ok(crypto.portfolio()),
     setExits: ok(crypto.portfolio()),
     addToAccount: ok(crypto.portfolio()),

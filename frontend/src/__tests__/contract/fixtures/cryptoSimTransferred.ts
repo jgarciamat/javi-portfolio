@@ -47,6 +47,7 @@ export const cryptoSimTransferred = {
       closeType: 'market',
       openedAt: '2026-03-15T12:05:00.000Z',
       closedAt: '2026-03-15T12:05:00.000Z',
+      recorded: false,
       transfer: {
         accountId: '00000000-0000-4000-8000-000000000004',
         accountName: 'Criptomonedas',

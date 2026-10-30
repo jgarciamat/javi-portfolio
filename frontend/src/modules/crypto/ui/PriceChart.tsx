@@ -31,6 +31,7 @@ import { DrawBar, DrawSummary, DrawSurface, useDrawTools } from './ChartDrawings
 import { ChartFrame, HINT_KEY } from './ConsoleSkeleton';
 import { LayerBar } from './LayerBar';
 import { useMoney } from './money';
+import { useOnScreen } from './useOnScreen';
 import { useCandleChart, type CandleChart, type ChartLine } from './useCandleChart';
 import './css/PriceChart.css';
 
@@ -414,31 +415,6 @@ function Stage({ loading, children }: { loading?: boolean; children: ReactNode }
 /** In full screen the chart is a dialog that holds the focus. */
 const dialogProps = (expanded: boolean, name: string) =>
   expanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': name } : {};
-
-/**
- * Tells `onScreen` whether the chart is in the viewport (also in full screen, where it is the
- * element shown); without IntersectionObserver it counts as on screen. Off when it goes.
- */
-function useOnScreen(
-  root: RefObject<HTMLDivElement | null>,
-  onScreen?: (visible: boolean) => void
-) {
-  useEffect(() => {
-    if (!onScreen) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      onScreen(true);
-      return () => onScreen(false);
-    }
-    const observer = new IntersectionObserver((entries) =>
-      onScreen(entries[entries.length - 1].isIntersecting)
-    );
-    observer.observe(root.current!);
-    return () => {
-      observer.disconnect();
-      onScreen(false);
-    };
-  }, [root, onScreen]);
-}
 
 /** Full screen: the browser's own when it allows it, turned sideways on phones that let us. */
 function useFullScreen(root: RefObject<HTMLDivElement | null>) {

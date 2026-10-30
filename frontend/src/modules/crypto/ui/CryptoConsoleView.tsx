@@ -9,6 +9,7 @@ import { useLayers } from '../application/useLayers';
 import { useAlerts, useRanking, type Ranking } from '../application/useRanking';
 import { useAccountTransfer } from '../application/useAccountTransfer';
 import { useSimulator, type Simulator } from '../application/useSimulator';
+import { withLivePrice } from '../domain/live';
 import { withSlot } from '../domain/orders';
 import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
@@ -61,9 +62,10 @@ export function fillText(f: SimFill, t: Translate, price: (euros: number) => str
   if (f.type === 'expired') return t('app.crypto.fills.expired', vars);
   if (f.type === 'liquidation') return t('app.crypto.fills.liquidation', vars);
   const opening = (f.side === 'buy') === (f.direction === 'long');
-  return opening
-    ? t(`app.crypto.fills.opened.${f.direction}`, vars)
-    : t(`app.crypto.fills.closed.${f.type}`, vars);
+  if (opening) return t(`app.crypto.fills.opened.${f.direction}`, vars);
+  const closed = t(`app.crypto.fills.closed.${f.type}`, vars);
+  // Take profit and stop loss reached in one candle: which came first is unknown.
+  return f.sameCandle ? `${closed} ${t('app.crypto.fills.sameCandle')}` : closed;
 }
 
 function FillsNotice({ fills }: { fills: SimFill[] }) {
@@ -149,12 +151,15 @@ function SimulatorBody({
   symbol,
   coin,
   onGlossary,
+  onOpenScreen,
 }: {
   portfolio: SimPortfolio;
   sim: Simulator;
   symbol: string;
   coin: CryptoCoin | undefined;
   onGlossary: () => void;
+  /** Told whether the open trades are on screen (the live tick moves their results). */
+  onOpenScreen: (visible: boolean) => void;
 }) {
   const busy = sim.action.pending;
   const transfer = useAccountTransfer(sim);
@@ -167,6 +172,7 @@ function SimulatorBody({
         portfolio={portfolio}
         busy={busy}
         onPlace={sim.place}
+        onRecord={sim.record}
         onGuide={onGlossary}
         practice={
           outOfBalance(portfolio) ? <PracticeOffer portfolio={portfolio} sim={sim} /> : undefined
@@ -180,6 +186,7 @@ function SimulatorBody({
         busy={busy}
         onPlace={sim.place}
         onSetExits={sim.setExits}
+        onScreen={onOpenScreen}
       />
       <PendingPanel
         orders={portfolio.pending}
@@ -253,6 +260,21 @@ function quotedCoin(market: ReturnType<typeof useCryptoMarket>, symbol: string) 
   const quote =
     market.candles?.quote ?? market.coins?.coins.find((c) => c.symbol === symbol)?.quote;
   return quote ? { symbol, quote } : null;
+}
+
+/** Whether the portfolio has an open trade of the coin (its result follows the live price). */
+const holds = (p: SimPortfolio | null, symbol: string): boolean =>
+  !!p && p.open.some((o) => o.symbol === symbol);
+
+/** Between two answers of the API, the open trades of the coin move with its live price. */
+function useLiveTrades(
+  p: SimPortfolio | null,
+  symbol: string,
+  coin: CryptoCoin | undefined,
+  at: string | null
+): SimPortfolio | null {
+  const price = coin?.price;
+  return useMemo(() => p && withLivePrice(p, symbol, price, at), [p, symbol, price, at]);
 }
 
 /** Longest wait for the whole console before saying what is missing (the requests go on). */
@@ -338,15 +360,17 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
   const [view, setView] = useState(savedView);
   const guide = useGuide();
   const [layers, toggleLayer] = useLayers();
-  // The live tick (every 2 s) only while the chart is on screen.
+  // The live tick (every 2 s) while the chart is on screen, or the open trades with one of the
+  // coin on screen (their result follows it).
   const [chartOnScreen, setChartOnScreen] = useState(false);
+  const [openOnScreen, setOpenOnScreen] = useState(false);
+  const sim = useSimulator(t('app.crypto.sim.error'));
   const market = useCryptoMarket(
     view.symbol,
     view.interval,
     t('app.crypto.market.error'),
-    chartOnScreen
+    chartOnScreen || (openOnScreen && holds(sim.portfolio, view.symbol))
   );
-  const sim = useSimulator(t('app.crypto.sim.error'));
   // Asked for once the portfolio of the month is there (the server starts it on the first visit).
   const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
   // «Invite a friend» of the menu, the same programme: without an answer nothing is offered.
@@ -360,6 +384,7 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
     () => chartLines(sim.portfolio, view.symbol, t, money),
     [sim.portfolio, view.symbol, t, money]
   );
+  const live = useLiveTrades(sim.portfolio, view.symbol, coin, market.live.at);
   const marketReady = useMarketReady(market);
   const ready = allThere(marketReady, sim, ranking, !referral.loading);
   const { shown, late } = useFirstPaint(ready, sim.switching);
@@ -370,7 +395,7 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
     storage.set(VIEW_KEY, JSON.stringify(value));
   };
 
-  if (!shown || !sim.portfolio) {
+  if (!shown || !live) {
     return (
       <div className="section-view cc">
         <RiskBanner />
@@ -389,9 +414,9 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
         usdPerEur={rate}
       />
       <RankingIntro ranking={ranking.ranking} />
-      <SeasonPanel portfolio={sim.portfolio} sim={sim} />
-      <InviteNudge portfolio={sim.portfolio} ranking={ranking.ranking} referral={referral.data} />
-      <SimulatorHead portfolio={sim.portfolio} sim={sim} />
+      <SeasonPanel portfolio={live} sim={sim} />
+      <InviteNudge portfolio={live} ranking={ranking.ranking} referral={referral.data} />
+      <SimulatorHead portfolio={live} sim={sim} />
       <MarketPanel
         view={view}
         market={market}
@@ -407,14 +432,15 @@ function Console({ currency, onRetry }: { currency: DisplayChoice; onRetry: () =
         onChartScreen={setChartOnScreen}
       />
       <SimulatorBody
-        portfolio={sim.portfolio}
+        portfolio={live}
         sim={sim}
         symbol={view.symbol}
         coin={coin}
         onGlossary={() => guide.show('glossary')}
+        onOpenScreen={setOpenOnScreen}
       />
       <SeasonExtras
-        portfolio={sim.portfolio}
+        portfolio={live}
         coins={market.coins?.coins ?? []}
         ranking={ranking}
         referral={referral.data}

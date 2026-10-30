@@ -43,6 +43,7 @@ const closed = (pnl: number): ClosedTrade => ({
   closeType: 'limit',
   openedAt: '2026-03-10T12:00:00.000Z',
   closedAt: '2026-03-11T12:00:00.000Z',
+  recorded: false,
   transfer: null,
 });
 const result = (r: Partial<SeasonResult> = {}): SeasonResult => ({

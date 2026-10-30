@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatDateTime, formatQuantity, pnl } from '../domain/format';
@@ -23,6 +23,7 @@ import type { AccountTransfer } from '../application/useAccountTransfer';
 import { AddToAccount } from './AddToAccount';
 import { useMoney } from './money';
 import { Help } from './Notices';
+import { useOnScreen } from './useOnScreen';
 
 type Place = (order: OrderRequest) => Promise<boolean>;
 type SetExits = (positionId: string, exits: ExitsRequest) => Promise<boolean>;
@@ -56,6 +57,20 @@ export function SlotBadge({ slot }: { slot: Slot }) {
     <span className={`cc-slot cc-slot--${slot % 2 ? 'odd' : 'even'}`}>
       <span aria-hidden="true">#{slot}</span>
       <span className="sr-only">{t('app.crypto.slot.label', { n: slot })}</span>
+    </span>
+  );
+}
+
+/**
+ * «Registrada»: a trade registered by hand at the entry the person chose (practice only), not
+ * opened against the market in the console. The words say it; its hint tells why.
+ */
+export function RecordedBadge({ recorded }: { recorded: boolean }) {
+  const { t } = useI18n();
+  if (!recorded) return null;
+  return (
+    <span className="cc-recorded" title={t('app.crypto.record.badgeHint')}>
+      {t('app.crypto.record.badge')}
     </span>
   );
 }
@@ -532,6 +547,7 @@ function OpenCard({
           <DirectionBadge direction={trade.direction} />
           <b>{trade.symbol}</b>
           <SlotBadge slot={trade.slot} />
+          <RecordedBadge recorded={trade.recorded} />
         </span>
         <small className="cc-sub">
           {formatQuantity(trade.quantity, locale)} · {formatDateTime(trade.openedAt, locale)}
@@ -622,6 +638,7 @@ export function OpenPanel({
   busy,
   onPlace,
   onSetExits,
+  onScreen,
 }: {
   trades: OpenTrade[];
   pending: PendingOrder[];
@@ -629,9 +646,13 @@ export function OpenPanel({
   busy: boolean;
   onPlace: Place;
   onSetExits: SetExits;
+  /** Told whether the panel is on screen (the live price moves its results meanwhile). */
+  onScreen?: (visible: boolean) => void;
 }) {
   const { t } = useI18n();
   const page = usePage(trades);
+  const root = useRef<HTMLElement>(null);
+  useOnScreen(root, onScreen);
   const [done, setDone] = useState<string | null>(null);
   const close = async (trade: OpenTrade) => {
     setDone(null);
@@ -640,7 +661,7 @@ export function OpenPanel({
     }
   };
   return (
-    <section className="card cc-panel" aria-labelledby="cc-open-title">
+    <section ref={root} className="card cc-panel" aria-labelledby="cc-open-title">
       <h2 id="cc-open-title" className="section-title">
         {t('app.crypto.trades.openTitle', { count: trades.length })}
       </h2>
@@ -823,6 +844,7 @@ export function ClosedPanel({
                     <DirectionBadge direction={trade.direction} />
                     <b>{trade.symbol}</b>
                     <SlotBadge slot={trade.slot} />
+                    <RecordedBadge recorded={trade.recorded} />
                   </span>
                   <small className="cc-sub">
                     {formatQuantity(trade.quantity, locale)} ·{' '}

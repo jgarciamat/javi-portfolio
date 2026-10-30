@@ -53,6 +53,7 @@ const openRow = (
   closeType: null,
   closedAt: null,
   slot,
+  recorded: false,
 });
 
 describe('Crypto console', () => {
@@ -336,6 +337,7 @@ describe('Crypto console', () => {
           price: 45_000,
           at: '2026-03-15T12:02:00.000Z',
           slot: 1,
+          sameCandle: false,
         },
       ]);
       expect(body.open[0]).toMatchObject({
@@ -494,6 +496,7 @@ describe('Crypto console', () => {
           closeType: null,
           closedAt: null,
           slot: null,
+          recorded: false,
         });
       }
       const full = await buy({ amount: 10 }).expect(400);

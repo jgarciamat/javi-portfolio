@@ -718,6 +718,11 @@ export interface CryptoSimPosition {
   closedAt: string | null;
   /** Its number among the operations of the coin (#1, #2); null on the oldest closed ones. */
   slot: number | null;
+  /**
+   * Registered by hand (practice only): opened at the entry price and moment the person gave,
+   * not against the market (`openType` is then `market`).
+   */
+  recorded: boolean;
 }
 
 /** An order waiting for a price: a purchase (`amountCents`) or the sale of `positionId`. */
@@ -877,7 +882,10 @@ export interface CryptoSimRepository {
   claimSeasonClose(season: string, at: string): boolean;
   badges(userId: string): { badge: string; earnedAt: string }[];
   addBadge(userId: string, badge: string, at: string): void;
-  /** Operations of every portfolio of the user: opened, closed and closed at a take profit. */
+  /**
+   * Operations of every portfolio of the user: opened, closed and closed at a take profit. The
+   * ones registered by hand do not count (their entry was not played in the console).
+   */
   badgeFacts(userId: string): { opened: number; closed: number; takeProfit: number };
   saveEquityDay(portfolioId: string, day: string, equityCents: Cents): void;
   equityDays(portfolioId: string): { day: string; equityCents: Cents }[];

@@ -1144,6 +1144,25 @@ export const cryptoOrderBody = z
 
 export const cryptoOrderParams = z.object({ id: z.string().uuid() }).strict();
 
+/**
+ * «Register a trade I already opened» in a practice portfolio (the official one refuses it): the
+ * entry price and the moment the person gives (ISO with its zone; now when missing), the amount
+ * in euros and, optionally, its take profit and stop loss. The service checks them against the
+ * price and the candles.
+ */
+export const cryptoRecordBody = z
+  .object({
+    portfolioId: z.string().uuid(),
+    symbol: cryptoSymbol,
+    direction: z.enum(['long', 'short']).optional(),
+    entryPrice: cryptoPrice,
+    amount: z.number().finite().min(1).max(10_000_000).transform(toCents),
+    takeProfit: cryptoPrice.optional(),
+    stopLoss: cryptoPrice.optional(),
+    openedAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .strict();
+
 /** Take profit and stop loss of an open position: a price sets or moves it, null removes it. */
 export const cryptoExitsBody = z
   .object({

@@ -1,4 +1,13 @@
-import type { Candle, CryptoCandles, CryptoCoin, CryptoCoins, CryptoLive } from './types';
+import { exitResult } from './orders';
+import type {
+  Candle,
+  CryptoCandles,
+  CryptoCoin,
+  CryptoCoins,
+  CryptoLive,
+  OpenTrade,
+  SimPortfolio,
+} from './types';
 
 /** Time between two live ticks while the chart is on screen. */
 export const LIVE_REFRESH_MS = 2000;
@@ -90,5 +99,53 @@ export function withLive(list: CryptoCoins, tick: CryptoLive): CryptoCoins {
     coins: list.coins.map((c) =>
       c.symbol === tick.symbol && c.quote === tick.quote ? liveCoin(c, tick.price) : c
     ),
+  };
+}
+
+const cents = (value: number) => Math.round(value * 100) / 100;
+const sumOf = (trades: OpenTrade[], key: 'value' | 'pnl') =>
+  trades.reduce((sum, trade) => sum + trade[key]!, 0);
+
+/**
+ * The portfolio with its open trades of `symbol` worked out again at the live price (the same
+ * sums as the API), and its totals with them, so their result moves with the price every 2 s
+ * between two answers of the API. The same portfolio back when the live price is not newer than
+ * the portfolio's own prices or no open trade is of that coin.
+ */
+export function withLivePrice(
+  p: SimPortfolio,
+  symbol: string,
+  price: number | null | undefined,
+  at: string | null
+): SimPortfolio {
+  if (price === null || price === undefined || at === null) return p;
+  if (at <= (p.market.updatedAt ?? '')) return p;
+  if (!p.open.some((trade) => trade.symbol === symbol)) return p;
+  const open = p.open.map((trade) => {
+    if (trade.symbol !== symbol) return trade;
+    const result = exitResult(trade, price, p.account.feeBps);
+    return {
+      ...trade,
+      currentPrice: price,
+      value: cents(result.proceeds),
+      exitFee: result.fee,
+      pnl: cents(result.pnl),
+      pnlPercent: cents(result.percent),
+    };
+  });
+  // Another coin without a price leaves the totals as the API gave them (unknown).
+  if (open.some((trade) => trade.value === null)) return { ...p, open };
+  const equity = cents(p.account.cash + p.account.reserved + sumOf(open, 'value'));
+  const total = cents(equity - p.account.initial);
+  return {
+    ...p,
+    open,
+    summary: {
+      ...p.summary,
+      equity,
+      unrealized: cents(sumOf(open, 'pnl')),
+      total,
+      totalPercent: cents((total / p.account.initial) * 100),
+    },
   };
 }

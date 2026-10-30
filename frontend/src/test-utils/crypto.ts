@@ -234,6 +234,7 @@ export function portfolio(overrides: Partial<SimPortfolio> = {}): SimPortfolio {
         entryFee: 1,
         openType: 'market',
         openedAt: '2026-03-15T12:00:00.000Z',
+        recorded: false,
         currentPrice: 55_000,
         value: 1_098.9,
         exitFee: 1.1,

@@ -11,6 +11,7 @@ import {
   cryptoOrderParams,
   cryptoPortfolioParams,
   cryptoRankingBody,
+  cryptoRecordBody,
   cryptoResetBody,
   cryptoSeasonParams,
   cryptoSimQuery,
@@ -22,6 +23,9 @@ export const LIVE_PER_MINUTE = 60;
 
 /** Practice results a person may add to an account per minute. */
 export const TRANSFERS_PER_MINUTE = 10;
+
+/** Trades registered by hand (practice) a person may add per minute. */
+export const RECORDS_PER_MINUTE = 10;
 
 /** Live ticks per minute from one network (an office or a home behind one IP). */
 export const LIVE_PER_NETWORK = 1200;
@@ -52,6 +56,8 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
   const liveReads = byUser(LIVE_PER_MINUTE);
   // Adding a practice result to an account writes a real movement: a few a minute is plenty.
   const transferWrites = byUser(TRANSFERS_PER_MINUTE);
+  // A registered trade may read the candles since its entry: a few a minute is plenty.
+  const recordWrites = byUser(RECORDS_PER_MINUTE);
 
   router.get(
     '/crypto/coins',
@@ -107,6 +113,18 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
             }
           : order;
       res.status(201).json(await c.cryptoSim.place(req.userId, input, portfolioId));
+    })
+  );
+  // «Register a trade I already opened» (practice only): a position at the entry price and moment
+  // the person gives, not against the market.
+  router.post(
+    '/crypto/sim/recorded',
+    recordWrites,
+    authed(async (req, res) => {
+      const { portfolioId, amount, ...trade } = cryptoRecordBody.parse(req.body);
+      res
+        .status(201)
+        .json(await c.cryptoSim.record(req.userId, { ...trade, amountCents: amount }, portfolioId));
     })
   );
   router.delete(

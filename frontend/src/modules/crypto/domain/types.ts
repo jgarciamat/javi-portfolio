@@ -97,6 +97,8 @@ export interface OpenTrade {
   entryFee: number;
   openType: TradeType;
   openedAt: string;
+  /** Registered by hand at a chosen entry (practice only), not opened against the market. */
+  recorded: boolean;
   currentPrice: number | null;
   /** What selling now would give, after the commission. */
   value: number | null;
@@ -143,6 +145,8 @@ export interface ClosedTrade {
   closeType: TradeType | 'liquidation' | 'season';
   openedAt: string;
   closedAt: string;
+  /** Registered by hand at a chosen entry (practice only), not opened against the market. */
+  recorded: boolean;
   /**
    * Practice only: the account its result was added to (once) and what it added (positive) or
    * took (negative) there; null while it has not been added, and always on the official one.
@@ -166,6 +170,8 @@ export interface SimFill {
   price: number | null;
   at: string;
   slot: Slot;
+  /** Its take profit and stop loss were both reached in one candle: the prudent one was taken. */
+  sameCandle: boolean;
 }
 
 /** A play-money portfolio: the official one of a monthly season, or a practice one. */
@@ -285,6 +291,20 @@ export type OrderRequest =
 export interface ExitsRequest {
   takeProfit?: number | null;
   stopLoss?: number | null;
+}
+
+/**
+ * «Register a trade I already opened» (practice portfolios only): a position at the entry price
+ * and moment given, not against the market. `openedAt` is ISO; now when left out.
+ */
+export interface RecordRequest {
+  symbol: string;
+  direction: Direction;
+  entryPrice: number;
+  amount: number;
+  takeProfit?: number;
+  stopLoss?: number;
+  openedAt?: string;
 }
 
 /** An order for a given portfolio (the official one of the month when missing). */

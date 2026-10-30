@@ -27,6 +27,7 @@ const closed = (id: string, pnl: number, extra: Partial<ClosedTrade> = {}): Clos
   closeType: 'limit',
   openedAt: '2026-03-10T12:00:00.000Z',
   closedAt: '2026-03-11T12:00:00.000Z',
+  recorded: false,
   transfer: null,
   ...extra,
 });
