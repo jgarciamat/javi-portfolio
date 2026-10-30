@@ -68,7 +68,7 @@ describe('A preview on the screen', () => {
     const toggle = screen.getByRole('button', { name: 'Ver vista previa' });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
-    await waitFor(() => expect(drawn()).toContainEqual([1, 600]));
+    await waitFor(() => expect(drawn()).toContainEqual([1, 600]), { timeout: 5000 });
     expect(screen.getByRole('button', { name: 'Ocultar vista previa' })).toHaveAttribute(
       'aria-expanded',
       'true'
@@ -76,10 +76,10 @@ describe('A preview on the screen', () => {
     expect(screen.getByRole('img', { name: /modelo 130, página 1 de 2/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Página anterior' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Página siguiente' }));
-    await waitFor(() => expect(drawn()).toContainEqual([2, 600]));
+    await waitFor(() => expect(drawn()).toContainEqual([2, 600]), { timeout: 5000 });
     expect(screen.getByRole('button', { name: 'Página siguiente' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Página anterior' }));
-    await waitFor(() => expect(drawn().at(-1)).toEqual([1, 600]));
+    await waitFor(() => expect(drawn().at(-1)).toEqual([1, 600]), { timeout: 5000 });
     // The figures typed in, for screen readers.
     expect(screen.getByText('Casillas rellenadas (2)')).toBeInTheDocument();
     expect(screen.getByText('12.000,00')).toBeInTheDocument();

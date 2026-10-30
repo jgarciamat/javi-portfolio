@@ -480,7 +480,7 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await page.getByLabel('Capital por operación').fill('100');
   await page.getByRole('button', { name: 'Abrir long' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
-  await page.getByRole('button', { name: 'Empezar de nuevo con 10.000 €' }).click();
+  await page.getByRole('button', { name: 'Empezar de nuevo con 100.000 €' }).click();
   await page.getByRole('button', { name: 'Sí, empezar de nuevo' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (0)' })).toBeVisible();
   await page.getByRole('button', { name: 'Borrar esta cartera' }).click();
