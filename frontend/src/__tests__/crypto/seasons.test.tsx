@@ -384,6 +384,13 @@ describe('Crypto console: ranking of the month', () => {
     // With a place, nothing missing and no progress.
     expect(within(ranking).queryByRole('progressbar')).toBeNull();
     expect(within(ranking).getByLabelText('Tu alias')).toHaveValue('Lince Azul');
+    // The person is told it is saved, until the field changes again.
+    expect(within(ranking).getByText(/Listo: tu alias ahora es «Lince Azul»/)).toBeVisible();
+    fireEvent.change(within(ranking).getByLabelText('Tu alias'), { target: { value: 'Otro' } });
+    expect(within(ranking).queryByText(/Listo: tu alias/)).toBeNull();
+    fireEvent.change(within(ranking).getByLabelText('Tu alias'), {
+      target: { value: 'Lince Azul' },
+    });
     api.cryptoApi.setRanking.mockRejectedValue(new Error('El alias no puede llevar correos.'));
     fireEvent.click(within(ranking).getByRole('button', { name: 'Guardar alias' }));
     expect(await within(ranking).findByRole('alert')).toHaveTextContent(

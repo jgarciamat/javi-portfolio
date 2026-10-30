@@ -6004,6 +6004,7 @@
   "app.crypto.ranking.alias": "Tu alias",
   "app.crypto.ranking.saveAlias": "Guardar alias",
   "app.crypto.ranking.rules.who": "Participan las carteras oficiales del mes, cada una con su alias. Es gratis y no hace falta comprar nada.",
+  "app.crypto.ranking.aliasSaved": "Listo: tu alias ahora es «{alias}». Ya se ve así en el ranking.",
   "app.crypto.ranking.aliasHint": "Al empezar es tu nombre de pila (o «Jugador» y cuatro cifras). Entre {min} y {max} caracteres, sin correos, enlaces ni teléfonos.",
   "app.crypto.ranking.aliasNotice": "Si estás en el ranking del mes, se ve tu alias con tu rentabilidad y tu número de operaciones. Puedes cambiarlo cuando quieras; nunca se muestra tu correo ni tu nombre completo.",
   "app.crypto.ranking.intro.title": "En el ranking del mes saldrás como «{alias}»",

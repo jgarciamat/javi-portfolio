@@ -6015,6 +6015,7 @@
   "app.crypto.ranking.alias": "Your alias",
   "app.crypto.ranking.saveAlias": "Save alias",
   "app.crypto.ranking.rules.who": "The official portfolios of the month take part, each with its alias. It is free and nothing has to be bought.",
+  "app.crypto.ranking.aliasSaved": "Done: your alias is now «{alias}». That is how it shows in the ranking.",
   "app.crypto.ranking.aliasHint": "At first it is your first name (or «Jugador» and four digits). Between {min} and {max} characters, no e-mails, links or phone numbers.",
   "app.crypto.ranking.aliasNotice": "When you are in the ranking of the month, your alias is shown with your return and your number of operations. You can change it whenever you like; your e-mail and your full name are never shown.",
   "app.crypto.ranking.intro.title": "In the ranking of the month you will appear as «{alias}»",
