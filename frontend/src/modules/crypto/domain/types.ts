@@ -143,6 +143,18 @@ export interface ClosedTrade {
   closeType: TradeType | 'liquidation' | 'season';
   openedAt: string;
   closedAt: string;
+  /**
+   * Practice only: the account its result was added to (once) and what it added (positive) or
+   * took (negative) there; null while it has not been added, and always on the official one.
+   */
+  transfer: SimTransfer | null;
+}
+
+export interface SimTransfer {
+  accountId: string;
+  accountName: string;
+  amount: number;
+  at: string;
 }
 
 export interface SimFill {

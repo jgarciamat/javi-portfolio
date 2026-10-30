@@ -62,18 +62,25 @@ async function setup(
 const bar = () => screen.getByRole('group', { name: 'Herramientas de dibujo' });
 const tool = (name: string) => within(bar()).getByRole('button', { name });
 const layer = () => document.querySelector<SVGSVGElement>('.cc-draw-layer')!;
+/** What takes the pointer while a tool draws: over the whole chart, scales included. */
+const surface = () => document.querySelector<HTMLElement>('.cc-draw-catch')!;
 const hint = () => document.querySelector('.cc-draw-hint')!;
 const shapes = (kind?: string) =>
   [...layer().querySelectorAll(kind ? `[data-drawing="${kind}"]` : '[data-drawing]')] as Element[];
-const at = (x: number, y: number) => ({ clientX: x, clientY: y, pointerId: 1 });
+const at = (x: number, y: number, extra: PointerEventInit = {}) => ({
+  clientX: x,
+  clientY: y,
+  pointerId: 1,
+  ...extra,
+});
 const drag = (from: [number, number], to: [number, number]) => {
-  fireEvent.pointerDown(layer(), at(...from));
-  fireEvent.pointerMove(layer(), at(...to));
-  fireEvent.pointerUp(layer(), at(...to));
+  fireEvent.pointerDown(surface(), at(...from));
+  fireEvent.pointerMove(surface(), at(...to));
+  fireEvent.pointerUp(surface(), at(...to));
 };
 const tap = (x: number, y: number) => {
-  fireEvent.pointerDown(layer(), at(x, y));
-  fireEvent.pointerUp(layer(), at(x, y));
+  fireEvent.pointerDown(surface(), at(x, y));
+  fireEvent.pointerUp(surface(), at(x, y));
 };
 const saved = (api: FakeApi) =>
   api.cryptoApi.saveDrawings.mock.calls[api.cryptoApi.saveDrawings.mock.calls.length - 1][1];
@@ -90,9 +97,11 @@ const line = (id: string, extra: Partial<Drawing> = {}): Drawing => ({
 beforeAll(() => {
   class FakePointerEvent extends MouseEvent {
     pointerId: number;
+    pointerType: string;
     constructor(type: string, init: PointerEventInit = {}) {
       super(type, init);
       this.pointerId = init.pointerId ?? 0;
+      this.pointerType = init.pointerType ?? 'mouse';
     }
   }
   Object.defineProperty(window, 'PointerEvent', { configurable: true, value: FakePointerEvent });
@@ -150,11 +159,11 @@ describe('Drawing on the chart', () => {
     expect(hint()).toHaveTextContent(
       'Arrastra de un punto a otro, o toca los dos. Esc para salir.'
     );
-    fireEvent.pointerDown(layer(), at(10, 200));
-    fireEvent.pointerMove(layer(), at(25, 195));
+    fireEvent.pointerDown(surface(), at(10, 200));
+    fireEvent.pointerMove(surface(), at(25, 195));
     // While dragging, the line follows the pointer.
     expect(shapes('trend')).toHaveLength(1);
-    fireEvent.pointerUp(layer(), at(30, 190));
+    fireEvent.pointerUp(surface(), at(30, 190));
     expect(tool('Línea de tendencia')).toHaveAttribute('aria-pressed', 'false');
     const [drawn] = shapes('trend');
     const stroke = drawn.querySelectorAll('line')[1];
@@ -209,10 +218,10 @@ describe('Drawing on the chart', () => {
     tap(10, 200);
     expect(shapes('rect')).toHaveLength(1);
     // Hovering moves the second corner; a cancelled touch keeps the first one.
-    fireEvent.pointerMove(layer(), at(40, 180));
+    fireEvent.pointerMove(surface(), at(40, 180));
     expect(shapes('rect')[0].querySelector('rect')).toHaveAttribute('width', '30');
-    fireEvent.pointerDown(layer(), at(40, 180));
-    fireEvent.pointerCancel(layer());
+    fireEvent.pointerDown(surface(), at(40, 180));
+    fireEvent.pointerCancel(surface(), at(40, 180));
     expect(shapes('rect')[0].querySelector('rect')).toHaveAttribute('width', '0');
     tap(40, 180);
     expect(tool('Zona')).toHaveAttribute('aria-pressed', 'false');
@@ -231,10 +240,10 @@ describe('Drawing on the chart', () => {
     fireEvent.click(tool('Rosa'));
     expect(tool('Rosa')).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(tool('Línea horizontal'));
-    fireEvent.pointerDown(layer(), at(5, 100));
+    fireEvent.pointerDown(surface(), at(5, 100));
     // A drag of a horizontal line only moves its height.
-    fireEvent.pointerMove(layer(), at(15, 90));
-    fireEvent.pointerUp(layer(), at(20, 100));
+    fireEvent.pointerMove(surface(), at(15, 90));
+    fireEvent.pointerUp(surface(), at(20, 100));
     const [mark] = shapes('horizontal');
     expect(mark.querySelectorAll('line')[1]).toHaveAttribute(
       'style',
@@ -253,9 +262,9 @@ describe('Drawing on the chart', () => {
     await setup();
     fireEvent.click(tool('Nota de texto'));
     expect(hint()).toHaveTextContent('Toca donde quieras la nota.');
-    fireEvent.pointerDown(layer(), at(20, 150));
+    fireEvent.pointerDown(surface(), at(20, 150));
     expect(shapes()).toHaveLength(0);
-    fireEvent.pointerUp(layer(), at(20, 150));
+    fireEvent.pointerUp(surface(), at(20, 150));
     const input = screen.getByRole('textbox', { name: 'Texto de la nota' });
     expect(input).toHaveFocus();
     expect(input).toHaveAttribute('maxLength', '60');
@@ -333,11 +342,11 @@ describe('Drawing on the chart', () => {
     expect(width('Normal (2 px)')).toHaveAttribute('aria-pressed', 'false');
     expect(localStorage.getItem('mm_crypto_draw_width')).toBe('6');
     fireEvent.click(tool('Línea de tendencia'));
-    fireEvent.pointerDown(layer(), at(10, 200));
-    fireEvent.pointerMove(layer(), at(25, 195));
+    fireEvent.pointerDown(surface(), at(10, 200));
+    fireEvent.pointerMove(surface(), at(25, 195));
     // The line being drawn already has it.
     expect(shapes('trend')[0].querySelectorAll('line')[1]).toHaveAttribute('stroke-width', '6');
-    fireEvent.pointerUp(layer(), at(30, 190));
+    fireEvent.pointerUp(surface(), at(30, 190));
     fireEvent.click(width('Fino (1 px)'));
     fireEvent.click(tool('Zona'));
     drag([40, 150], [60, 170]);
@@ -394,8 +403,8 @@ describe('Drawing on the chart', () => {
     expect(layer()).toHaveClass('cc-draw-layer--erase');
     expect(layer()).not.toHaveAttribute('aria-hidden');
     expect(hint()).toHaveTextContent('Toca el dibujo que quieras borrar.');
-    // Taps on the empty chart erase nothing.
-    tap(300, 50);
+    // The eraser takes no surface: the drawings are its buttons.
+    expect(surface()).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /^Borrar la línea horizontal de 100,00/ }));
     expect(shapes('horizontal')).toHaveLength(0);
     const erase = screen.getByRole('button', { name: 'Borrar la nota «Hola»' });
@@ -476,30 +485,119 @@ describe('Drawing on the chart', () => {
     prices.blind = false;
     chart.blind = true;
     act(() => chart.paint());
-    fireEvent.pointerDown(layer(), at(10, 100));
-    fireEvent.pointerMove(layer(), at(20, 100));
-    fireEvent.pointerUp(layer(), at(20, 100));
+    fireEvent.pointerDown(surface(), at(10, 100));
+    fireEvent.pointerMove(surface(), at(20, 100));
+    fireEvent.pointerUp(surface(), at(20, 100));
     expect(tool('Línea de tendencia')).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('takes no pointer while no tool is on, and captures it while one is', async () => {
     await setup();
-    fireEvent.pointerDown(layer(), at(10, 100));
-    fireEvent.pointerMove(layer(), at(20, 100));
-    fireEvent.pointerUp(layer(), at(20, 100));
-    expect(shapes()).toHaveLength(0);
+    expect(surface()).toBeNull();
+    expect(layer()).not.toHaveClass('cc-draw-layer--on');
     fireEvent.click(tool('Línea de tendencia'));
     const capture = jest.fn();
-    Object.defineProperty(layer(), 'setPointerCapture', { value: capture });
-    fireEvent.pointerMove(layer(), at(20, 100));
-    fireEvent.pointerUp(layer(), at(20, 100));
+    Object.defineProperty(surface(), 'setPointerCapture', { value: capture });
+    fireEvent.pointerMove(surface(), at(20, 100));
+    fireEvent.pointerUp(surface(), at(20, 100));
     expect(shapes()).toHaveLength(0);
-    fireEvent.pointerDown(layer(), at(10, 100));
-    fireEvent.pointerCancel(layer());
+    fireEvent.pointerDown(surface(), at(10, 100));
+    fireEvent.pointerCancel(surface(), at(10, 100));
     expect(shapes()).toHaveLength(0);
     drag([10, 100], [40, 100]);
     expect(capture).toHaveBeenCalledWith(1);
     expect(shapes('trend')).toHaveLength(1);
+  });
+
+  it('covers the whole chart while a tool draws, and holds what it reads inside the pane', async () => {
+    await setup();
+    fireEvent.click(tool('Zona'));
+    // A finger that lands on the price scale (right of the pane) or on the time scale (below it)
+    // draws as well: it does not stretch the chart. The pane is 600 × 300 here.
+    expect(surface().parentElement).toBe(layer().parentElement);
+    expect(surface()).toHaveClass('cc-draw-catch');
+    drag([650, 340], [20, 100]);
+    expect(tool('Zona')).toHaveAttribute('aria-pressed', 'false');
+    // Held at the pane's corner (600, 300), not beyond it.
+    const zone = shapes('rect')[0].querySelector('rect')!;
+    expect(zone).toHaveAttribute('x', '20');
+    expect(zone).toHaveAttribute('width', '580');
+    expect(zone).toHaveAttribute('y', '100');
+    expect(Number(zone.getAttribute('height'))).toBeCloseTo(200);
+  });
+
+  it('tells a finger tap from a drag with more room than a mouse', async () => {
+    await setup();
+    fireEvent.click(tool('Zona'));
+    const finger = { pointerType: 'touch' } as const;
+    // 8 px of shake with a finger: a tap, the first corner.
+    fireEvent.pointerDown(surface(), at(10, 200, finger));
+    fireEvent.pointerUp(surface(), at(10, 208, finger));
+    expect(tool('Zona')).toHaveAttribute('aria-pressed', 'true');
+    expect(shapes('rect')).toHaveLength(1);
+    // The next tap finishes it.
+    fireEvent.pointerDown(surface(), at(40, 180, finger));
+    fireEvent.pointerUp(surface(), at(40, 180, finger));
+    expect(tool('Zona')).toHaveAttribute('aria-pressed', 'false');
+    expect(shapes('rect')[0].querySelector('rect')).toHaveAttribute('width', '30');
+    expect(shapes('rect')[0].querySelector('rect')).toHaveAttribute('height', '28');
+    // The same 8 px with a mouse is a drag.
+    fireEvent.click(tool('Zona'));
+    fireEvent.pointerDown(surface(), at(10, 100));
+    fireEvent.pointerUp(surface(), at(10, 108));
+    expect(tool('Zona')).toHaveAttribute('aria-pressed', 'false');
+    expect(shapes('rect')).toHaveLength(2);
+    // A drag of a finger beyond its shake is a drag.
+    fireEvent.click(tool('Zona'));
+    fireEvent.pointerDown(surface(), at(10, 100, finger));
+    fireEvent.pointerUp(surface(), at(40, 100, finger));
+    expect(shapes('rect')).toHaveLength(3);
+  });
+
+  it('keeps the stroke of the first finger when another one lands, moves or lifts', async () => {
+    await setup();
+    fireEvent.click(tool('Línea de tendencia'));
+    const second = { pointerId: 2, pointerType: 'touch' } as const;
+    fireEvent.pointerDown(surface(), at(10, 200, { pointerType: 'touch' }));
+    // A second finger (a pinch, a resting thumb) neither starts, moves nor ends the stroke.
+    fireEvent.pointerDown(surface(), at(500, 50, second));
+    fireEvent.pointerMove(surface(), at(520, 60, second));
+    fireEvent.pointerCancel(surface(), at(520, 60, second));
+    fireEvent.pointerUp(surface(), at(520, 60, second));
+    expect(tool('Línea de tendencia')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.pointerMove(surface(), at(30, 190, { pointerType: 'touch' }));
+    const stroke = shapes('trend')[0].querySelectorAll('line')[1];
+    expect(stroke).toHaveAttribute('x1', '10');
+    expect(stroke).toHaveAttribute('x2', '30');
+    fireEvent.pointerUp(surface(), at(30, 190, { pointerType: 'touch' }));
+    expect(tool('Línea de tendencia')).toHaveAttribute('aria-pressed', 'false');
+    expect(shapes('trend')).toHaveLength(1);
+  });
+
+  it('does not stay stuck when the browser takes the touch or the capture is lost', async () => {
+    await setup();
+    fireEvent.click(tool('Línea de tendencia'));
+    // The browser took the touch (pointercancel) and no pointerup will come: the next one draws.
+    fireEvent.pointerDown(surface(), at(10, 200, { pointerId: 7 }));
+    fireEvent.pointerCancel(surface(), at(10, 200, { pointerId: 7 }));
+    expect(shapes()).toHaveLength(0);
+    drag([10, 200], [40, 190]);
+    expect(shapes('trend')).toHaveLength(1);
+    // The same when the capture is lost; another pointer losing it changes nothing.
+    fireEvent.click(tool('Línea de tendencia'));
+    fireEvent.pointerDown(surface(), at(10, 200, { pointerId: 8 }));
+    fireEvent.lostPointerCapture(surface(), at(10, 200, { pointerId: 9 }));
+    expect(shapes('trend')).toHaveLength(2);
+    fireEvent.lostPointerCapture(surface(), at(10, 200, { pointerId: 8 }));
+    expect(shapes('trend')).toHaveLength(1);
+    drag([10, 100], [40, 90]);
+    expect(shapes('trend')).toHaveLength(2);
+  });
+
+  it('opens no menu and selects nothing on a long press over the chart', async () => {
+    await setup();
+    fireEvent.click(tool('Zona'));
+    expect(fireEvent.contextMenu(surface())).toBe(false);
   });
 
   it('says when the coin is full, when a save failed and when they could not be loaded', async () => {

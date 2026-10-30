@@ -4,6 +4,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent,
   type PointerEvent,
 } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
@@ -399,6 +400,8 @@ function Shape({
 
 /** A drag shorter than this (px) is a tap: two taps also make a line or a zone. */
 const TAP = 6;
+/** A finger shakes more than a mouse: its taps are looser, or two taps would be a tiny line. */
+const TAP_FINGER = 12;
 
 type Translate = ReturnType<typeof useI18n>['t'];
 
@@ -414,53 +417,75 @@ function hintFor(t: Translate, tool: DrawTool | null, drawings: Drawings): strin
 /**
  * The mouse or the finger on the surface while a tool is on: a drag (or two taps) for a line or
  * a zone, a tap for a horizontal line or for where a note goes. `draft` is what is being drawn.
+ * The first pointer that goes down owns the stroke: another finger (a pinch, a resting thumb)
+ * neither moves nor ends it.
  */
 function useGesture(control: DrawControl, pointAt: (event: PointerEvent) => DrawingPoint | null) {
   const [draft, setDraft] = useState<DrawingPoint[] | null>(null);
   const [first, setFirst] = useState<DrawingPoint | null>(null);
-  const down = useRef<{ x: number; y: number } | null>(null);
+  const down = useRef<{ id: number; x: number; y: number; from: DrawingPoint } | null>(null);
   const tool = control.tool === 'eraser' ? null : control.tool;
   const pair = !!tool && twoPoints(tool);
+  const mine = (event: PointerEvent) => !down.current || down.current.id === event.pointerId;
 
-  const finish = (event: PointerEvent, kind: DrawingKind, p: DrawingPoint) => {
-    const start = down.current!;
+  const finish = (
+    event: PointerEvent,
+    kind: DrawingKind,
+    p: DrawingPoint,
+    start: NonNullable<typeof down.current>
+  ) => {
+    const slop = event.pointerType === 'mouse' ? TAP : TAP_FINGER;
     if (kind === 'text') {
       setDraft(null);
       control.openNote(p);
     } else if (!pair) {
       control.place(kind, [p]);
-    } else if (first || Math.hypot(event.clientX - start.x, event.clientY - start.y) > TAP) {
-      control.place(kind, [first ?? draft![0], p]);
+    } else if (first || Math.hypot(event.clientX - start.x, event.clientY - start.y) > slop) {
+      control.place(kind, [first ?? start.from, p]);
     } else {
       // A tap: the first corner or end; the next tap finishes it.
       setFirst(p);
       setDraft([p, p]);
     }
   };
+  // The stroke is gone (the browser took the touch, or the capture was lost): what was set down
+  // stays as it was, so the next touch starts clean.
+  const abandon = (event: PointerEvent) => {
+    if (down.current?.id !== event.pointerId) return;
+    down.current = null;
+    setDraft(first ? [first, first] : null);
+  };
 
-  return {
-    draft: tool && tool !== 'text' && draft ? { kind: tool, points: draft } : null,
-    onPointerDown: (event: PointerEvent<SVGSVGElement>) => {
-      const p = tool && pointAt(event);
+  const handlers = {
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
+      const p = tool && mine(event) && pointAt(event);
       if (!p) return;
       event.preventDefault();
       event.currentTarget.setPointerCapture?.(event.pointerId);
-      down.current = { x: event.clientX, y: event.clientY };
+      down.current = { id: event.pointerId, x: event.clientX, y: event.clientY, from: p };
       setDraft(pair ? [first ?? p, p] : [p]);
     },
-    onPointerMove: (event: PointerEvent<SVGSVGElement>) => {
-      const p = (down.current || first) && pointAt(event);
-      if (p) setDraft(pair ? [first ?? draft![0], p] : [p]);
+    onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
+      const start = first ?? (mine(event) ? down.current?.from : undefined);
+      const p = start && pointAt(event);
+      if (start && p) setDraft(pair ? [start, p] : [p]);
     },
-    onPointerUp: (event: PointerEvent<SVGSVGElement>) => {
-      const p = tool && down.current && pointAt(event);
-      if (p) finish(event, tool, p);
+    onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
+      const start = down.current;
+      if (start?.id !== event.pointerId) return;
+      const p = tool && pointAt(event);
+      if (p) finish(event, tool, p, start);
       down.current = null;
     },
-    onPointerCancel: () => {
-      down.current = null;
-      setDraft(first ? [first, first] : null);
-    },
+    onPointerCancel: abandon,
+    onLostPointerCapture: abandon,
+    // A long press is not a menu or a text selection over the chart: it is a finger resting.
+    onContextMenu: (event: MouseEvent) => event.preventDefault(),
+  };
+
+  return {
+    draft: tool && tool !== 'text' && draft ? { kind: tool, points: draft } : null,
+    handlers,
   };
 }
 
@@ -496,7 +521,9 @@ const layerClass = (tool: DrawTool | null) =>
 /**
  * The drawings over the chart's pane (an SVG of the pane's size, placed again whenever the chart
  * moves) and, while a tool is on, the surface that takes the mouse or the finger instead of the
- * chart, so dragging draws and does not move it.
+ * chart, so dragging draws and does not move it. That surface covers the whole chart, scales
+ * included (a finger that lands on them draws too, it does not stretch the chart), and what it
+ * reads is held inside the pane.
  */
 function DrawLayer({
   control,
@@ -511,10 +538,13 @@ function DrawLayer({
   rate: number;
 }) {
   const { t } = useI18n();
+  const pane = useRef<SVGSVGElement>(null);
   const pointAt = (event: PointerEvent): DrawingPoint | null => {
-    const box = event.currentTarget.getBoundingClientRect();
-    const time = projection!.time(event.clientX - box.left);
-    const price = projection!.price(event.clientY - box.top);
+    const box = pane.current!.getBoundingClientRect();
+    const x = Math.min(Math.max(event.clientX - box.left, 0), projection!.width);
+    const y = Math.min(Math.max(event.clientY - box.top, 0), projection!.height);
+    const time = projection!.time(x);
+    const price = projection!.price(y);
     return time === null || price === null ? null : anchor(time, price / rate);
   };
   const gesture = useGesture(control, pointAt);
@@ -543,19 +573,17 @@ function DrawLayer({
   return (
     <>
       <svg
+        ref={pane}
         className={layerClass(tool)}
         width={projection.width}
         height={projection.height}
         aria-hidden={erasing ? undefined : true}
-        onPointerDown={gesture.onPointerDown}
-        onPointerMove={gesture.onPointerMove}
-        onPointerUp={gesture.onPointerUp}
-        onPointerCancel={gesture.onPointerCancel}
       >
         {drawings.items.map((d) => shape(d, erasing))}
         {draft &&
           shape({ id: 'draft', color: control.color, width: control.width, ...draft }, false)}
       </svg>
+      {tool && !erasing && <div className="cc-draw-catch" {...gesture.handlers} />}
       {editor && <NoteInput control={control} at={editor} />}
       <p className="cc-draw-hint" aria-live="polite">
         {hintFor(t, tool, drawings)}

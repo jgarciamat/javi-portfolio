@@ -71,7 +71,7 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 ## Datos de mercado
 
 - **Fuente**: datos públicos de Binance, sin clave ni cuenta (`data-api.binance.vision` y, si
-  falla, `api.binance.com`). 22 monedas (las 20 primeras más PEPE y BONK). Cada una sale de **un
+  falla, `api.binance.com`). 23 monedas (las 20 primeras, HYPE en quinto lugar, más PEPE y BONK). Cada una sale de **un
   solo par**, fijado por versión (ver «Fuente por moneda»): BTC y ETH de su par en euros; el resto
   de su par en **USDT convertido a euros** al cambio de referencia del BCE.
 - **Proxy en el backend** (`/api/crypto/coins` y `/api/crypto/candles`, con sesión): el navegador
@@ -116,6 +116,7 @@ precio; volumen de 24 h del par en euros):
 | POL | 15 k€ | — | 85 % | 59 % | 0,5 % |
 | PEPE | 36 k€ | — | 85 % | 28 % | 0 % |
 | BONK | sin par en EUR | — | — | — | 0,5 % |
+| HYPE | sin par en EUR | — | — | — | par USDT ~188 M$ de volumen en 24 h (30-10-2026), sin medir velas vacías |
 
 (5 min sobre 1.000 velas; 15 min y 1 h sobre 200.) Los pares en USDT mueven de cientos de miles a
 miles de millones de dólares al día y no tienen velas vacías en ninguna temporalidad.
@@ -228,6 +229,14 @@ mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
   a pulsar la herramienta salen; Escape con herramienta no cierra la pantalla completa (salvo la
   pantalla completa nativa del navegador, que se queda la tecla). Con el foco en la gráfica,
   Intro dibuja la herramienta en las últimas velas.
+- **Con el dedo** (octubre de 2026): la superficie que recoge el gesto (`.cc-draw-catch`, solo con
+  herramienta de dibujo, no con la goma) cubre toda la gráfica, escalas incluidas, y lo que lee se
+  sujeta al panel: un dedo que empieza sobre la escala de precios o la de tiempo dibuja, no
+  estira la gráfica. El primer dedo manda en el trazo (un segundo dedo no lo mueve ni lo termina),
+  un `pointercancel` o la pérdida de la captura sueltan el trazo (no se queda atascado), un toque
+  admite 12 px de temblor (6 px con ratón) antes de contar como arrastre, y una pulsación larga no
+  abre menú ni selecciona. En pantallas táctiles los botones de la barra se tocan en 44 px de alto
+  (alcance invisible, la barra mide lo mismo). Capturas en `docs/consola-dibujo/movil/`.
 - **Anclaje a datos**: cada punto es `{ time, price }`: hora en ms UTC y precio en **euros** (la
   moneda en la que llegan todos los precios de la consola, como el simulador y las alertas). El
   dólar es solo una conversión de pantalla con el mismo cambio que las velas, así que un dibujo
@@ -482,14 +491,44 @@ largos y cortos; sin comisión por mantener):
 ## Cartera de prácticas
 
 - **1 a la vez en el plan gratuito** (402 `PLAN_LIMIT` si se pide otra) y **hasta 5 con
-  Premium**. Siempre 10.000 € y comisión del 0,10 %.
+  Premium**. La oficial, siempre 10.000 €; la de prácticas, 100.000 € y comisión del 0,10 %.
 - Separada de la temporada: **no puntúa** en el ranking ni da resultado de temporada, y sigue
   igual cuando cambia el mes.
-- Se reinicia con su propio botón, dentro de su tarjeta (siempre 10.000 €). Límite anti-abuso:
+- Se reinicia con su propio botón, dentro de su tarjeta (siempre 100.000 €). Límite anti-abuso:
   **5 creaciones o reinicios al día** por persona (día de Madrid, `CRYPTO_PRACTICE_DAILY`).
   Se puede borrar.
 - Si se pide una cartera que ya no existe, la lectura muestra la oficial y las escrituras
   responden `CRYPTO_PORTFOLIO_NOT_FOUND`.
+
+### Añadir el resultado a una cuenta (octubre de 2026)
+
+- En **Cerradas** de una cartera de **práctica**, cada operación con resultado distinto de 0 tiene
+  «Añadir a una cuenta». Antes de nada abre un diálogo que dice que es **dinero de práctica**,
+  qué se apuntará (un **ingreso** si ganó, un **gasto** si perdió, del resultado neto de
+  comisiones, en céntimos exactos) y que cambia el saldo total de las cuentas. Luego, un botón por
+  cuenta activa de tipo **Criptomonedas** («Añadir a Cuenta 1», «Añadir a Cuenta 2»…). Sin
+  ninguna, ofrece crear «Criptomonedas» ahí mismo (cuenta como una más del límite del plan: 3 en
+  el gratuito) o crearla en Cuentas.
+- Una vez añadida, la fila dice «Añadido a X: ±importe» y no vuelve a ofrecerse. Una segunda
+  petición responde **409 `CRYPTO_ALREADY_TRANSFERRED`** con la cuenta en `details`.
+- Nunca desde la cartera oficial del mes (400 `CRYPTO_TRANSFER_OFFICIAL`), ni con la operación
+  abierta (`CRYPTO_TRANSFER_OPEN`), ni con resultado 0 (`CRYPTO_TRANSFER_ZERO`), ni a una cuenta de
+  otro tipo (`CRYPTO_TRANSFER_ACCOUNT_TYPE`), archivada (`ACCOUNT_ARCHIVED`) o ajena (404). Si la
+  moneda de las cuentas no es el euro, se rechaza (`CRYPTO_TRANSFER_CURRENCY`): el simulador va en
+  euros y no se convierte.
+- El movimiento: fecha de hoy, categoría «Consola crypto» (🪙, se crea la primera vez; «Crypto
+  console» en inglés), descripción «Consola crypto (práctica): BTC +97,90 €» y nota que dice que
+  es dinero de práctica del simulador, no una operación real. Es un movimiento normal: se puede
+  editar, moverse de cuenta (la fila sigue a la cuenta en la que está) o borrar; **borrarlo libera
+  la operación** para añadirla otra vez (nunca dos a la vez). «Empezar de nuevo» o borrar la
+  cartera quita las operaciones y su marca, pero el movimiento se queda en la cuenta.
+- Dentro de un hogar: la operación es de quien juega (`userId`) y la cuenta, de los datos que usa
+  (`dataUserId`, los del hogar), igual que cualquier movimiento que ya puede apuntar.
+- El movimiento pasa por el repositorio de movimientos con sellos (`dataVersions.ts`): el total de
+  cuentas, el mes, la previsión y los análisis en caché (`VersionedCache`) se recalculan; la app
+  recarga cuentas y mes al terminar.
+- Límite de ritmo propio: 10 por minuto y persona. No toca Renta ni autónomos: la categoría no es
+  profesional salvo que la persona la marque.
 
 ## Ranking mensual (participan todos)
 
@@ -631,13 +670,23 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - `crypto_drawings (user_id, symbol, drawings JSON, updated_at)`, clave `(user_id, symbol)`,
   `ON DELETE CASCADE`. Aditiva.
 
+## Migración 044
+
+- Tipo de cuenta `crypto` (Criptomonedas): la tabla `accounts` se reconstruye con el mismo
+  contenido (columnas, filas, nombre único por persona e índice) porque SQLite no cambia un
+  `CHECK` en el sitio; las tablas que apuntan a `accounts(id)` siguen apuntando (mismo nombre y
+  mismos ids, comprobado con `foreign_key_check`).
+- `crypto_sim_transfers (position_id PK → crypto_sim_positions, user_id, transaction_id UNIQUE →
+  transactions, created_at)`, todo `ON DELETE CASCADE`: una vez por operación.
+
 ## Persistencia y datos personales
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
 - La exportación RGPD (`cryptoSimulator`) incluye `portfolios` (con operaciones, órdenes
   pendientes y patrimonio diario), `ranking` (alias elegido y contador de prácticas),
   `seasonResults`, `badges` y
-  `priceAlerts`.
+  `priceAlerts`. Cada operación de práctica añadida a una cuenta lleva `addedAsMovementId` y
+  `addedToAccountAt`.
 - Los dibujos de la gráfica salen aparte, en `cryptoDrawings` (moneda, dibujos y fecha).
 
 ## API
@@ -651,6 +700,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `POST /crypto/sim/practice`                                              | Nueva cartera de prácticas (1 gratis, 5 Premium)                                                 |
 | `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
 | `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
+| `POST /crypto/sim/positions/:id/transfer`                                | `{ accountId }`: añade una vez el resultado de una operación de práctica cerrada                 |
 | `GET /crypto/ranking`                                                    | Top 5 del mes, tu posición, reglas, ganadores del mes anterior                                   |
 | `PUT /crypto/ranking/settings`                                           | `{ alias }` (cambia el alias; `optIn` de apps antiguas se acepta y se ignora)                    |
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |

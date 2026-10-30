@@ -14,10 +14,14 @@ import {
   cryptoResetBody,
   cryptoSeasonParams,
   cryptoSimQuery,
+  cryptoTransferBody,
 } from '../schemas';
 
 /** Live ticks a person may ask for per minute (the chart asks 30: one every 2 s). */
 export const LIVE_PER_MINUTE = 60;
+
+/** Practice results a person may add to an account per minute. */
+export const TRANSFERS_PER_MINUTE = 10;
 
 /** Live ticks per minute from one network (an office or a home behind one IP). */
 export const LIVE_PER_NETWORK = 1200;
@@ -46,6 +50,8 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
   // The live tick of the chart (every 2 s while it is on screen): its own budget, so it never
   // takes the reads of the rest of the console. Two windows at once still fit.
   const liveReads = byUser(LIVE_PER_MINUTE);
+  // Adding a practice result to an account writes a real movement: a few a minute is plenty.
+  const transferWrites = byUser(TRANSFERS_PER_MINUTE);
 
   router.get(
     '/crypto/coins',
@@ -123,6 +129,19 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
         )
       )
     )
+  );
+  // The result of a closed practice operation, added once to an account of type Criptomonedas:
+  // the operation is the person's own (`userId`), the account is one of the accounts they use
+  // (`dataUserId`, the household's inside one). Answers with that portfolio again.
+  router.post(
+    '/crypto/sim/positions/:id/transfer',
+    transferWrites,
+    authed(async (req, res) => {
+      const { id } = cryptoOrderParams.parse(req.params);
+      const { accountId } = cryptoTransferBody.parse(req.body);
+      const { portfolioId } = c.cryptoTransfers.add(req.userId, req.dataUserId, id, accountId);
+      res.status(201).json(await c.cryptoSim.portfolio(req.userId, portfolioId));
+    })
   );
   // «Start again» only exists for practice portfolios: the official season never restarts.
   router.post(

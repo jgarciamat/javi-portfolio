@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ACCOUNT_TYPES } from '@domain/model/Account';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
 import { ACTIVITY_TERRITORIES } from '@domain/services/autonomo-territory';
 import {
@@ -255,7 +256,7 @@ export const categoryBody = z.object({
 export const categoryPatchBody = categoryBody.partial();
 export const deleteCategoryQuery = z.object({ reassignTo: id.optional() });
 
-const accountType = z.enum(['checking', 'savings', 'cash', 'card', 'investment', 'other']);
+const accountType = z.enum(ACCOUNT_TYPES);
 export const accountBody = z.object({
   name: z.string().trim().min(1).max(50),
   type: accountType.default('checking'),
@@ -1170,6 +1171,12 @@ export const cryptoResetBody = z
   .strict();
 
 export const cryptoPortfolioParams = z.object({ id: z.string().uuid() }).strict();
+
+/**
+ * The result of a closed practice operation added to one of the person's accounts of type
+ * Criptomonedas (the operation goes in the path, as `cryptoOrderParams`).
+ */
+export const cryptoTransferBody = z.object({ accountId: id }).strict();
 
 /** The alias of the ranking; `optIn`, sent by older versions of the app, is accepted and ignored. */
 export const cryptoRankingBody = z

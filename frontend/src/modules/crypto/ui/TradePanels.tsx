@@ -19,6 +19,8 @@ import type {
   PendingOrder,
   Slot,
 } from '../domain/types';
+import type { AccountTransfer } from '../application/useAccountTransfer';
+import { AddToAccount } from './AddToAccount';
 import { useMoney } from './money';
 import { Help } from './Notices';
 
@@ -782,7 +784,17 @@ export function PendingPanel({
   );
 }
 
-export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
+/**
+ * The closed operations. With `transfer` (a practice portfolio), each one with a result can be
+ * added once to an account of type Criptomonedas.
+ */
+export function ClosedPanel({
+  trades,
+  transfer,
+}: {
+  trades: ClosedTrade[];
+  transfer?: AccountTransfer;
+}) {
   const { t, locale } = useI18n();
   const money = useMoney();
   const page = usePage(trades);
@@ -794,6 +806,7 @@ export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
       <p className="cc-helps">
         <Help term="realized" label={t('app.crypto.help.realized')} />
       </p>
+      {transfer && trades.length > 0 && <p className="cc-hint">{t('app.crypto.transfer.hint')}</p>}
       {trades.length === 0 ? (
         <p className="cc-hint">{t('app.crypto.trades.closedEmpty')}</p>
       ) : (
@@ -839,6 +852,7 @@ export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
                 <Cell role="end" label={t('app.crypto.trades.cols.result')}>
                   <BigResult pnl={trade.pnl} percent={trade.pnlPercent} />
                 </Cell>
+                {transfer && <AddToAccount trade={trade} transfer={transfer} />}
               </li>
             ))}
           </ul>

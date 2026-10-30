@@ -1717,6 +1717,26 @@
     }
   },
   {
+    "name": "cryptoAccountCreate",
+    "method": "POST",
+    "path": "/accounts",
+    "auth": true,
+    "body": {
+      "name": "Criptomonedas",
+      "type": "crypto",
+      "icon": "🪙"
+    }
+  },
+  {
+    "name": "cryptoTransfer",
+    "method": "POST",
+    "path": "/crypto/sim/positions/{closed}/transfer",
+    "auth": true,
+    "body": {
+      "accountId": "{account}"
+    }
+  },
+  {
     "name": "cryptoResetPractice",
     "method": "POST",
     "path": "/crypto/sim/reset",

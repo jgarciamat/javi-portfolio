@@ -101,7 +101,7 @@ describe('Crypto console', () => {
     it('lists every coin, with prices when the source answers', async () => {
       const res = await get('/crypto/coins').expect(200);
       expect(res.headers['cache-control']).toBe('private, max-age=15');
-      expect(res.body.coins).toHaveLength(22);
+      expect(res.body.coins).toHaveLength(23);
       expect(res.body.coins[0]).toEqual({
         symbol: 'BTC',
         name: 'Bitcoin',
@@ -115,6 +115,14 @@ describe('Crypto console', () => {
         quote: 'EUR',
       });
       expect(res.body.coins[2]).toMatchObject({ symbol: 'BNB', price: null, quote: 'USDT' });
+      expect(res.body.coins.map((c: { symbol: string }) => c.symbol).slice(0, 6)).toEqual([
+        'BTC',
+        'ETH',
+        'BNB',
+        'XRP',
+        'HYPE',
+        'SOL',
+      ]);
       expect(res.body.coins.map((c: { symbol: string }) => c.symbol).slice(-2)).toEqual([
         'PEPE',
         'BONK',

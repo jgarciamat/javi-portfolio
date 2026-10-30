@@ -234,14 +234,14 @@ describe('Crypto console seasons, practice and ranking', () => {
   });
 
   describe('practice portfolios', () => {
-    it('one on the free plan: separate, 10.000 €, restarts and does not count', async () => {
+    it('one on the free plan: separate, 100.000 €, restarts and does not count', async () => {
       expireTrial(ctx, user);
       const official = (await me().get('/crypto/sim').expect(200)).body;
       expect(official.plan).toEqual({ premium: false, practiceMax: 1, practiceActionsLeft: 5 });
       const created = await me().post('/crypto/sim/practice').expect(201);
       const practice = created.body.portfolio;
       expect(practice).toMatchObject({ kind: 'practice', season: null });
-      expect(created.body.account).toMatchObject({ initial: 10_000, cash: 10_000, feeBps: 10 });
+      expect(created.body.account).toMatchObject({ initial: 100_000, cash: 100_000, feeBps: 10 });
       expect(created.body.portfolios.map((p: { kind: string }) => p.kind)).toEqual([
         'season',
         'practice',
@@ -258,7 +258,7 @@ describe('Crypto console seasons, practice and ranking', () => {
       expect(practiceView.open).toHaveLength(1);
 
       const reset = await me().post('/crypto/sim/reset', { portfolioId: practice.id }).expect(200);
-      expect(reset.body.account).toMatchObject({ cash: 10_000, initial: 10_000 });
+      expect(reset.body.account).toMatchObject({ cash: 100_000, initial: 100_000 });
       expect(reset.body.open).toEqual([]);
 
       const deleted = await me().del(`/crypto/sim/practice/${practice.id}`).expect(200);
@@ -306,7 +306,7 @@ describe('Crypto console seasons, practice and ranking', () => {
       expect(broke.body).toMatchObject({ code: 'CRYPTO_NO_BALANCE', details: { kind: 'season' } });
       expect(broke.body.error).toContain('cartera de prácticas');
       const id = (await me().post('/crypto/sim/practice').expect(201)).body.portfolio.id;
-      const practice = await buy(user, { portfolioId: id, amount: 9999 }).expect(400);
+      const practice = await buy(user, { portfolioId: id, amount: 99_999 }).expect(400);
       expect(practice.body.details).toEqual({ kind: 'practice' });
     });
 

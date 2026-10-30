@@ -265,6 +265,10 @@ add('cryptoBuyPractice', () =>
     amount: 100,
   })
 );
+add('cryptoAccountCreate', () =>
+  accountApi.create({ name: 'Criptomonedas', type: 'crypto', icon: '🪙' })
+);
+add('cryptoTransfer', () => cryptoApi.addToAccount('{closed}', '{account}'));
 add('cryptoResetPractice', () => cryptoApi.resetPractice('{practice}'));
 add('cryptoDeletePractice', () => cryptoApi.deletePractice('{practice}'));
 add('cryptoRanking', () => cryptoApi.setRanking({ alias: 'Lince' }));

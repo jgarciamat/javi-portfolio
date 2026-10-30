@@ -1,4 +1,5 @@
 import {
+  CryptoPracticeTransfer,
   CryptoPriceAlert,
   CryptoSeasonResult,
   CryptoSimOrder,
@@ -25,6 +26,14 @@ const ORDER = `id, user_id AS userId, portfolio_id AS portfolioId, symbol, side,
 const RESULT = `user_id AS userId, season, initial_cents AS initialCents, final_cents AS finalCents,
   trades, wins, active_days AS activeDays, reached_at AS reachedAt, ranked, alias, premium, place,
   prize_days AS prizeDays, created_at AS createdAt`;
+
+/** A transfer with the movement it made and the account that movement is in now. */
+const TRANSFER = `SELECT x.position_id AS positionId, x.transaction_id AS transactionId,
+    t.account_id AS accountId, a.name AS accountName, t.amount_cents AS amountCents, t.type,
+    x.created_at AS createdAt
+  FROM crypto_sim_transfers x
+  JOIN transactions t ON t.id = x.transaction_id
+  JOIN accounts a ON a.id = t.account_id`;
 
 const ALERT = `id, user_id AS userId, symbol, condition, price, created_at AS createdAt,
   triggered_at AS triggeredAt`;
@@ -277,6 +286,38 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
     this.db.prepare('DELETE FROM crypto_sim_orders WHERE portfolio_id = ?').run(portfolioId);
     this.db.prepare('DELETE FROM crypto_sim_positions WHERE portfolio_id = ?').run(portfolioId);
     this.db.prepare('DELETE FROM crypto_sim_equity_days WHERE portfolio_id = ?').run(portfolioId);
+  }
+
+  // ─── Practice results added to an account ────────────────────────────────
+
+  transfers(portfolioId: string): CryptoPracticeTransfer[] {
+    return this.db
+      .prepare(
+        `${TRANSFER} JOIN crypto_sim_positions p ON p.id = x.position_id
+         WHERE p.portfolio_id = ?`
+      )
+      .all(portfolioId) as CryptoPracticeTransfer[];
+  }
+
+  transferOf(positionId: string): CryptoPracticeTransfer | null {
+    return (
+      (this.db.prepare(`${TRANSFER} WHERE x.position_id = ?`).get(positionId) as
+        CryptoPracticeTransfer | undefined) ?? null
+    );
+  }
+
+  insertTransfer(x: {
+    positionId: string;
+    userId: string;
+    transactionId: string;
+    createdAt: string;
+  }): void {
+    this.db
+      .prepare(
+        `INSERT INTO crypto_sim_transfers (position_id, user_id, transaction_id, created_at)
+         VALUES (@positionId, @userId, @transactionId, @createdAt)`
+      )
+      .run(x);
   }
 
   // ─── Ranking, seasons and badges ─────────────────────────────────────────

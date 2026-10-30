@@ -307,6 +307,22 @@ describe('API contract', () => {
       },
     ];
 
+    /** A purchase of the practice portfolio, sold at market at once: its id. */
+    const closedPractice = async (practice: string): Promise<string> => {
+      const bought = await send('cryptoBuyPractice', { practice });
+      const id = (bought.body.open as { id: string }[])[0].id;
+      await request(ctx.app)
+        .post('/api/crypto/sim/orders')
+        .set(user.auth)
+        .send({ action: 'sell', positionId: id, type: 'market', portfolioId: practice })
+        .expect(201);
+      return id;
+    };
+    const cryptoAccount = async (): Promise<string> =>
+      ((await get('/accounts')).body.accounts as { id: string; type: string }[]).find(
+        (a) => a.type === 'crypto'
+      )!.id;
+
     it('answers (compared with the fixtures the app type-checks)', async () => {
       ctx.market.setCandles('ETH', candles);
       // A coin quoted in USDT (already converted by the source double).
@@ -342,6 +358,14 @@ describe('API contract', () => {
       await send('cryptoDrawings');
       contract('cryptoDrawings', (await get('/crypto/drawings/BTC')).body);
       contract('cryptoReport', (await get('/crypto/seasons/2026-03/report')).body);
+      // A practice result added to an account of type Criptomonedas (the answer carries where).
+      const practice = (await send('cryptoPractice')).body.portfolio.id as string;
+      const closed = await closedPractice(practice);
+      await send('cryptoAccountCreate');
+      contract(
+        'cryptoSimTransferred',
+        (await send('cryptoTransfer', { closed, account: await cryptoAccount() })).body
+      );
     });
 
     it('requests (the bodies the app sends are accepted by the routes)', async () => {
@@ -357,6 +381,9 @@ describe('API contract', () => {
         await send(name, { position });
       }
       const practice = (await send('cryptoPractice')).body.portfolio.id as string;
+      const closed = await closedPractice(practice);
+      await send('cryptoAccountCreate');
+      await send('cryptoTransfer', { closed, account: await cryptoAccount() });
       for (const name of ['cryptoBuyPractice', 'cryptoResetPractice', 'cryptoDeletePractice']) {
         await send(name, { practice });
       }

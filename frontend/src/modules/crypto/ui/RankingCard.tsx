@@ -99,14 +99,24 @@ function Mine({ ranking }: { ranking: CryptoRanking }) {
 }
 
 /** The alias (everybody is in the ranking with one) and what the others see, in plain words. */
-function Settings({ ranking, state }: { ranking: CryptoRanking; state: Ranking }) {
+function Settings({
+  ranking,
+  state,
+  saved,
+  onSaved,
+}: {
+  ranking: CryptoRanking;
+  state: Ranking;
+  saved: string | null;
+  onSaved: (alias: string) => void;
+}) {
   const { t } = useI18n();
   const { settings, rules } = ranking;
   const [alias, setAlias] = useState(settings.alias);
   const busy = state.action.pending;
   const save = (event: FormEvent) => {
     event.preventDefault();
-    void state.save({ alias });
+    void state.save({ alias }).then((ok) => ok && onSaved(alias));
   };
   return (
     <div className="cc-ranking-settings">
@@ -133,6 +143,11 @@ function Settings({ ranking, state }: { ranking: CryptoRanking; state: Ranking }
       <p className="cc-hint">
         {t('app.crypto.ranking.aliasHint', { min: rules.aliasMin, max: rules.aliasMax })}
       </p>
+      {saved === settings.alias && alias === settings.alias && !state.action.error && (
+        <p className="cc-alias-saved" role="status">
+          <Icon name="check" /> <span>{t('app.crypto.ranking.aliasSaved', { alias: saved })}</span>
+        </p>
+      )}
       {state.action.error && (
         <p className="error-banner" role="alert">
           {state.action.error}
@@ -184,6 +199,8 @@ export function RankingIntro({ ranking }: { ranking: CryptoRanking | null }) {
 export function RankingCard({ state }: { state: Ranking }) {
   const { t, locale } = useI18n();
   const { ranking, error } = state;
+  // The alias just saved: the form remounts with the new alias, so the notice lives here.
+  const [savedAlias, setSavedAlias] = useState<string | null>(null);
   // The console waits for the ranking: without one, it failed.
   if (!ranking) {
     return (
@@ -215,7 +232,13 @@ export function RankingCard({ state }: { state: Ranking }) {
         <p className="cc-hint">{t('app.crypto.ranking.empty', { trades: rules.minTrades })}</p>
       )}
       <Mine ranking={ranking} />
-      <Settings key={String(ranking.settings.alias)} ranking={ranking} state={state} />
+      <Settings
+        key={String(ranking.settings.alias)}
+        ranking={ranking}
+        state={state}
+        saved={savedAlias}
+        onSaved={setSavedAlias}
+      />
       <details className="cc-rules">
         <summary>{t('app.crypto.ranking.rulesTitle')}</summary>
         <ul>

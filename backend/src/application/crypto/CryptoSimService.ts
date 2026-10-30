@@ -7,6 +7,7 @@ import {
   UnavailableError,
 } from '@domain/errors';
 import {
+  CryptoPracticeTransfer,
   CryptoSeasonResult,
   CryptoSimOrder,
   CryptoSimPortfolio,
@@ -173,6 +174,19 @@ export interface CryptoClosedView {
   closeType: TradeType | 'liquidation' | 'season';
   openedAt: string;
   closedAt: string;
+  /**
+   * Practice only: the account its result was added to (once), with the amount the movement
+   * adds or takes there; null while it has not been added (and always on the official one).
+   */
+  transfer: CryptoTransferView | null;
+}
+
+export interface CryptoTransferView {
+  accountId: string;
+  accountName: string;
+  /** Signed: positive when it added money to the account, negative when it took it. */
+  amount: number;
+  at: string;
 }
 
 export interface CryptoPortfolioRef {
@@ -502,7 +516,7 @@ export class CryptoSimService {
       finished: portfolio.closedAt !== null,
       initial: fromCents(portfolio.initialCents),
       result: result ? resultView(result) : null,
-      closed: closed.map(closedView),
+      closed: closed.map((p) => closedView(p)),
       stats: await this.stats(portfolio, closed, prices),
     };
   }
@@ -1304,7 +1318,13 @@ export class CryptoSimService {
       });
     const slots = new Map(all.map((p) => [p.id, p.slot]));
     const closedRows = all.filter((p) => p.closedAt);
-    const closed = closedRows.map(closedView);
+    const transfers = new Map(
+      (portfolio.kind === 'practice' ? this.repo.transfers(portfolio.id) : []).map((x) => [
+        x.positionId,
+        x,
+      ])
+    );
+    const closed = closedRows.map((p) => closedView(p, transfers.get(p.id)));
     const perf = performance(closedRows.map((p) => ({ pnlCents: p.pnlCents! })));
     const priced = open.every((p) => p._cents !== null);
     const openValue = open.reduce((sum, p) => sum + (p._cents?.proceedsCents ?? 0), 0);
@@ -1466,7 +1486,10 @@ export function resultView(r: CryptoSeasonResult): CryptoSeasonResultView {
   };
 }
 
-export function closedView(p: CryptoSimPosition): CryptoClosedView {
+export function closedView(
+  p: CryptoSimPosition,
+  transfer?: CryptoPracticeTransfer
+): CryptoClosedView {
   const paid = p.amountCents + p.entryFeeCents;
   return {
     id: p.id,
@@ -1485,6 +1508,16 @@ export function closedView(p: CryptoSimPosition): CryptoClosedView {
     closeType: p.closeType!,
     openedAt: p.openedAt,
     closedAt: p.closedAt!,
+    transfer: transfer
+      ? {
+          accountId: transfer.accountId,
+          accountName: transfer.accountName,
+          amount: fromCents(
+            transfer.type === 'INCOME' ? transfer.amountCents : -transfer.amountCents
+          ),
+          at: transfer.createdAt,
+        }
+      : null,
   };
 }
 

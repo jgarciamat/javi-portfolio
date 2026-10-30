@@ -128,6 +128,24 @@
   cursor: default;
 }
 
+/*
+ * While a tool draws: a transparent surface over the whole chart, scales included, so a finger
+ * that lands on a scale or an edge draws instead of stretching the chart. Nothing else on the
+ * page moves with the stroke (no scroll, no zoom, no pull to refresh), and a long press is not a
+ * menu nor a text selection.
+ */
+.cc-draw-catch {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* A wide, invisible stroke around each line: easy to hit with a finger. */
 .cc-draw-hit {
   stroke: transparent;
@@ -198,6 +216,29 @@
   display: none;
 }
 
+/*
+ * A finger: the buttons keep their look and the bar its size (nothing below moves), but each one
+ * is 44 px tall to touch and as wide as its place in the row (the reach is invisible).
+ */
+@media (pointer: coarse) {
+  .cc-draw-btn,
+  .cc-draw-color {
+    position: relative;
+  }
+
+  .cc-draw-btn::after {
+    content: '';
+    position: absolute;
+    inset: -6px -2px;
+  }
+
+  .cc-draw-color::after {
+    content: '';
+    position: absolute;
+    inset: -9px -2px;
+  }
+}
+
 /* A phone on its side in full screen: the bar in one row that scrolls sideways if it must. */
 @media (orientation: landscape) and (max-height: 500px) {
   .cc-chart--expanded .cc-draw {
@@ -208,6 +249,28 @@
   .cc-chart--expanded .cc-draw-btn {
     width: 30px;
     height: 30px;
+  }
+}
+
+/* The same on its side, where the bar scrolls sideways: room for 44 px wide as well. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+  .cc-chart--expanded .cc-draw,
+  .cc-chart--expanded .cc-draw-colors,
+  .cc-chart--expanded .cc-draw-widths {
+    gap: 0.5rem;
+  }
+
+  .cc-chart--expanded .cc-draw {
+    padding: 7px 0;
+    margin: -7px 0;
+  }
+
+  .cc-chart--expanded .cc-draw-btn::after {
+    inset: -7px;
+  }
+
+  .cc-chart--expanded .cc-draw-color::after {
+    inset: -9px -4px;
   }
 }
 

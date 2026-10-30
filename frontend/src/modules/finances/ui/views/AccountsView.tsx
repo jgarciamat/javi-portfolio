@@ -17,6 +17,8 @@ const ACCOUNT_TYPES: { value: AccountType; icon: string }[] = [
   { value: 'cash', icon: '💵' },
   { value: 'card', icon: '💳' },
   { value: 'investment', icon: '📈' },
+  // The practice results of the crypto console can be added to it.
+  { value: 'crypto', icon: '🪙' },
   { value: 'other', icon: '📦' },
 ];
 

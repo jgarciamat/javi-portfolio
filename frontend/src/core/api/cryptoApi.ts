@@ -52,6 +52,16 @@ export const cryptoApi = {
       { method: 'PUT', body: jsonBody(exits) }
     );
   },
+  /**
+   * Adds the result of a closed practice operation (once) to an account of type Criptomonedas:
+   * an income when it gained, an expense when it lost. Answers with that portfolio again.
+   */
+  addToAccount(positionId: string, accountId: string) {
+    return apiRequest<SimPortfolio>(
+      `/crypto/sim/positions/${encodeURIComponent(positionId)}/transfer`,
+      { method: 'POST', body: jsonBody({ accountId }) }
+    );
+  },
   /** «Start again» of a practice portfolio: 10.000 € again. */
   resetPractice(portfolioId: string) {
     return apiRequest<SimPortfolio>('/crypto/sim/reset', {

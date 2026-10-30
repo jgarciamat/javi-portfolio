@@ -587,6 +587,16 @@
   color: var(--accent-300);
 }
 
+.cc-alias-saved {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin: 0;
+  color: var(--accent-300);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 /* The first time in the console: everybody is in the ranking now, with which alias. */
 .cc-ranking-intro {
   display: grid;

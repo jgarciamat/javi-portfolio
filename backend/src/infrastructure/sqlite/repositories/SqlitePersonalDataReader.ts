@@ -123,8 +123,9 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
 
   /**
    * The play-money simulator of the crypto console: every portfolio (official seasons and
-   * practice) with its operations and pending orders, the frozen season results, the alias of
-   * the ranking, badges, daily equity and price alerts.
+   * practice) with its operations (and the movement a practice result was added as) and pending
+   * orders, the frozen season results, the alias of the ranking, badges, daily equity and price
+   * alerts.
    */
   private cryptoSimulator(userId: string): Row | null {
     const portfolios = this.all(
@@ -162,11 +163,14 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         initial: money(initial_cents),
         cash: money(cash_cents),
         operations: this.all(
-          `SELECT id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents,
+          `SELECT p.id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents,
                   entry_fee_cents, open_type AS openType, opened_at AS openedAt,
                   exit_price AS exitPrice, exit_fee_cents, proceeds_cents, pnl_cents,
-                  close_type AS closeType, closed_at AS closedAt
-           FROM crypto_sim_positions WHERE user_id = ? AND portfolio_id = ? ORDER BY opened_at`,
+                  close_type AS closeType, closed_at AS closedAt,
+                  x.transaction_id AS addedAsMovementId, x.created_at AS addedToAccountAt
+           FROM crypto_sim_positions p
+           LEFT JOIN crypto_sim_transfers x ON x.position_id = p.id
+           WHERE p.user_id = ? AND portfolio_id = ? ORDER BY opened_at`,
           userId,
           id
         ).map(

@@ -7,6 +7,7 @@ import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
 import { useAlerts, useRanking, type Ranking } from '../application/useRanking';
+import { useAccountTransfer } from '../application/useAccountTransfer';
 import { useSimulator, type Simulator } from '../application/useSimulator';
 import { withSlot } from '../domain/orders';
 import { outOfBalance } from '../domain/season';
@@ -156,6 +157,7 @@ function SimulatorBody({
   onGlossary: () => void;
 }) {
   const busy = sim.action.pending;
+  const transfer = useAccountTransfer(sim);
   return (
     <>
       <OrderBox
@@ -185,7 +187,10 @@ function SimulatorBody({
         days={portfolio.limits.pendingDays}
         onCancel={sim.cancel}
       />
-      <ClosedPanel trades={portfolio.closed} />
+      <ClosedPanel
+        trades={portfolio.closed}
+        transfer={portfolio.portfolio.kind === 'practice' ? transfer : undefined}
+      />
       <StatsCard portfolio={portfolio} />
     </>
   );
