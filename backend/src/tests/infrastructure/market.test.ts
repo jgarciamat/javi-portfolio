@@ -123,6 +123,7 @@ describe('the plan of sources', () => {
     expect(quoteOf('BTC', EURO_PAIRS)).toBe('EUR');
     expect(quoteOf('NEAR', EURO_PAIRS)).toBe('USDT');
     expect(PAIRS.get('NEARUSDT')).toEqual({ symbol: 'NEAR', quote: 'USDT' });
+    expect(PAIRS.get('HYPEUSDT')).toEqual({ symbol: 'HYPE', quote: 'USDT' });
     expect(PAIRS.get('BONKUSDT')).toEqual({ symbol: 'BONK', quote: 'USDT' });
     expect(PAIRS.has('NEAREUR')).toBe(false);
     // One pair per coin.

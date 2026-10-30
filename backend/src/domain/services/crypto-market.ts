@@ -11,6 +11,7 @@ export const CRYPTO_COINS = [
   { symbol: 'ETH', name: 'Ethereum' },
   { symbol: 'BNB', name: 'BNB' },
   { symbol: 'XRP', name: 'XRP' },
+  { symbol: 'HYPE', name: 'Hyperliquid' },
   { symbol: 'SOL', name: 'Solana' },
   { symbol: 'ADA', name: 'Cardano' },
   { symbol: 'DOGE', name: 'Dogecoin' },

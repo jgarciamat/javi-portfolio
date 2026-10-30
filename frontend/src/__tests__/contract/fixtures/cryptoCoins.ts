@@ -50,6 +50,18 @@ export const cryptoCoins = {
       quote: 'USDT',
     },
     {
+      symbol: 'HYPE',
+      name: 'Hyperliquid',
+      price: null,
+      changePercent24h: null,
+      high24h: null,
+      low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
+      quote: 'USDT',
+    },
+    {
       symbol: 'SOL',
       name: 'Solana',
       price: null,

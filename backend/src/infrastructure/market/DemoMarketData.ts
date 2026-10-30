@@ -18,6 +18,7 @@ const BASE: Record<CryptoSymbol, number> = {
   ETH: 2_500,
   BNB: 500,
   XRP: 0.5,
+  HYPE: 40,
   SOL: 140,
   ADA: 0.4,
   DOGE: 0.12,

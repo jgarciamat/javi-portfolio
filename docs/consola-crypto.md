@@ -71,7 +71,7 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 ## Datos de mercado
 
 - **Fuente**: datos públicos de Binance, sin clave ni cuenta (`data-api.binance.vision` y, si
-  falla, `api.binance.com`). 22 monedas (las 20 primeras más PEPE y BONK). Cada una sale de **un
+  falla, `api.binance.com`). 23 monedas (las 20 primeras, HYPE en quinto lugar, más PEPE y BONK). Cada una sale de **un
   solo par**, fijado por versión (ver «Fuente por moneda»): BTC y ETH de su par en euros; el resto
   de su par en **USDT convertido a euros** al cambio de referencia del BCE.
 - **Proxy en el backend** (`/api/crypto/coins` y `/api/crypto/candles`, con sesión): el navegador
@@ -116,6 +116,7 @@ precio; volumen de 24 h del par en euros):
 | POL | 15 k€ | — | 85 % | 59 % | 0,5 % |
 | PEPE | 36 k€ | — | 85 % | 28 % | 0 % |
 | BONK | sin par en EUR | — | — | — | 0,5 % |
+| HYPE | sin par en EUR | — | — | — | par USDT ~188 M$ de volumen en 24 h (30-10-2026), sin medir velas vacías |
 
 (5 min sobre 1.000 velas; 15 min y 1 h sobre 200.) Los pares en USDT mueven de cientos de miles a
 miles de millones de dólares al día y no tienen velas vacías en ninguna temporalidad.
