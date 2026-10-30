@@ -530,6 +530,73 @@ largos y cortos; sin comisión por mantener):
 - Límite de ritmo propio: 10 por minuto y persona. No toca Renta ni autónomos: la categoría no es
   profesional salvo que la persona la marque.
 
+### Registrar una operación que ya abrí (octubre de 2026)
+
+Petición del dueño: en la **cartera de prácticas** (nunca en la oficial) apuntar una operación
+«como si hubiera entrado a otro precio» (por ejemplo, la que abrió fuera, en otro exchange) y
+verla en directo: cuánto va ganando o perdiendo, con su TP y su SL.
+
+- **Dónde**: en la caja de operar de una cartera de prácticas, el selector «Cómo la abres»:
+  «Nueva orden» | «Registrar una que ya abrí» (`OrderBox.tsx` → `RecordForm` en
+  `ui/RecordTrade.tsx`; los campos comunes están en `ui/OrderFields.tsx`). En la oficial no
+  aparece. Texto fijo arriba: es una simulación con dinero de práctica, no se envía ninguna orden
+  real.
+- **Campos**: dirección (long/short), **precio de entrada** (cualquiera positivo; botón «Usar el
+  precio actual»), importe (con los atajos 25-100 %), **hora de entrada opcional**
+  (`datetime-local`, vacía = ahora, de los últimos 30 días) y TP/SL opcionales.
+- **«Antes de registrar»** en vivo (`checkRecord` en `domain/orders.ts`, las mismas reglas que el
+  servidor): falta precio, importe o entrada; entrada a más de ×100 del precio (rechazo, igual que
+  cualquier orden: evita cifras absurdas); **aviso, sin bloquear**, si la entrada se aleja más del
+  50 % del precio actual (`RECORDED_FAR_SHARE`); saldo con la comisión; TP/SL al lado correcto
+  **de la entrada** (long: TP encima, SL debajo; short al revés); hora futura o de hace más de 30
+  días. Sin hora (entra ahora): un TP o SL que el precio de ahora ya habría tocado se rechaza, y un
+  short cuya entrada ya está a la mitad o menos del precio actual (garantía agotada) también. Con
+  hora pasada esas dos comprobaciones las hace el servidor con las velas. Cifras: cantidad
+  aproximada, total pagado, precio de garantía agotada (short), **«Con el precio de ahora
+  irías»** (+X € y %), y lo que daría en el TP y en el SL.
+- **Servidor** (`CryptoSimService.record`, `POST /crypto/sim/recorded`): solo carteras de
+  prácticas; la oficial responde **400 `CRYPTO_RECORD_OFFICIAL`** («en el ranking todos entran al
+  precio del mercado»). Exige precios al día (503 `CRYPTO_PRICES_STALE`), las mismas reglas de
+  hueco y dinero que una compra (`room`: 1.000 operaciones, 50 abiertas, 2 por moneda con
+  409 `CRYPTO_COIN_FULL`, saldo con la comisión `CRYPTO_NO_BALANCE`), entrada a no más de ×100
+  (`CRYPTO_PRICE_OUT_OF_RANGE`), TP/SL respecto a la entrada (`CRYPTO_TAKE_PROFIT_SIDE`,
+  `CRYPTO_STOP_LOSS_SIDE`; sin hora, también respecto al precio de ahora), hora no posterior a
+  ahora (`CRYPTO_RECORD_FUTURE`; hasta 5 min por delante se toma como ahora, por relojes
+  adelantados) ni de hace más de 30 días (`CRYPTO_RECORD_TOO_OLD`, con `details.days`), y sin
+  hora un short ya agotado (`CRYPTO_RECORD_LIQUIDATED`). Importes en céntimos enteros; esquema
+  Zod estricto (`cryptoRecordBody`, `openedAt` ISO con zona). Límite propio: **10 por minuto y
+  persona** (`RECORDS_PER_MINUTE`), aparte de las 30 escrituras generales.
+- **La posición** es una posición normal (`openType: market`, `recorded: true`): `entry_price` el
+  elegido, `opened_at` la hora dada (o ahora), cantidad = importe / entrada. Se cobra la
+  **comisión de entrada** de la cartera (0,10 %) y, al cerrar, la de salida, como en cualquier
+  operación: el resultado es neto de las dos, igual que el de una compra a mercado, y la cartera
+  cuadra (efectivo − importe − comisión). TP/SL se guardan como sus órdenes vinculadas con
+  `created_at` = hora de entrada. A partir de ahí todo funciona igual: TP/SL editables, cierre
+  manual, historial, gráfica (líneas #1/#2), estadísticas, «Añadir a una cuenta» y exportación.
+- **Hora pasada**: justo después de registrarla, el servidor revisa con las velas desde esa hora
+  (las mismas de `resolve`: la resolución más fina que llega hasta ella; 30 días caben en las
+  1.000 velas de 1 h) si el TP, el SL o la garantía de un short ya se habrían alcanzado. Si es
+  así, la cierra **a ese nivel con la hora de la vela** (con hueco, al precio de apertura de la
+  vela, como siempre) y lo explica: el aviso de novedades de órdenes y el mensaje del formulario
+  («Según las velas desde tu hora de entrada, BTC #1 ya habría tocado su take profit el … : se ha
+  cerrado a …. La ves en «Cerradas».»). La vela en la que cae la hora de entrada no cuenta (parte
+  de ella fue antes), como con las órdenes pendientes. **Misma vela con TP y SL**: no se sabe qué
+  fue antes, así que gana el **stop loss** (el criterio prudente de `firstFill`); la respuesta lo
+  marca con `fills[].sameCandle: true` y el texto lo dice («se ha tomado la más prudente»). Este
+  campo vale para cualquier posición, no solo las registradas.
+- **Resultado en directo**: la tarjeta de «Abiertas» muestra el resultado en € y % grande, como
+  todas. Entre dos respuestas de la API (cada 30 s), las operaciones abiertas de la moneda en
+  pantalla se recalculan con el **precio en vivo de 2 s** (`withLivePrice` en `domain/live.ts`,
+  mismas cuentas que el servidor; también el resumen y las tiras de la caja), solo si ese precio
+  es más reciente que el de la cartera. El tick en vivo sigue activo mientras está en pantalla la
+  gráfica **o el panel de abiertas con alguna operación de esa moneda** (`useOnScreen`, ahora en
+  `ui/useOnScreen.ts`), con el mismo presupuesto de 60/min por persona.
+- **Insignia «Registrada»** (`RecordedBadge`, borde discontinuo ámbar, con explicación al pasar)
+  en Abiertas y Cerradas. Las registradas **no dan insignias** (`badgeFacts` las ignora: su entrada
+  no se jugó en la consola) y, al ser solo de práctica, nunca cuentan para el ranking.
+- **Datos**: columna `recorded` (migración 045); en la exportación RGPD cada operación lleva
+  `recordedByHand`.
+
 ## Ranking mensual (participan todos)
 
 - **Sin interruptor** (decisión del dueño, octubre de 2026): participan **todas las carteras
@@ -679,6 +746,11 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - `crypto_sim_transfers (position_id PK → crypto_sim_positions, user_id, transaction_id UNIQUE →
   transactions, created_at)`, todo `ON DELETE CASCADE`: una vez por operación.
 
+## Migración 045
+
+- `recorded INTEGER NOT NULL DEFAULT 0 CHECK (recorded IN (0, 1))` en `crypto_sim_positions`:
+  posición registrada a mano en una cartera de prácticas. Aditiva; todo lo anterior queda en 0.
+
 ## Persistencia y datos personales
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
@@ -686,7 +758,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   pendientes y patrimonio diario), `ranking` (alias elegido y contador de prácticas),
   `seasonResults`, `badges` y
   `priceAlerts`. Cada operación de práctica añadida a una cuenta lleva `addedAsMovementId` y
-  `addedToAccountAt`.
+  `addedToAccountAt`, y cada operación lleva `recordedByHand` (registrada a mano o no).
 - Los dibujos de la gráfica salen aparte, en `cryptoDrawings` (moneda, dibujos y fecha).
 
 ## API
@@ -701,6 +773,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
 | `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
 | `POST /crypto/sim/positions/:id/transfer`                                | `{ accountId }`: añade una vez el resultado de una operación de práctica cerrada                 |
+| `POST /crypto/sim/recorded`                                              | Registrar una operación ya abierta (solo prácticas): `portfolioId`, entrada, importe, TP/SL, hora |
 | `GET /crypto/ranking`                                                    | Top 5 del mes, tu posición, reglas, ganadores del mes anterior                                   |
 | `PUT /crypto/ranking/settings`                                           | `{ alias }` (cambia el alias; `optIn` de apps antiguas se acepta y se ignora)                    |
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
@@ -852,6 +925,14 @@ Temporadas y ranking (datos inventados):
   una sola vez (también tras un periodo de pago y nada extra para quien tiene Premium de por vida),
   push al ganador, Premium (estadísticas, informe, alertas) y exportación/borrado RGPD, y la
   migración 039 con datos de la 038.
+- Operaciones registradas a mano: `backend/src/tests/integration/crypto-recorded.test.ts`
+  (entrada distinta del precio, comisión y P&L, cierre manual, TP/SL respecto a la entrada y al
+  precio de ahora, hora pasada con TP alcanzado en una vela, misma vela → SL, salidas ya pasadas
+  decididas por las velas, short agotado, límites de 30 días y reloj adelantado, cartera oficial
+  rechazada, saldo y 2 por moneda, precios caducados, esquema, exportación, límite de ritmo y
+  migración 045) y `frontend/src/__tests__/crypto/recorded.test.tsx` (`checkRecord`,
+  `withLivePrice`, textos, formulario completo, rechazo de la API, insignia y tarjeta que se mueve
+  con el tick en vivo).
 - Los tests del frontend se ejecutan con `TZ=UTC` como en CI (`src/__tests__/crypto/domain.test.ts`
   depende de la zona horaria local).
 
