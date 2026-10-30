@@ -499,6 +499,36 @@ largos y cortos; sin comisión por mantener):
 - Si se pide una cartera que ya no existe, la lectura muestra la oficial y las escrituras
   responden `CRYPTO_PORTFOLIO_NOT_FOUND`.
 
+### Añadir el resultado a una cuenta (octubre de 2026)
+
+- En **Cerradas** de una cartera de **práctica**, cada operación con resultado distinto de 0 tiene
+  «Añadir a una cuenta». Antes de nada abre un diálogo que dice que es **dinero de práctica**,
+  qué se apuntará (un **ingreso** si ganó, un **gasto** si perdió, del resultado neto de
+  comisiones, en céntimos exactos) y que cambia el saldo total de las cuentas. Luego, un botón por
+  cuenta activa de tipo **Criptomonedas** («Añadir a Cuenta 1», «Añadir a Cuenta 2»…). Sin
+  ninguna, ofrece crear «Criptomonedas» ahí mismo (cuenta como una más del límite del plan: 3 en
+  el gratuito) o crearla en Cuentas.
+- Una vez añadida, la fila dice «Añadido a X: ±importe» y no vuelve a ofrecerse. Una segunda
+  petición responde **409 `CRYPTO_ALREADY_TRANSFERRED`** con la cuenta en `details`.
+- Nunca desde la cartera oficial del mes (400 `CRYPTO_TRANSFER_OFFICIAL`), ni con la operación
+  abierta (`CRYPTO_TRANSFER_OPEN`), ni con resultado 0 (`CRYPTO_TRANSFER_ZERO`), ni a una cuenta de
+  otro tipo (`CRYPTO_TRANSFER_ACCOUNT_TYPE`), archivada (`ACCOUNT_ARCHIVED`) o ajena (404). Si la
+  moneda de las cuentas no es el euro, se rechaza (`CRYPTO_TRANSFER_CURRENCY`): el simulador va en
+  euros y no se convierte.
+- El movimiento: fecha de hoy, categoría «Consola crypto» (🪙, se crea la primera vez; «Crypto
+  console» en inglés), descripción «Consola crypto (práctica): BTC +97,90 €» y nota que dice que
+  es dinero de práctica del simulador, no una operación real. Es un movimiento normal: se puede
+  editar, moverse de cuenta (la fila sigue a la cuenta en la que está) o borrar; **borrarlo libera
+  la operación** para añadirla otra vez (nunca dos a la vez). «Empezar de nuevo» o borrar la
+  cartera quita las operaciones y su marca, pero el movimiento se queda en la cuenta.
+- Dentro de un hogar: la operación es de quien juega (`userId`) y la cuenta, de los datos que usa
+  (`dataUserId`, los del hogar), igual que cualquier movimiento que ya puede apuntar.
+- El movimiento pasa por el repositorio de movimientos con sellos (`dataVersions.ts`): el total de
+  cuentas, el mes, la previsión y los análisis en caché (`VersionedCache`) se recalculan; la app
+  recarga cuentas y mes al terminar.
+- Límite de ritmo propio: 10 por minuto y persona. No toca Renta ni autónomos: la categoría no es
+  profesional salvo que la persona la marque.
+
 ## Ranking mensual (participan todos)
 
 - **Sin interruptor** (decisión del dueño, octubre de 2026): participan **todas las carteras
@@ -639,13 +669,23 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - `crypto_drawings (user_id, symbol, drawings JSON, updated_at)`, clave `(user_id, symbol)`,
   `ON DELETE CASCADE`. Aditiva.
 
+## Migración 044
+
+- Tipo de cuenta `crypto` (Criptomonedas): la tabla `accounts` se reconstruye con el mismo
+  contenido (columnas, filas, nombre único por persona e índice) porque SQLite no cambia un
+  `CHECK` en el sitio; las tablas que apuntan a `accounts(id)` siguen apuntando (mismo nombre y
+  mismos ids, comprobado con `foreign_key_check`).
+- `crypto_sim_transfers (position_id PK → crypto_sim_positions, user_id, transaction_id UNIQUE →
+  transactions, created_at)`, todo `ON DELETE CASCADE`: una vez por operación.
+
 ## Persistencia y datos personales
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
 - La exportación RGPD (`cryptoSimulator`) incluye `portfolios` (con operaciones, órdenes
   pendientes y patrimonio diario), `ranking` (alias elegido y contador de prácticas),
   `seasonResults`, `badges` y
-  `priceAlerts`.
+  `priceAlerts`. Cada operación de práctica añadida a una cuenta lleva `addedAsMovementId` y
+  `addedToAccountAt`.
 - Los dibujos de la gráfica salen aparte, en `cryptoDrawings` (moneda, dibujos y fecha).
 
 ## API
@@ -659,6 +699,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `POST /crypto/sim/practice`                                              | Nueva cartera de prácticas (1 gratis, 5 Premium)                                                 |
 | `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
 | `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
+| `POST /crypto/sim/positions/:id/transfer`                                | `{ accountId }`: añade una vez el resultado de una operación de práctica cerrada                 |
 | `GET /crypto/ranking`                                                    | Top 5 del mes, tu posición, reglas, ganadores del mes anterior                                   |
 | `PUT /crypto/ranking/settings`                                           | `{ alias }` (cambia el alias; `optIn` de apps antiguas se acepta y se ignora)                    |
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
