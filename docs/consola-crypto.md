@@ -491,10 +491,10 @@ largos y cortos; sin comisión por mantener):
 ## Cartera de prácticas
 
 - **1 a la vez en el plan gratuito** (402 `PLAN_LIMIT` si se pide otra) y **hasta 5 con
-  Premium**. Siempre 10.000 € y comisión del 0,10 %.
+  Premium**. La oficial, siempre 10.000 €; la de prácticas, 100.000 € y comisión del 0,10 %.
 - Separada de la temporada: **no puntúa** en el ranking ni da resultado de temporada, y sigue
   igual cuando cambia el mes.
-- Se reinicia con su propio botón, dentro de su tarjeta (siempre 10.000 €). Límite anti-abuso:
+- Se reinicia con su propio botón, dentro de su tarjeta (siempre 100.000 €). Límite anti-abuso:
   **5 creaciones o reinicios al día** por persona (día de Madrid, `CRYPTO_PRACTICE_DAILY`).
   Se puede borrar.
 - Si se pide una cartera que ya no existe, la lectura muestra la oficial y las escrituras
