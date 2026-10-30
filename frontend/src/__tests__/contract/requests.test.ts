@@ -265,6 +265,17 @@ add('cryptoBuyPractice', () =>
     amount: 100,
   })
 );
+add('cryptoRecord', () =>
+  cryptoApi.recordTrade('{practice}', {
+    symbol: 'ETH',
+    direction: 'long',
+    entryPrice: 1800,
+    amount: 500,
+    takeProfit: 2500,
+    stopLoss: 1500,
+    openedAt: '2026-03-15T11:00:00.000Z',
+  })
+);
 add('cryptoAccountCreate', () =>
   accountApi.create({ name: 'Criptomonedas', type: 'crypto', icon: '🪙' })
 );

@@ -43,6 +43,16 @@ export const PENDING_DAYS = 30;
 export const PENDING_MS = PENDING_DAYS * 24 * 60 * 60 * 1000;
 
 /**
+ * «Register a trade I already opened» (practice only): how far back its entry may be. The hourly
+ * candles of the market data (1.000 of them, about 41 days) still cover it whole, so its take
+ * profit and stop loss can be checked against everything that happened since.
+ */
+export const RECORDED_MAX_DAYS = 30;
+export const RECORDED_MAX_MS = RECORDED_MAX_DAYS * 24 * 60 * 60 * 1000;
+/** A registered entry this much later than now (a clock a little ahead) is taken as now. */
+export const RECORDED_CLOCK_SKEW_MS = 5 * 60 * 1000;
+
+/**
  * The number of a new operation of a coin: the lowest one not in use (#1, then #2). It stays with
  * the operation while it lives (a pending order passes it to its position) and is free again once
  * the operation closes or is cancelled.

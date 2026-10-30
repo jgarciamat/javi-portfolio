@@ -51,6 +51,7 @@ import { cryptoLive } from './fixtures/cryptoLive';
 import { cryptoCoins } from './fixtures/cryptoCoins';
 import { cryptoSim } from './fixtures/cryptoSim';
 import { cryptoSimFilled } from './fixtures/cryptoSimFilled';
+import { cryptoSimRecorded } from './fixtures/cryptoSimRecorded';
 import { cryptoSimTransferred } from './fixtures/cryptoSimTransferred';
 import { accounts } from './fixtures/accounts';
 import { annualSummary } from './fixtures/annualSummary';
@@ -137,11 +138,15 @@ describe('API answers fit the types of the app', () => {
     contract<SimPortfolio>()(cryptoSim);
     contract<SimPortfolio>()(cryptoSimFilled);
     contract<SimPortfolio>()(cryptoSimTransferred);
+    contract<SimPortfolio>()(cryptoSimRecorded);
     contract<CryptoRanking>()(cryptoRanking);
     contract<PriceAlerts>()(cryptoAlerts);
     contract<CryptoDrawings>()(cryptoDrawings);
     contract<SeasonReport>()(cryptoReport);
     expect(cryptoSim.pending.length).toBeGreaterThan(0);
     expect(cryptoSimFilled.fills).toHaveLength(1);
+    // Registered by hand an hour before: the candles since then reached its take profit.
+    expect(cryptoSimRecorded.closed.find((c) => c.recorded)).toMatchObject({ closeType: 'limit' });
+    expect(cryptoSimRecorded.fills).toEqual([expect.objectContaining({ sameCandle: false })]);
   });
 });

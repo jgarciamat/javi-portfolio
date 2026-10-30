@@ -89,6 +89,7 @@ const closed = (i: number, pnl: number, extra: Partial<ClosedTrade> = {}): Close
   closeType: i % 2 ? 'limit' : 'stop',
   openedAt: '2026-03-10T12:00:00.000Z',
   closedAt: '2026-03-11T12:00:00.000Z',
+  recorded: false,
   transfer: null,
   ...extra,
 });
@@ -1493,6 +1494,7 @@ describe('Crypto console: open, pending and closed', () => {
       price: 45_000,
       at: 'x',
       slot: null,
+      sameCandle: false,
       ...f,
     });
     const fills = [
@@ -1636,6 +1638,7 @@ describe('Crypto console: helpers', () => {
       price: 1,
       at: '',
       slot: null,
+      sameCandle: false,
     };
     expect(fillText(take, t, money.price)).toMatch(/take profit/);
   });

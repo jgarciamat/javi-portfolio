@@ -366,6 +366,8 @@ describe('API contract', () => {
         'cryptoSimTransferred',
         (await send('cryptoTransfer', { closed, account: await cryptoAccount() })).body
       );
+      // A trade registered by hand an hour before: the candles since then reach its take profit.
+      contract('cryptoSimRecorded', (await send('cryptoRecord', { practice })).body);
     });
 
     it('requests (the bodies the app sends are accepted by the routes)', async () => {
@@ -384,7 +386,12 @@ describe('API contract', () => {
       const closed = await closedPractice(practice);
       await send('cryptoAccountCreate');
       await send('cryptoTransfer', { closed, account: await cryptoAccount() });
-      for (const name of ['cryptoBuyPractice', 'cryptoResetPractice', 'cryptoDeletePractice']) {
+      for (const name of [
+        'cryptoBuyPractice',
+        'cryptoRecord',
+        'cryptoResetPractice',
+        'cryptoDeletePractice',
+      ]) {
         await send(name, { practice });
       }
       await send('cryptoRanking');

@@ -47,6 +47,9 @@ import {
   firstFill,
   performance,
   PendingLike,
+  RECORDED_CLOCK_SKEW_MS,
+  RECORDED_MAX_DAYS,
+  RECORDED_MAX_MS,
   resolutionFor,
   sale,
 } from '@domain/services/crypto-sim';
@@ -92,6 +95,21 @@ export type CryptoOrderInput =
     }
   | { action: 'sell'; positionId: string; type: OrderType; price?: number };
 
+/**
+ * «Register a trade I already opened» (practice only): a position at the entry price and moment
+ * the person gives, as if it had been opened then (zod checks the shapes).
+ */
+export interface CryptoRecordInput {
+  symbol: CryptoSymbol;
+  direction?: Direction;
+  entryPrice: number;
+  amountCents: Cents;
+  takeProfit?: number;
+  stopLoss?: number;
+  /** When it was opened (ISO); now when missing. */
+  openedAt?: string;
+}
+
 /** New take profit and stop loss of an open position: a price sets or moves it, null removes it. */
 export interface CryptoExitsInput {
   takeProfit?: number | null;
@@ -109,6 +127,11 @@ export interface CryptoFillView {
   at: string;
   /** Number of the operation among those of its coin (#1, #2). */
   slot: number | null;
+  /**
+   * Its take profit and stop loss (or a short's guarantee) were both reached in the same candle:
+   * which came first is not known, so the most prudent one was taken (`type` says which).
+   */
+  sameCandle: boolean;
 }
 
 type TradeType = 'market' | 'limit' | 'stop';
@@ -127,6 +150,8 @@ export interface CryptoOpenView {
   entryFee: number;
   openType: TradeType;
   openedAt: string;
+  /** Registered by hand at a chosen entry (practice only), not opened against the market. */
+  recorded: boolean;
   /** Null while the market data is not available. */
   currentPrice: number | null;
   /** What selling now would give, after the commission. */
@@ -174,6 +199,8 @@ export interface CryptoClosedView {
   closeType: TradeType | 'liquidation' | 'season';
   openedAt: string;
   closedAt: string;
+  /** Registered by hand at a chosen entry (practice only), not opened against the market. */
+  recorded: boolean;
   /**
    * Practice only: the account its result was added to (once), with the amount the movement
    * adds or takes there; null while it has not been added (and always on the official one).
@@ -416,6 +443,84 @@ export class CryptoSimService {
       }
     });
     return this.view(userId, portfolio.id, tickers, fills);
+  }
+
+  /**
+   * «Register a trade I already opened», practice portfolios only: a position opened at the
+   * entry price and moment the person gives (a trade made somewhere else, or a «what if I had
+   * entered at…»), not against the market. It pays the commission of the portfolio on opening
+   * and on closing like any other, needs the same room (open positions, two per coin) and money,
+   * and from then on is an ordinary position: take profit, stop loss, closing, history, live
+   * result. With a moment in the past its take profit and stop loss (and a short's guarantee) are
+   * checked right away against the candles since then, so it may come back already closed (see
+   * `fills`). The official portfolio never takes one: everybody in the ranking enters at the
+   * market price.
+   */
+  async record(
+    userId: string,
+    input: CryptoRecordInput,
+    portfolioId?: string
+  ): Promise<CryptoSimView> {
+    await this.ensureSeason(userId);
+    const portfolio = this.writable(userId, portfolioId);
+    if (portfolio.kind !== 'practice') {
+      throw new BusinessRuleError(
+        'CRYPTO_RECORD_OFFICIAL',
+        'La cartera oficial del mes no admite operaciones registradas a mano: en el ranking todos entran al precio del mercado. Usa una cartera de prácticas.'
+      );
+    }
+    const now = this.clock.now().getTime();
+    const openedAt = recordedAt(input.openedAt, now);
+    const past = openedAt < now;
+    const tickers = await this.tickers();
+    const fills = await this.resolve(portfolio, tickers);
+    if (!tickers || tickers.stale) {
+      throw new UnavailableError(
+        'Los precios no están al día ahora mismo. Inténtalo en unos minutos.',
+        'CRYPTO_PRICES_STALE'
+      );
+    }
+    const current = priceOf(priceMap(tickers), input.symbol);
+    const at = new Date(openedAt).toISOString();
+    this.uow.run(() => {
+      const fresh = this.fresh(portfolio);
+      const direction = input.direction ?? 'long';
+      this.checkRange(input.entryPrice, current);
+      if (!past && direction === 'short' && current >= liquidationPrice(input.entryPrice)) {
+        throw new BusinessRuleError(
+          'CRYPTO_RECORD_LIQUIDATED',
+          'Con ese precio de entrada el corto ya habría agotado su garantía: el precio actual es el doble o más.',
+          { current }
+        );
+      }
+      // Entered now, its exits must not be reached already; entered before, the candles since
+      // then tell whether they were (just below).
+      const exits = this.exitPrices(input, direction, input.entryPrice, (type, price) => {
+        if (past) this.checkRange(price, current);
+        else this.checkExit(direction, type, price, current);
+        return price;
+      });
+      const { slot, fee, total } = this.room(fresh, input.symbol, input.amountCents);
+      const position: CryptoSimPosition = {
+        ...openPosition(
+          fresh,
+          input.symbol,
+          direction,
+          input.amountCents,
+          fee,
+          input.entryPrice,
+          'market',
+          at,
+          slot
+        ),
+        recorded: true,
+      };
+      this.repo.insertPosition(position);
+      this.insertExits(position, exits, at);
+      this.repo.savePortfolio({ ...fresh, cashCents: fresh.cashCents - total });
+    });
+    const replayed = past ? await this.resolve(this.fresh(portfolio), tickers) : [];
+    return this.view(userId, portfolio.id, tickers, [...fills, ...replayed]);
   }
 
   async cancel(userId: string, orderId: string): Promise<CryptoSimView> {
@@ -701,36 +806,12 @@ export class CryptoSimService {
     current: number,
     at: string
   ): void {
-    const counts = this.repo.countPositions(portfolio.id);
-    if (counts.total >= MAX_POSITIONS) {
-      throw new BusinessRuleError(
-        'CRYPTO_HISTORY_FULL',
-        portfolio.kind === 'season'
-          ? `Has llegado a ${MAX_POSITIONS} operaciones este mes. La próxima temporada empieza el día 1.`
-          : `Has llegado a ${MAX_POSITIONS} operaciones. Descarga el historial y empieza de nuevo la cartera de prácticas.`
-      );
-    }
-    if (counts.open >= MAX_OPEN_POSITIONS) {
-      throw new BusinessRuleError(
-        'CRYPTO_TOO_MANY_OPEN',
-        `Puedes tener hasta ${MAX_OPEN_POSITIONS} posiciones abiertas a la vez.`
-      );
-    }
-    const slot = this.coinSlot(portfolio.id, input.symbol);
-    const fee = feeCents(input.amountCents, portfolio.feeBps);
-    const total = input.amountCents + fee;
-    if (total > portfolio.cashCents) {
-      throw new BusinessRuleError(
-        'CRYPTO_NO_BALANCE',
-        portfolio.kind === 'season'
-          ? 'No tienes saldo virtual suficiente para esta compra (con la comisión). Puedes seguir practicando con una cartera de prácticas.'
-          : 'No tienes saldo virtual suficiente para esta compra (con la comisión).',
-        { kind: portfolio.kind }
-      );
-    }
+    const { slot, fee, total } = this.room(portfolio, input.symbol, input.amountCents);
     const direction = input.direction ?? 'long';
     const entry = input.type === 'market' ? current : input.price!;
-    const exits = this.exitPrices(input, direction, entry, current);
+    const exits = this.exitPrices(input, direction, entry, (type, price) =>
+      this.exitPrice(type, input, direction, price, current)
+    );
     if (input.type === 'market') {
       const position = openPosition(
         portfolio,
@@ -768,6 +849,45 @@ export class CryptoSimService {
       });
     }
     this.repo.savePortfolio({ ...portfolio, cashCents: portfolio.cashCents - total });
+  }
+
+  /**
+   * Room for one more operation of `symbol` (history, open positions, two per coin) and the money
+   * for it with its commission: its number, the commission and the total taken from the cash.
+   */
+  private room(
+    portfolio: CryptoSimPortfolio,
+    symbol: string,
+    amountCents: Cents
+  ): { slot: number; fee: Cents; total: Cents } {
+    const counts = this.repo.countPositions(portfolio.id);
+    if (counts.total >= MAX_POSITIONS) {
+      throw new BusinessRuleError(
+        'CRYPTO_HISTORY_FULL',
+        portfolio.kind === 'season'
+          ? `Has llegado a ${MAX_POSITIONS} operaciones este mes. La próxima temporada empieza el día 1.`
+          : `Has llegado a ${MAX_POSITIONS} operaciones. Descarga el historial y empieza de nuevo la cartera de prácticas.`
+      );
+    }
+    if (counts.open >= MAX_OPEN_POSITIONS) {
+      throw new BusinessRuleError(
+        'CRYPTO_TOO_MANY_OPEN',
+        `Puedes tener hasta ${MAX_OPEN_POSITIONS} posiciones abiertas a la vez.`
+      );
+    }
+    const slot = this.coinSlot(portfolio.id, symbol);
+    const fee = feeCents(amountCents, portfolio.feeBps);
+    const total = amountCents + fee;
+    if (total > portfolio.cashCents) {
+      throw new BusinessRuleError(
+        'CRYPTO_NO_BALANCE',
+        portfolio.kind === 'season'
+          ? 'No tienes saldo virtual suficiente para esta compra (con la comisión). Puedes seguir practicando con una cartera de prácticas.'
+          : 'No tienes saldo virtual suficiente para esta compra (con la comisión).',
+        { kind: portfolio.kind }
+      );
+    }
+    return { slot, fee, total };
   }
 
   private sell(
@@ -815,13 +935,14 @@ export class CryptoSimService {
 
   /**
    * Take profit and stop loss of a new position. A long gains above its entry and loses below;
-   * a short the other way round. A market position's exits must not be reached already.
+   * a short the other way round. `check` tells whether each one may be there now (a market
+   * position's must not be reached already) and gives its price.
    */
   private exitPrices(
-    input: Extract<CryptoOrderInput, { action: 'buy' }>,
+    input: { takeProfit?: number; stopLoss?: number },
     direction: Direction,
     entry: number,
-    current: number
+    check: (type: PendingType, price: number) => number
   ): { type: PendingType; price: number }[] {
     const long = direction === 'long';
     const exits: { type: PendingType; price: number }[] = [];
@@ -834,10 +955,7 @@ export class CryptoSimService {
             : 'En un corto, el precio objetivo (take profit) tiene que estar por debajo del de entrada.'
         );
       }
-      exits.push({
-        type: 'limit',
-        price: this.exitPrice('limit', input, direction, input.takeProfit, current),
-      });
+      exits.push({ type: 'limit', price: check('limit', input.takeProfit) });
     }
     if (input.stopLoss !== undefined) {
       if (!(long ? input.stopLoss < entry : input.stopLoss > entry)) {
@@ -848,10 +966,7 @@ export class CryptoSimService {
             : 'En un corto, el precio de protección (stop loss) tiene que estar por encima del de entrada.'
         );
       }
-      exits.push({
-        type: 'stop',
-        price: this.exitPrice('stop', input, direction, input.stopLoss, current),
-      });
+      exits.push({ type: 'stop', price: check('stop', input.stopLoss) });
     }
     return exits;
   }
@@ -1144,6 +1259,7 @@ export class CryptoSimService {
       const position = this.repo.position(userId, positionId)!;
       const winner = firstFill(list)!;
       this.close(this.fresh(portfolio), position, winner.fill.price, winner.type, winner.fill.at);
+      const sameCandle = list.some((x) => x !== winner && x.fill.at === winner.fill.at);
       events.push({
         orderId: winner.order?.id ?? position.id,
         symbol: position.symbol,
@@ -1153,6 +1269,7 @@ export class CryptoSimService {
         price: winner.fill.price,
         at: winner.fill.at,
         slot: position.slot,
+        sameCandle,
       });
     }
     return events;
@@ -1308,6 +1425,7 @@ export class CryptoSimService {
           entryFee: fromCents(p.entryFeeCents),
           openType: p.openType,
           openedAt: p.openedAt,
+          recorded: p.recorded,
           currentPrice: current,
           value: sold && fromCents(sold.proceedsCents),
           exitFee: sold && fromCents(sold.feeCents),
@@ -1508,6 +1626,7 @@ export function closedView(
     closeType: p.closeType!,
     openedAt: p.openedAt,
     closedAt: p.closedAt!,
+    recorded: p.recorded,
     transfer: transfer
       ? {
           accountId: transfer.accountId,
@@ -1587,7 +1706,31 @@ function openPosition(
     closeType: null,
     closedAt: null,
     slot,
+    recorded: false,
   };
+}
+
+/**
+ * The moment a registered trade was opened (ms): now when not given, never in the future (a
+ * clock a few minutes ahead counts as now) and no further back than the candles reach.
+ */
+function recordedAt(openedAt: string | undefined, now: number): number {
+  if (openedAt === undefined) return now;
+  const at = Date.parse(openedAt);
+  if (at > now + RECORDED_CLOCK_SKEW_MS) {
+    throw new BusinessRuleError(
+      'CRYPTO_RECORD_FUTURE',
+      'La hora de entrada no puede ser posterior a ahora.'
+    );
+  }
+  if (at < now - RECORDED_MAX_MS) {
+    throw new BusinessRuleError(
+      'CRYPTO_RECORD_TOO_OLD',
+      `La hora de entrada puede ser de los últimos ${RECORDED_MAX_DAYS} días como mucho.`,
+      { days: RECORDED_MAX_DAYS }
+    );
+  }
+  return Math.min(at, now);
 }
 
 const event = (
@@ -1604,4 +1747,5 @@ const event = (
   price,
   at,
   slot: order.slot,
+  sameCandle: false,
 });

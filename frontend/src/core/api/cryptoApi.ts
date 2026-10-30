@@ -7,6 +7,7 @@ import type {
   ExitsRequest,
   PortfolioOrder,
   PriceAlerts,
+  RecordRequest,
   SeasonReport,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
@@ -38,6 +39,13 @@ export const cryptoApi = {
     return apiRequest<SimPortfolio>('/crypto/sim/orders', {
       method: 'POST',
       body: jsonBody(order),
+    });
+  },
+  /** «Register a trade I already opened» in a practice portfolio (play money, never a real order). */
+  recordTrade(portfolioId: string, trade: RecordRequest) {
+    return apiRequest<SimPortfolio>('/crypto/sim/recorded', {
+      method: 'POST',
+      body: jsonBody({ portfolioId, ...trade }),
     });
   },
   cancelOrder(id: string) {

@@ -17,7 +17,7 @@ const POSITION = `id, user_id AS userId, portfolio_id AS portfolioId, symbol, di
   entry_price AS entryPrice, amount_cents AS amountCents, entry_fee_cents AS entryFeeCents,
   open_type AS openType, opened_at AS openedAt, exit_price AS exitPrice,
   exit_fee_cents AS exitFeeCents, proceeds_cents AS proceedsCents, pnl_cents AS pnlCents,
-  close_type AS closeType, closed_at AS closedAt, slot`;
+  close_type AS closeType, closed_at AS closedAt, slot, recorded`;
 
 const ORDER = `id, user_id AS userId, portfolio_id AS portfolioId, symbol, side, direction, type,
   price, amount_cents AS amountCents, reserved_cents AS reservedCents, position_id AS positionId,
@@ -47,6 +47,9 @@ const toResult = (r: ResultRow): CryptoSeasonResult => ({
   ranked: r.ranked === 1,
   premium: r.premium === 1,
 });
+
+type PositionRow = Omit<CryptoSimPosition, 'recorded'> & { recorded: number };
+const toPosition = (r: PositionRow): CryptoSimPosition => ({ ...r, recorded: r.recorded === 1 });
 
 export class SqliteCryptoSimRepository implements CryptoSimRepository {
   constructor(private readonly db: Db) {}
@@ -149,20 +152,20 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
   // ─── Operations ──────────────────────────────────────────────────────────
 
   positions(portfolioId: string): CryptoSimPosition[] {
-    return this.db
+    const rows = this.db
       .prepare(
         `SELECT ${POSITION} FROM crypto_sim_positions WHERE portfolio_id = ?
          ORDER BY COALESCE(closed_at, opened_at) DESC, rowid DESC`
       )
-      .all(portfolioId) as CryptoSimPosition[];
+      .all(portfolioId) as PositionRow[];
+    return rows.map(toPosition);
   }
 
   position(userId: string, id: string): CryptoSimPosition | null {
-    return (
-      (this.db
-        .prepare(`SELECT ${POSITION} FROM crypto_sim_positions WHERE user_id = ? AND id = ?`)
-        .get(userId, id) as CryptoSimPosition | undefined) ?? null
-    );
+    const row = this.db
+      .prepare(`SELECT ${POSITION} FROM crypto_sim_positions WHERE user_id = ? AND id = ?`)
+      .get(userId, id) as PositionRow | undefined;
+    return row ? toPosition(row) : null;
   }
 
   countPositions(portfolioId: string): { open: number; total: number } {
@@ -178,8 +181,8 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
     this.db
       .prepare(
         `INSERT INTO crypto_sim_positions (id, user_id, portfolio_id, symbol, direction, quantity,
-           entry_price, amount_cents, entry_fee_cents, open_type, opened_at, slot)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+           entry_price, amount_cents, entry_fee_cents, open_type, opened_at, slot, recorded)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         p.id,
@@ -193,7 +196,8 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
         p.entryFeeCents,
         p.openType,
         p.openedAt,
-        p.slot
+        p.slot,
+        p.recorded ? 1 : 0
       );
   }
 
@@ -475,7 +479,7 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
         `SELECT COUNT(*) AS opened,
                 COALESCE(SUM(closed_at IS NOT NULL AND close_type <> 'season'), 0) AS closed,
                 COALESCE(SUM(close_type = 'limit'), 0) AS takeProfit
-         FROM crypto_sim_positions WHERE user_id = ?`
+         FROM crypto_sim_positions WHERE user_id = ? AND recorded = 0`
       )
       .get(userId) as { opened: number; closed: number; takeProfit: number };
   }
