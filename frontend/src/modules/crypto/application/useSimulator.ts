@@ -24,6 +24,11 @@ export interface Simulator {
   setExits: (positionId: string, exits: ExitsRequest) => Promise<boolean>;
   /** Shows another portfolio (the official season or a practice one). */
   select: (portfolioId: string) => Promise<boolean>;
+  /**
+   * Adds the result of a closed practice operation to an account (once) and shows the portfolio
+   * again; throws when the API refuses it (the caller shows why, beside its own buttons).
+   */
+  addToAccount: (positionId: string, accountId: string) => Promise<void>;
   createPractice: () => Promise<boolean>;
   resetPractice: () => Promise<boolean>;
   deletePractice: () => Promise<boolean>;
@@ -98,6 +103,8 @@ export function useSimulator(fallback: string): Simulator {
     cancel: (id) => run(() => cryptoApi.cancelOrder(id)),
     setExits: (id, exits) => run(() => cryptoApi.setExits(id, exits)),
     select: (id) => swap(() => cryptoApi.portfolio(id)),
+    addToAccount: async (positionId, accountId) =>
+      apply(await cryptoApi.addToAccount(positionId, accountId)),
     createPractice: () => swap(() => cryptoApi.createPractice()),
     resetPractice: () => run(() => cryptoApi.resetPractice(current())),
     deletePractice: () => swap(() => cryptoApi.deletePractice(current())),
