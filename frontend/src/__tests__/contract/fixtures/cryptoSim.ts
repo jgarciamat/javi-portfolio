@@ -95,6 +95,7 @@ export const cryptoSim = {
       closeType: 'market',
       openedAt: '2026-03-15T12:00:00.000Z',
       closedAt: '2026-03-15T12:00:00.000Z',
+      transfer: null,
     },
   ],
   summary: {

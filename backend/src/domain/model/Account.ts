@@ -9,6 +9,8 @@ export const ACCOUNT_TYPES = [
   'cash',
   'card',
   'investment',
+  /** Criptomonedas: the one the practice results of the crypto console can be added to. */
+  'crypto',
   'other',
 ] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];

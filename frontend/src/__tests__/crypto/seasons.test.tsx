@@ -736,6 +736,7 @@ describe('Crypto console: season report table', () => {
         closeType: 'season',
         openedAt: '2026-02-10T10:00:00.000Z',
         closedAt: '2026-02-28T22:59:59.000Z',
+        transfer: null,
       },
     ],
     stats: stats({ best: null, worst: null, winRate: null }),

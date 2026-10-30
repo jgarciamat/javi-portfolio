@@ -318,7 +318,15 @@ export interface UpdateCustomAlertDTO {
 
 // ─── Accounts & transfers ────────────────────────────────────────────────────
 
-export type AccountType = 'checking' | 'savings' | 'cash' | 'card' | 'investment' | 'other';
+export type AccountType =
+  | 'checking'
+  | 'savings'
+  | 'cash'
+  | 'card'
+  | 'investment'
+  /** Criptomonedas: the results of practice operations of the crypto console can be added to it. */
+  | 'crypto'
+  | 'other';
 
 export interface Account {
   id: string;

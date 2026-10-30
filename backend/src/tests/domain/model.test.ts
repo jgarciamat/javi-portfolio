@@ -92,7 +92,10 @@ describe('Category, Account, Transfer, CustomAlert', () => {
     expect(() => Category.create({ userId: 'u', name: '' })).toThrow();
     expect(() => Category.create({ userId: 'u', name: 'x', color: 'red' })).toThrow('Color');
     expect(Category.create({ userId: 'u', name: ' Mascotas ' }).name).toBe('Mascotas');
-    expect(() => Account.create('u', { name: 'x', type: 'crypto' })).toThrow('Tipo de cuenta');
+    expect(() => Account.create('u', { name: 'x', type: 'gold' })).toThrow('Tipo de cuenta');
+    expect(Account.create('u', { name: 'Exchange', type: 'crypto' }).toPrimitives().type).toBe(
+      'crypto'
+    );
     expect(
       Account.create('u', { name: 'Tarjeta', type: 'card', initialBalanceCents: -5000 })
         .initialBalanceCents

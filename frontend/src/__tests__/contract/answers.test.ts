@@ -51,6 +51,7 @@ import { cryptoLive } from './fixtures/cryptoLive';
 import { cryptoCoins } from './fixtures/cryptoCoins';
 import { cryptoSim } from './fixtures/cryptoSim';
 import { cryptoSimFilled } from './fixtures/cryptoSimFilled';
+import { cryptoSimTransferred } from './fixtures/cryptoSimTransferred';
 import { accounts } from './fixtures/accounts';
 import { annualSummary } from './fixtures/annualSummary';
 import { authResult } from './fixtures/authResult';
@@ -135,6 +136,7 @@ describe('API answers fit the types of the app', () => {
     contract<CryptoLive>()(cryptoLive);
     contract<SimPortfolio>()(cryptoSim);
     contract<SimPortfolio>()(cryptoSimFilled);
+    contract<SimPortfolio>()(cryptoSimTransferred);
     contract<CryptoRanking>()(cryptoRanking);
     contract<PriceAlerts>()(cryptoAlerts);
     contract<CryptoDrawings>()(cryptoDrawings);

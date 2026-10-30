@@ -63,6 +63,7 @@ import { CryptoAlertService } from '@application/crypto/CryptoAlertService';
 import { CryptoDrawingService } from '@application/crypto/CryptoDrawingService';
 import { CryptoRankingService } from '@application/crypto/CryptoRankingService';
 import { CryptoSimService } from '@application/crypto/CryptoSimService';
+import { CryptoTransferService } from '@application/crypto/CryptoTransferService';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
@@ -397,6 +398,15 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock
     ),
     cryptoDrawings: new CryptoDrawingService(repos.cryptoDrawings, clock),
+    cryptoTransfers: new CryptoTransferService(
+      repos.cryptoSim,
+      repos.transactions,
+      accountResolver,
+      categoryResolver,
+      repos.settings,
+      uow,
+      clock
+    ),
     cryptoAlerts: new CryptoAlertService(
       repos.cryptoSim,
       market,

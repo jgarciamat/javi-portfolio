@@ -781,6 +781,21 @@ export interface CryptoPriceAlert {
   triggeredAt: string | null;
 }
 
+/**
+ * A closed practice operation whose result was added to a real account (migration 044): the
+ * movement it made there and the account that movement is in now.
+ */
+export interface CryptoPracticeTransfer {
+  positionId: string;
+  transactionId: string;
+  accountId: string;
+  accountName: string;
+  /** What the movement adds (gain) or takes (loss), as written in the account. */
+  amountCents: Cents;
+  type: 'INCOME' | 'EXPENSE';
+  createdAt: string;
+}
+
 /** Chart drawings of the crypto console: one list per person and coin (migration 043). */
 export interface CryptoDrawingRepository {
   get(userId: string, symbol: string): { drawings: CryptoDrawing[]; updatedAt: string } | null;
@@ -826,6 +841,18 @@ export interface CryptoSimRepository {
   deleteOrdersOfPosition(userId: string, positionId: string): number;
   /** «Start again» of a practice portfolio: every position and order goes. */
   clear(portfolioId: string): void;
+
+  // Practice results added to an account
+  /** The operations of a portfolio already added to an account. */
+  transfers(portfolioId: string): CryptoPracticeTransfer[];
+  transferOf(positionId: string): CryptoPracticeTransfer | null;
+  /** Marks an operation as added (once: its primary key); the movement must exist already. */
+  insertTransfer(transfer: {
+    positionId: string;
+    userId: string;
+    transactionId: string;
+    createdAt: string;
+  }): void;
 
   // Ranking, seasons and badges
   profile(userId: string): CryptoSimProfile | null;
