@@ -12,7 +12,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 /** Play money every season starts with (cents): the same for the free plan and Premium. */
 export const SEASON_INITIAL_CENTS = 1_000_000;
 /** Practice portfolios: separate, never ranked, start again with this. */
-export const PRACTICE_INITIAL_CENTS = 1_000_000;
+export const PRACTICE_INITIAL_CENTS = 10_000_000;
 /** Practice portfolios at once: one on the free plan, five with Premium. */
 export const PRACTICE_MAX = { free: 1, premium: 5 } as const;
 /** Pending orders per portfolio: a convenience, it does not change the results. */

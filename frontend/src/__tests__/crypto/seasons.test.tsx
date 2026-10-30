@@ -107,7 +107,7 @@ describe('Crypto console: the season', () => {
     expect(within(bar).queryByRole('tab')).toBeNull();
     expect(bar).toHaveTextContent('Temporada de marzo · cartera oficial');
     expect(within(bar).getByRole('button', { name: /^Cartera de prácticas$/ })).toBeEnabled();
-    expect(bar).toHaveTextContent('Practica con otros 10.000 € virtuales sin afectar al ranking.');
+    expect(bar).toHaveTextContent('Practica con otros 100.000 € virtuales sin afectar al ranking.');
     const badges = screen.getByRole('heading', { name: 'Tus insignias' }).closest('section')!;
     expect(within(badges).getByText('Conseguida')).toBeInTheDocument();
     expect(within(badges).getByText('Cierra 10 operaciones.')).toBeInTheDocument();
@@ -233,11 +233,11 @@ describe('Crypto console: practice portfolios', () => {
         expect.objectContaining({ portfolioId: fx.PRACTICE_REF.id, amount: 100 })
       )
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo con 10.000 €' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo con 100.000 €' }));
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveTextContent('Tu temporada no cambia');
     fireEvent.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo con 10.000 €' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo con 100.000 €' }));
     fireEvent.click(screen.getByRole('button', { name: 'Sí, empezar de nuevo' }));
     await waitFor(() =>
       expect(api.cryptoApi.resetPractice).toHaveBeenCalledWith(fx.PRACTICE_REF.id)
@@ -275,7 +275,7 @@ describe('Crypto console: practice portfolios', () => {
       })
     );
     expect(
-      await screen.findByRole('button', { name: 'Empezar de nuevo con 10.000 €' })
+      await screen.findByRole('button', { name: 'Empezar de nuevo con 100.000 €' })
     ).toBeDisabled();
     const make = screen.getByRole('button', { name: /^Cartera de prácticas$/ });
     expect(make).toBeDisabled();

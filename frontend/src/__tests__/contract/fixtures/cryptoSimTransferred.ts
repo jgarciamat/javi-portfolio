@@ -21,8 +21,8 @@ export const cryptoSimTransferred = {
     },
   ],
   account: {
-    initial: 10000,
-    cash: 9999.8,
+    initial: 100000,
+    cash: 99999.8,
     reserved: 0,
     feeBps: 10,
     startedAt: '2026-03-15T12:05:00.000Z',
@@ -56,7 +56,7 @@ export const cryptoSimTransferred = {
     },
   ],
   summary: {
-    equity: 9999.8,
+    equity: 99999.8,
     realized: -0.2,
     unrealized: 0,
     total: -0.2,
@@ -96,7 +96,7 @@ export const cryptoSimTransferred = {
     },
     averageWin: null,
     averageLoss: -0.2,
-    equityDays: [{ day: '2026-03-15', equity: 9999.8 }],
+    equityDays: [{ day: '2026-03-15', equity: 99999.8 }],
     hold: { symbol: 'ETH', startPrice: 41000, price: 2000, percent: -95.12 },
   },
   market: {
