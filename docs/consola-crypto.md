@@ -228,6 +228,14 @@ mide siempre lo mismo y el esqueleto de carga la reserva (sin saltos).
   a pulsar la herramienta salen; Escape con herramienta no cierra la pantalla completa (salvo la
   pantalla completa nativa del navegador, que se queda la tecla). Con el foco en la gráfica,
   Intro dibuja la herramienta en las últimas velas.
+- **Con el dedo** (octubre de 2026): la superficie que recoge el gesto (`.cc-draw-catch`, solo con
+  herramienta de dibujo, no con la goma) cubre toda la gráfica, escalas incluidas, y lo que lee se
+  sujeta al panel: un dedo que empieza sobre la escala de precios o la de tiempo dibuja, no
+  estira la gráfica. El primer dedo manda en el trazo (un segundo dedo no lo mueve ni lo termina),
+  un `pointercancel` o la pérdida de la captura sueltan el trazo (no se queda atascado), un toque
+  admite 12 px de temblor (6 px con ratón) antes de contar como arrastre, y una pulsación larga no
+  abre menú ni selecciona. En pantallas táctiles los botones de la barra se tocan en 44 px de alto
+  (alcance invisible, la barra mide lo mismo). Capturas en `docs/consola-dibujo/movil/`.
 - **Anclaje a datos**: cada punto es `{ time, price }`: hora en ms UTC y precio en **euros** (la
   moneda en la que llegan todos los precios de la consola, como el simulador y las alertas). El
   dólar es solo una conversión de pantalla con el mismo cambio que las velas, así que un dibujo
