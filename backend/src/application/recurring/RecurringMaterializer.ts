@@ -73,7 +73,7 @@ export class RecurringMaterializer {
   /** Generates the movements of one rule within [from, to]. */
   materializeRule(rule: RecurringRule, from: Period, to: Period, monthStartDay: number): number {
     const skipped = new Set(this.rules.skippedPeriods(rule.id).map(periodOrdinal));
-    const accountId = rule.accountId ?? this.accounts.defaultAccount(rule.userId).id;
+    const accountId = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
     let count = 0;
     for (const period of rule.periodsWithin(from, to)) {
       if (skipped.has(periodOrdinal(period))) continue;

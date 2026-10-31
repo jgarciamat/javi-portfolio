@@ -67,6 +67,18 @@ describe('resolvers', () => {
     );
   });
 
+  it('notes generated movements in the chosen account, or the default one if it is not usable', () => {
+    const repo = ctx.container.repos.accounts;
+    const main = accounts.defaultAccount(user.id);
+    const crypto = Account.create(user.id, { name: 'Cripto', type: 'crypto' });
+    repo.save(crypto);
+    expect(accounts.forGeneratedMovement(user.id, crypto.id).id).toBe(crypto.id);
+    expect(accounts.forGeneratedMovement(user.id, null).id).toBe(main.id);
+    expect(accounts.forGeneratedMovement(user.id, 'gone').id).toBe(main.id);
+    repo.save(crypto.update({ archived: true }));
+    expect(accounts.forGeneratedMovement(user.id, crypto.id).id).toBe(main.id);
+  });
+
   it('finds or creates categories by name', () => {
     const found = categories.findOrCreate(user.id, 'Otros');
     expect(categories.findOrCreate(user.id, 'Otros').id).toBe(found.id);

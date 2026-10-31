@@ -80,6 +80,16 @@ export class AccountResolver {
     return account;
   }
 
+  /**
+   * Account for a movement an automatic operation generates: the one it chose while it is still
+   * active; archived or gone (deleted accounts leave it null), the default one, so the movement
+   * keeps counting in the total instead of landing where nobody sees it.
+   */
+  forGeneratedMovement(userId: string, accountId: string | null): Account {
+    const chosen = accountId ? this.accounts.findById(userId, accountId) : null;
+    return chosen && !chosen.archived ? chosen : this.defaultAccount(userId);
+  }
+
   /** Account for a new or edited movement: explicit (must be active) or the default one. */
   resolveForMovement(userId: string, accountId?: string | null): Account {
     if (!accountId) return this.defaultAccount(userId);

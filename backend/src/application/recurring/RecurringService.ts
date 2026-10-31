@@ -65,7 +65,16 @@ export class RecurringService {
     return rule;
   }
 
-  private resolveRefs(userId: string, input: RuleInput): Partial<RecurringRuleInput> {
+  /**
+   * `current` is the rule being edited: keeping the account it already has is always allowed,
+   * even if that account was archived since (its movements go to the default one meanwhile), so
+   * editing anything else never fails because of it.
+   */
+  private resolveRefs(
+    userId: string,
+    input: RuleInput,
+    current?: RecurringRule
+  ): Partial<RecurringRuleInput> {
     const resolved: Partial<RecurringRuleInput> = {
       description: input.description,
       amountCents: input.amountCents,
@@ -77,7 +86,7 @@ export class RecurringService {
     };
     if (input.categoryId || input.category)
       resolved.categoryId = this.categories.resolve(userId, input).id;
-    if (input.accountId !== undefined) {
+    if (input.accountId !== undefined && input.accountId !== current?.accountId) {
       resolved.accountId = input.accountId
         ? this.accounts.resolveForMovement(userId, input.accountId).id
         : null;
@@ -115,7 +124,7 @@ export class RecurringService {
     const startDay = this.settings.get(userId).monthStartDay;
     const updated = this.uow.run(() => {
       const before = this.require(userId, id);
-      const after = before.update(this.resolveRefs(userId, input));
+      const after = before.update(this.resolveRefs(userId, input, before));
       this.rules.save(after);
       const scheduleChanged =
         comparePeriods(before.start, after.start) !== 0 ||
