@@ -20,6 +20,8 @@ export function MonthCharges({ onEdit }: { onEdit: (tx: Transaction) => void }) 
   const f = useFinances();
   const charges = useMemo(() => monthCharges(f.transactions, todayDateOnly()), [f.transactions]);
   if (charges.items.length === 0) return null;
+  // As in the month's list: the account is named once there is more than one.
+  const showAccount = f.accounts.filter((acc) => !acc.archived).length > 1;
   const title = t(f.isCurrentPeriod ? 'app.charges.title' : 'app.charges.titleOther');
 
   return (
@@ -62,6 +64,7 @@ export function MonthCharges({ onEdit }: { onEdit: (tx: Transaction) => void }) 
                 <span className="entity-name">{tx.description}</span>
                 <span className="entity-sub">
                   {dayMonth(tx.date)} · {tCategory(tx.category)}
+                  {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
                 </span>
               </span>
               <span className="month-charges-amount">

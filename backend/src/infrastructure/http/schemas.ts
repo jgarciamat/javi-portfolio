@@ -21,6 +21,7 @@ import {
   DrawingWidth,
 } from '@domain/services/crypto-drawings';
 import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
+import { DEBT_TYPES, MAX_PROJECTED_PAYMENTS } from '@domain/services/debt';
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
@@ -355,6 +356,22 @@ export const householdCodeParams = z.object({ code: z.string().trim().min(10).ma
 export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
 const assetValue = z.number().finite().min(0).max(1_000_000_000).transform(toCents);
 const assetRate = z.number().finite().min(0).max(100);
+const debtType = z.enum(DEBT_TYPES);
+/** How a debt is paid every month: an automatic operation from one of the person's accounts. */
+const debtPayment = z
+  .object({
+    amount: money,
+    day: z.number().int().min(1).max(31),
+    accountId: optionalId,
+    startYear: year.nullish(),
+    startMonth: month.nullish(),
+    instalments: z.number().int().min(1).max(MAX_PROJECTED_PAYMENTS).nullish(),
+  })
+  .transform(({ amount, startYear, startMonth, ...rest }) => ({
+    ...rest,
+    amountCents: amount,
+    start: startYear && startMonth ? { year: startYear, month: startMonth } : null,
+  }));
 export const assetBody = z.object({
   name: z.string().trim().min(1).max(60),
   kind: z.enum(['investment', 'property', 'vehicle', 'other', 'debt']),
@@ -362,6 +379,15 @@ export const assetBody = z.object({
   date: date.nullish(),
   interestRate: assetRate.nullish(),
   minPayment: assetValue.nullish(),
+  debtType: debtType.nullish(),
+  initialValue: assetValue.nullish(),
+  payment: debtPayment.nullish(),
+});
+export const assetDebtBody = z.object({
+  debtType: debtType.optional(),
+  initialValue: assetValue.nullish(),
+  interestRate: assetRate.nullish(),
+  payment: debtPayment.nullish(),
 });
 export const assetTermsBody = z.object({
   interestRate: assetRate.nullable(),

@@ -31,6 +31,7 @@ function validTerms(interestRate: number | null, minPayment: number | null): boo
 function DebtTerms({ debt, onSaved }: { debt: Asset; onSaved: () => void }) {
   const { assetApi } = useApi();
   const { t } = useI18n();
+  const { money } = useFormat();
   const action = useAction();
   const [rate, setRate] = useState(fieldText(debt.interestRate));
   const [min, setMin] = useState(fieldText(debt.minPayment));
@@ -51,17 +52,25 @@ function DebtTerms({ debt, onSaved }: { debt: Asset; onSaved: () => void }) {
           onChange={(e) => setRate(e.target.value)}
         />
       </label>
-      <label className="field">
-        <span className="field-label">{t('app.debt.min')}</span>
-        <input
-          className="tx-input"
-          inputMode="decimal"
-          placeholder={t('app.debt.minEstimated', { amount: estimatedMinimum(debt.value) })}
-          aria-label={t('app.debt.minOf', { name: debt.name })}
-          value={min}
-          onChange={(e) => setMin(e.target.value)}
-        />
-      </label>
+      {debt.payment ? (
+        // Paid every month by itself: the plan counts that payment (changed on the debt).
+        <p className="field">
+          <span className="field-label">{t('app.debt.min')}</span>
+          <span>{t('app.debt.minAuto', { amount: money(debt.payment.amount) })}</span>
+        </p>
+      ) : (
+        <label className="field">
+          <span className="field-label">{t('app.debt.min')}</span>
+          <input
+            className="tx-input"
+            inputMode="decimal"
+            placeholder={t('app.debt.minEstimated', { amount: estimatedMinimum(debt.value) })}
+            aria-label={t('app.debt.minOf', { name: debt.name })}
+            value={min}
+            onChange={(e) => setMin(e.target.value)}
+          />
+        </label>
+      )}
       <button
         className="btn-secondary"
         disabled={!valid || action.pending}
@@ -101,7 +110,7 @@ export function DebtPlanCard({ debts, onChanged }: { debts: Asset[]; onChanged: 
     name: d.name,
     balance: d.value,
     rate: d.interestRate ?? 0,
-    minPayment: d.minPayment ?? estimatedMinimum(d.value),
+    minPayment: d.payment?.amount ?? d.minPayment ?? estimatedMinimum(d.value),
   }));
   const result = compareDebtPlan(list, extraAmount, strategy);
   const now = new Date();
@@ -119,7 +128,7 @@ export function DebtPlanCard({ debts, onChanged }: { debts: Asset[]; onChanged: 
       <ul className="debt-terms-list">
         {debts.map((d) => (
           <DebtTerms
-            key={`${d.id}-${d.interestRate}-${d.minPayment}`}
+            key={`${d.id}-${d.interestRate}-${d.minPayment}-${d.payment?.amount}`}
             debt={d}
             onSaved={onChanged}
           />

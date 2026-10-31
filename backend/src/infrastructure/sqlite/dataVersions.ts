@@ -160,6 +160,7 @@ export function statsTracking(db: Db): Record<string, WriteTracking> {
         insertIfAbsent: entityOwner,
         delete: userArg,
         deleteByRule: userArg,
+        deleteByRuleAfter: userArg,
         deleteSample: userArg,
       },
     },

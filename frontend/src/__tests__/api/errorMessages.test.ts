@@ -42,6 +42,9 @@ describe('apiErrorMessage in English', () => {
     expect(apiErrorMessage('CRYPTO_COIN_FULL', 'x', { symbol: 'SOL', limit: 2 })).toBe(
       'You already have 2 SOL trades: close or cancel one to open another.'
     );
+    expect(apiErrorMessage('ACCOUNT_HAS_RECURRING', 'x', { rules: ['Rent', 'Gym'] })).toBe(
+      'These active automatic operations use this account: Rent, Gym. Change their account or pause them first.'
+    );
   });
 
   it('falls back to a generic message for unknown or missing codes', () => {

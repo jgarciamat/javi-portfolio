@@ -58,6 +58,8 @@ import {
 import { AiAllowance, AiDenial, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from '@application/billing/EntitlementService';
 import { VersionedCache } from '@application/shared/VersionedCache';
+import type { DebtPayments } from '@application/assets/DebtPayments';
+import type { RecurringMaterializer } from '@application/recurring/RecurringMaterializer';
 import { TransactionService } from '@application/transactions/TransactionService';
 
 // ─── Stats ───────────────────────────────────────────────────────────────────
@@ -144,7 +146,9 @@ export class StatsService {
     private readonly clock: Clock,
     private readonly assets: AssetRepository,
     private readonly categories: CategoryRepository,
-    versions: DataVersions
+    versions: DataVersions,
+    private readonly debts?: DebtPayments,
+    private readonly materializer?: RecurringMaterializer
   ) {
     this.forecasts = new VersionedCache(versions);
     this.detected = new VersionedCache(versions);
@@ -360,6 +364,8 @@ export class StatsService {
     const startDay = this.settings.get(userId).monthStartDay;
     const to = currentPeriod(startDay, this.clock.now());
     const from = addMonths(to, -(Math.min(Math.max(months, 1), 120) - 1));
+    // The automatic operations (and the debts they pay) up to this month must exist.
+    this.materializer?.ensureUpTo(userId, to);
     const earliest = this.transactions.earliestPeriod(userId) ?? from;
     const initial = this.accounts.listByUser(userId).reduce((s, a) => s + a.initialBalanceCents, 0);
     const totals = new Map(
@@ -369,6 +375,7 @@ export class StatsService {
     );
     const assetList = this.assets.listByUser(userId);
     const assetValues = this.assets.valuesByUser(userId);
+    const debtPayments = this.debts?.paymentsByAsset(userId, assetList);
     let available = initial;
     let saved = 0;
     const points: NetWorthPoint[] = [];
@@ -383,7 +390,8 @@ export class StatsService {
         const { assetsCents, debtsCents } = assetTotalsAt(
           assetList,
           assetValues,
-          periodEnd(p, startDay)
+          periodEnd(p, startDay),
+          debtPayments
         );
         points.push({
           ...p,

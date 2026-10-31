@@ -14,6 +14,7 @@ import { billingApi } from '@core/api/billingApi';
 import { cryptoApi } from '@core/api/cryptoApi';
 import {
   accountApi,
+  assetApi,
   budgetApi,
   businessApi,
   categoryApi,
@@ -30,6 +31,13 @@ import { buildInputs } from '@modules/finances/ui/components/autonomoInputs';
 import { emptyActivity } from '@modules/finances/ui/components/activityForm';
 import { NO_EXTRAS, emptyManual } from '@modules/finances/ui/components/AutonomoManual';
 import { toSaved } from '@modules/finances/ui/components/autonomoSync';
+import {
+  assetFormResult,
+  emptyAssetForm,
+  paymentResult,
+  type CreateAssetInput,
+} from '@modules/finances/domain/assetForm';
+import type { DebtPaymentInput } from '@modules/finances/domain/types';
 import saved from './fixtures/requests.json';
 
 const FILE = resolve(__dirname, 'fixtures/requests.json');
@@ -177,6 +185,25 @@ add('recurringCreate', () =>
     frequency: 'monthly',
   })
 );
+// A mortgage paid every month from an account, as the form of «Inversiones, bienes y deudas»
+// builds it, and then a new monthly payment from the same form of the debt.
+const mortgage = assetFormResult({
+  ...emptyAssetForm(),
+  group: 'debt',
+  debtType: 'mortgage',
+  name: 'Hipoteca',
+  value: '1000',
+  initial: '5000',
+  rate: '2',
+  pays: true,
+  payment: { amount: '300', day: '20', accountId: '{account}', start: '2026-04', instalments: '' },
+}) as { input: CreateAssetInput };
+const newPayment = paymentResult(
+  { amount: '350', day: '5', accountId: '', start: '', instalments: '' },
+  true
+) as { payment: DebtPaymentInput };
+add('assetCreateDebt', () => assetApi.create(mortgage.input));
+add('assetUpdateDebt', () => assetApi.updateDebt('{asset}', { payment: newPayment.payment }));
 add('customAlertCreate', () =>
   customAlertApi.create({
     name: 'Ocio alto',

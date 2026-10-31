@@ -12,10 +12,13 @@ import {
   addMonths,
   comparePeriods,
   currentPeriod,
+  dateInPeriod,
   periodOrdinal,
   periodStart,
+  todayDateOnly,
 } from '@domain/shared/period';
 import { AccountResolver } from '@application/shared/resolvers';
+import type { DebtPayments } from '@application/assets/DebtPayments';
 
 /** How far ahead of today generated movements may exist. */
 export const MAX_MONTHS_AHEAD = 12;
@@ -37,8 +40,25 @@ export class RecurringMaterializer {
     private readonly settings: SettingsRepository,
     private readonly accounts: AccountResolver,
     private readonly uow: UnitOfWork,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly debts?: DebtPayments
   ) {}
+
+  /**
+   * The rule's account is no longer usable (archived before archiving was blocked, or old data):
+   * its movements still to come, dated after today, go to the default account too. The past ones
+   * and those already charged stay. Idempotent; unarchiving does not bring them back.
+   */
+  private relocateComing(rule: RecurringRule, today: string, monthStartDay: number): void {
+    if (!rule.accountId) return;
+    const target = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
+    if (target === rule.accountId) return;
+    for (const tx of this.transactions.listByRule(rule.userId, rule.id)) {
+      const { date, accountId } = tx.toPrimitives();
+      if (date <= today || accountId !== rule.accountId) continue;
+      this.transactions.save(tx.update({ accountId: target }, monthStartDay));
+    }
+  }
 
   /** Forget what was generated for a user (after editing rules or settings). */
   invalidate(userId: string): void {
@@ -58,10 +78,12 @@ export class RecurringMaterializer {
     const targetOrd = periodOrdinal(limit);
     if ((this.watermark.get(userId) ?? -1) >= targetOrd) return 0;
 
+    const today = todayDateOnly(this.clock.now());
     const created = this.uow.run(() => {
       let count = 0;
       for (const rule of this.rules.listByUser(userId)) {
         if (!rule.active) continue;
+        this.relocateComing(rule, today, monthStartDay);
         count += this.materializeRule(rule, rule.start, limit, monthStartDay);
       }
       return count;
@@ -70,28 +92,41 @@ export class RecurringMaterializer {
     return created;
   }
 
-  /** Generates the movements of one rule within [from, to]. */
+  /**
+   * Generates the movements of one rule within [from, to], on the rule's day (or the first day
+   * of the period). A rule that pays a debt pays what is left at most, and nothing once it is
+   * paid off (see DebtPayments).
+   */
   materializeRule(rule: RecurringRule, from: Period, to: Period, monthStartDay: number): number {
     const skipped = new Set(this.rules.skippedPeriods(rule.id).map(periodOrdinal));
-    const accountId = rule.accountId ?? this.accounts.defaultAccount(rule.userId).id;
+    const accountId = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
+    const debt = this.debts?.planner(rule) ?? null;
     let count = 0;
     for (const period of rule.periodsWithin(from, to)) {
       if (skipped.has(periodOrdinal(period))) continue;
+      const date = rule.day
+        ? dateInPeriod(period, rule.day, monthStartDay)
+        : periodStart(period, monthStartDay);
+      const amountCents = debt ? debt.amountFor(period, date) : rule.amountCents;
+      if (amountCents === null) continue;
       const tx = Transaction.create(
         {
           userId: rule.userId,
           accountId,
           categoryId: rule.categoryId,
           description: rule.description,
-          amountCents: rule.amountCents,
+          amountCents,
           type: rule.type,
-          date: periodStart(period, monthStartDay),
+          date,
           recurringRuleId: rule.id,
         },
         monthStartDay,
         this.clock.now()
       );
-      if (this.transactions.insertIfAbsent(tx)) count++;
+      if (this.transactions.insertIfAbsent(tx)) {
+        count++;
+        debt?.paid(date, amountCents);
+      }
     }
     return count;
   }

@@ -8,6 +8,7 @@ import { migrate, prunePreMigrationCopies } from '@infrastructure/sqlite/migrato
 import { migrations } from '@infrastructure/sqlite/migrations';
 import { baseline } from '@infrastructure/sqlite/migrations/001-baseline';
 import { dropUploadedPictures } from '@infrastructure/sqlite/migrations/033-drop-uploaded-pictures';
+import { debtPayments } from '@infrastructure/sqlite/migrations/046-debt-payments';
 
 /** Builds a database exactly as v1.10 left it, with representative data. */
 function legacyDatabase(file = ':memory:'): Db {
@@ -254,6 +255,68 @@ describe('migrations', () => {
 
     dropUploadedPictures.up(db);
     expect(read()).toEqual(expected);
+    db.close();
+  });
+
+  it('keeps the assets and rules there were: debts become «other» debts (046)', () => {
+    const db = openDatabase(':memory:');
+    migrate(
+      db,
+      migrations.filter((m) => m.version < debtPayments.version)
+    );
+    db.exec(`
+      INSERT INTO users (id, email, name, password_hash, created_at)
+        VALUES ('u1', 'u1@x.es', 'U', NULL, '2026-01-01T00:00:00Z');
+      INSERT INTO categories (id, user_id, name) VALUES ('c1', 'u1', 'Vivienda');
+      INSERT INTO recurring_rules (id, user_id, description, amount_cents, type, category_id,
+        start_year, start_month, created_at)
+        VALUES ('r1', 'u1', 'Alquiler', 80000, 'EXPENSE', 'c1', 2026, 1, '2026-01-01T00:00:00Z');
+      INSERT INTO assets (id, user_id, name, kind, created_at, interest_rate, min_payment_cents)
+        VALUES ('d1', 'u1', 'Préstamo', 'debt', '2026-01-01T00:00:00Z', 7, 10000),
+               ('p1', 'u1', 'Piso', 'property', '2026-01-01T00:00:00Z', NULL, NULL),
+               ('i1', 'u1', 'Fondo', 'investment', '2026-01-01T00:00:00Z', NULL, NULL);
+      INSERT INTO asset_values (asset_id, date, value_cents) VALUES ('d1', '2026-01-01', 500000);
+    `);
+    migrate(db, migrations);
+    expect(
+      db
+        .prepare(
+          `SELECT id, kind, debt_type, initial_cents, payment_rule_id, payment_end_year,
+             interest_rate, min_payment_cents FROM assets ORDER BY id`
+        )
+        .all()
+    ).toEqual([
+      expect.objectContaining({
+        id: 'd1',
+        debt_type: 'other',
+        interest_rate: 7,
+        min_payment_cents: 10000,
+      }),
+      expect.objectContaining({ id: 'i1', debt_type: null, payment_rule_id: null }),
+      expect.objectContaining({
+        id: 'p1',
+        debt_type: null,
+        initial_cents: null,
+        payment_end_year: null,
+      }),
+    ]);
+    expect(db.prepare('SELECT day FROM recurring_rules').get()).toEqual({ day: null });
+    expect(db.prepare('SELECT value_cents FROM asset_values').get()).toEqual({
+      value_cents: 500000,
+    });
+    // One automatic operation per debt; removing it leaves the debt without one.
+    db.exec(`UPDATE assets SET payment_rule_id = 'r1' WHERE id = 'd1'`);
+    expect(() => db.exec(`UPDATE assets SET payment_rule_id = 'r1' WHERE id = 'p1'`)).toThrow(
+      /UNIQUE/
+    );
+    expect(() => db.exec(`UPDATE assets SET debt_type = 'casino' WHERE id = 'd1'`)).toThrow(
+      /CHECK/
+    );
+    expect(() => db.exec(`UPDATE recurring_rules SET day = 32`)).toThrow(/CHECK/);
+    db.exec(`DELETE FROM recurring_rules WHERE id = 'r1'`);
+    expect(db.prepare(`SELECT payment_rule_id FROM assets WHERE id = 'd1'`).get()).toEqual({
+      payment_rule_id: null,
+    });
     db.close();
   });
 

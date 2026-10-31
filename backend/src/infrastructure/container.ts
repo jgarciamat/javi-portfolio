@@ -27,6 +27,7 @@ import { SplitService } from '@application/split/SplitService';
 import { TaxService } from '@application/tax/TaxService';
 import { AutonomoDataService } from '@application/tax/AutonomoDataService';
 import { AssetService } from '@application/assets/AssetService';
+import { DebtPayments } from '@application/assets/DebtPayments';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
 import { TwoFactorService } from '@application/auth/TwoFactorService';
@@ -273,13 +274,21 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock
   );
   const accountResolver = new AccountResolver(repos.accounts, repos.settings);
+  const debtPayments = new DebtPayments(
+    repos.assets,
+    repos.rules,
+    repos.transactions,
+    repos.settings,
+    clock
+  );
   const materializer = new RecurringMaterializer(
     repos.rules,
     repos.transactions,
     repos.settings,
     accountResolver,
     uow,
-    clock
+    clock,
+    debtPayments
   );
 
   const twoFactor = new TwoFactorService(
@@ -456,7 +465,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.settings,
       accountResolver,
       entitlements,
-      clock
+      clock,
+      repos.rules
     ),
     recurring: new RecurringService(
       repos.rules,
@@ -467,7 +477,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       materializer,
       entitlements,
       uow,
-      clock
+      clock,
+      debtPayments
     ),
     alerts: new CustomAlertService(repos.alerts, categoryResolver, entitlements, clock),
     budgets: new BudgetService(repos.budgets, categoryResolver, entitlements, uow, clock),
@@ -490,7 +501,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       repos.assets,
       repos.categories,
-      versions
+      versions,
+      debtPayments,
+      materializer
     ),
     moneyLeaks: new MoneyLeakService(
       repos.transactions,
@@ -521,7 +534,15 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     ),
     split: new SplitService(repos.splits, uow, clock),
     tax,
-    assetService: new AssetService(repos.assets, entitlements, uow, clock),
+    assetService: new AssetService(repos.assets, entitlements, uow, clock, {
+      rules: repos.rules,
+      transactions: repos.transactions,
+      settings: repos.settings,
+      categories: categoryResolver,
+      accounts: accountResolver,
+      materializer,
+      debts: debtPayments,
+    }),
     advice: new AdviceService(
       transactions,
       repos.transactions,

@@ -1054,6 +1054,113 @@ button.entity-item {
   min-width: 0;
 }
 
+/* A debt paid every month: payment, next one, progress and its editor. */
+.debt-details {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.debt-summary {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  font-size: 0.88rem;
+}
+
+.debt-summary p {
+  margin: 0;
+}
+
+.debt-progress {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.debt-progress .progress-fill {
+  background: var(--green-300);
+}
+
+.debt-warning {
+  margin: 0;
+  color: var(--amber-400);
+}
+
+.debt-editor {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+/* Adding an element, step by step. */
+.asset-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.asset-step {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.asset-step-title {
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.asset-substep {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+}
+
+.asset-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.asset-group {
+  position: relative;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.asset-group small {
+  color: var(--slate-400);
+}
+
+.asset-group.is-on {
+  border-color: var(--accent-400);
+  box-shadow: inset 0 0 0 1px var(--accent-400);
+}
+
+.asset-group input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.asset-group:focus-within {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.asset-pays {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 /* ─── Shared expenses ────────────────────────── */
 .split-groups,
 .split-balances,

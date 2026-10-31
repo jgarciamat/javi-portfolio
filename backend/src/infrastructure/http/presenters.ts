@@ -156,6 +156,8 @@ export function presentRule(r: RuleView) {
     endMonth: r.end?.month ?? null,
     frequency: r.frequency,
     active: r.active,
+    day: r.day,
+    debt: r.debt,
     createdAt: r.createdAt,
   };
 }
@@ -443,6 +445,26 @@ export function presentAsset(a: AssetView) {
     valueDate: a.valueDate,
     previousValue: a.previousCents === null ? null : m(a.previousCents),
     history: a.history.map((h) => ({ date: h.date, value: m(h.valueCents) })),
+    debtType: a.debtType,
+    initialValue: a.initialCents === null ? null : m(a.initialCents),
+    payment: a.payment && {
+      ruleId: a.payment.ruleId,
+      amount: m(a.payment.amountCents),
+      day: a.payment.day,
+      accountId: a.payment.accountId,
+      active: a.payment.active,
+      startYear: a.payment.start.year,
+      startMonth: a.payment.start.month,
+      endYear: a.payment.end?.year ?? null,
+      endMonth: a.payment.end?.month ?? null,
+      lastInstalmentYear: a.payment.lastInstalment?.year ?? null,
+      lastInstalmentMonth: a.payment.lastInstalment?.month ?? null,
+      nextDate: a.payment.nextDate,
+      remainingPayments: a.payment.remainingPayments,
+      paid: m(a.payment.paidCents),
+      coversInterest: a.payment.coversInterest,
+    },
+    paidOff: a.paidOff,
   };
 }
 

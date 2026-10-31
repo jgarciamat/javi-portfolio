@@ -5,6 +5,7 @@ import type {
   AIAnswer,
   AnnualReport,
   Asset,
+  DebtPayment,
   EndOfMonth,
   Forecast,
   SubscriptionReport,
@@ -554,6 +555,25 @@ export const asset = (over: Partial<Asset> = {}): Asset => ({
   valueDate: '2026-03-01',
   previousValue: null,
   history: [],
+  ...over,
+});
+
+export const debtPayment = (over: Partial<DebtPayment> = {}): DebtPayment => ({
+  ruleId: nextId('r'),
+  amount: 300,
+  day: 20,
+  accountId: null,
+  active: true,
+  startYear: 2026,
+  startMonth: 3,
+  endYear: 2026,
+  endMonth: 6,
+  lastInstalmentYear: null,
+  lastInstalmentMonth: null,
+  nextDate: '2026-03-20',
+  remainingPayments: 4,
+  paid: 0,
+  coversInterest: true,
   ...over,
 });
 

@@ -17,10 +17,17 @@ interface Options {
   onUpdateRule: (id: string, dto: UpdateRecurringRuleDTO) => Promise<RecurringRule>;
   /** Runs after a successful save (e.g. reload the month, which may have new movements). */
   onAfterSave?: () => Promise<void>;
+  /** Preselected for a new rule (the accounts may arrive after the form opens). */
+  defaultAccountId?: string;
 }
 
 /** Create / edit form of a recurring rule. `formError` is an i18n key or an API message. */
-export function useRecurringRuleForm({ onCreateRule, onUpdateRule, onAfterSave }: Options) {
+export function useRecurringRuleForm({
+  onCreateRule,
+  onUpdateRule,
+  onAfterSave,
+  defaultAccountId = '',
+}: Options) {
   const [showForm, setShowForm] = useState(false);
   const [editingRule, setEditingRule] = useState<RecurringRule | null>(null);
   const [form, setForm] = useState<RuleFormState>(emptyRuleForm);
@@ -28,7 +35,7 @@ export function useRecurringRuleForm({ onCreateRule, onUpdateRule, onAfterSave }
 
   const open = (rule: RecurringRule | null) => {
     setEditingRule(rule);
-    setForm(rule ? ruleToForm(rule) : emptyRuleForm());
+    setForm(rule ? ruleToForm(rule) : emptyRuleForm(new Date(), defaultAccountId));
     action.setError(null);
     setShowForm(true);
   };
@@ -46,7 +53,12 @@ export function useRecurringRuleForm({ onCreateRule, onUpdateRule, onAfterSave }
     }
     const saved = await action.run(async () => {
       if (editingRule) await onUpdateRule(editingRule.id, result.dto);
-      else await onCreateRule(result.dto);
+      // A new rule names its account, so it stays there even if the default one changes later.
+      else
+        await onCreateRule({
+          ...result.dto,
+          accountId: result.dto.accountId ?? (defaultAccountId || null),
+        });
       await onAfterSave?.();
     });
     if (saved) closeForm();

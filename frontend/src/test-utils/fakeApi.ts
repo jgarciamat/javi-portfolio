@@ -217,6 +217,7 @@ export function createFakeApi(): FakeApi {
         previousValue: null,
         history: [],
       }),
+      updateDebt: ok(f.asset({ kind: 'debt', debtType: 'other' })),
       remove: ok(undefined),
     },
     rentaApi: { register: ok({ used: 1 }), draft: ok({}) },

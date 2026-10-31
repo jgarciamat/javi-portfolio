@@ -276,12 +276,15 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
   private assets(userId: string): Row[] {
     return this.all(
       `SELECT id, name, kind, interest_rate AS interestRate, min_payment_cents,
+              debt_type AS debtType, initial_cents, payment_rule_id AS paymentRuleId,
+              payment_end_year AS paymentEndYear, payment_end_month AS paymentEndMonth,
               created_at AS createdAt
        FROM assets WHERE user_id = ? ORDER BY created_at`,
       userId
-    ).map(({ min_payment_cents, ...a }) => ({
+    ).map(({ min_payment_cents, initial_cents, ...a }) => ({
       ...a,
       minPayment: money(min_payment_cents),
+      initialValue: money(initial_cents),
       values: this.all(
         'SELECT date, value_cents FROM asset_values WHERE asset_id = ? ORDER BY date',
         a.id

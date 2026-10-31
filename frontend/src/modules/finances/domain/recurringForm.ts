@@ -1,4 +1,5 @@
 import type {
+  Account,
   CreateRecurringRuleDTO,
   RecurringFrequency,
   RecurringRule,
@@ -13,6 +14,8 @@ export interface RuleFormState {
   amount: string;
   type: TransactionType;
   category: string;
+  /** Account the movements are noted in; '' is «the default account». */
+  accountId: string;
   frequency: RecurringFrequency;
   /** YYYY-MM-DD (only year and month are used). */
   startDate: string;
@@ -22,13 +25,14 @@ export interface RuleFormState {
 
 const firstDay = (year: number, month: number) => `${year}-${String(month).padStart(2, '0')}-01`;
 
-/** A new rule starts on the first day of the current month. */
-export function emptyRuleForm(today = new Date()): RuleFormState {
+/** A new rule starts on the first day of the current month, in the default account. */
+export function emptyRuleForm(today = new Date(), defaultAccountId = ''): RuleFormState {
   return {
     description: '',
     amount: '',
     type: 'EXPENSE',
     category: '',
+    accountId: defaultAccountId,
     frequency: 'monthly',
     startDate: firstDay(today.getFullYear(), today.getMonth() + 1),
     hasEnd: false,
@@ -43,6 +47,7 @@ export function ruleToForm(rule: RecurringRule): RuleFormState {
     amount: String(rule.amount),
     type: rule.type,
     category: rule.category,
+    accountId: rule.accountId ?? '',
     frequency: rule.frequency,
     startDate: firstDay(rule.startYear, rule.startMonth),
     hasEnd,
@@ -82,6 +87,7 @@ export function validateRuleForm(
       amount,
       type: form.type,
       category: form.category,
+      accountId: form.accountId || null,
       frequency: form.frequency,
       startYear,
       startMonth,
@@ -89,4 +95,24 @@ export function validateRuleForm(
       endMonth: end ? end[1] : null,
     },
   };
+}
+
+export interface RuleAccount {
+  /** Where the coming movements are noted (null until the accounts are known). */
+  account: Account | null;
+  /** The rule names no account: it follows the default one. */
+  byDefault: boolean;
+  /** The account the rule chose, now archived: the default one takes its place. */
+  archived: Account | null;
+}
+
+/**
+ * The account of an automatic operation as the server applies it: the chosen one while it is
+ * active, otherwise (none chosen, archived or deleted) the default account.
+ */
+export function ruleAccount(rule: RecurringRule, accounts: Account[]): RuleAccount {
+  const fallback = accounts.find((a) => a.isDefault) ?? null;
+  const chosen = accounts.find((a) => a.id === rule.accountId);
+  if (chosen && !chosen.archived) return { account: chosen, byDefault: false, archived: null };
+  return { account: fallback, byDefault: !chosen, archived: chosen ?? null };
 }

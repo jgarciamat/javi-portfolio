@@ -3,6 +3,7 @@ import { Account, AccountInput, AccountProps } from '@domain/model/Account';
 import { Transfer } from '@domain/model/Transfer';
 import {
   AccountRepository,
+  RecurringRuleRepository,
   SettingsRepository,
   TransferRepository,
   TransferView,
@@ -25,8 +26,28 @@ export class AccountService {
     private readonly settings: SettingsRepository,
     private readonly resolver: AccountResolver,
     private readonly entitlements: EntitlementService,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly rules: RecurringRuleRepository
   ) {}
+
+  /**
+   * An account where active automatic operations note their movements cannot be archived nor
+   * deleted: they would keep charging an account that no longer counts. Paused ones do not
+   * block (they generate nothing; when resumed they go to the default account meanwhile).
+   */
+  private assertNoActiveRules(userId: string, account: Account, action: string): void {
+    const names = this.rules
+      .listByUser(userId)
+      .filter((r) => r.active && r.accountId === account.id)
+      .map((r) => r.description);
+    if (names.length === 0) return;
+    throw new ConflictError(
+      `No puedes ${action} «${account.name}»: la usan estas operaciones automáticas activas: ` +
+        `${names.join(', ')}. Cambia su cuenta o páusalas antes.`,
+      'ACCOUNT_HAS_RECURRING',
+      { rules: names }
+    );
+  }
 
   private activeCount(userId: string): number {
     return this.accounts.listByUser(userId).filter((a) => !a.archived).length;
@@ -87,16 +108,19 @@ export class AccountService {
         'DEFAULT_ACCOUNT'
       );
     }
+    if (changes.archived && !account.archived)
+      this.assertNoActiveRules(userId, account, 'archivar');
     const updated = account.update(changes);
     this.accounts.save(updated);
     return updated.toPrimitives();
   }
 
   delete(userId: string, id: string): void {
-    this.resolver.requireById(userId, id);
+    const account = this.resolver.requireById(userId, id);
     if (this.settings.get(userId).defaultAccountId === id) {
       throw new ConflictError('No puedes eliminar la cuenta por defecto', 'DEFAULT_ACCOUNT');
     }
+    this.assertNoActiveRules(userId, account, 'eliminar');
     if (this.accounts.countReferences(userId, id) > 0) {
       throw new ConflictError(
         'La cuenta tiene movimientos. Archívala en lugar de eliminarla.',

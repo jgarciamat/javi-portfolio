@@ -239,6 +239,10 @@ export interface RecurringRule {
   endMonth: number | null;
   frequency: RecurringFrequency;
   active: boolean;
+  /** Day of the month of each movement (null: the first day of the month). */
+  day?: number | null;
+  /** The debt it pays every month: its type and dates are the debt's. */
+  debt?: { id: string; name: string } | null;
   createdAt: string;
 }
 
@@ -457,6 +461,43 @@ export interface Inbox {
 }
 
 export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
+export type DebtType = 'mortgage' | 'personal' | 'car' | 'card' | 'other';
+
+/** How a debt is paid every month: an automatic operation that lowers what is owed. */
+export interface DebtPayment {
+  /** The automatic operation (recurring rule) that pays it. */
+  ruleId: string;
+  amount: number;
+  /** Day of the month of each payment. */
+  day: number;
+  accountId: string | null;
+  /** False while the operation is paused. */
+  active: boolean;
+  startYear: number;
+  startMonth: number;
+  endYear: number | null;
+  endMonth: number | null;
+  /** Last instalment, when the person said how many are left. */
+  lastInstalmentYear: number | null;
+  lastInstalmentMonth: number | null;
+  nextDate: string | null;
+  /** Payments still needed (estimate). */
+  remainingPayments: number | null;
+  /** What the operation has paid so far. */
+  paid: number;
+  /** False when the payment does not cover the month's interest. */
+  coversInterest: boolean;
+}
+
+/** How the app sends a debt's monthly payment. */
+export interface DebtPaymentInput {
+  amount: number;
+  day: number;
+  accountId?: string | null;
+  startYear?: number | null;
+  startMonth?: number | null;
+  instalments?: number | null;
+}
 
 /** An investment, property or debt the user values by hand. */
 export interface Asset {
@@ -471,6 +512,12 @@ export interface Asset {
   /** The value before the latest one (to show the change). */
   previousValue: number | null;
   history: { date: string; value: number }[];
+  /** Debts: what kind of debt, what was borrowed and how it is paid every month. */
+  debtType?: DebtType | null;
+  initialValue?: number | null;
+  payment?: DebtPayment | null;
+  /** A debt paid every month that owes nothing any more. */
+  paidOff?: boolean;
 }
 
 export interface SafeToSpend {

@@ -12,6 +12,7 @@ import { UserSettingsProps } from '@domain/model/UserSettings';
 import { SubscriptionProps } from '@domain/model/Subscription';
 import { Advice } from '@domain/services/rule-based-advisor';
 import { CryptoDrawing } from '@domain/services/crypto-drawings';
+import { DebtType } from '@domain/services/debt';
 import { LeakDecision, LeakMovement } from '@domain/services/money-leaks';
 import { RuleMovement } from '@domain/services/recurring-match';
 import { SubscriptionCandidate } from '@domain/services/subscriptions';
@@ -115,6 +116,14 @@ export interface Asset {
   /** Debts: yearly interest rate in percent and minimum monthly payment. */
   interestRate: number | null;
   minPaymentCents: number | null;
+  /** Debts: what kind of debt it is (null for investments and goods). */
+  debtType: DebtType | null;
+  /** Debts: what was borrowed, for the progress (optional). */
+  initialCents: number | null;
+  /** Debts: the automatic operation that pays it every month. */
+  paymentRuleId: string | null;
+  /** Debts: the last instalment, when the person said how many are left. */
+  paymentEnd: Period | null;
   createdAt: string;
 }
 
@@ -133,6 +142,8 @@ export interface AssetRepository {
   setValue(value: AssetValue): void;
   /** Every value of the user's assets, oldest first. */
   valuesByUser(userId: string): AssetValue[];
+  /** The debt an automatic operation pays, if any. */
+  findByPaymentRule(userId: string, ruleId: string): Asset | null;
 }
 
 export interface AccountRepository {
@@ -256,6 +267,8 @@ export interface TransactionRepository {
   lastCategoryByDescription(userId: string, descriptionKeys: string[]): Map<string, string>;
   listByRule(userId: string, ruleId: string): Transaction[];
   deleteByRule(userId: string, ruleId: string, fromPeriod?: Period): number;
+  /** Removes the rule's movements dated after `date` (the ones still to come). */
+  deleteByRuleAfter(userId: string, ruleId: string, date: string): number;
   listAllByUser(userId: string): Transaction[];
   /**
    * The expenses not added by an automatic operation, with only what the subscription detector

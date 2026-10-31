@@ -321,13 +321,27 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     api.recurringApi.getAll.mockResolvedValue([
       f.rule(),
       f.rule({ description: 'Gimnasio', endYear: 2026, endMonth: 6, active: false }),
+      f.rule({ description: 'Staking', accountId: 'a2' }),
     ]);
+    api.accountApi.getAll.mockResolvedValue({
+      accounts: [
+        f.account({ id: 'a1', name: 'Principal', isDefault: true }),
+        f.account({ id: 'a2', name: 'Cripto', type: 'crypto' }),
+      ],
+      total: 0,
+    });
     render(<RecurringRulesTab categories={[]} />, api);
+    // The account of each rule is in the file: wait for the accounts to arrive.
+    await screen.findAllByText(/Cripto/);
     const button = await csvButton(locale, 'app.recurring.title');
     await waitFor(() => expect(button).toBeEnabled());
     const file = await download(button);
     expect(file.name).toBe(`finanverso_gastos-fijos_${TODAY}.csv`);
     expect(file.head).toContain(`"${translate(locale, 'app.recurring.form.frequency')}"`);
+    expect(file.head).toContain(`"${translate(locale, 'app.export.csv.account')}"`);
+    expect(file.rows[0]).toContain('"Principal"');
+    expect(file.rows[2]).toContain('"Cripto"');
+    file.rows.splice(2, 1);
     expect(file.rows).toHaveLength(2);
     expect(file.rows[0]).toContain('"2026-01";""');
     expect(file.rows[1]).toContain(
@@ -335,7 +349,17 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     );
     const pdf = await downloadPdf(await pdfButton(locale, 'app.recurring.title'));
     expect(pdf.name).toBe(`finanverso_gastos-fijos_${TODAY}.pdf`);
-    expect(pdf.body).toHaveLength(2);
+    expect(pdf.body).toHaveLength(3);
+  });
+
+  it('Fixed expenses: the account stays empty while the accounts are not known', async () => {
+    const api = createFakeApi();
+    api.recurringApi.getAll.mockResolvedValue([f.rule({ accountId: 'a2' })]);
+    render(<RecurringRulesTab categories={[]} />, api);
+    const button = await csvButton(locale, 'app.recurring.title');
+    await waitFor(() => expect(button).toBeEnabled());
+    const file = await download(button);
+    expect(file.rows[0]).toContain(`"${translate(locale, 'app.recurring.form.type.expense')}";"";`);
   });
 
   it('Analysis: trends and net worth', async () => {

@@ -134,6 +134,18 @@ describe('AccountsView', () => {
     expect(await screen.findByText('Tiene movimientos')).toBeInTheDocument();
   });
 
+  it('says which automatic operations stop an account from being archived', async () => {
+    const { api } = setup();
+    const message =
+      'No puedes archivar «Efectivo»: la usan estas operaciones automáticas activas: Alquiler. Cambia su cuenta o páusalas antes.';
+    api.accountApi.update.mockRejectedValueOnce(
+      new ApiError(message, 409, 'ACCOUNT_HAS_RECURRING', { rules: ['Alquiler'] })
+    );
+    await screen.findByRole('button', { name: `${tr('app.common.edit')} Efectivo` });
+    fireEvent.click(screen.getAllByRole('button', { name: tr('app.accounts.archive') })[0]);
+    expect(await screen.findByText(message)).toBeInTheDocument();
+  });
+
   it('keeps the edit open when saving fails', async () => {
     const { api } = setup();
     api.accountApi.update.mockRejectedValueOnce(new Error('Nombre repetido'));
@@ -1308,6 +1320,7 @@ describe('the investments and debts section', () => {
 
     const add = screen.getByRole('button', { name: tr('app.assets.add') });
     expect(add).toBeDisabled();
+    fireEvent.click(screen.getByRole('radio', { name: new RegExp(tr('app.assets.group.good')) }));
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.name') }), {
       target: { value: ' Casa ' },
     });

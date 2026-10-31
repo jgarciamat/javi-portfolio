@@ -8,6 +8,10 @@ const asset = (id: string, kind: Asset['kind']): Asset => ({
   kind,
   interestRate: null,
   minPaymentCents: null,
+  debtType: kind === 'debt' ? 'other' : null,
+  initialCents: null,
+  paymentRuleId: null,
+  paymentEnd: null,
   createdAt: '2026-01-01T00:00:00Z',
 });
 const value = (assetId: string, date: string, valueCents: number): AssetValue => ({

@@ -8,6 +8,7 @@ import {
 } from '@modules/finances/domain/customAlerts';
 import {
   emptyRuleForm,
+  ruleAccount,
   ruleToForm,
   validateRuleForm,
   type RuleFormState,
@@ -15,7 +16,7 @@ import {
 import { buildSummaryCards, savingsRateAccent } from '@modules/finances/domain/summaryCards';
 import { amountSign, totalsByType } from '@modules/finances/domain/transactionTypes';
 import type { CustomAlertMetric } from '@modules/finances/domain/types';
-import { customAlert, rule, summary } from '@test-utils/fixtures';
+import { account, customAlert, rule, summary } from '@test-utils/fixtures';
 
 describe('buildAnnualChartData', () => {
   it('sorts months and adds the totals', () => {
@@ -115,6 +116,7 @@ describe('recurring rule form', () => {
         amount: 800.5,
         type: 'EXPENSE',
         category: 'Vivienda',
+        accountId: null,
         frequency: 'monthly',
         startYear: 2026,
         startMonth: 3,
@@ -127,6 +129,46 @@ describe('recurring rule form', () => {
     });
     expect(validateRuleForm({ ...valid, hasEnd: true, endDate: '' })).toMatchObject({
       dto: { endYear: null },
+    });
+    expect(validateRuleForm({ ...valid, accountId: 'a2' })).toMatchObject({
+      dto: { accountId: 'a2' },
+    });
+  });
+
+  it('keeps the account of the rule, or the default one for a new rule', () => {
+    expect(emptyRuleForm(new Date(2026, 2, 15)).accountId).toBe('');
+    expect(emptyRuleForm(new Date(2026, 2, 15), 'a1').accountId).toBe('a1');
+    expect(ruleToForm(rule({ accountId: 'a2' })).accountId).toBe('a2');
+    // A rule without account follows the default one: it stays like that unless changed.
+    expect(ruleToForm(rule({ accountId: null })).accountId).toBe('');
+    expect(ruleToForm(rule()).accountId).toBe('');
+  });
+
+  it('tells where the movements of a rule are noted', () => {
+    const main = account({ id: 'a1', isDefault: true });
+    const crypto = account({ id: 'a2', name: 'Cripto', type: 'crypto' });
+    const old = account({ id: 'a3', name: 'Vieja', archived: true });
+    const accounts = [main, crypto, old];
+    expect(ruleAccount(rule({ accountId: 'a2' }), accounts)).toEqual({
+      account: crypto,
+      byDefault: false,
+      archived: null,
+    });
+    expect(ruleAccount(rule({ accountId: null }), accounts)).toEqual({
+      account: main,
+      byDefault: true,
+      archived: null,
+    });
+    expect(ruleAccount(rule({ accountId: 'a3' }), accounts)).toEqual({
+      account: main,
+      byDefault: false,
+      archived: old,
+    });
+    // Before the accounts arrive nothing is said.
+    expect(ruleAccount(rule({ accountId: 'a2' }), [])).toEqual({
+      account: null,
+      byDefault: true,
+      archived: null,
     });
   });
 });

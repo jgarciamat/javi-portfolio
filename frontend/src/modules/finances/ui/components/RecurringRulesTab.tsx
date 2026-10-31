@@ -3,8 +3,18 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { DateField } from '@shared/components/DateField';
 import { useAction } from '@shared/hooks/useAction';
-import type { Category, RecurringRule, TransactionType } from '@modules/finances/domain/types';
-import { FREQUENCIES, type RuleFormState } from '@modules/finances/domain/recurringForm';
+import type {
+  Account,
+  Category,
+  RecurringRule,
+  TransactionType,
+} from '@modules/finances/domain/types';
+import {
+  FREQUENCIES,
+  ruleAccount,
+  type RuleAccount,
+  type RuleFormState,
+} from '@modules/finances/domain/recurringForm';
 import { TRANSACTION_TYPES } from '@modules/finances/domain/transactionTypes';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
 import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleForm';
@@ -65,6 +75,51 @@ function EndDateFields({ form, set, name }: { form: RuleFormState; set: SetField
   );
 }
 
+/**
+ * The account each movement is noted in (any type: the main one, savings, crypto…). An archived
+ * account stays listed only for the rule that already has it.
+ */
+function AccountField({
+  form,
+  set,
+  accounts,
+  id,
+}: {
+  form: RuleFormState;
+  set: SetField;
+  accounts: Account[];
+  id: string;
+}) {
+  const { t } = useI18n();
+  const selectable = accounts.filter((a) => !a.archived || a.id === form.accountId);
+  const fallback = accounts.find((a) => a.isDefault) ?? selectable[0];
+  if (!fallback) return null;
+  return (
+    <div className="recurring-form-field">
+      <label className="recurring-label" htmlFor={`${id}-account`}>
+        {t('app.recurring.form.account')}
+      </label>
+      <select
+        id={`${id}-account`}
+        className="tx-input"
+        value={form.accountId || fallback.id}
+        onChange={(e) => set('accountId', e.target.value)}
+        aria-describedby={`${id}-account-hint`}
+      >
+        {selectable.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.icon} {a.name}
+            {a.archived ? ` (${t('app.recurring.form.account.archived')})` : ''}
+          </option>
+        ))}
+      </select>
+      <small id={`${id}-account-hint`} className="recurring-field-hint">
+        {t('app.recurring.form.account.hint')}
+      </small>
+    </div>
+  );
+}
+
 interface RuleFormProps {
   form: RuleFormState;
   onChange: (form: RuleFormState) => void;
@@ -73,7 +128,10 @@ interface RuleFormProps {
   loading: boolean;
   error: string | null;
   categories: Category[];
+  accounts: Account[];
   isEdit: boolean;
+  /** The rule pays this debt: its type, frequency and dates are the debt's. */
+  debtName?: string;
 }
 
 function RuleForm({
@@ -84,7 +142,9 @@ function RuleForm({
   loading,
   error,
   categories,
+  accounts,
   isEdit,
+  debtName,
 }: RuleFormProps) {
   const { t, tCategory } = useI18n();
   const id = useId();
@@ -134,23 +194,25 @@ function RuleForm({
           />
         </div>
 
-        <div className="recurring-form-field">
-          <label className="recurring-label" htmlFor={`${id}-type`}>
-            {t('app.recurring.form.type')}
-          </label>
-          <select
-            id={`${id}-type`}
-            className="tx-input"
-            value={form.type}
-            onChange={(e) => set('type', e.target.value as TransactionType)}
-          >
-            {TRANSACTION_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {t(typeKey(type))}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!debtName && (
+          <div className="recurring-form-field">
+            <label className="recurring-label" htmlFor={`${id}-type`}>
+              {t('app.recurring.form.type')}
+            </label>
+            <select
+              id={`${id}-type`}
+              className="tx-input"
+              value={form.type}
+              onChange={(e) => set('type', e.target.value as TransactionType)}
+            >
+              {TRANSACTION_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {t(typeKey(type))}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="recurring-form-field">
           <label className="recurring-label" htmlFor={`${id}-category`}>
@@ -171,35 +233,48 @@ function RuleForm({
           </select>
         </div>
 
-        <div className="recurring-form-field">
-          <label className="recurring-label" htmlFor={`${id}-frequency`}>
-            {t('app.recurring.form.frequency')}
-          </label>
-          <select
-            id={`${id}-frequency`}
-            className="tx-input"
-            value={form.frequency}
-            onChange={(e) => set('frequency', e.target.value as RuleFormState['frequency'])}
+        <AccountField form={form} set={set} accounts={accounts} id={id} />
+
+        {debtName ? (
+          <p
+            className="recurring-form-field recurring-form-field--wide recurring-debt-note"
+            role="note"
           >
-            {FREQUENCIES.map((f) => (
-              <option key={f} value={f}>
-                {t(`app.recurring.form.frequency.${f}`)}
-              </option>
-            ))}
-          </select>
-        </div>
+            {t('app.recurring.form.debtManaged', { name: debtName })}
+          </p>
+        ) : (
+          <>
+            <div className="recurring-form-field">
+              <label className="recurring-label" htmlFor={`${id}-frequency`}>
+                {t('app.recurring.form.frequency')}
+              </label>
+              <select
+                id={`${id}-frequency`}
+                className="tx-input"
+                value={form.frequency}
+                onChange={(e) => set('frequency', e.target.value as RuleFormState['frequency'])}
+              >
+                {FREQUENCIES.map((f) => (
+                  <option key={f} value={f}>
+                    {t(`app.recurring.form.frequency.${f}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <div className="recurring-form-field">
-          <span className="recurring-label">{t('app.recurring.form.start')}</span>
-          <DateField
-            value={form.startDate}
-            onChange={(v) => set('startDate', v)}
-            label={t('app.recurring.form.start')}
-            className="recurring-date-display"
-          />
-        </div>
+            <div className="recurring-form-field">
+              <span className="recurring-label">{t('app.recurring.form.start')}</span>
+              <DateField
+                value={form.startDate}
+                onChange={(v) => set('startDate', v)}
+                label={t('app.recurring.form.start')}
+                className="recurring-date-display"
+              />
+            </div>
 
-        <EndDateFields form={form} set={set} name={`${id}-end`} />
+            <EndDateFields form={form} set={set} name={`${id}-end`} />
+          </>
+        )}
       </div>
 
       {error && <p className="recurring-error">{t(error)}</p>}
@@ -218,14 +293,40 @@ function RuleForm({
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
+/** «Cuenta: X», and a warning when the chosen one was archived. */
+function RuleAccountLine({ where }: { where: RuleAccount }) {
+  const { t } = useI18n();
+  if (!where.account) return null;
+  const name = `${where.account.icon} ${where.account.name}`;
+  return (
+    <>
+      <span className="recurring-meta-item">
+        {t(where.byDefault ? 'app.recurring.card.accountDefault' : 'app.recurring.card.account', {
+          name,
+        })}
+      </span>
+      {where.archived && (
+        <span className="recurring-meta-item recurring-meta-warning" role="note">
+          ⚠️{' '}
+          {t('app.recurring.card.accountArchived', {
+            name: where.archived.name,
+            fallback: where.account.name,
+          })}
+        </span>
+      )}
+    </>
+  );
+}
+
 interface RuleCardProps {
   rule: RecurringRule;
+  where: RuleAccount;
   onEdit: (rule: RecurringRule) => void;
   onDelete: (rule: RecurringRule) => void;
   onToggle: (rule: RecurringRule) => void;
 }
 
-function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
+function RuleCard({ rule, where, onEdit, onDelete, onToggle }: RuleCardProps) {
   const { t, tCategory } = useI18n();
   const { money, monthName } = useFormat();
   const period = (year: number, month: number) => `${monthName(month, 'short')} ${year}`;
@@ -255,7 +356,13 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
       </div>
 
       <div className="recurring-card-meta">
+        {rule.debt && (
+          <span className="recurring-meta-item recurring-meta-debt">
+            💳 {t('app.recurring.card.debt', { name: rule.debt.name })}
+          </span>
+        )}
         <span className="recurring-meta-item">📁 {tCategory(rule.category)}</span>
+        <RuleAccountLine where={where} />
         <span className="recurring-meta-item">
           <Icon name="repeat" /> {t(`app.recurring.form.frequency.${rule.frequency}`)}
         </span>
@@ -300,18 +407,25 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
 const yearMonth = (year: number | null, month: number | null) =>
   year && month ? `${year}-${String(month).padStart(2, '0')}` : '';
 
+const defaultAccountOf = (accounts: Account[]) => accounts.find((a) => a.isDefault)?.id;
+
+/** The debt the rule being edited pays, if any. */
+const debtNameOf = (rule: RecurringRule | null) => rule?.debt?.name;
+
 export function RecurringRulesTab({ categories }: { categories: Category[] }) {
   const { t, tCategory } = useI18n();
   const { currency } = useFormat();
   const { rules, loading, error, createRule, updateRule, deleteRule, toggleActive } =
     useRecurringRules();
-  const { refresh } = useFinances();
+  const { refresh, accounts } = useFinances();
   const reloadMonths = () => refresh({ invalidate: true });
   const editor = useRecurringRuleForm({
     onCreateRule: createRule,
     onUpdateRule: updateRule,
     onAfterSave: reloadMonths,
+    defaultAccountId: defaultAccountOf(accounts),
   });
+  const whereOf = (rule: RecurringRule) => ruleAccount(rule, accounts);
   const [deleting, setDeleting] = useState<RecurringRule | null>(null);
   const deletion = useAction();
   const toggling = useAction();
@@ -330,6 +444,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
       t('app.export.csv.description'),
       t('app.export.csv.category'),
       t('app.export.csv.type'),
+      t('app.export.csv.account'),
       `${t('app.export.csv.amount')} (${currency})`,
       t('app.recurring.form.frequency'),
       t('app.recurring.export.start'),
@@ -340,6 +455,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
       r.description,
       tCategory(r.category),
       t(typeKey(r.type)),
+      whereOf(r).account?.name ?? '',
       r.amount,
       t(`app.recurring.form.frequency.${r.frequency}`),
       yearMonth(r.startYear, r.startMonth),
@@ -382,7 +498,9 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
             loading={editor.saving}
             error={editor.formError}
             categories={categories}
+            accounts={accounts}
             isEdit={editor.editingRule !== null}
+            debtName={debtNameOf(editor.editingRule)}
           />
         </div>
       )}
@@ -403,6 +521,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
             <RuleCard
               key={rule.id}
               rule={rule}
+              where={whereOf(rule)}
               onEdit={editor.openEdit}
               onDelete={(r) => {
                 deletion.setError(null);

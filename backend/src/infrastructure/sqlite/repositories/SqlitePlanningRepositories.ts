@@ -31,6 +31,7 @@ interface RuleRow {
   end_month: number | null;
   frequency: string;
   active: number;
+  day: number | null;
   created_at: string;
 }
 
@@ -48,6 +49,7 @@ const toRule = (r: RuleRow): RecurringRule =>
       r.end_year !== null && r.end_month !== null ? { year: r.end_year, month: r.end_month } : null,
     frequency: r.frequency as RecurringFrequency,
     active: r.active === 1,
+    day: r.day,
     createdAt: r.created_at,
   });
 
@@ -74,15 +76,16 @@ export class SqliteRecurringRuleRepository implements RecurringRuleRepository {
     this.db
       .prepare(
         `INSERT INTO recurring_rules (id, user_id, description, amount_cents, type, category_id,
-           account_id, start_year, start_month, end_year, end_month, frequency, active, created_at)
+           account_id, start_year, start_month, end_year, end_month, frequency, active, day,
+           created_at)
          VALUES (@id, @userId, @description, @amountCents, @type, @categoryId, @accountId,
-           @startYear, @startMonth, @endYear, @endMonth, @frequency, @active, @createdAt)
+           @startYear, @startMonth, @endYear, @endMonth, @frequency, @active, @day, @createdAt)
          ON CONFLICT(id) DO UPDATE SET description = excluded.description,
            amount_cents = excluded.amount_cents, type = excluded.type,
            category_id = excluded.category_id, account_id = excluded.account_id,
            start_year = excluded.start_year, start_month = excluded.start_month,
            end_year = excluded.end_year, end_month = excluded.end_month,
-           frequency = excluded.frequency, active = excluded.active`
+           frequency = excluded.frequency, active = excluded.active, day = excluded.day`
       )
       .run({
         id: p.id,
@@ -98,6 +101,7 @@ export class SqliteRecurringRuleRepository implements RecurringRuleRepository {
         endMonth: p.end?.month ?? null,
         frequency: p.frequency,
         active: p.active ? 1 : 0,
+        day: p.day,
         createdAt: p.createdAt,
       });
   }

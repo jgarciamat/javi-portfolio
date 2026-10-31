@@ -386,6 +386,12 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return rows.map(toEntity);
   }
 
+  deleteByRuleAfter(userId: string, ruleId: string, date: string): number {
+    return this.db
+      .prepare('DELETE FROM transactions WHERE user_id = ? AND recurring_rule_id = ? AND date > ?')
+      .run(userId, ruleId, date).changes;
+  }
+
   deleteByRule(userId: string, ruleId: string, fromPeriod?: Period): number {
     if (!fromPeriod) {
       return this.db

@@ -12,6 +12,8 @@ import type {
   AnnualSummary,
   Asset,
   AssetKind,
+  DebtPaymentInput,
+  DebtType,
   BusinessCategory,
   SplitGroup,
   SplitGroupSummary,
@@ -396,8 +398,23 @@ export const assetApi = {
     date?: string;
     interestRate?: number | null;
     minPayment?: number | null;
+    debtType?: DebtType;
+    initialValue?: number | null;
+    payment?: DebtPaymentInput | null;
   }) {
     return apiRequest<Asset>('/assets', { method: 'POST', body: jsonBody(input) });
+  },
+  /** A debt's kind, amount borrowed, interest and monthly payment (`payment: null` stops it). */
+  updateDebt(
+    id: string,
+    changes: {
+      debtType?: DebtType;
+      initialValue?: number | null;
+      interestRate?: number | null;
+      payment?: DebtPaymentInput | null;
+    }
+  ) {
+    return apiRequest<Asset>(`/assets/${id}/debt`, { method: 'PATCH', body: jsonBody(changes) });
   },
   /** Records what the asset is worth now (or on `date`). */
   setValue(id: string, value: number, date?: string) {

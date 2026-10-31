@@ -299,6 +299,41 @@
     }
   },
   {
+    "name": "assetCreateDebt",
+    "method": "POST",
+    "path": "/assets",
+    "auth": true,
+    "body": {
+      "name": "Hipoteca",
+      "kind": "debt",
+      "value": 1000,
+      "debtType": "mortgage",
+      "initialValue": 5000,
+      "interestRate": 2,
+      "payment": {
+        "amount": 300,
+        "day": 20,
+        "accountId": "{account}",
+        "startYear": 2026,
+        "startMonth": 4,
+        "instalments": null
+      }
+    }
+  },
+  {
+    "name": "assetUpdateDebt",
+    "method": "PATCH",
+    "path": "/assets/{asset}/debt",
+    "auth": true,
+    "body": {
+      "payment": {
+        "amount": 350,
+        "day": 5,
+        "accountId": null
+      }
+    }
+  },
+  {
     "name": "customAlertCreate",
     "method": "POST",
     "path": "/custom-alerts",
