@@ -19,7 +19,12 @@ Producción: <https://finanverso.app>
 - **Presupuestos por categoría** con avisos al 80 % y al 100 %.
 - **Metas de ahorro** con progreso y ahorro mensual necesario.
 - **Reglas recurrentes** (mensual, bimestral, trimestral, anual). Los cambios se aplican desde el mes actual
-  y los movimientos generados que borras no se vuelven a crear.
+  y los movimientos generados que borras no se vuelven a crear. Cada operación automática se anota en la
+  **cuenta** que elijas (de cualquier tipo, también Criptomonedas): su saldo baja o sube y el total de
+  cuentas cambia como con cualquier movimiento. Las creadas antes sin cuenta siguen en la cuenta por
+  defecto. Si la cuenta elegida se archiva o se borra, los próximos movimientos van a la cuenta por
+  defecto (la tarjeta lo avisa) y vuelven a ella si se desarchiva; cambiar la cuenta mueve los
+  movimientos del mes actual en adelante, nunca los pasados.
 - **Importación de extractos** CSV (cualquier separador y formato numérico) y Norma 43, con detección de
   duplicados y categorización automática a partir de tu historial, palabras clave y, en Premium, IA.
 - **Búsqueda y filtros** por texto, tipo, categoría, cuenta, fechas e importes.

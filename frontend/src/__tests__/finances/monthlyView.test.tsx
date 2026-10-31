@@ -667,6 +667,33 @@ describe('«Recibos y cargos de este mes»', () => {
     expect(screen.queryByRole('region', { name: tr('app.charges.title') })).toBeNull();
   });
 
+  it('names the account each charge is noted in once there is more than one', async () => {
+    const crypto = f.transaction({
+      ...gym('g1', '2026-03-05'),
+      accountId: 'a3',
+      accountName: 'Cripto',
+    });
+    const unnamed = f.transaction({ ...gym('g2', '2026-03-28'), accountName: undefined });
+    const { unmount } = setup(f.overview({ transactions: [dinner, crypto, unnamed] }));
+    let card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    await waitFor(() => expect(card.getAllByRole('listitem')[0]).toHaveTextContent('· Cripto'));
+    expect(card.getAllByRole('listitem')[1]).not.toHaveTextContent('Principal');
+    unmount();
+
+    // With a single active account there is nothing to tell apart.
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [dinner, crypto] }));
+    api.categoryApi.getAll.mockResolvedValue(categories);
+    api.accountApi.getAll.mockResolvedValue({
+      accounts: [accounts[0], { ...accounts[1], archived: true }],
+      total: 1000,
+    });
+    renderWithProviders(<Dashboard />, { api });
+    card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    await waitFor(() => expect(api.accountApi.getAll).toHaveBeenCalled());
+    expect(card.getByRole('listitem')).not.toHaveTextContent('Cripto');
+  });
+
   it('says «del mes» in another month, where everything was already charged', async () => {
     setup(f.overview({ transactions: [dinner, gym('g1', '2026-02-05')] }));
     await screen.findByRole('region', { name: tr('app.charges.title') });

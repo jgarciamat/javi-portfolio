@@ -66,6 +66,12 @@
   letter-spacing: 0.02em;
 }
 
+.recurring-field-hint {
+  font-size: 0.72rem;
+  color: var(--slate-500);
+  line-height: 1.35;
+}
+
 .recurring-date-display {
   width: 200px;
   max-width: 100%;
@@ -216,6 +222,10 @@
 .recurring-meta-item {
   font-size: 0.78rem;
   color: var(--slate-500);
+}
+
+.recurring-meta-warning {
+  color: var(--amber-400);
 }
 
 .recurring-card-actions {

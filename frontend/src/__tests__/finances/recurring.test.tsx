@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RecurringRulesTab } from '@modules/finances/ui/components/RecurringRulesTab';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
+import type { Account } from '@modules/finances/domain/types';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
@@ -19,10 +20,12 @@ function setup(
       endYear: 2026,
       endMonth: 12,
     }),
-  ]
+  ],
+  accounts: Account[] = []
 ) {
   const api = createFakeApi();
   api.recurringApi.getAll.mockResolvedValue(rules);
+  api.accountApi.getAll.mockResolvedValue({ accounts, total: 0 });
   const view = renderWithProviders(<RecurringRulesTab categories={categories} />, { api });
   return view;
 }
@@ -86,6 +89,7 @@ describe('RecurringRulesTab', () => {
         amount: 30,
         type: 'EXPENSE',
         category: 'Vivienda',
+        accountId: null,
         frequency: 'quarterly',
         startYear: 2026,
         startMonth: 4,
@@ -162,5 +166,139 @@ describe('RecurringRulesTab', () => {
     await waitFor(() => expect(api.recurringApi.delete).toHaveBeenLastCalledWith('r1', 'all'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.queryByText('Alquiler')).toBeNull();
+  });
+
+  describe('the account of each automatic operation', () => {
+    const main = f.account({ id: 'a1', name: 'Principal', isDefault: true });
+    const crypto = f.account({ id: 'a2', name: 'Cripto', type: 'crypto', icon: '🪙' });
+    const old = f.account({ id: 'a3', name: 'Vieja', archived: true });
+    const accounts = [main, crypto, old];
+    const rules = [
+      f.rule({ id: 'r1', description: 'Alquiler', accountId: null }),
+      f.rule({ id: 'r2', description: 'Staking', accountId: 'a2' }),
+      f.rule({ id: 'r3', description: 'Seguro', accountId: 'a3' }),
+    ];
+
+    const card = async (name: string) =>
+      within(
+        (
+          await screen.findByRole('button', { name: `${tr('app.recurring.card.edit')}: ${name}` })
+        ).closest('.recurring-card') as HTMLElement
+      );
+
+    it('shows it on the card, with a warning when it was archived', async () => {
+      setup(rules, accounts);
+      expect(
+        (await card('Alquiler')).getByText(
+          tr('app.recurring.card.accountDefault', { name: '🏦 Principal' })
+        )
+      ).toBeInTheDocument();
+      expect(
+        (await card('Staking')).getByText(tr('app.recurring.card.account', { name: '🪙 Cripto' }))
+      ).toBeInTheDocument();
+      const archived = await card('Seguro');
+      expect(
+        archived.getByText(tr('app.recurring.card.account', { name: '🏦 Principal' }))
+      ).toBeInTheDocument();
+      expect(archived.getByRole('note')).toHaveTextContent(
+        tr('app.recurring.card.accountArchived', { name: 'Vieja', fallback: 'Principal' })
+      );
+    });
+
+    it('a new one starts in the default account and can go to any active one', async () => {
+      const { api } = setup([], accounts);
+      await screen.findByText(new RegExp(tr('app.recurring.empty')));
+      await waitFor(() => expect(api.accountApi.getAll).toHaveBeenCalled());
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.new') }));
+      const select = await screen.findByRole('combobox', {
+        name: tr('app.recurring.form.account'),
+      });
+      expect(select).toHaveValue('a1');
+      expect(select).toHaveAccessibleDescription(tr('app.recurring.form.account.hint'));
+      // Archived accounts are not offered for a new rule.
+      expect(
+        within(select)
+          .getAllByRole('option')
+          .map((o) => o.textContent)
+      ).toEqual(['🏦 Principal', '🪙 Cripto']);
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.description')), {
+        target: { value: 'Staking' },
+      });
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.amount')), {
+        target: { value: '10' },
+      });
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.category')), {
+        target: { value: 'Vivienda' },
+      });
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.form.save') }));
+      await waitFor(() =>
+        expect(api.recurringApi.create).toHaveBeenLastCalledWith(
+          expect.objectContaining({ accountId: 'a1' })
+        )
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.new') }));
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.description')), {
+        target: { value: 'Staking' },
+      });
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.amount')), {
+        target: { value: '10' },
+      });
+      fireEvent.change(screen.getByLabelText(tr('app.recurring.form.category')), {
+        target: { value: 'Vivienda' },
+      });
+      fireEvent.change(screen.getByRole('combobox', { name: tr('app.recurring.form.account') }), {
+        target: { value: 'a2' },
+      });
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.form.save') }));
+      await waitFor(() =>
+        expect(api.recurringApi.create).toHaveBeenLastCalledWith(
+          expect.objectContaining({ accountId: 'a2' })
+        )
+      );
+    });
+
+    it('editing keeps the account the rule has, archived or by default, unless changed', async () => {
+      const { api } = setup(rules, accounts);
+      api.recurringApi.update.mockResolvedValueOnce(rules[2]).mockResolvedValueOnce(rules[0]);
+      fireEvent.click(
+        await screen.findByRole('button', { name: `${tr('app.recurring.card.edit')}: Seguro` })
+      );
+      const select = screen.getByRole('combobox', { name: tr('app.recurring.form.account') });
+      expect(select).toHaveValue('a3');
+      expect(within(select).getByRole('option', { selected: true })).toHaveTextContent(
+        `Vieja (${tr('app.recurring.form.account.archived')})`
+      );
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.form.save') }));
+      await waitFor(() =>
+        expect(api.recurringApi.update).toHaveBeenLastCalledWith(
+          'r3',
+          expect.objectContaining({ accountId: 'a3' })
+        )
+      );
+
+      fireEvent.click(
+        await screen.findByRole('button', { name: `${tr('app.recurring.card.edit')}: Alquiler` })
+      );
+      expect(screen.getByRole('combobox', { name: tr('app.recurring.form.account') })).toHaveValue(
+        'a1'
+      );
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.form.save') }));
+      await waitFor(() =>
+        expect(api.recurringApi.update).toHaveBeenLastCalledWith(
+          'r1',
+          expect.objectContaining({ accountId: null })
+        )
+      );
+    });
+
+    it('without a default account the first one is shown', async () => {
+      setup([], [f.account({ id: 'a9', name: 'Única' })]);
+      await screen.findByText(new RegExp(tr('app.recurring.empty')));
+      fireEvent.click(screen.getByRole('button', { name: tr('app.recurring.new') }));
+      expect(
+        await screen.findByRole('combobox', { name: tr('app.recurring.form.account') })
+      ).toHaveValue('a9');
+    });
   });
 });
