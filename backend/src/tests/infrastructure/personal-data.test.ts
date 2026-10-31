@@ -22,9 +22,10 @@ function seed(db: Db): void {
   db.exec(`
     INSERT INTO categories (id, user_id, name) VALUES ('c1', 'ana', 'Comida');
     INSERT INTO accounts (id, user_id, name, created_at) VALUES ('a1', 'ana', 'Principal', '${NOW}');
-    INSERT INTO assets (id, user_id, name, kind, created_at, interest_rate, min_payment_cents)
-      VALUES ('as1', 'ana', 'Hipoteca', 'debt', '${NOW}', 2.5, 50000),
-             ('as2', 'ana', 'Coche', 'vehicle', '${NOW}', NULL, NULL);
+    INSERT INTO assets (id, user_id, name, kind, created_at, interest_rate, min_payment_cents,
+      debt_type, initial_cents, payment_end_year, payment_end_month)
+      VALUES ('as1', 'ana', 'Hipoteca', 'debt', '${NOW}', 2.5, 50000, 'mortgage', 9000000, 2040, 6),
+             ('as2', 'ana', 'Coche', 'vehicle', '${NOW}', NULL, NULL, NULL, NULL, NULL, NULL);
     INSERT INTO asset_values (asset_id, date, value_cents) VALUES ('as1', '2026-03-01', 1234500);
     INSERT INTO category_rules (id, user_id, pattern, category_id, created_at)
       VALUES ('r1', 'ana', 'mercadona', 'c1', '${NOW}');
@@ -96,9 +97,14 @@ describe('SqlitePersonalDataReader', () => {
           kind: 'debt',
           interestRate: 2.5,
           minPayment: 500,
+          debtType: 'mortgage',
+          initialValue: 90000,
+          paymentRuleId: null,
+          paymentEndYear: 2040,
+          paymentEndMonth: 6,
           values: [{ date: '2026-03-01', value: 12345 }],
         },
-        { name: 'Coche', minPayment: null, values: [] },
+        { name: 'Coche', minPayment: null, debtType: null, initialValue: null, values: [] },
       ],
       categoryRules: [{ pattern: 'mercadona', category: 'Comida' }],
       businessCategories: [{ category: 'Comida', vatRate: 10 }],

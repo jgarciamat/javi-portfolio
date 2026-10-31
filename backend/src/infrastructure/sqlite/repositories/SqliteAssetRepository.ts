@@ -1,4 +1,5 @@
 import { Asset, AssetKind, AssetRepository, AssetValue } from '@domain/ports/repositories';
+import { DebtType } from '@domain/services/debt';
 import { Db } from '../database';
 
 interface AssetRow {
@@ -8,6 +9,11 @@ interface AssetRow {
   kind: string;
   interest_rate: number | null;
   min_payment_cents: number | null;
+  debt_type: string | null;
+  initial_cents: number | null;
+  payment_rule_id: string | null;
+  payment_end_year: number | null;
+  payment_end_month: number | null;
   created_at: string;
 }
 
@@ -18,6 +24,13 @@ const toAsset = (r: AssetRow): Asset => ({
   kind: r.kind as AssetKind,
   interestRate: r.interest_rate,
   minPaymentCents: r.min_payment_cents,
+  debtType: r.debt_type as DebtType | null,
+  initialCents: r.initial_cents,
+  paymentRuleId: r.payment_rule_id,
+  paymentEnd:
+    r.payment_end_year !== null && r.payment_end_month !== null
+      ? { year: r.payment_end_year, month: r.payment_end_month }
+      : null,
   createdAt: r.created_at,
 });
 
@@ -38,15 +51,33 @@ export class SqliteAssetRepository implements AssetRepository {
     return row ? toAsset(row) : null;
   }
 
+  findByPaymentRule(userId: string, ruleId: string): Asset | null {
+    const row = this.db
+      .prepare('SELECT * FROM assets WHERE user_id = ? AND payment_rule_id = ?')
+      .get(userId, ruleId) as AssetRow | undefined;
+    return row ? toAsset(row) : null;
+  }
+
   save(asset: Asset): void {
+    const { paymentEnd, ...rest } = asset;
     this.db
       .prepare(
-        `INSERT INTO assets (id, user_id, name, kind, interest_rate, min_payment_cents, created_at)
-         VALUES (@id, @userId, @name, @kind, @interestRate, @minPaymentCents, @createdAt)
+        `INSERT INTO assets (id, user_id, name, kind, interest_rate, min_payment_cents, debt_type,
+           initial_cents, payment_rule_id, payment_end_year, payment_end_month, created_at)
+         VALUES (@id, @userId, @name, @kind, @interestRate, @minPaymentCents, @debtType,
+           @initialCents, @paymentRuleId, @paymentEndYear, @paymentEndMonth, @createdAt)
          ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind,
-           interest_rate = excluded.interest_rate, min_payment_cents = excluded.min_payment_cents`
+           interest_rate = excluded.interest_rate, min_payment_cents = excluded.min_payment_cents,
+           debt_type = excluded.debt_type, initial_cents = excluded.initial_cents,
+           payment_rule_id = excluded.payment_rule_id,
+           payment_end_year = excluded.payment_end_year,
+           payment_end_month = excluded.payment_end_month`
       )
-      .run(asset);
+      .run({
+        ...rest,
+        paymentEndYear: paymentEnd?.year ?? null,
+        paymentEndMonth: paymentEnd?.month ?? null,
+      });
   }
 
   delete(userId: string, id: string): boolean {

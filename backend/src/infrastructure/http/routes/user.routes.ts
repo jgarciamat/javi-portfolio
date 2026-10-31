@@ -24,6 +24,7 @@ import {
   forecastQuery,
   nameBody,
   assetBody,
+  assetDebtBody,
   assetTermsBody,
   splitExpenseBody,
   splitExpenseParams,
@@ -324,13 +325,14 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   router.post(
     '/assets',
     authed((req, res) => {
-      const { value, minPayment, ...rest } = assetBody.parse(req.body);
+      const { value, minPayment, initialValue, ...rest } = assetBody.parse(req.body);
       res.status(201).json(
         presentAsset(
           c.assetService.create(req.dataUserId, {
             ...rest,
             valueCents: value,
             minPaymentCents: minPayment,
+            initialCents: initialValue,
           })
         )
       );
@@ -375,6 +377,21 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
           c.assetService.setTerms(req.dataUserId, idParam.parse(req.params).id, {
             interestRate,
             minPaymentCents: minPayment,
+          })
+        )
+      );
+    })
+  );
+  // A debt's kind, amount borrowed, interest and how it is paid every month.
+  router.patch(
+    '/assets/:id/debt',
+    authed((req, res) => {
+      const { initialValue, ...rest } = assetDebtBody.parse(req.body);
+      res.json(
+        presentAsset(
+          c.assetService.updateDebt(req.dataUserId, idParam.parse(req.params).id, {
+            ...rest,
+            initialCents: initialValue,
           })
         )
       );

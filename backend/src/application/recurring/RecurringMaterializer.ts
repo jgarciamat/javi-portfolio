@@ -12,11 +12,13 @@ import {
   addMonths,
   comparePeriods,
   currentPeriod,
+  dateInPeriod,
   periodOrdinal,
   periodStart,
   todayDateOnly,
 } from '@domain/shared/period';
 import { AccountResolver } from '@application/shared/resolvers';
+import type { DebtPayments } from '@application/assets/DebtPayments';
 
 /** How far ahead of today generated movements may exist. */
 export const MAX_MONTHS_AHEAD = 12;
@@ -38,7 +40,8 @@ export class RecurringMaterializer {
     private readonly settings: SettingsRepository,
     private readonly accounts: AccountResolver,
     private readonly uow: UnitOfWork,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly debts?: DebtPayments
   ) {}
 
   /**
@@ -89,28 +92,41 @@ export class RecurringMaterializer {
     return created;
   }
 
-  /** Generates the movements of one rule within [from, to]. */
+  /**
+   * Generates the movements of one rule within [from, to], on the rule's day (or the first day
+   * of the period). A rule that pays a debt pays what is left at most, and nothing once it is
+   * paid off (see DebtPayments).
+   */
   materializeRule(rule: RecurringRule, from: Period, to: Period, monthStartDay: number): number {
     const skipped = new Set(this.rules.skippedPeriods(rule.id).map(periodOrdinal));
     const accountId = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
+    const debt = this.debts?.planner(rule) ?? null;
     let count = 0;
     for (const period of rule.periodsWithin(from, to)) {
       if (skipped.has(periodOrdinal(period))) continue;
+      const date = rule.day
+        ? dateInPeriod(period, rule.day, monthStartDay)
+        : periodStart(period, monthStartDay);
+      const amountCents = debt ? debt.amountFor(period, date) : rule.amountCents;
+      if (amountCents === null) continue;
       const tx = Transaction.create(
         {
           userId: rule.userId,
           accountId,
           categoryId: rule.categoryId,
           description: rule.description,
-          amountCents: rule.amountCents,
+          amountCents,
           type: rule.type,
-          date: periodStart(period, monthStartDay),
+          date,
           recurringRuleId: rule.id,
         },
         monthStartDay,
         this.clock.now()
       );
-      if (this.transactions.insertIfAbsent(tx)) count++;
+      if (this.transactions.insertIfAbsent(tx)) {
+        count++;
+        debt?.paid(date, amountCents);
+      }
     }
     return count;
   }

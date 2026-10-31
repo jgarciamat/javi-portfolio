@@ -11,6 +11,8 @@ import { Cents } from '@domain/shared/money';
 import { Period, addMonths, comparePeriods, currentPeriod } from '@domain/shared/period';
 import { AccountResolver, CategoryRef, CategoryResolver } from '@application/shared/resolvers';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import type { DebtPayments } from '@application/assets/DebtPayments';
+import { Asset } from '@domain/ports/repositories';
 import { RecurringMaterializer } from './RecurringMaterializer';
 
 export type DeleteScope = 'none' | 'from_current' | 'all';
@@ -28,6 +30,8 @@ export interface RuleInput extends CategoryRef {
 
 export interface RuleView extends RecurringRuleProps {
   categoryName: string;
+  /** The debt the rule pays every month (its dates and type are the debt's). */
+  debt: { id: string; name: string } | null;
 }
 
 export class RecurringService {
@@ -40,14 +44,20 @@ export class RecurringService {
     private readonly materializer: RecurringMaterializer,
     private readonly entitlements: EntitlementService,
     private readonly uow: UnitOfWork,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly debts?: DebtPayments
   ) {}
 
-  private view(userId: string, rule: RecurringRule): RuleView {
+  private view(userId: string, rule: RecurringRule, debt: Asset | null): RuleView {
     return {
       ...rule.toPrimitives(),
       categoryName: this.categories.requireById(userId, rule.categoryId).name,
+      debt: debt ? { id: debt.id, name: debt.name } : null,
     };
+  }
+
+  private debtOf(userId: string, ruleId: string): Asset | null {
+    return this.debts?.debtOf(userId, ruleId) ?? null;
   }
 
   private today(userId: string): Period {
@@ -56,7 +66,8 @@ export class RecurringService {
 
   /** Read-only: listing rules no longer creates movements as a side effect. */
   list(userId: string): RuleView[] {
-    return this.rules.listByUser(userId).map((r) => this.view(userId, r));
+    const debts = this.debts?.debtsByRule(userId) ?? new Map<string, Asset>();
+    return this.rules.listByUser(userId).map((r) => this.view(userId, r, debts.get(r.id) ?? null));
   }
 
   private require(userId: string, id: string): RecurringRule {
@@ -110,7 +121,7 @@ export class RecurringService {
     });
     this.materializer.invalidate(userId);
     this.materializer.ensureUpTo(userId, addMonths(this.today(userId), 1));
-    return this.view(userId, rule);
+    return this.view(userId, rule, null);
   }
 
   /**
@@ -120,6 +131,8 @@ export class RecurringService {
    * are filled in.
    */
   update(userId: string, id: string, input: RuleInput): RuleView {
+    const debt = this.debtOf(userId, id);
+    if (debt) return this.updateDebtRule(userId, id, input, debt);
     const today = this.today(userId);
     const startDay = this.settings.get(userId).monthStartDay;
     const updated = this.uow.run(() => {
@@ -142,7 +155,42 @@ export class RecurringService {
     });
     this.materializer.invalidate(userId);
     this.materializer.ensureUpTo(userId, addMonths(today, 1));
-    return this.view(userId, updated);
+    return this.view(userId, updated, null);
+  }
+
+  /**
+   * A rule that pays a debt: its type, frequency and dates are the debt's (they are left as they
+   * are); description, amount, category, account and pausing apply to the payments still to
+   * come. Payments already made are never removed. Resumed, it starts again with the next
+   * payment day (the months it was paused are not filled in).
+   */
+  private updateDebtRule(userId: string, id: string, input: RuleInput, debt: Asset): RuleView {
+    const debts = this.debts as DebtPayments;
+    const updated = this.uow.run(() => {
+      const before = this.require(userId, id);
+      const changes = this.resolveRefs(
+        userId,
+        {
+          description: input.description,
+          amountCents: input.amountCents,
+          categoryId: input.categoryId,
+          category: input.category,
+          accountId: input.accountId,
+          active: input.active,
+        },
+        before
+      );
+      if (changes.active && !before.active) {
+        changes.start = debts.firstFuturePeriod(userId, before.start, before.day ?? 1);
+        changes.end = null;
+      }
+      this.rules.save(before.update(changes));
+      debts.resync(userId, debt);
+      return this.require(userId, id);
+    });
+    this.materializer.invalidate(userId);
+    this.materializer.ensureUpTo(userId, addMonths(this.today(userId), 1));
+    return this.view(userId, updated, debt);
   }
 
   /**
@@ -156,6 +204,8 @@ export class RecurringService {
       this.require(userId, id);
       if (scope === 'all') this.transactions.deleteByRule(userId, id);
       if (scope === 'from_current') this.transactions.deleteByRule(userId, id, addMonths(today, 1));
+      // A debt it paid keeps what it owed after the payments that stay, valued by hand again.
+      this.debts?.detach(userId, id);
       this.rules.delete(userId, id);
     });
     this.materializer.invalidate(userId);

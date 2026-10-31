@@ -32,6 +32,8 @@ export interface RecurringRuleProps {
   end: Period | null;
   frequency: RecurringFrequency;
   active: boolean;
+  /** Day of the month of each movement (1..31); null: the first day of the period. */
+  day: number | null;
   createdAt: string;
 }
 
@@ -45,6 +47,7 @@ export interface RecurringRuleInput {
   end?: Period | null;
   frequency?: string;
   active?: boolean;
+  day?: number | null;
 }
 
 function validate(props: RecurringRuleProps): RecurringRuleProps {
@@ -61,6 +64,9 @@ function validate(props: RecurringRuleProps): RecurringRuleProps {
         'INVALID_RANGE'
       );
     }
+  }
+  if (props.day !== null && !(Number.isInteger(props.day) && props.day >= 1 && props.day <= 31)) {
+    throw new ValidationError('El día debe estar entre 1 y 31', 'INVALID_DAY');
   }
   if (!RECURRING_FREQUENCIES.includes(props.frequency)) {
     throw new ValidationError(`Frecuencia inválida. Debe ser ${RECURRING_FREQUENCIES.join(', ')}`);
@@ -85,6 +91,7 @@ export class RecurringRule {
         end: input.end ?? null,
         frequency: (input.frequency ?? 'monthly') as RecurringFrequency,
         active: input.active ?? true,
+        day: input.day ?? null,
         createdAt: now.toISOString(),
       })
     );
@@ -106,6 +113,7 @@ export class RecurringRule {
     if (changes.end !== undefined) next.end = changes.end;
     if (changes.frequency !== undefined) next.frequency = changes.frequency as RecurringFrequency;
     if (changes.active !== undefined) next.active = changes.active;
+    if (changes.day !== undefined) next.day = changes.day;
     return new RecurringRule(validate(next));
   }
 
@@ -142,7 +150,8 @@ export class RecurringRule {
       a.amountCents !== b.amountCents ||
       a.type !== b.type ||
       a.categoryId !== b.categoryId ||
-      a.accountId !== b.accountId
+      a.accountId !== b.accountId ||
+      a.day !== b.day
     );
   }
 
@@ -178,6 +187,9 @@ export class RecurringRule {
   }
   get active(): boolean {
     return this.props.active;
+  }
+  get day(): number | null {
+    return this.props.day;
   }
 
   toPrimitives(): RecurringRuleProps {

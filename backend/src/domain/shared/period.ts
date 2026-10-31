@@ -114,6 +114,19 @@ export function periodEnd(p: Period, startDay = 1): string {
   return formatDate(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
 }
 
+/**
+ * The date with day of the month `day` (1..31) inside a period: days before the start day fall
+ * in the calendar month after the one the period starts in. A day the month lacks (31 in April,
+ * 30 in February) becomes its last day.
+ */
+export function dateInPeriod(p: Period, day: number, startDay = 1): string {
+  const sd = normalizeStartDay(startDay);
+  const startMonth = sd > 15 ? addMonths(p, -1) : p;
+  const calendar = day >= sd ? startMonth : addMonths(startMonth, 1);
+  const last = new Date(Date.UTC(calendar.year, calendar.month, 0)).getUTCDate();
+  return formatDate(calendar.year, calendar.month, Math.min(Math.max(1, Math.trunc(day)), last));
+}
+
 export function todayDateOnly(now: Date = new Date()): string {
   return formatDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
 }
