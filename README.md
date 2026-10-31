@@ -33,6 +33,24 @@ Producción: <https://finanverso.app>
   duplicados y categorización automática a partir de tu historial, palabras clave y, en Premium, IA.
 - **Búsqueda y filtros** por texto, tipo, categoría, cuenta, fechas e importes.
 - **Análisis**: tendencias por categoría (frente al mes anterior y a la media de 3 meses) y evolución del patrimonio.
+- **Inversiones, bienes y deudas** valorados a mano (el total y el patrimonio restan las deudas). **Deudas que
+  se pagan solas**: una deuda (hipoteca, préstamo personal o del coche, tarjeta u otra) puede tener una cuota
+  mensual, un día de pago y una cuenta de origen (de cualquier tipo, también Criptomonedas). Se crea una
+  operación automática de gasto vinculada («Cuota …», categoría Vivienda para la hipoteca y Deudas para el
+  resto, marcada «Deuda: …» en Operaciones automáticas) y lo pendiente baja con cada movimiento generado:
+  - Lo pendiente no se guarda tras cada pago, se calcula con el último valor apuntado a mano y los
+    movimientos de la operación posteriores a él (no hay duplicados aunque se generen otra vez; un pago
+    borrado no cuenta y uno editado cuenta con su importe). Un valor nuevo («Actualizar») es el nuevo punto
+    de partida y no reescribe los meses pasados. El patrimonio mes a mes usa lo que se debía cada mes.
+  - Con interés anual, cada cuota paga primero el interés del mes (pendiente × interés / 12) y el resto baja
+    lo pendiente; sin él, la cuota entera. Es una estimación y la app lo dice.
+  - La última cuota es solo lo que queda y la operación termina sola (fecha de fin = último pago necesario,
+    o la última cuota si se dio cuántas quedan). Nunca crea pagos de días ya pasados.
+  - Cambiar cuota, día o cuenta rehace solo los pagos que faltan. Pausarla desde Operaciones automáticas no
+    toca los pagos hechos y reanudarla no rellena los meses en pausa; allí no se cambian su tipo ni sus
+    fechas (son de la deuda).
+  - Quitar el pago automático, la operación o la deuda deja los pagos ya hechos como movimientos normales
+    y quita los que faltaban; la deuda conserva lo que debía (y su historial) y vuelve a actualizarse a mano.
 - **Asesor IA** (Cloudflare Workers AI) con respaldo por reglas. Solo se envían cifras agregadas, nunca descripciones.
 - **Alertas personalizadas**, exportación CSV y **exportación completa de datos** en JSON (portabilidad RGPD).
 - **Ajustes** de moneda, idioma (es/en, guardado en la cuenta) y notificaciones locales.
