@@ -158,20 +158,19 @@ describe('Debt payoff plan', () => {
 
   it('sends the terms of a new debt and leaves them out for other kinds', async () => {
     const api = setup([]);
-    fireEvent.change(await screen.findByRole('textbox', { name: tr('app.assets.name') }), {
+    const debt = new RegExp(tr('app.assets.group.debt'));
+    fireEvent.click(await screen.findByRole('radio', { name: debt }));
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.name') }), {
       target: { value: 'Préstamo' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.value') }), {
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.owed') }), {
       target: { value: '5000' },
     });
-    fireEvent.change(screen.getByRole('combobox', { name: tr('app.assets.kind') }), {
-      target: { value: 'debt' },
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.assets.debtType') }), {
+      target: { value: 'personal' },
     });
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.rate') }), {
       target: { value: '7,5' },
-    });
-    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.minPayment') }), {
-      target: { value: '120' },
     });
     fireEvent.click(screen.getByRole('button', { name: tr('app.assets.add') }));
     await waitFor(() =>
@@ -179,15 +178,17 @@ describe('Debt payoff plan', () => {
         name: 'Préstamo',
         kind: 'debt',
         value: 5000,
+        debtType: 'personal',
         interestRate: 7.5,
-        minPayment: 120,
       })
     );
-    expect(screen.getByRole('textbox', { name: tr('app.assets.rate') })).toHaveValue('');
+    // The form starts again.
+    expect(screen.queryByRole('textbox', { name: tr('app.assets.rate') })).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: debt }));
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.name') }), {
       target: { value: 'Otra' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.value') }), {
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.owed') }), {
       target: { value: '10' },
     });
     fireEvent.click(screen.getByRole('button', { name: tr('app.assets.add') }));
@@ -196,6 +197,7 @@ describe('Debt payoff plan', () => {
         name: 'Otra',
         kind: 'debt',
         value: 10,
+        debtType: 'mortgage',
       })
     );
   });

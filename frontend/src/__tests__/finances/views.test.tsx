@@ -1320,6 +1320,7 @@ describe('the investments and debts section', () => {
 
     const add = screen.getByRole('button', { name: tr('app.assets.add') });
     expect(add).toBeDisabled();
+    fireEvent.click(screen.getByRole('radio', { name: new RegExp(tr('app.assets.group.good')) }));
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.name') }), {
       target: { value: ' Casa ' },
     });

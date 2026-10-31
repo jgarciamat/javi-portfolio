@@ -190,6 +190,18 @@ describe('API contract', () => {
       contract('importResult', (await send('importPreview')).body);
     });
 
+    it('debts paid every month and their automatic operation', async () => {
+      const accounts = (await get('/accounts')).body.accounts as {
+        id: string;
+        isDefault: boolean;
+      }[];
+      const account = accounts.find((a) => a.isDefault)!.id;
+      const { body } = await send('assetCreateDebt', { account });
+      await send('assetUpdateDebt', { asset: body.id as string });
+      contract('assets', (await get('/assets')).body);
+      contract('recurringRules', (await get('/recurring-rules')).body);
+    });
+
     it('sample data', async () => {
       contract('sampleData', (await send('sampleDataLoad')).body);
       await send('sampleDataRemove');

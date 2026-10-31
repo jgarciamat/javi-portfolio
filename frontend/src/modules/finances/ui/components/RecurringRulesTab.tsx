@@ -130,6 +130,8 @@ interface RuleFormProps {
   categories: Category[];
   accounts: Account[];
   isEdit: boolean;
+  /** The rule pays this debt: its type, frequency and dates are the debt's. */
+  debtName?: string;
 }
 
 function RuleForm({
@@ -142,6 +144,7 @@ function RuleForm({
   categories,
   accounts,
   isEdit,
+  debtName,
 }: RuleFormProps) {
   const { t, tCategory } = useI18n();
   const id = useId();
@@ -191,23 +194,25 @@ function RuleForm({
           />
         </div>
 
-        <div className="recurring-form-field">
-          <label className="recurring-label" htmlFor={`${id}-type`}>
-            {t('app.recurring.form.type')}
-          </label>
-          <select
-            id={`${id}-type`}
-            className="tx-input"
-            value={form.type}
-            onChange={(e) => set('type', e.target.value as TransactionType)}
-          >
-            {TRANSACTION_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {t(typeKey(type))}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!debtName && (
+          <div className="recurring-form-field">
+            <label className="recurring-label" htmlFor={`${id}-type`}>
+              {t('app.recurring.form.type')}
+            </label>
+            <select
+              id={`${id}-type`}
+              className="tx-input"
+              value={form.type}
+              onChange={(e) => set('type', e.target.value as TransactionType)}
+            >
+              {TRANSACTION_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {t(typeKey(type))}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="recurring-form-field">
           <label className="recurring-label" htmlFor={`${id}-category`}>
@@ -230,35 +235,46 @@ function RuleForm({
 
         <AccountField form={form} set={set} accounts={accounts} id={id} />
 
-        <div className="recurring-form-field">
-          <label className="recurring-label" htmlFor={`${id}-frequency`}>
-            {t('app.recurring.form.frequency')}
-          </label>
-          <select
-            id={`${id}-frequency`}
-            className="tx-input"
-            value={form.frequency}
-            onChange={(e) => set('frequency', e.target.value as RuleFormState['frequency'])}
+        {debtName ? (
+          <p
+            className="recurring-form-field recurring-form-field--wide recurring-debt-note"
+            role="note"
           >
-            {FREQUENCIES.map((f) => (
-              <option key={f} value={f}>
-                {t(`app.recurring.form.frequency.${f}`)}
-              </option>
-            ))}
-          </select>
-        </div>
+            {t('app.recurring.form.debtManaged', { name: debtName })}
+          </p>
+        ) : (
+          <>
+            <div className="recurring-form-field">
+              <label className="recurring-label" htmlFor={`${id}-frequency`}>
+                {t('app.recurring.form.frequency')}
+              </label>
+              <select
+                id={`${id}-frequency`}
+                className="tx-input"
+                value={form.frequency}
+                onChange={(e) => set('frequency', e.target.value as RuleFormState['frequency'])}
+              >
+                {FREQUENCIES.map((f) => (
+                  <option key={f} value={f}>
+                    {t(`app.recurring.form.frequency.${f}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <div className="recurring-form-field">
-          <span className="recurring-label">{t('app.recurring.form.start')}</span>
-          <DateField
-            value={form.startDate}
-            onChange={(v) => set('startDate', v)}
-            label={t('app.recurring.form.start')}
-            className="recurring-date-display"
-          />
-        </div>
+            <div className="recurring-form-field">
+              <span className="recurring-label">{t('app.recurring.form.start')}</span>
+              <DateField
+                value={form.startDate}
+                onChange={(v) => set('startDate', v)}
+                label={t('app.recurring.form.start')}
+                className="recurring-date-display"
+              />
+            </div>
 
-        <EndDateFields form={form} set={set} name={`${id}-end`} />
+            <EndDateFields form={form} set={set} name={`${id}-end`} />
+          </>
+        )}
       </div>
 
       {error && <p className="recurring-error">{t(error)}</p>}
@@ -340,6 +356,11 @@ function RuleCard({ rule, where, onEdit, onDelete, onToggle }: RuleCardProps) {
       </div>
 
       <div className="recurring-card-meta">
+        {rule.debt && (
+          <span className="recurring-meta-item recurring-meta-debt">
+            💳 {t('app.recurring.card.debt', { name: rule.debt.name })}
+          </span>
+        )}
         <span className="recurring-meta-item">📁 {tCategory(rule.category)}</span>
         <RuleAccountLine where={where} />
         <span className="recurring-meta-item">
@@ -387,6 +408,9 @@ const yearMonth = (year: number | null, month: number | null) =>
   year && month ? `${year}-${String(month).padStart(2, '0')}` : '';
 
 const defaultAccountOf = (accounts: Account[]) => accounts.find((a) => a.isDefault)?.id;
+
+/** The debt the rule being edited pays, if any. */
+const debtNameOf = (rule: RecurringRule | null) => rule?.debt?.name;
 
 export function RecurringRulesTab({ categories }: { categories: Category[] }) {
   const { t, tCategory } = useI18n();
@@ -476,6 +500,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
             categories={categories}
             accounts={accounts}
             isEdit={editor.editingRule !== null}
+            debtName={debtNameOf(editor.editingRule)}
           />
         </div>
       )}

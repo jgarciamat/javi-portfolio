@@ -228,6 +228,18 @@
   color: var(--amber-400);
 }
 
+/* The debt a rule pays: its type and dates are changed on the debt. */
+.recurring-meta-debt {
+  color: var(--accent-400);
+  font-weight: 600;
+}
+
+.recurring-debt-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--slate-400);
+}
+
 .recurring-card-actions {
   display: flex;
   gap: 0.5rem;

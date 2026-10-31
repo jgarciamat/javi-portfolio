@@ -14,6 +14,7 @@ import type { BillingOverview, PlanCatalog, ReferralSummary } from '@modules/bil
 import type {
   Account,
   AnnualSummary,
+  Asset,
   AutonomoCloudCopy,
   AutonomoDraft,
   BusinessCategory,
@@ -25,6 +26,7 @@ import type {
   LeakFinding,
   MoneyLeaks,
   MonthOverview,
+  RecurringRule,
   Transaction,
   TransactionSearchResult,
   UserSettings,
@@ -54,6 +56,8 @@ import { cryptoSimFilled } from './fixtures/cryptoSimFilled';
 import { cryptoSimRecorded } from './fixtures/cryptoSimRecorded';
 import { cryptoSimTransferred } from './fixtures/cryptoSimTransferred';
 import { accounts } from './fixtures/accounts';
+import { assets } from './fixtures/assets';
+import { recurringRules } from './fixtures/recurringRules';
 import { annualSummary } from './fixtures/annualSummary';
 import { authResult } from './fixtures/authResult';
 import { autonomoData } from './fixtures/autonomoData';
@@ -94,6 +98,8 @@ describe('API answers fit the types of the app', () => {
     contract<UserSettings>()(settings);
     contract<{ accounts: Account[]; total: number }>()(accounts);
     contract<Goal[]>()(goals);
+    contract<Asset[]>()(assets);
+    contract<RecurringRule[]>()(recurringRules);
     contract<MoneyLeaks>()(moneyLeaks);
     contract<LeakFinding>()(leakDecision);
     contract<ImportResult>()(importResult);
