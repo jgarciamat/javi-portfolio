@@ -14,6 +14,7 @@ import {
   currentPeriod,
   periodOrdinal,
   periodStart,
+  todayDateOnly,
 } from '@domain/shared/period';
 import { AccountResolver } from '@application/shared/resolvers';
 
@@ -40,6 +41,22 @@ export class RecurringMaterializer {
     private readonly clock: Clock
   ) {}
 
+  /**
+   * The rule's account is no longer usable (archived before archiving was blocked, or old data):
+   * its movements still to come, dated after today, go to the default account too. The past ones
+   * and those already charged stay. Idempotent; unarchiving does not bring them back.
+   */
+  private relocateComing(rule: RecurringRule, today: string, monthStartDay: number): void {
+    if (!rule.accountId) return;
+    const target = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
+    if (target === rule.accountId) return;
+    for (const tx of this.transactions.listByRule(rule.userId, rule.id)) {
+      const { date, accountId } = tx.toPrimitives();
+      if (date <= today || accountId !== rule.accountId) continue;
+      this.transactions.save(tx.update({ accountId: target }, monthStartDay));
+    }
+  }
+
   /** Forget what was generated for a user (after editing rules or settings). */
   invalidate(userId: string): void {
     this.watermark.delete(userId);
@@ -58,10 +75,12 @@ export class RecurringMaterializer {
     const targetOrd = periodOrdinal(limit);
     if ((this.watermark.get(userId) ?? -1) >= targetOrd) return 0;
 
+    const today = todayDateOnly(this.clock.now());
     const created = this.uow.run(() => {
       let count = 0;
       for (const rule of this.rules.listByUser(userId)) {
         if (!rule.active) continue;
+        this.relocateComing(rule, today, monthStartDay);
         count += this.materializeRule(rule, rule.start, limit, monthStartDay);
       }
       return count;

@@ -22,9 +22,11 @@ Producción: <https://finanverso.app>
   y los movimientos generados que borras no se vuelven a crear. Cada operación automática se anota en la
   **cuenta** que elijas (de cualquier tipo, también Criptomonedas): su saldo baja o sube y el total de
   cuentas cambia como con cualquier movimiento. Las creadas antes sin cuenta siguen en la cuenta por
-  defecto. Si la cuenta elegida se archiva o se borra, los próximos movimientos van a la cuenta por
-  defecto (la tarjeta lo avisa) y vuelven a ella si se desarchiva; cambiar la cuenta mueve los
-  movimientos del mes actual en adelante, nunca los pasados.
+  defecto. Una cuenta con operaciones automáticas activas no se puede archivar ni eliminar (hay que
+  cambiarles la cuenta o pausarlas; las pausadas no bloquean). Si aun así una operación activa apunta
+  a una cuenta archivada (datos antiguos), sus movimientos aún por llegar (fecha posterior a hoy) y
+  los nuevos van a la cuenta por defecto, y la tarjeta lo avisa; desarchivarla no los devuelve.
+  Cambiar la cuenta mueve los movimientos del mes actual en adelante, nunca los pasados.
 - **Importación de extractos** CSV (cualquier separador y formato numérico) y Norma 43, con detección de
   duplicados y categorización automática a partir de tu historial, palabras clave y, en Premium, IA.
 - **Búsqueda y filtros** por texto, tipo, categoría, cuenta, fechas e importes.

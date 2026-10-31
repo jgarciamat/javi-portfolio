@@ -1308,6 +1308,7 @@
   "app.apiError.CRYPTO_TRANSFER_CURRENCY": "The simulator works in euros and your accounts use another currency, so the result cannot be added without changing its value.",
   "app.apiError.ACCOUNT_EXISTS": "An account with that name already exists.",
   "app.apiError.ACCOUNT_IN_USE": "The account has transactions. Archive it instead of deleting it.",
+  "app.apiError.ACCOUNT_HAS_RECURRING": "These active automatic operations use this account: {rules}. Change their account or pause them first.",
   "app.apiError.DEFAULT_ACCOUNT": "This is the default account. Choose another default account first.",
   "app.apiError.SAME_ACCOUNT": "The source and destination accounts must be different.",
   "app.apiError.CATEGORY_EXISTS": "A category with that name already exists.",

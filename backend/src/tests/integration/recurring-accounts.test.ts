@@ -160,51 +160,93 @@ describe('Recurring rules and their account', () => {
     expect((await byDate())['2026-04-01']).toBe((await principal()).name);
   });
 
-  it('once its account is archived, new movements go to the default one; editing still works', async () => {
+  const archive = (id: string, archived = true, who = user) =>
+    request(ctx.app).patch(`/api/accounts/${id}`).set(who.auth).send({ archived });
+
+  it('an account used by active rules cannot be archived nor deleted; paused ones do not block', async () => {
     const crypto = await createAccount('Cripto');
     const rule = (await createRule({ accountId: crypto.id }).expect(201)).body;
-    await request(ctx.app)
-      .patch(`/api/accounts/${crypto.id}`)
-      .set(user.auth)
-      .send({ archived: true })
-      .expect(200);
+    await createRule({ description: 'Gimnasio', amount: 30, accountId: crypto.id }).expect(201);
 
-    // Viewing June generates May and June: in the default account, not in the archived one.
+    const refused = await archive(crypto.id).expect(409);
+    expect(refused.body).toMatchObject({
+      code: 'ACCOUNT_HAS_RECURRING',
+      details: { rules: expect.arrayContaining(['Alquiler', 'Gimnasio']) },
+    });
+    expect(refused.body.error).toMatch(/Alquiler|Gimnasio/);
+    expect(refused.body.error).toContain('Cambia su cuenta o páusalas');
+    const deleting = await request(ctx.app)
+      .delete(`/api/accounts/${crypto.id}`)
+      .set(user.auth)
+      .expect(409);
+    expect(deleting.body.code).toBe('ACCOUNT_HAS_RECURRING');
+    expect((await account('Cripto')).archived).toBe(false);
+
+    // Moved to another account or paused, they no longer block.
+    await patchRule(rule.id, { accountId: null }).expect(200);
+    const gym = (await request(ctx.app).get('/api/recurring-rules').set(user.auth)).body.find(
+      (r: { description: string }) => r.description === 'Gimnasio'
+    );
+    await patchRule(gym.id, { active: false }).expect(200);
+    await archive(crypto.id).expect(200);
+    // Archiving again (already archived) or unarchiving never asks.
+    await archive(crypto.id).expect(200);
+    await archive(crypto.id, false).expect(200);
+  });
+
+  it('an active rule on an account archived some other way: its coming movements go to the default one', async () => {
+    const crypto = await createAccount('Cripto');
+    const rule = (await createRule({ accountId: crypto.id }).expect(201)).body;
     await request(ctx.app).get('/api/months/2026/6').set(user.auth).expect(200);
+    // Archived before this was blocked (old data): straight in the database.
+    const repo = ctx.container.repos.accounts;
+    const stored = repo.findById(user.id, crypto.id)!;
+    repo.save(stored.update({ archived: true }));
+    ctx.container.materializer.invalidate(user.id);
+
+    await request(ctx.app).get('/api/months/2026/3').set(user.auth).expect(200);
     const main = (await principal()).name;
-    expect(await byDate()).toMatchObject({
-      '2026-04-01': 'Cripto',
+    const moved = {
+      '2026-01-01': 'Cripto',
+      '2026-02-01': 'Cripto',
+      // Today is 15 March: the charge of this month already happened and stays.
+      '2026-03-01': 'Cripto',
+      '2026-04-01': main,
       '2026-05-01': main,
       '2026-06-01': main,
-    });
+    };
+    expect(await byDate()).toEqual(moved);
+    // Idempotent.
+    ctx.container.materializer.invalidate(user.id);
+    await request(ctx.app).get('/api/months/2026/3').set(user.auth).expect(200);
+    expect(await byDate()).toEqual(moved);
 
     // The rule keeps its account: editing something else with it does not fail.
     const edited = await patchRule(rule.id, { accountId: crypto.id, description: 'Piso' }).expect(
       200
     );
     expect(edited.body).toMatchObject({ accountId: crypto.id, description: 'Piso' });
-    // Regenerated from this month on, again in the default account.
-    expect((await byDate())['2026-03-01']).toBe(main);
+    expect((await byDate())['2026-04-01']).toBe(main);
 
-    // Unarchived, the coming months go back to it.
-    await request(ctx.app)
-      .patch(`/api/accounts/${crypto.id}`)
-      .set(user.auth)
-      .send({ archived: false })
-      .expect(200);
-    await patchRule(rule.id, { amount: 810 }).expect(200);
-    expect((await byDate())['2026-04-01']).toBe('Cripto');
+    // Unarchived: what was moved stays where it is; months generated later use it again.
+    repo.save(repo.findById(user.id, crypto.id)!.update({ archived: false }));
+    ctx.container.materializer.invalidate(user.id);
+    await request(ctx.app).get('/api/months/2026/7').set(user.auth).expect(200);
+    expect(await byDate()).toMatchObject({ '2026-04-01': main, '2026-07-01': 'Cripto' });
   });
 
   it('a deleted account leaves the rule on the default account', async () => {
     const crypto = await createAccount('Cripto');
-    // Starts later: nothing is noted yet, so the account can still be deleted.
+    // Starts later and paused: nothing is noted yet, so the account can still be deleted.
     const rule = (await createRule({ accountId: crypto.id, startMonth: 7 }).expect(201)).body;
+    await request(ctx.app).delete(`/api/accounts/${crypto.id}`).set(user.auth).expect(409);
+    await patchRule(rule.id, { active: false }).expect(200);
     expect(await generated()).toHaveLength(0);
     await request(ctx.app).delete(`/api/accounts/${crypto.id}`).set(user.auth).expect(204);
 
     const [listed] = (await request(ctx.app).get('/api/recurring-rules').set(user.auth)).body;
     expect(listed).toMatchObject({ id: rule.id, accountId: null });
+    await patchRule(rule.id, { active: true }).expect(200);
     await request(ctx.app).get('/api/months/2026/7').set(user.auth).expect(200);
     expect(await byDate()).toEqual({ '2026-07-01': (await principal()).name });
   });
@@ -223,5 +265,10 @@ describe('Recurring rules and their account', () => {
     );
     await createRule({ accountId: shared.id }).expect(201);
     expect((await account('Cripto común', owner)).balance).toBe(1000 - 4 * 800);
+    // Neither of the two can archive it while the rule is active.
+    expect((await archive(shared.id, true, owner).expect(409)).body.code).toBe(
+      'ACCOUNT_HAS_RECURRING'
+    );
+    await archive(shared.id).expect(409);
   });
 });
