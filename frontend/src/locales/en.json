@@ -258,7 +258,7 @@
   "app.recurring.form.type.saving": "↑ Saving",
   "app.recurring.form.category": "Category",
   "app.recurring.form.account": "Account",
-  "app.recurring.form.account.hint": "Each time it is due, the movement is recorded in this account and its balance goes down (expense or saving) or up (income).",
+  "app.recurring.form.account.hint": "Each time it is due, the movement is recorded in this account and its balance goes down (expense or saving) or up (income). If you change it, it applies from next month.",
   "app.recurring.form.account.archived": "archived",
   "app.recurring.card.account": "Account: {name}",
   "app.recurring.card.accountDefault": "Account: {name} (default)",

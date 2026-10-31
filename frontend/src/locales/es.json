@@ -258,7 +258,7 @@
   "app.recurring.form.type.saving": "↑ Ahorro",
   "app.recurring.form.category": "Categoría",
   "app.recurring.form.account": "Cuenta",
-  "app.recurring.form.account.hint": "Cada vez que toque, el movimiento se anota en esta cuenta y su saldo baja (gasto o ahorro) o sube (ingreso).",
+  "app.recurring.form.account.hint": "Cada vez que toque, el movimiento se anota en esta cuenta y su saldo baja (gasto o ahorro) o sube (ingreso). Si la cambias, se aplica desde el mes que viene.",
   "app.recurring.form.account.archived": "archivada",
   "app.recurring.card.account": "Cuenta: {name}",
   "app.recurring.card.accountDefault": "Cuenta: {name} (por defecto)",

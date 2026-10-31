@@ -128,7 +128,8 @@ export class RecurringService {
    * Changes apply from the current period on: generated movements of this and
    * future periods are regenerated with the new values, past ones are history and
    * stay as they are. If the start moves earlier, the newly covered past periods
-   * are filled in.
+   * are filled in. A change of account alone applies from the next period: this
+   * period's movement stays in the account it was noted in.
    */
   update(userId: string, id: string, input: RuleInput): RuleView {
     const debt = this.debtOf(userId, id);
@@ -144,9 +145,17 @@ export class RecurringService {
         JSON.stringify(before.end) !== JSON.stringify(after.end) ||
         before.frequency !== after.frequency ||
         before.active !== after.active;
-      if (scheduleChanged || RecurringRule.contentChanged(before, after)) {
+      // Anything but the account: this month's movement is redone too, as always.
+      const otherChanged =
+        scheduleChanged ||
+        RecurringRule.contentChanged(before.update({ accountId: after.accountId }), after);
+      if (otherChanged) {
         this.transactions.deleteByRule(userId, id, today);
         this.rules.clearSkipsFrom(id, today);
+      } else if (before.accountId !== after.accountId) {
+        // Only the account: the coming months go to the new one; this month's movement and the
+        // past ones stay in the account they were noted in (and removed months stay removed).
+        this.transactions.deleteByRule(userId, id, addMonths(today, 1));
       }
       if (comparePeriods(after.start, before.start) < 0 && after.active) {
         this.materializer.materializeRule(after, after.start, addMonths(today, -1), startDay);

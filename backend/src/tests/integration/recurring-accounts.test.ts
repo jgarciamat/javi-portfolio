@@ -140,24 +140,49 @@ describe('Recurring rules and their account', () => {
     expect((await account('Suya', stranger)).balance).toBe(1000);
   });
 
-  it('changing the account moves this and the coming months only; the past stays', async () => {
+  it('changing only the account moves the coming months; this month and the past stay', async () => {
     const crypto = await createAccount('Cripto');
     const savings = await createAccount('Ahorro', 'savings');
     const rule = (await createRule({ accountId: crypto.id }).expect(201)).body;
+    await request(ctx.app).get('/api/months/2026/5').set(user.auth).expect(200);
+    // The person removed May: changing the account does not bring it back.
+    const may = (await generated()).find((t) => t.date === '2026-05-01') as TxRow & { id: string };
+    await request(ctx.app).delete(`/api/transactions/${may.id}`).set(user.auth).expect(204);
 
     const res = await patchRule(rule.id, { accountId: savings.id }).expect(200);
     expect(res.body.accountId).toBe(savings.id);
+    await request(ctx.app).get('/api/months/2026/6').set(user.auth).expect(200);
     expect(await byDate()).toEqual({
       '2026-01-01': 'Cripto',
       '2026-02-01': 'Cripto',
-      '2026-03-01': 'Ahorro',
+      '2026-03-01': 'Cripto',
       '2026-04-01': 'Ahorro',
+      '2026-06-01': 'Ahorro',
     });
 
-    // Back to «the default account» (null).
+    // Back to «the default account» (null): the same, from next month.
     const reset = await patchRule(rule.id, { accountId: null }).expect(200);
     expect(reset.body.accountId).toBeNull();
-    expect((await byDate())['2026-04-01']).toBe((await principal()).name);
+    const main = (await principal()).name;
+    expect(await byDate()).toMatchObject({ '2026-03-01': 'Cripto', '2026-04-01': main });
+
+    // Saving the same account again changes nothing.
+    await patchRule(rule.id, { accountId: null }).expect(200);
+    expect((await byDate())['2026-03-01']).toBe('Cripto');
+  });
+
+  it('changing the account together with something else redoes this month too, as before', async () => {
+    const crypto = await createAccount('Cripto');
+    const savings = await createAccount('Ahorro', 'savings');
+    const rule = (await createRule({ accountId: crypto.id }).expect(201)).body;
+    await patchRule(rule.id, { accountId: savings.id, amount: 850 }).expect(200);
+    const items = await generated();
+    expect(items.map((t) => [t.date, t.accountName])).toEqual([
+      ['2026-01-01', 'Cripto'],
+      ['2026-02-01', 'Cripto'],
+      ['2026-03-01', 'Ahorro'],
+      ['2026-04-01', 'Ahorro'],
+    ]);
   });
 
   const archive = (id: string, archived = true, who = user) =>
