@@ -29,6 +29,18 @@ Producción: <https://finanverso.app>
   Cambiar solo la cuenta se aplica desde el mes siguiente: el movimiento del mes en curso y los
   pasados se quedan en la cuenta en que se anotaron (cambiar el importe u otro dato rehace también
   el del mes en curso, como siempre).
+- **Dividir entre varias cuentas** un gasto, ingreso, ahorro u operación automática: p. ej. 800 € =
+  500 € de la cuenta corriente + 300 € del efectivo. El movimiento sigue siendo uno (categorías,
+  presupuestos e informes cuentan los 800 € una vez) y cada cuenta descuenta solo su parte; las partes
+  se guardan aparte (`transaction_splits`, `recurring_rule_splits`, migración 047) y deben ser 2 a 10
+  cuentas distintas y activas cuya suma sea exactamente el importe (códigos `SPLIT_*`). El formulario
+  rellena solo la última parte con lo que falta, reparte a partes iguales y dice en verde o rojo si
+  cuadra. Editar el importe exige repartirlo otra vez; elegir otra cuenta (o mover varios movimientos
+  a una cuenta) lo pasa entero a esa cuenta. Una operación automática genera cada mes las mismas
+  partes; cambiar solo el reparto se aplica desde el mes siguiente, y una cuenta de sus partes bloquea
+  archivarla o eliminarla mientras esté activa (pausada, al eliminar la cuenta su parte pasa a la de
+  por defecto). El pago de una deuda no se divide. La búsqueda por cuenta encuentra el movimiento en
+  cada cuenta con parte y suma solo esa parte; la exportación incluye las partes.
 - **Importación de extractos** CSV (cualquier separador y formato numérico) y Norma 43, con detección de
   duplicados y categorización automática a partir de tu historial, palabras clave y, en Premium, IA.
 - **Búsqueda y filtros** por texto, tipo, categoría, cuenta, fechas e importes.
