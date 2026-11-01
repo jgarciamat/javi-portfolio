@@ -422,7 +422,8 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem
+    calc(1rem + env(safe-area-inset-bottom, 0px));
   animation: cal-overlay-in 0.15s ease;
 }
 
@@ -443,7 +444,9 @@
   width: 100%;
   max-width: 420px;
   max-height: 85vh;
+  max-height: var(--dialog-max-h);
   overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   animation: cal-modal-in 0.18s ease;
@@ -637,7 +640,7 @@
   .cal-modal {
     max-width: 100%;
     border-radius: 14px;
-    max-height: 80vh;
+    max-height: var(--dialog-max-h);
   }
 
   .cal-modal-overlay {

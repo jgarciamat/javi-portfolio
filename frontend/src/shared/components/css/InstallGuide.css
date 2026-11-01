@@ -223,7 +223,9 @@
   width: 100%;
   max-width: 640px;
   max-height: 92vh;
+  max-height: var(--dialog-max-h);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.25rem;
   border-radius: 14px;
   border: 1px solid var(--slate-800);

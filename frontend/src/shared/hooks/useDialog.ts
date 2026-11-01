@@ -25,6 +25,33 @@ function trapTab(panel: HTMLElement, e: KeyboardEvent): void {
   }
 }
 
+/** Background scroll lock shared by every open dialog (the last one to close releases it). */
+let locks = 0;
+let previousOverflow = '';
+
+/**
+ * While a dialog is open the page behind does not scroll, and `--vv-height` follows the visible
+ * viewport (the on-screen keyboard shrinks it), so the dialog's max height always fits.
+ */
+function lockPage(): () => void {
+  const root = document.documentElement;
+  if (locks++ === 0) {
+    previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  const viewport = window.visualViewport;
+  const sync = () => root.style.setProperty('--vv-height', `${viewport?.height}px`);
+  viewport?.addEventListener('resize', sync);
+  if (viewport) sync();
+  return () => {
+    viewport?.removeEventListener('resize', sync);
+    if (--locks === 0) {
+      document.body.style.overflow = previousOverflow;
+      root.style.removeProperty('--vv-height');
+    }
+  };
+}
+
 /**
  * Keyboard and focus behaviour of a modal dialog: focus moves into it on open
  * (unless a field took it with autoFocus) and goes back to where it was on close,
@@ -56,7 +83,9 @@ export function useDialog(
       else if (e.key === 'Escape' && canDismiss.current) close.current();
     };
     document.addEventListener('keydown', onKeyDown);
+    const unlock = lockPage();
     return () => {
+      unlock();
       document.removeEventListener('keydown', onKeyDown);
       openDialogs.splice(openDialogs.indexOf(panel), 1);
       opener?.focus();
