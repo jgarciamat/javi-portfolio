@@ -40,6 +40,21 @@ const outlookOf = (view: Awaited<ReturnType<typeof panel>>) =>
 const whatIf = { name: tr('app.forecast.whatIf') };
 
 describe('Forecast panel', () => {
+  it('starts folded, also when the month changes and comes back', async () => {
+    setup();
+    const header = await screen.findByRole('button', titleButton);
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(header);
+    expect(header).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.nav.prev')) }));
+    await screen.findByText(tr('app.nav.goToCurrentMonth'));
+    fireEvent.click(screen.getByText(tr('app.nav.goToCurrentMonth')));
+    expect(await screen.findByRole('button', titleButton)).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+  });
+
   it('says how the month would end, what can be spent a day and the coming months (Premium)', async () => {
     const { api } = setup();
     const view = await panel();

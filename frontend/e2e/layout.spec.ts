@@ -63,6 +63,8 @@ async function forecastStaysPut(page: Page) {
   // What loads above the panel (month summary, tour closing) is not the forecast's doing: count from here.
   await expect(page.locator('.summary-card').first()).toBeVisible();
   await page.evaluate(() => ((window as unknown as { __cls: number }).__cls = 0));
+  // Folded by default: open it, so the placeholder and the data are compared open.
+  await panel.locator('.collapsible-header').click();
   const loading = (await panel.boundingBox())?.height ?? 0;
   await expect(panel.locator('.eom')).toBeVisible();
   const loaded = (await panel.boundingBox())?.height ?? 0;

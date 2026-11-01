@@ -19,7 +19,7 @@ interface CollapsiblePanelProps {
 
 export function CollapsiblePanel({
   title,
-  defaultOpen = true,
+  defaultOpen = false,
   open: openProp,
   onToggle,
   children,

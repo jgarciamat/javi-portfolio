@@ -45,3 +45,13 @@
 .month-charges .section-hint:last-child {
   margin: 0.75rem 0 0;
 }
+
+/* The short summary under the title, visible while the panel is folded (wraps, no clipping). */
+.month-charges-summary {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--slate-400);
+  font-variant-numeric: tabular-nums;
+}

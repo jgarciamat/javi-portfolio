@@ -220,7 +220,7 @@ describe('CollapsiblePanel', () => {
   it('works uncontrolled and controlled', () => {
     const onToggle = jest.fn();
     const { rerender } = renderWithI18n(
-      <CollapsiblePanel title="Panel" defaultOpen={false} className="x" style={{ margin: 0 }}>
+      <CollapsiblePanel title="Panel" className="x" style={{ margin: 0 }}>
         cuerpo
       </CollapsiblePanel>
     );
@@ -236,6 +236,25 @@ describe('CollapsiblePanel', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Panel' }));
     expect(onToggle).toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Panel' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('starts folded unless told to start open', () => {
+    renderWithI18n(
+      <>
+        <CollapsiblePanel title="Plegado">a</CollapsiblePanel>
+        <CollapsiblePanel title="Abierto" defaultOpen>
+          b
+        </CollapsiblePanel>
+      </>
+    );
+    expect(screen.getByRole('button', { name: 'Plegado' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+    expect(screen.getByRole('button', { name: 'Abierto' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
   });
 });
 
