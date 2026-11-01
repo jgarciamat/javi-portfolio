@@ -478,6 +478,13 @@ describe('API contract', () => {
       await send('recurringCreateSplit', two);
     });
 
+    it('an automatic operation on a fixed day keeps that day', async () => {
+      const { body } = await send('recurringCreateDay', await vars());
+      expect(body.day).toBe(28);
+      const march = (await get('/months/2026/3')).body.transactions as { date: string }[];
+      expect(march.map((t) => t.date)).toEqual(['2026-03-28']);
+    });
+
     it('self-employed, plans and payments', async () => {
       const v = await vars();
       for (const name of [

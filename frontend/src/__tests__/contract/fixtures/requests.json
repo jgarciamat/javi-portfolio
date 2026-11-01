@@ -299,6 +299,22 @@
     }
   },
   {
+    "name": "recurringCreateDay",
+    "method": "POST",
+    "path": "/recurring-rules",
+    "auth": true,
+    "body": {
+      "description": "Seguro del coche",
+      "amount": 42.5,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "startYear": 2026,
+      "startMonth": 1,
+      "frequency": "monthly",
+      "day": 28
+    }
+  },
+  {
     "name": "transactionCreateSplit",
     "method": "POST",
     "path": "/transactions",

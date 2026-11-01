@@ -277,6 +277,8 @@ export interface CreateRecurringRuleDTO {
   endYear?: number | null;
   endMonth?: number | null;
   frequency?: RecurringFrequency;
+  /** Day of the month of each movement (null or left out: the first day of the month). */
+  day?: number | null;
 }
 
 export interface UpdateRecurringRuleDTO {
@@ -292,6 +294,8 @@ export interface UpdateRecurringRuleDTO {
   endMonth?: number | null;
   frequency?: RecurringFrequency;
   active?: boolean;
+  /** null: back to the first day of the month. */
+  day?: number | null;
 }
 
 // ─── Custom Alerts ────────────────────────────────────────────────────────────

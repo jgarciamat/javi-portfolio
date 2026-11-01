@@ -29,6 +29,8 @@ export interface RuleInput extends CategoryRef {
   end?: Period | null;
   frequency?: string;
   active?: boolean;
+  /** Day of the month of each movement; null: the first day of the period. */
+  day?: number | null;
 }
 
 export interface RuleView extends RecurringRuleProps {
@@ -97,6 +99,7 @@ export class RecurringService {
       end: input.end,
       frequency: input.frequency,
       active: input.active,
+      day: input.day,
     };
     if (input.categoryId || input.category)
       resolved.categoryId = this.categories.resolve(userId, input).id;
