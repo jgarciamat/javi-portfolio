@@ -6,6 +6,7 @@ import {
   type RentaInput,
   type RentaResult,
 } from './rentaCalc';
+import { RENTA_LIMIT_SEVERAL_PAYERS } from './calculators';
 import { round2 } from './round';
 
 /** couple: spouses and their minor children; single: one parent with the children who live with them. */
@@ -23,7 +24,10 @@ export interface JointComparison {
   you: RentaResult;
   /** The spouse's own return (null for a single parent). */
   partner: RentaResult | null;
-  /** The individual returns together: positive to pay, negative to be refunded. */
+  /**
+   * The individual returns together: positive to pay, negative to be refunded. A spouse who does not
+   * have to file and would have to pay counts 0 (see `partnerNotFiling`).
+   */
   individual: number;
   joint: RentaResult;
   /** Positive: what the joint return saves; negative: what it costs. */
@@ -38,7 +42,28 @@ export interface JointComparison {
   oneGeneralExpense: number | null;
   /** The 340 € deduction of the individual returns that the joint one leaves out. */
   lowPayLeftOut: number;
+  /** The spouse would not have to file and their own return comes out to pay: it counts 0 in the sum. */
+  partnerNotFiling: boolean;
 }
+
+/**
+ * Whether the spouse surely does not have to file (LIRPF art. 96, BOE-A-2006-20764, consolidated
+ * text, checked 01-11-2026): only pay or pensions up to 15,876 € (art. 96.3: the limit whatever the
+ * number of payers, which we do not ask), no savings income (whether it was withheld is not known,
+ * art. 96.2.b) and no pension plan that lowers the base (art. 96.4).
+ */
+export function partnerNeedNotFile(partner: JointMember): boolean {
+  return (
+    partner.gross <= RENTA_LIMIT_SEVERAL_PAYERS && partner.savings <= 0 && partner.pensionPlan <= 0
+  );
+}
+
+/**
+ * What the spouse's own return adds to the sum of the individual ones: who does not have to file
+ * and would pay does not file, so they pay nothing (art. 96); a refund is only had by filing.
+ */
+export const partnerCounted = (partner: JointMember, result: number): number =>
+  partnerNeedNotFile(partner) ? Math.min(0, result) : result;
 
 /** Whether the family unit exists: a couple always; one parent needs a minor child (LIRPF art. 82.1). */
 export function canFileJointly(kind: JointKind, children: Child[], rules: JointRules): boolean {
@@ -84,12 +109,14 @@ export function partnerInput(
 function childrenToOneOf(input: RentaInput, spouse: JointMember): JointComparison['childrenToOne'] {
   const { family } = input;
   if (countedChildren(family).length === 0) return null;
+  const partnerWith = (children: Child[]) =>
+    partnerCounted(spouse, computeRenta(partnerInput(input, spouse, children, false)).result);
   const toYou =
     computeRenta({ ...input, family: { ...family, sharedChildren: false } }).result +
-    computeRenta(partnerInput(input, spouse, [], false)).result;
+    partnerWith([]);
   const toPartner =
     computeRenta({ ...input, family: { ...family, children: [] } }).result +
-    computeRenta(partnerInput(input, spouse, family.children, false)).result;
+    partnerWith(family.children);
   return toYou <= toPartner
     ? { to: 'you', individual: round2(toYou) }
     : { to: 'partner', individual: round2(toPartner) };
@@ -171,7 +198,8 @@ export function compareJoint(
   const partnerResult = spouse
     ? computeRenta(partnerInput(input, spouse, family.children, true))
     : null;
-  const individual = round2(you.result + (partnerResult?.result ?? 0));
+  const partnerSum = spouse ? partnerCounted(spouse, (partnerResult as RentaResult).result) : 0;
+  const individual = round2(you.result + partnerSum);
   const reduction = reductionOf(spouse !== null, options);
   const { joint, oneGeneralExpense } = jointOf(input, spouse, reduction, rules.minorUntil);
   const saving = round2(individual - joint.result);
@@ -189,5 +217,6 @@ export function compareJoint(
     lowPayLeftOut: joint.lowPayLeftOut
       ? round2(you.lowPay + (partnerResult as RentaResult).lowPay)
       : 0,
+    partnerNotFiling: partnerResult !== null && partnerSum !== partnerResult.result,
   };
 }
