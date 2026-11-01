@@ -35,7 +35,6 @@ test('the edit dialog fits a short phone screen and keeps Guardar reachable', as
     expect((button?.y ?? 0) + (button?.height ?? 0)).toBeLessThanOrEqual(height);
     await dialog.getByLabel('Notas').scrollIntoViewIfNeeded();
   }
-  await page.screenshot({ path: '/private/tmp/claude-502/edit-320.png' });
   await save.click();
   await expect(dialog).toBeHidden();
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
