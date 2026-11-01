@@ -15,7 +15,13 @@ const ROWS: Row[] = [
   { key: 'result', of: (r) => r.result },
 ];
 
-/** Two individual returns against the joint one, with what each choice costs and a recommendation. */
+/** The verdict: a single parent has one individual return, not two to add up. */
+const verdictKey = (joint: JointComparison) =>
+  joint.partner !== null || joint.best === 'same'
+    ? `tools.renta.joint.best.${joint.best}`
+    : `tools.renta.joint.bestSingle.${joint.best}`;
+
+/** The individual returns against the joint one, with what each choice comes to with the data given. */
 export function JointTable({
   joint,
   money,
@@ -37,7 +43,11 @@ export function JointTable({
           {
             key: 'sum',
             label: t('tools.renta.joint.col.sum'),
-            value: (row: Row) => row.of(joint.you) + row.of(joint.partner as RentaResult),
+            // The result is the sum that counts: 0 for a spouse who need not file and would pay.
+            value: (row: Row) =>
+              row.key === 'result'
+                ? joint.individual
+                : row.of(joint.you) + row.of(joint.partner as RentaResult),
           },
         ]
       : []),
@@ -54,7 +64,7 @@ export function JointTable({
     <section className="renta-block renta-joint" aria-labelledby="renta-joint-title">
       <h3 id="renta-joint-title">{t('tools.renta.joint.compareTitle')}</h3>
       <p className="renta-joint-verdict" role="status">
-        <strong>{t(`tools.renta.joint.best.${joint.best}`, { amount })}</strong>
+        <strong>{t(verdictKey(joint), { amount })}</strong>
       </p>
       <div className="renta-compare-scroll">
         <table className="renta-compare-table">
@@ -98,6 +108,13 @@ export function JointTable({
             amount: money(joint.joint.jointReduction),
           })}
         </li>
+        {joint.partnerNotFiling && (
+          <li>
+            {t('tools.renta.joint.note.partnerNotFiling', {
+              amount: money((joint.partner as RentaResult).result),
+            })}
+          </li>
+        )}
         {toOne && (
           <li>
             {t('tools.renta.joint.note.childrenToOne', {

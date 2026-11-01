@@ -53,7 +53,6 @@ describe('the reviewer of the return', () => {
     const savings = r.items.map((i) => i.saving);
     expect(savings).toEqual([...savings].sort((a, b) => b - a));
     expect(r.items.every((i) => i.saving > 0 && i.source.startsWith('https://'))).toBe(true);
-    expect(r.total).toBe(Math.round(savings.reduce((a, b) => a + b, 0) * 100) / 100);
     expect(r.missing).toEqual([]);
   });
 

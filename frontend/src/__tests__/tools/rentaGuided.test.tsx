@@ -416,6 +416,58 @@ describe('the joint return in the result', () => {
     expect(table).toHaveTextContent(/si contara uno solo, la conjunta saldría/);
   });
 
+  it('counts 0 for a spouse who need not file and would pay, and says why', async () => {
+    // Hand case of rentaJoint.test.ts: a pension of 15,800 € with nothing withheld comes out to
+    // pay 482.30; the sum of the individual returns is your 833, and the joint 3,949.
+    saved({
+      ccaaId: 'castilla-y-leon',
+      gross: '30000',
+      socialSecurity: '1950',
+      withheld: '4000',
+      joint: 'couple',
+      partner: {
+        ...emptyForm('').partner,
+        gross: '15800',
+        socialSecurity: '0',
+        nonSalary: '15800',
+        retired: true,
+        age: '60',
+      },
+      answers: { ccaa: 'castilla-y-leon' },
+    });
+    premium();
+    const table = await screen.findByRole('region', { name: tr('tools.renta.joint.compareTitle') });
+    expect(within(table).getByRole('status')).toHaveTextContent(
+      tr('tools.renta.joint.best.individual', { amount: '3.116,00 €' })
+    );
+    const result = within(table).getByRole('row', {
+      name: new RegExp(tr('tools.renta.joint.row.result')),
+    });
+    expect(result).toHaveTextContent(/833,00 €.*482,30 €.*833,00 €.*3\.949,00 €/);
+    expect(table).toHaveTextContent(
+      tr('tools.renta.joint.note.partnerNotFiling', { amount: '482,30 €' })
+    );
+  });
+
+  it('compares one parent with a single individual return', async () => {
+    // 25,000 - 1,625 - 2,000 = 21,375 with a minimum of 7,950 (5,550 + 2,400): State 2,289 -
+    // 755.25 = 1,533.75; CyL 2,215 - 715.50 = 1,499.50. Joint, 2,150 less: 19,225, State
+    // 1,995.75 - 755.25 = 1,240.50; CyL 1,933.50 - 715.50 = 1,218. 3,033.25 - 2,458.50 = 574.75.
+    saved({
+      ccaaId: 'castilla-y-leon',
+      gross: '25000',
+      socialSecurity: '1625',
+      children: [{ age: '8', disability: 0 }],
+      joint: 'single',
+      answers: { ccaa: 'castilla-y-leon' },
+    });
+    premium();
+    const table = await screen.findByRole('region', { name: tr('tools.renta.joint.compareTitle') });
+    expect(within(table).getByRole('status')).toHaveTextContent(
+      tr('tools.renta.joint.bestSingle.joint', { amount: '574,75 €' })
+    );
+  });
+
   it('shows one parent without a spouse column, and nothing without a minor child', async () => {
     saved({
       ccaaId: 'castilla-y-leon',

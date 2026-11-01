@@ -12,6 +12,7 @@ import { scrollBehavior } from '@shared/utils/motion';
 import { ResultAmount, resultLabel, resultTone } from './shared';
 import { hasRentaWebCopy, RENTA_WEB_RESULT_ID } from './invest/RentaWebPanel';
 import { ledgerOf } from '../../domain/invest/summary';
+import { isChildAid } from '../../domain/rentaSavings';
 
 export interface Snapshot {
   result: RentaResult;
@@ -20,25 +21,26 @@ export interface Snapshot {
   joint?: JointComparison | null;
   /** The year of the return it was worked out for (missing: saved before 2026-10, so 2025). */
   year?: number;
+  /** What the children change in the result, all together (missing: saved before 2026-11). */
+  childrenEffect?: number;
 }
 
 /** An amount that is taken off, shown with a minus sign unless it is zero. */
 const minus = (n: number, money: (n: number) => string) => (n > 0 ? `−${money(n)}` : money(0));
-
-const CHILD_AID =
-  /hij|maternidad|guarder|nacimiento|adopci|natalidad|descend|infantil|numerosa|menor/i;
 
 /** Everything that helps for children, in three clearly different layers that add up but never repeat. */
 function ChildAids({ shown, money }: { shown: Snapshot; money: (n: number) => string }) {
   const { t } = useI18n();
   const { result, kids } = shown;
   if (kids.length === 0) return null;
-  const lines: DeductionLine[] = result.lines.filter(
-    (l) => l.group === 'family' && CHILD_AID.test(`${l.id} ${l.title}`)
-  );
+  const lines: DeductionLine[] = result.lines.filter((l) => l.group === 'family' && isChildAid(l));
   const bySide = (scope: DeductionLine['scope']) => lines.filter((l) => l.scope === scope);
   const minimum = kids.reduce((sum, k) => sum + k.amount, 0);
-  const total = result.minimumSavings.descendants + lines.reduce((s, l) => s + l.amount, 0);
+  // The lines added up are a ceiling: the minimum and each deduction measured before the tax runs
+  // out. The whole return worked out without the children is the figure, when there is one.
+  const ceiling = result.minimumSavings.descendants + lines.reduce((s, l) => s + l.amount, 0);
+  const measured = typeof shown.childrenEffect === 'number';
+  const total = measured ? (shown.childrenEffect as number) : ceiling;
   return (
     <section className="renta-block renta-child-aids">
       <h3>{t('tools.renta.childAids')}</h3>
@@ -81,7 +83,8 @@ function ChildAids({ shown, money }: { shown: Snapshot; money: (n: number) => st
         </li>
       </ol>
       <p className="renta-gives">
-        {t('tools.renta.childAids.total')} <strong>{money(total)}</strong>
+        {t(measured ? 'tools.renta.childAids.total' : 'tools.renta.childAids.totalMax')}{' '}
+        <strong>{money(total)}</strong>
       </p>
     </section>
   );

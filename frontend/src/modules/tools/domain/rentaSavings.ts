@@ -89,3 +89,24 @@ export function markedSaving(input: RentaInput, current: RentaResult): number {
   const without = computeRenta({ ...input, choices: none, donations: undefined });
   return round2(Math.max(0, without.result - current.result));
 }
+
+/** A deduction for children or the family with children, told by its id and title. */
+export const CHILD_AID =
+  /hij|maternidad|guarder|nacimiento|adopci|natalidad|descend|infantil|numerosa|menor/i;
+
+export const isChildAid = (d: { id: string; title: string }): boolean =>
+  CHILD_AID.test(`${d.id} ${d.title}`);
+
+/**
+ * What the children change in the result, all counted together: the return without children and
+ * without the deductions for them, less the current one. Lower than adding up the minimum and each
+ * deduction when the tax runs out (LIRPF arts. 67.2 and 77.2: the net tax is never negative).
+ */
+export function childrenEffect(input: RentaInput, current: RentaResult): number {
+  const lines = new Set(current.lines.filter(isChildAid).map((l) => l.id));
+  const choices = Object.fromEntries(
+    Object.entries(input.choices).filter(([id]) => !lines.has(id) && !CHILD_AID.test(id))
+  );
+  const without = computeRenta({ ...input, choices, family: { ...input.family, children: [] } });
+  return round2(Math.max(0, without.result - current.result));
+}
