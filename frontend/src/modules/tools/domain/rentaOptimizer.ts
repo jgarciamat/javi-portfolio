@@ -56,9 +56,8 @@ export interface OptimizerData extends RentaData {
 export type MissingKey = 'ccaa' | 'socialSecurity' | 'withheld' | 'age' | 'jointKind';
 
 export interface Optimization {
+  /** Each one estimated on its own: they are not added up (together they give more or less). */
   items: Opportunity[];
-  /** Everything together is less than the sum: each one is estimated on its own. */
-  total: number;
   missing: MissingKey[];
 }
 
@@ -283,9 +282,5 @@ export function optimize(
     });
   }
   items.sort((a, b) => b.saving - a.saving);
-  return {
-    items,
-    total: round2(items.reduce((sum, i) => sum + i.saving, 0)),
-    missing: missingOf(form),
-  };
+  return { items, missing: missingOf(form) };
 }
