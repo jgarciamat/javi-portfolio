@@ -315,6 +315,31 @@ describe('Renta planner: free calculations', () => {
     expect(screen.getAllByText(tr('tools.renta.usedNoSnapshot')).length).toBeGreaterThan(0);
   });
 
+  it('adds up the help for children with the whole return, or as a ceiling when saved before', async () => {
+    const first = renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
+      authenticated: false,
+    });
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('tools.renta.addChild')) }));
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 })), {
+      target: { value: '2' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    await screen.findByText(new RegExp(tr('tools.renta.toPay')));
+    const total = () =>
+      (
+        screen.getByText(tr('tools.renta.childAids')).closest('section') as HTMLElement
+      ).querySelector('.renta-gives') as HTMLElement;
+    expect(total()).toHaveTextContent(tr('tools.renta.childAids.total'));
+    first.unmount();
+    // Saved before the total was worked out with the whole return: the sum, said as a ceiling.
+    const saved = JSON.parse(localStorage.getItem('mm_renta_snapshot_v2') as string);
+    expect(saved.childrenEffect).toBeGreaterThan(0);
+    delete saved.childrenEffect;
+    localStorage.setItem('mm_renta_snapshot_v2', JSON.stringify(saved));
+    renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
+    expect(total()).toHaveTextContent(tr('tools.renta.childAids.totalMax'));
+  });
+
   it('shows the result of a refund and the lines of the calculation', async () => {
     renderWithProviders(<RentaPlanner mode="local" initialIncome="40000" />, {
       authenticated: false,

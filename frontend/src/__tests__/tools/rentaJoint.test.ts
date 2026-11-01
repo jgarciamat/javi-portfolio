@@ -6,6 +6,7 @@ import { rentaJoint } from '@modules/tools/data/renta/conjunta';
 import { rentaWorkExtras } from '@modules/tools/data/renta/estado-extra';
 import { rentaState } from '@modules/tools/data/renta/state';
 import { workReductionOf } from '@modules/tools/domain/rentaWork';
+import { round2 } from '@modules/tools/domain/round';
 
 // Every figure below is worked out by hand with the State scale (9.5 / 12 / 15 / 18.5 %) and the
 // scale of Castilla y León (9 / 12 / 14 / 18.5 %), which uses the State's minimums.
@@ -268,6 +269,75 @@ describe('joint return of a couple', () => {
     );
     expect(c.you.blocked).toContain(birth.id);
     expect(c.joint.blocked).not.toContain(birth.id);
+  });
+});
+
+describe('a spouse who does not have to file (LIRPF art. 96)', () => {
+  // A pension of 15,800 € from two payers with nothing withheld: under 15,876 € they need not file.
+  // Reduction measured on 15,800: 7,302 - 1.75 x (15,800 - 14,852) = 5,643. Base 15,800 - 2,000
+  // - 5,643 = 8,157 over a minimum of 5,550: 2,607 x 9.5 % = 247.67 (State) and x 9 % = 234.63
+  // (CyL): 482.30 to pay if they filed.
+  const pensioner = spouse({ gross: 15800, nonSalaryIncome: 15800, retired: true, age: 60 });
+
+  it('counts 0 for them in the sum when their own return would come out to pay', () => {
+    // You earn nothing. Joint: 8,157 - 3,400 = 4,757, under the minimum: 0.
+    // Before, the sum was 482.30 and the joint return looked 482.30 better; filing apart nobody
+    // pays, so both come out the same.
+    const c = couple(input({ gross: 0, socialSecurity: 0, withheld: 0 }), pensioner);
+    expect(c.partner?.result).toBe(482.3);
+    expect(c.partnerNotFiling).toBe(true);
+    expect(c.individual).toBe(0);
+    expect(c.joint.taxBase).toBe(4757);
+    expect(c.joint.result).toBe(0);
+    expect(c.saving).toBe(0);
+    expect(c.best).toBe('same');
+  });
+
+  it('keeps your own return and measures the joint one with both incomes', () => {
+    // You: 833 to pay (first case). Joint: 26,050 + 13,800 = 39,850, no work reduction;
+    // 36,450 of base. State 4,594 - 527.25 = 4,066.75; CyL 4,381.75 - 499.50 = 3,882.25;
+    // 7,949 - 4,000 = 3,949. The sum is 833, not 1,315.30: 3,116 better apart.
+    const c = couple(input(), pensioner);
+    expect(c.individual).toBe(833);
+    expect(c.joint.taxBase).toBe(36450);
+    expect(c.joint.result).toBe(3949);
+    expect(c.saving).toBe(-3116);
+    expect(c.best).toBe('individual');
+  });
+
+  it('keeps a refund: it is only had by filing', () => {
+    // A pension of 12,000 with 300 withheld: base 2,698 under the minimum, 300 back.
+    const c = couple(
+      input(),
+      spouse({ ...pensioner, gross: 12000, nonSalaryIncome: 12000, withheld: 300 })
+    );
+    expect(c.partner?.result).toBe(-300);
+    expect(c.partnerNotFiling).toBe(false);
+    expect(c.individual).toBe(533);
+  });
+
+  it('counts the whole return when they may have to file', () => {
+    // Over 15,876 € (one or more payers: not asked), with savings or with a pension plan.
+    const over = couple(input(), { ...pensioner, gross: 16000, nonSalaryIncome: 16000 });
+    expect(over.partnerNotFiling).toBe(false);
+    expect(over.individual).toBe(round2(833 + (over.partner?.result ?? 0)));
+    expect(over.partner?.result).toBeGreaterThan(0);
+    expect(couple(input(), { ...pensioner, savings: 100 }).partnerNotFiling).toBe(false);
+    expect(couple(input(), { ...pensioner, pensionPlan: 100 }).partnerNotFiling).toBe(false);
+  });
+
+  it('counts 0 for them too when all the children go to one return', () => {
+    // All the children with you: the spouse's own return still comes out to pay 482.30.
+    const kids = [{ age: 8, disability: 0 as const }];
+    const c = couple(input({ family: { ...input().family, children: kids } }), pensioner);
+    expect(c.childrenToOne?.to).toBe('you');
+    expect(c.childrenToOne?.individual).toBe(
+      round2(
+        computeRenta(
+          input({ family: { ...input().family, sharedChildren: false, children: kids } })
+        ).result
+      )
+    );
   });
 });
 

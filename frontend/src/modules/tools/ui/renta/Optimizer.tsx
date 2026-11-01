@@ -107,7 +107,8 @@ function Confirmed({
 
 /**
  * The reviewer: what could lower the tax and is not in the data, each one first as a question. Only
- * what the person confirms gets a saving (and counts in the total); a «no» or «I do not know» is
+ * what the person confirms gets a figure, each on its own and never added up (cuts in the base and
+ * in the tax do not add: the scale is progressive and the tax runs out); a «no» or «I do not know» is
  * put aside without a figure. The deductions are gone through in their own review: here, how many
  * are left. Orientative only.
  */
@@ -122,7 +123,6 @@ export function Optimizer({
   found: Deduction[];
 }) {
   const { t } = useI18n();
-  const money = useMoney();
   const held = useHeld();
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   // What a confirmed one saved when the person said yes (its change is in the form since then).
@@ -182,7 +182,6 @@ export function Optimizer({
       answers[i.id] !== 'unknown'
   );
   const archived = Object.keys(answers).filter((id) => answers[id] !== 'yes');
-  const total = confirmed.reduce((sum, c) => sum + c.saving, 0);
   const nothing = questions.length === 0 && found.length === 0;
 
   return (
@@ -203,7 +202,7 @@ export function Optimizer({
         <>
           {!held && (
             <p className="renta-saving-total" role="status">
-              {t('tools.renta.opt.total', { count: confirmed.length, amount: money(total) })}
+              {t('tools.renta.opt.total', { count: confirmed.length })}
             </p>
           )}
           <ol className="renta-deductions">

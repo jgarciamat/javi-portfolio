@@ -36,7 +36,7 @@ import type { DeductionSaving } from '../../domain/rentaSavings';
 import { compareBoxes, ourBoxes } from '../../domain/rentaCompare';
 import { draftDeductionIds, draftGaps, withGaps, type DraftGap } from '../../domain/rentaDraftGaps';
 import { withDraftDeductions } from '../../domain/rentaDraftApply';
-import { deductionSavings, markedSaving } from '../../domain/rentaSavings';
+import { childrenEffect, deductionSavings, markedSaving } from '../../domain/rentaSavings';
 import { clearProgress, loadProgress, saveProgress } from '../../application/rentaProgress';
 import { forgetMappings } from '../../application/investImport';
 import type { Snapshot } from './ResultStep';
@@ -232,10 +232,13 @@ function useLive(
   family: ReturnType<typeof familyOf>,
   form: RentaForm
 ): Snapshot {
-  return useMemo(
-    () => ({
-      result: computeRenta(input),
-      kids: descendantBreakdown(family, rules.state.minimums),
+  return useMemo(() => {
+    const result = computeRenta(input);
+    const kids = descendantBreakdown(family, rules.state.minimums);
+    return {
+      result,
+      kids,
+      ...(kids.length > 0 ? { childrenEffect: childrenEffect(input, result) } : {}),
       joint:
         form.joint === 'couple' || form.joint === 'single'
           ? compareJoint(input, form.joint, partnerOf(form), {
@@ -243,9 +246,8 @@ function useLive(
               rules: rules.joint,
             })
           : null,
-    }),
-    [rules, input, family, form]
-  );
+    };
+  }, [rules, input, family, form]);
 }
 
 /**
