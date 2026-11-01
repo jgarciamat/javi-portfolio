@@ -90,6 +90,7 @@ describe('RecurringRulesTab', () => {
         type: 'EXPENSE',
         category: 'Vivienda',
         accountId: null,
+        splits: null,
         frequency: 'quarterly',
         startYear: 2026,
         startMonth: 4,

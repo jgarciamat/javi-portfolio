@@ -236,6 +236,7 @@ describe('new movement form', () => {
         date: '2026-03-15',
         notes: 'con amigos',
         accountId: 'a2',
+        splits: null,
       })
     );
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalledTimes(2));

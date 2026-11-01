@@ -11,6 +11,7 @@ import type {
   UpdateTransactionDTO,
 } from '@modules/finances/domain/types';
 import { txDayKey } from '@modules/finances/domain/transactionGrouping';
+import { splitFromParts } from '@modules/finances/domain/accountSplit';
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import { TransactionFormFields } from './TransactionFormFields';
 import '../css/TransactionForm.css';
@@ -68,6 +69,7 @@ export function EditTransactionModal({
       date: txDayKey(transaction.date),
       notes: transaction.notes ?? '',
       accountId: transaction.accountId ?? null,
+      split: splitFromParts(transaction.splits),
     },
   });
 

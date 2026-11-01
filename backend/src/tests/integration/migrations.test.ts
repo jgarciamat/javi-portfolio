@@ -9,6 +9,7 @@ import { migrations } from '@infrastructure/sqlite/migrations';
 import { baseline } from '@infrastructure/sqlite/migrations/001-baseline';
 import { dropUploadedPictures } from '@infrastructure/sqlite/migrations/033-drop-uploaded-pictures';
 import { debtPayments } from '@infrastructure/sqlite/migrations/046-debt-payments';
+import { accountSplits } from '@infrastructure/sqlite/migrations/047-account-splits';
 
 /** Builds a database exactly as v1.10 left it, with representative data. */
 function legacyDatabase(file = ':memory:'): Db {
@@ -317,6 +318,51 @@ describe('migrations', () => {
     expect(db.prepare(`SELECT payment_rule_id FROM assets WHERE id = 'd1'`).get()).toEqual({
       payment_rule_id: null,
     });
+    db.close();
+  });
+
+  it('leaves every movement and rule in its single account; parts go with them (047)', () => {
+    const db = openDatabase(':memory:');
+    migrate(
+      db,
+      migrations.filter((m) => m.version < accountSplits.version)
+    );
+    db.exec(`
+      INSERT INTO users (id, email, name, password_hash, created_at)
+        VALUES ('u1', 'u1@x.es', 'U', NULL, '2026-01-01T00:00:00Z');
+      INSERT INTO accounts (id, user_id, name, created_at)
+        VALUES ('a1', 'u1', 'Corriente', '2026-01-01T00:00:00Z'),
+               ('a2', 'u1', 'Efectivo', '2026-01-01T00:00:00Z');
+      INSERT INTO categories (id, user_id, name) VALUES ('c1', 'u1', 'Hogar');
+      INSERT INTO recurring_rules (id, user_id, description, amount_cents, type, category_id,
+        account_id, start_year, start_month, created_at)
+        VALUES ('r1', 'u1', 'Común', 80000, 'EXPENSE', 'c1', 'a1', 2026, 1, '2026-01-01T00:00:00Z');
+      INSERT INTO transactions (id, user_id, account_id, category_id, year, month, date,
+        description, description_key, amount_cents, type, created_at)
+        VALUES ('t1', 'u1', 'a1', 'c1', 2026, 3, '2026-03-01', 'Común', 'comun', 80000, 'EXPENSE',
+          '2026-03-01T00:00:00Z');
+    `);
+    migrate(db, migrations);
+    expect(db.prepare('SELECT COUNT(*) AS n FROM transaction_splits').get()).toEqual({ n: 0 });
+    expect(db.prepare('SELECT COUNT(*) AS n FROM recurring_rule_splits').get()).toEqual({ n: 0 });
+    db.exec(`
+      INSERT INTO transaction_splits (transaction_id, account_id, amount_cents, position)
+        VALUES ('t1', 'a1', 50000, 0), ('t1', 'a2', 30000, 1);
+      INSERT INTO recurring_rule_splits (rule_id, account_id, amount_cents, position)
+        VALUES ('r1', 'a1', 50000, 0), ('r1', 'a2', 30000, 1);
+    `);
+    // One part per account, never zero; an account with parts cannot go.
+    expect(() => db.exec(`INSERT INTO transaction_splits VALUES ('t1', 'a2', 1, 2)`)).toThrow(
+      /UNIQUE|PRIMARY/
+    );
+    expect(() =>
+      db.exec(`UPDATE recurring_rule_splits SET amount_cents = 0 WHERE account_id = 'a2'`)
+    ).toThrow(/CHECK/);
+    expect(() => db.exec(`DELETE FROM accounts WHERE id = 'a2'`)).toThrow(/FOREIGN KEY/);
+    db.exec(`DELETE FROM transactions WHERE id = 't1'`);
+    db.exec(`DELETE FROM recurring_rules WHERE id = 'r1'`);
+    expect(db.prepare('SELECT COUNT(*) AS n FROM transaction_splits').get()).toEqual({ n: 0 });
+    expect(db.prepare('SELECT COUNT(*) AS n FROM recurring_rule_splits').get()).toEqual({ n: 0 });
     db.close();
   });
 

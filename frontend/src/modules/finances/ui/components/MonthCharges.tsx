@@ -5,6 +5,7 @@ import { Icon } from '@shared/components/Icon';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction } from '@modules/finances/domain/types';
 import { monthCharges } from '@modules/finances/domain/monthCharges';
+import { accountLabel } from '@modules/finances/domain/accountSplit';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
 import '../css/MonthCharges.css';
@@ -64,7 +65,7 @@ export function MonthCharges({ onEdit }: { onEdit: (tx: Transaction) => void }) 
                 <span className="entity-name">{tx.description}</span>
                 <span className="entity-sub">
                   {dayMonth(tx.date)} · {tCategory(tx.category)}
-                  {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
+                  {showAccount && accountLabel(tx, money) ? ` · ${accountLabel(tx, money)}` : ''}
                 </span>
               </span>
               <span className="month-charges-amount">

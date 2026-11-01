@@ -182,7 +182,7 @@ describe('the words after registering', () => {
   });
 
   it('writes a moment as the time field of the device does', () => {
-    expect(toLocalInput(Date.parse('2026-03-05T09:07:00Z'))).toBe('2026-03-05T09:07');
+    expect(toLocalInput(new Date(2026, 2, 5, 9, 7).getTime())).toBe('2026-03-05T09:07');
   });
 });
 

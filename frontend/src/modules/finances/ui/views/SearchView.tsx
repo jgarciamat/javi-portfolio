@@ -21,6 +21,7 @@ import {
 } from '@shared/components/BulkSelection';
 import { BULK_MAX } from '@modules/finances/domain/transactionBulk';
 import { isPendingAutomatic } from '@modules/finances/domain/monthCharges';
+import { accountLabel } from '@modules/finances/domain/accountSplit';
 import { todayDateOnly } from '@shared/utils/format';
 import { totalsByType } from '@modules/finances/domain/transactionTypes';
 import { useFinances } from '../../application/FinancesContext';
@@ -241,7 +242,7 @@ function SearchResults({
                 <span className="entity-name">{tx.description}</span>
                 <span className="entity-sub">
                   {date(tx.date)} · {tCategory(tx.category)}
-                  {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
+                  {showAccount && accountLabel(tx, money) ? ` · ${accountLabel(tx, money)}` : ''}
                   {isPendingAutomatic(tx, today) && (
                     <span className="pill pill--due">{t('app.search.scheduled')}</span>
                   )}

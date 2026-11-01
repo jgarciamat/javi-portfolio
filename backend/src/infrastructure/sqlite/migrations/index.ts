@@ -44,6 +44,7 @@ import { cryptoDrawings } from './043-crypto-drawings';
 import { cryptoPracticeTransfers } from './044-crypto-practice-transfers';
 import { cryptoRecordedPositions } from './045-crypto-recorded-positions';
 import { debtPayments } from './046-debt-payments';
+import { accountSplits } from './047-account-splits';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -94,4 +95,5 @@ export const migrations: Migration[] = [
   cryptoPracticeTransfers,
   cryptoRecordedPositions,
   debtPayments,
+  accountSplits,
 ];

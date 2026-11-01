@@ -73,9 +73,14 @@ export class SqliteAccountRepository implements AccountRepository {
   }
 
   countReferences(userId: string, id: string): number {
+    // A part of a split movement counts too (its row of transaction_splits points at the account).
     const tx = this.db
-      .prepare('SELECT COUNT(*) AS n FROM transactions WHERE user_id = ? AND account_id = ?')
-      .get(userId, id) as { n: number };
+      .prepare(
+        `SELECT COUNT(*) AS n FROM transactions t
+          WHERE t.user_id = @userId AND (t.account_id = @id OR EXISTS (
+            SELECT 1 FROM transaction_splits s WHERE s.transaction_id = t.id AND s.account_id = @id))`
+      )
+      .get({ userId, id }) as { n: number };
     const tr = this.db
       .prepare(
         'SELECT COUNT(*) AS n FROM transfers WHERE user_id = ? AND (from_account_id = ? OR to_account_id = ?)'
@@ -88,14 +93,23 @@ export class SqliteAccountRepository implements AccountRepository {
     userId: string,
     upTo?: { period: Period; endDate: string }
   ): Record<string, Cents> {
-    // The movements belong to a period (year, month); the transfers only have a date.
-    const inPeriod = upTo ? 'AND (year, month) <= (@year, @month)' : '';
+    // The movements belong to a period (year, month); the transfers only have a date. A split
+    // movement adds each part to its account; any other, its whole amount to its account.
+    const inPeriod = upTo ? 'AND (t.year, t.month) <= (@year, @month)' : '';
     const byDate = upTo ? 'AND date <= @endDate' : '';
     const rows = this.db
       .prepare(
         `SELECT account_id AS id, SUM(delta) AS cents FROM (
-           SELECT account_id, CASE WHEN type = 'INCOME' THEN amount_cents ELSE -amount_cents END AS delta
-             FROM transactions WHERE user_id = @userId ${inPeriod}
+           SELECT t.account_id,
+                  CASE WHEN t.type = 'INCOME' THEN t.amount_cents ELSE -t.amount_cents END AS delta
+             FROM transactions t
+            WHERE t.user_id = @userId ${inPeriod}
+              AND NOT EXISTS (SELECT 1 FROM transaction_splits s WHERE s.transaction_id = t.id)
+           UNION ALL
+           SELECT s.account_id,
+                  CASE WHEN t.type = 'INCOME' THEN s.amount_cents ELSE -s.amount_cents END
+             FROM transaction_splits s JOIN transactions t ON t.id = s.transaction_id
+            WHERE t.user_id = @userId ${inPeriod}
            UNION ALL
            SELECT to_account_id, amount_cents FROM transfers WHERE user_id = @userId ${byDate}
            UNION ALL

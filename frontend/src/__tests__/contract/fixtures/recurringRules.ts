@@ -9,6 +9,7 @@ export const recurringRules = [
     category: 'Vivienda',
     categoryId: '00000000-0000-4000-8000-000000000003',
     accountId: '00000000-0000-4000-8000-000000000004',
+    splits: [],
     startYear: 2026,
     startMonth: 4,
     endYear: 2026,

@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '@domain/errors';
+import { AccountSplit } from '@domain/model/AccountSplit';
 import { RecurringRule, RecurringRuleInput, RecurringRuleProps } from '@domain/model/RecurringRule';
 import {
   RecurringRuleRepository,
@@ -22,6 +23,8 @@ export interface RuleInput extends CategoryRef {
   amountCents?: Cents;
   type?: string;
   accountId?: string | null;
+  /** Split between several accounts (see TransactionService's NewTransactionInput.splits). */
+  splits?: AccountSplit[] | null;
   start?: Period;
   end?: Period | null;
   frequency?: string;
@@ -97,7 +100,17 @@ export class RecurringService {
     };
     if (input.categoryId || input.category)
       resolved.categoryId = this.categories.resolve(userId, input).id;
-    if (input.accountId !== undefined && input.accountId !== current?.accountId) {
+    if (input.splits !== undefined) {
+      // New parts: the rule's account is the first part's (the one named is not used).
+      resolved.splits = input.splits?.length
+        ? this.accounts.resolveSplits(userId, input.splits, current?.splits)
+        : null;
+    }
+    if (
+      !resolved.splits &&
+      input.accountId !== undefined &&
+      input.accountId !== current?.accountId
+    ) {
       resolved.accountId = input.accountId
         ? this.accounts.resolveForMovement(userId, input.accountId).id
         : null;
@@ -145,14 +158,13 @@ export class RecurringService {
         JSON.stringify(before.end) !== JSON.stringify(after.end) ||
         before.frequency !== after.frequency ||
         before.active !== after.active;
-      // Anything but the account: this month's movement is redone too, as always.
+      // Anything but the accounts: this month's movement is redone too, as always.
       const otherChanged =
-        scheduleChanged ||
-        RecurringRule.contentChanged(before.update({ accountId: after.accountId }), after);
+        scheduleChanged || RecurringRule.contentChanged(before, after, { ignoreAccounts: true });
       if (otherChanged) {
         this.transactions.deleteByRule(userId, id, today);
         this.rules.clearSkipsFrom(id, today);
-      } else if (before.accountId !== after.accountId) {
+      } else if (RecurringRule.accountsChanged(before, after)) {
         // Only the account: the coming months go to the new one; this month's movement and the
         // past ones stay in the account they were noted in (and removed months stay removed).
         this.transactions.deleteByRule(userId, id, addMonths(today, 1));
@@ -174,6 +186,13 @@ export class RecurringService {
    * payment day (the months it was paused are not filled in).
    */
   private updateDebtRule(userId: string, id: string, input: RuleInput, debt: Asset): RuleView {
+    // Its amount changes with what is left of the debt, so it is paid from one account.
+    if (input.splits?.length) {
+      throw new ValidationError(
+        'El pago de una deuda sale de una sola cuenta',
+        'SPLIT_NOT_FOR_DEBT'
+      );
+    }
     const debts = this.debts as DebtPayments;
     const updated = this.uow.run(() => {
       const before = this.require(userId, id);

@@ -299,6 +299,59 @@
     }
   },
   {
+    "name": "transactionCreateSplit",
+    "method": "POST",
+    "path": "/transactions",
+    "auth": true,
+    "body": {
+      "description": "Cuenta común",
+      "amount": 800,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "date": "2026-03-10",
+      "notes": null,
+      "accountId": "{account}",
+      "splits": [
+        {
+          "accountId": "{account}",
+          "amount": 500
+        },
+        {
+          "accountId": "{account2}",
+          "amount": 300
+        }
+      ]
+    }
+  },
+  {
+    "name": "recurringCreateSplit",
+    "method": "POST",
+    "path": "/recurring-rules",
+    "auth": true,
+    "body": {
+      "description": "Cuenta común",
+      "amount": 800,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "accountId": "{account}",
+      "splits": [
+        {
+          "accountId": "{account}",
+          "amount": 500
+        },
+        {
+          "accountId": "{account2}",
+          "amount": 300
+        }
+      ],
+      "frequency": "monthly",
+      "startYear": 2026,
+      "startMonth": 1,
+      "endYear": null,
+      "endMonth": null
+    }
+  },
+  {
     "name": "assetCreateDebt",
     "method": "POST",
     "path": "/assets",

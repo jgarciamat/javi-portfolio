@@ -1,5 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from '@domain/errors';
 import { Account, AccountInput, AccountProps } from '@domain/model/Account';
+import { mergeSplits } from '@domain/model/AccountSplit';
 import { Transfer } from '@domain/model/Transfer';
 import {
   AccountRepository,
@@ -7,6 +8,7 @@ import {
   SettingsRepository,
   TransferRepository,
   TransferView,
+  UnitOfWork,
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { Cents } from '@domain/shared/money';
@@ -27,18 +29,20 @@ export class AccountService {
     private readonly resolver: AccountResolver,
     private readonly entitlements: EntitlementService,
     private readonly clock: Clock,
-    private readonly rules: RecurringRuleRepository
+    private readonly rules: RecurringRuleRepository,
+    private readonly uow: UnitOfWork
   ) {}
 
   /**
    * An account where active automatic operations note their movements cannot be archived nor
-   * deleted: they would keep charging an account that no longer counts. Paused ones do not
-   * block (they generate nothing; when resumed they go to the default account meanwhile).
+   * deleted: they would keep charging an account that no longer counts. Being one of the
+   * accounts an operation is split between counts too. Paused ones do not block (they generate
+   * nothing; when resumed they go to the default account meanwhile).
    */
   private assertNoActiveRules(userId: string, account: Account, action: string): void {
     const names = this.rules
       .listByUser(userId)
-      .filter((r) => r.active && r.accountId === account.id)
+      .filter((r) => r.active && r.usesAccount(account.id))
       .map((r) => r.description);
     if (names.length === 0) return;
     throw new ConflictError(
@@ -127,7 +131,26 @@ export class AccountService {
         'ACCOUNT_IN_USE'
       );
     }
-    this.accounts.delete(userId, id);
+    this.uow.run(() => {
+      this.releaseFromPausedRules(userId, id);
+      this.accounts.delete(userId, id);
+    });
+  }
+
+  /**
+   * A paused operation split with the account being removed: that part goes to the default
+   * account (put together with a part already there), as a whole-amount operation in the
+   * account would follow the default one once the account is gone.
+   */
+  private releaseFromPausedRules(userId: string, id: string): void {
+    const fallback = this.resolver.defaultAccount(userId).id;
+    for (const rule of this.rules.listByUser(userId)) {
+      if (!rule.splits.some((s) => s.accountId === id)) continue;
+      const splits = mergeSplits(
+        rule.splits.map((s) => (s.accountId === id ? { ...s, accountId: fallback } : s))
+      );
+      this.rules.save(rule.update({ accountId: splits[0]?.accountId ?? fallback, splits }));
+    }
   }
 
   listTransfers(userId: string, limit = 50): TransferView[] {

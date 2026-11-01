@@ -19,6 +19,8 @@ export interface Transaction {
   categoryIcon?: string;
   accountId?: string;
   accountName?: string;
+  /** Split between several accounts: each one's part (empty or missing: all in `accountId`). */
+  splits?: TransactionSplit[];
   /** Calendar date, YYYY-MM-DD. */
   date: string;
   /** Budgeting period the movement belongs to. */
@@ -29,12 +31,25 @@ export interface Transaction {
   recurringRuleId?: string | null;
 }
 
+/** One account's part of an amount split between several accounts. */
+export interface AccountSplitInput {
+  accountId: string;
+  amount: number;
+}
+
+/** One account's part of a split movement, with the account's name. */
+export interface TransactionSplit extends AccountSplitInput {
+  accountName: string;
+}
+
 export interface CreateTransactionDTO {
   description: string;
   amount: number;
   type: TransactionType;
   category: string;
   accountId?: string | null;
+  /** 2+ different accounts adding up to the amount; null: all in `accountId`. */
+  splits?: AccountSplitInput[] | null;
   date?: string;
   notes?: string | null;
 }
@@ -45,6 +60,8 @@ export interface UpdateTransactionDTO {
   type?: TransactionType;
   category?: string;
   accountId?: string | null;
+  /** New parts; null leaves it in one account; not sent keeps them. */
+  splits?: AccountSplitInput[] | null;
   date?: string;
   notes?: string | null;
 }
@@ -233,6 +250,8 @@ export interface RecurringRule {
   category: string;
   categoryId?: string;
   accountId?: string | null;
+  /** Split between several accounts: each one's part (empty or missing: all in `accountId`). */
+  splits?: AccountSplitInput[];
   startYear: number;
   startMonth: number;
   endYear: number | null;
@@ -252,6 +271,7 @@ export interface CreateRecurringRuleDTO {
   type: TransactionType;
   category: string;
   accountId?: string | null;
+  splits?: AccountSplitInput[] | null;
   startYear: number;
   startMonth: number;
   endYear?: number | null;
@@ -265,6 +285,7 @@ export interface UpdateRecurringRuleDTO {
   type?: TransactionType;
   category?: string;
   accountId?: string | null;
+  splits?: AccountSplitInput[] | null;
   startYear?: number;
   startMonth?: number;
   endYear?: number | null;

@@ -10,6 +10,7 @@ import { SelectAllBar, SelectCheckbox } from '@shared/components/BulkSelection';
 import { Pager } from '@shared/components/Pager';
 import { DayCheckbox, RowCheckbox, selectableRow } from './TransactionSelect';
 import type { Transaction } from '@modules/finances/domain/types';
+import { accountLabel } from '@modules/finances/domain/accountSplit';
 import { useTransactionTable } from '../../application/hooks/useTransactionTable';
 import { SignedAmount, TypeBadge } from './TransactionBits';
 import '../css/TransactionTable.css';
@@ -113,7 +114,7 @@ function RowActions({ tx, handlers, onEdit }: Pick<RowProps, 'tx' | 'handlers' |
 const DesktopRow = memo(function DesktopRow(props: RowProps) {
   const { tx, selected, toggle, showAccount } = props;
   const { tCategory } = useI18n();
-  const { date } = useFormat();
+  const { date, money } = useFormat();
   const choice = { isSelected: () => selected, toggle };
   return (
     <tr {...selectableRow(tx, choice)}>
@@ -122,7 +123,7 @@ const DesktopRow = memo(function DesktopRow(props: RowProps) {
       </td>
       <td className="tx-cell-date">{date(tx.date)}</td>
       <td className="tx-cell-description">{tx.description}</td>
-      {showAccount && <td className="tx-cell-account">{tx.accountName}</td>}
+      {showAccount && <td className="tx-cell-account">{accountLabel(tx, money)}</td>}
       <td className="tx-notes-cell">
         <Notes {...props} />
       </td>
@@ -146,8 +147,9 @@ const DesktopRow = memo(function DesktopRow(props: RowProps) {
 const CardRow = memo(function CardRow(props: RowProps) {
   const { tx, selected, toggle, showAccount } = props;
   const { tCategory } = useI18n();
-  const { date } = useFormat();
+  const { date, money } = useFormat();
   const choice = { isSelected: () => selected, toggle };
+  const where = showAccount ? accountLabel(tx, money) : '';
   return (
     <div {...selectableRow(tx, choice, 'tx-card')}>
       <RowCheckbox tx={tx} selection={choice} />
@@ -155,7 +157,7 @@ const CardRow = memo(function CardRow(props: RowProps) {
         <div className="tx-card-desc">{tx.description}</div>
         <div className="tx-card-meta">
           {date(tx.date)} · {tCategory(tx.category)}
-          {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
+          {where ? ` · ${where}` : ''}
         </div>
         <Notes {...props} />
       </div>

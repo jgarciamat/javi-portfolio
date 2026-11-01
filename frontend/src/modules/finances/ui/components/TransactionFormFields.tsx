@@ -8,6 +8,7 @@ import {
   type CheckedField,
   type UseTransactionFormReturn,
 } from '../../application/hooks/useTransactionForm';
+import { AccountSplitFields } from './AccountSplitFields';
 import { CurrencyConverter } from './CurrencyConverter';
 import { ReceiptScanner } from './ReceiptScanner';
 
@@ -19,9 +20,25 @@ export interface TransactionFormFieldsProps {
   accounts: Account[];
 }
 
-/** The account the movement belongs to (shown only when there is more than one to choose from). */
+/**
+ * Accounts that can be chosen: the active ones, and an archived one the movement (or one of its
+ * parts) already uses.
+ */
+const selectableFor = (accounts: Account[], fields: UseTransactionFormReturn['fields']) =>
+  accounts.filter(
+    (a) =>
+      !a.archived ||
+      a.id === fields.accountId ||
+      fields.split.rows.some((r) => r.accountId === a.id)
+  );
+
+/**
+ * The account the movement belongs to (shown only when there is more than one to choose from;
+ * split between several, the rows of the split say them).
+ */
 function AccountField({ form, accounts }: { form: UseTransactionFormReturn; accounts: Account[] }) {
   const { t } = useI18n();
+  if (form.fields.split.on) return null;
   return (
     <div className="tx-field">
       <span className="tx-field-label" aria-hidden="true">
@@ -43,6 +60,34 @@ function AccountField({ form, accounts }: { form: UseTransactionFormReturn; acco
   );
 }
 
+/** «Dividir entre varias cuentas», with two or more accounts to choose from. */
+function SplitField({ form, accounts }: { form: UseTransactionFormReturn; accounts: Account[] }) {
+  if (accounts.length < 2) return null;
+  return (
+    <AccountSplitFields
+      split={form.fields.split}
+      onChange={form.setSplit}
+      total={form.fields.amount}
+      accounts={accounts}
+      accountId={form.fields.accountId}
+    />
+  );
+}
+
+/** The fields a submit checks; a refused submit takes focus to the first wrong one. */
+function useInvalidFocus(invalid: CheckedField[]) {
+  const refs = {
+    description: useRef<HTMLInputElement>(null),
+    amount: useRef<HTMLInputElement>(null),
+    category: useRef<HTMLSelectElement>(null),
+  };
+  useEffect(() => {
+    if (invalid.length > 0) refs[invalid[0]].current!.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invalid]);
+  return refs;
+}
+
 /** Fields shared by the "new movement" form and the edit dialog. */
 export function TransactionFormFields({
   form,
@@ -52,14 +97,9 @@ export function TransactionFormFields({
 }: TransactionFormFieldsProps) {
   const { t, tCategory } = useI18n();
   const { fields, invalid } = form;
-  // An archived account stays selectable for the movements that already use it.
-  const selectable = accounts.filter((a) => !a.archived || a.id === fields.accountId);
+  const selectable = selectableFor(accounts, fields);
   const id = useId();
-  const refs = {
-    description: useRef<HTMLInputElement>(null),
-    amount: useRef<HTMLInputElement>(null),
-    category: useRef<HTMLSelectElement>(null),
-  };
+  const refs = useInvalidFocus(invalid);
   /** Marks a field the last submit refused and points it at the error text. */
   const check = (field: CheckedField) =>
     invalid.includes(field)
@@ -71,12 +111,6 @@ export function TransactionFormFields({
   const categoryCheck = categoryMissing
     ? { 'aria-invalid': true, 'aria-describedby': `${id}-category-error ${form.errorId}` }
     : { 'aria-invalid': undefined, 'aria-describedby': undefined };
-
-  // A refused submit takes focus to the first wrong field.
-  useEffect(() => {
-    if (invalid.length > 0) refs[invalid[0]].current!.focus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [invalid]);
 
   return (
     <div className="tx-form-grid">
@@ -177,6 +211,7 @@ export function TransactionFormFields({
         </div>
         {selectable.length > 1 && <AccountField form={form} accounts={selectable} />}
       </div>
+      <SplitField form={form} accounts={selectable} />
       <div className="tx-field tx-field--notes">
         <label className="tx-field-label" htmlFor={`${id}-notes`}>
           {t('app.transaction.form.notes')}

@@ -1,5 +1,6 @@
 import { NotFoundError, ValidationError } from '@domain/errors';
 import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
+import { AccountSplit, mergeSplits } from '@domain/model/AccountSplit';
 import { Category } from '@domain/model/Category';
 import {
   AccountRepository,
@@ -98,5 +99,44 @@ export class AccountResolver {
       throw new ValidationError('La cuenta está archivada', 'ACCOUNT_ARCHIVED');
     }
     return account;
+  }
+
+  /**
+   * The parts of a split movement or operation: each account must be the user's (or the
+   * household's) and active. A part that keeps an account of `kept` (the parts it already had)
+   * is accepted even if that account was archived since, so editing anything else never fails.
+   * The amounts are checked against the total by the entity.
+   */
+  resolveSplits(
+    userId: string,
+    splits: readonly AccountSplit[],
+    kept: readonly AccountSplit[] = []
+  ): AccountSplit[] {
+    return splits.map((s) => ({
+      accountId: kept.some((k) => k.accountId === s.accountId)
+        ? this.requireById(userId, s.accountId).id
+        : this.resolveForMovement(userId, s.accountId).id,
+      amountCents: s.amountCents,
+    }));
+  }
+
+  /**
+   * Where a movement an automatic operation generates is noted: each part's account as
+   * `forGeneratedMovement` says (archived or gone: the default one), parts that end in the same
+   * account put together. `accountId` is the first part's (or the only) account.
+   */
+  forGeneratedSplits(
+    userId: string,
+    accountId: string | null,
+    splits: readonly AccountSplit[]
+  ): { accountId: string; splits: AccountSplit[] } {
+    if (splits.length === 0) {
+      return { accountId: this.forGeneratedMovement(userId, accountId).id, splits: [] };
+    }
+    const mapped = splits.map((s) => ({
+      accountId: this.forGeneratedMovement(userId, s.accountId).id,
+      amountCents: s.amountCents,
+    }));
+    return { accountId: mapped[0].accountId, splits: mergeSplits(mapped) };
   }
 }
