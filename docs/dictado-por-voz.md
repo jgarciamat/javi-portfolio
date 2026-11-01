@@ -11,6 +11,6 @@ Botón de micrófono en «Registrar transacción rápida». El audio nunca sale 
 
 1. `cd frontend && npm install` (el plugin está en `package.json`).
 2. En `frontend/android/app/src/main/AndroidManifest.xml`: permiso `android.permission.RECORD_AUDIO` y, para Android 11+, `<queries><intent><action android:name="android.speech.RecognitionService"/></intent></queries>`.
-3. `npm run build:android:prod` (incluye `npx cap sync android`).
+3. `npm run build:android:prod` (aplica `scripts/patch-plugins.mjs`, que corrige el `proguard-android.txt` del plugin para AGP 9, y hace `npx cap sync android`).
 4. Para un APK de prueba: `cd android && JAVA_HOME=<temurin-17> ./gradlew assembleDebug`.
 5. Un AAB nuevo (versionCode superior) es necesario para que los usuarios reciban el micrófono.
