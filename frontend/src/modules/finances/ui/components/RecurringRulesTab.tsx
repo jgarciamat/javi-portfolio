@@ -5,6 +5,7 @@ import { DateField } from '@shared/components/DateField';
 import { useAction } from '@shared/hooks/useAction';
 import type {
   Account,
+  AccountSplitInput,
   Category,
   RecurringRule,
   TransactionType,
@@ -16,6 +17,8 @@ import {
   type RuleFormState,
 } from '@modules/finances/domain/recurringForm';
 import { TRANSACTION_TYPES } from '@modules/finances/domain/transactionTypes';
+import { splitLabel, splitWithTotal } from '@modules/finances/domain/accountSplit';
+import { AccountSplitFields } from './AccountSplitFields';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
 import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleForm';
 import { useFinances } from '../../application/FinancesContext';
@@ -93,7 +96,7 @@ function AccountField({
   const { t } = useI18n();
   const selectable = accounts.filter((a) => !a.archived || a.id === form.accountId);
   const fallback = accounts.find((a) => a.isDefault) ?? selectable[0];
-  if (!fallback) return null;
+  if (!fallback || form.split.on) return null;
   return (
     <div className="recurring-form-field">
       <label className="recurring-label" htmlFor={`${id}-account`}>
@@ -116,6 +119,38 @@ function AccountField({
       <small id={`${id}-account-hint`} className="recurring-field-hint">
         {t('app.recurring.form.account.hint')}
       </small>
+    </div>
+  );
+}
+
+/**
+ * «Dividir entre varias cuentas» for an operation (not for a debt's payment, whose amount
+ * changes with what is left). Only with two or more accounts to choose from.
+ */
+function SplitField({
+  form,
+  set,
+  accounts,
+}: {
+  form: RuleFormState;
+  set: SetField;
+  accounts: Account[];
+}) {
+  const selectable = accounts.filter(
+    (a) =>
+      !a.archived || a.id === form.accountId || form.split.rows.some((r) => r.accountId === a.id)
+  );
+  if (selectable.length < 2) return null;
+  const fallback = accounts.find((a) => a.isDefault) ?? selectable[0];
+  return (
+    <div className="recurring-form-field recurring-form-field--wide">
+      <AccountSplitFields
+        split={form.split}
+        onChange={(split) => set('split', split)}
+        total={form.amount}
+        accounts={selectable}
+        accountId={form.accountId || fallback.id}
+      />
     </div>
   );
 }
@@ -149,6 +184,9 @@ function RuleForm({
   const { t, tCategory } = useI18n();
   const id = useId();
   const set: SetField = (key, value) => onChange({ ...form, [key]: value });
+  // The automatic last part of a split follows the amount.
+  const setAmount = (amount: string) =>
+    onChange({ ...form, amount, split: splitWithTotal(form.split, amount) });
 
   return (
     <form
@@ -190,7 +228,7 @@ function RuleForm({
             inputMode="decimal"
             placeholder="0.00"
             value={form.amount}
-            onChange={(e) => set('amount', e.target.value)}
+            onChange={(e) => setAmount(e.target.value)}
           />
         </div>
 
@@ -234,6 +272,7 @@ function RuleForm({
         </div>
 
         <AccountField form={form} set={set} accounts={accounts} id={id} />
+        {!debtName && <SplitField form={form} set={set} accounts={accounts} />}
 
         {debtName ? (
           <p
@@ -293,6 +332,36 @@ function RuleForm({
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
+/**
+ * A split operation: «Cuenta: 500 € Corriente + 300 € Efectivo», and a warning for each part
+ * whose account was archived (that part goes to the default account meanwhile).
+ */
+function RuleSplitLine({ parts, accounts }: { parts: AccountSplitInput[]; accounts: Account[] }) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const find = (id: string) => accounts.find((a) => a.id === id);
+  const fallback = accounts.find((a) => a.isDefault);
+  const archived = parts.map((p) => find(p.accountId)).filter((a) => a?.archived) as Account[];
+  return (
+    <>
+      <span className="recurring-meta-item">
+        {t('app.recurring.card.account', {
+          name: splitLabel(parts, money, (id) => find(id)?.name ?? ''),
+        })}
+      </span>
+      {archived.map((a) => (
+        <span key={a.id} className="recurring-meta-item recurring-meta-warning" role="note">
+          ⚠️{' '}
+          {t('app.recurring.card.accountArchived', {
+            name: a.name,
+            fallback: fallback?.name ?? '',
+          })}
+        </span>
+      ))}
+    </>
+  );
+}
+
 /** «Cuenta: X», and a warning when the chosen one was archived. */
 function RuleAccountLine({ where }: { where: RuleAccount }) {
   const { t } = useI18n();
@@ -318,15 +387,33 @@ function RuleAccountLine({ where }: { where: RuleAccount }) {
   );
 }
 
+/** The accounts of an operation on its card: its parts when split, its account otherwise. */
+function RuleAccounts({
+  rule,
+  where,
+  accounts,
+}: {
+  rule: RecurringRule;
+  where: RuleAccount;
+  accounts: Account[];
+}) {
+  return rule.splits?.length ? (
+    <RuleSplitLine parts={rule.splits} accounts={accounts} />
+  ) : (
+    <RuleAccountLine where={where} />
+  );
+}
+
 interface RuleCardProps {
   rule: RecurringRule;
   where: RuleAccount;
+  accounts: Account[];
   onEdit: (rule: RecurringRule) => void;
   onDelete: (rule: RecurringRule) => void;
   onToggle: (rule: RecurringRule) => void;
 }
 
-function RuleCard({ rule, where, onEdit, onDelete, onToggle }: RuleCardProps) {
+function RuleCard({ rule, where, accounts, onEdit, onDelete, onToggle }: RuleCardProps) {
   const { t, tCategory } = useI18n();
   const { money, monthName } = useFormat();
   const period = (year: number, month: number) => `${monthName(month, 'short')} ${year}`;
@@ -362,7 +449,7 @@ function RuleCard({ rule, where, onEdit, onDelete, onToggle }: RuleCardProps) {
           </span>
         )}
         <span className="recurring-meta-item">📁 {tCategory(rule.category)}</span>
-        <RuleAccountLine where={where} />
+        <RuleAccounts rule={rule} where={where} accounts={accounts} />
         <span className="recurring-meta-item">
           <Icon name="repeat" /> {t(`app.recurring.form.frequency.${rule.frequency}`)}
         </span>
@@ -455,7 +542,9 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
       r.description,
       tCategory(r.category),
       t(typeKey(r.type)),
-      whereOf(r).account?.name ?? '',
+      r.splits?.length
+        ? splitLabel(r.splits, String, (id) => accounts.find((a) => a.id === id)?.name ?? '')
+        : (whereOf(r).account?.name ?? ''),
       r.amount,
       t(`app.recurring.form.frequency.${r.frequency}`),
       yearMonth(r.startYear, r.startMonth),
@@ -522,6 +611,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
               key={rule.id}
               rule={rule}
               where={whereOf(rule)}
+              accounts={accounts}
               onEdit={editor.openEdit}
               onDelete={(r) => {
                 deletion.setError(null);

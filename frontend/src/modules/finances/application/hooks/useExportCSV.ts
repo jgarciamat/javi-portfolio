@@ -3,8 +3,10 @@ import type {
   FinancialSummary,
   MonthData,
   Transaction,
+  TransactionSplit,
 } from '@modules/finances/domain/types';
 import { TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
+import { splitLabel } from '@modules/finances/domain/accountSplit';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { todayDateOnly } from '@shared/utils/format';
@@ -68,6 +70,8 @@ export interface ExportableTransaction {
   notes: string | null;
   account?: string;
   accountName?: string;
+  /** Split between several accounts: each one's part. */
+  splits?: TransactionSplit[];
 }
 
 type Translate = (key: string) => string;
@@ -104,7 +108,9 @@ function movementsTable(
       tx.description,
       tCategory(tx.category),
       typeLabel(tx.type),
-      tx.accountName ?? tx.account ?? '',
+      tx.splits?.length
+        ? splitLabel(tx.splits, (amount) => String(amount))
+        : (tx.accountName ?? tx.account ?? ''),
       tx.amount,
       tx.notes,
     ]),

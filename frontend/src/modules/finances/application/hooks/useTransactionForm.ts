@@ -2,6 +2,13 @@ import { useEffect, useId, useState } from 'react';
 import type { CreateTransactionDTO, TransactionType } from '@modules/finances/domain/types';
 import { useAction } from '@shared/hooks/useAction';
 import { isPositiveAmount, parseDecimal } from '@shared/utils/numbers';
+import {
+  noSplit,
+  splitProblem,
+  splitTarget,
+  splitWithTotal,
+  type SplitForm,
+} from '@modules/finances/domain/accountSplit';
 
 export interface TransactionFields {
   description: string;
@@ -11,6 +18,8 @@ export interface TransactionFields {
   date: string;
   notes: string;
   accountId: string | null;
+  /** «Dividir entre varias cuentas» (off: everything in `accountId`). */
+  split: SplitForm;
 }
 
 interface Options {
@@ -59,6 +68,7 @@ export function useTransactionForm({
     date: defaultDate,
     notes: '',
     accountId: defaultAccountId,
+    split: noSplit(),
   });
   const [fields, setFields] = useState<TransactionFields>(() => initialValues ?? blank());
   const action = useAction(t('app.transaction.form.error'));
@@ -121,6 +131,11 @@ export function useTransactionForm({
       setInvalid(missing);
       return false;
     }
+    const split = splitProblem(fields.split, fields.amount);
+    if (split) {
+      setError(t(split));
+      return false;
+    }
     if (fields.type === 'SAVING' && amount > availableBalance) {
       setError(t('app.transaction.form.insufficient', { amount: formatMoney(availableBalance) }));
       setInvalid(['amount']);
@@ -134,7 +149,7 @@ export function useTransactionForm({
         category: fields.category,
         date: fields.date,
         notes: fields.notes.trim() || null,
-        accountId: fields.accountId,
+        ...splitTarget(fields.split, fields.accountId),
       })
     );
     if (saved && !initialValues) {
@@ -147,7 +162,13 @@ export function useTransactionForm({
   return {
     fields,
     setDescription: (v: string) => set('description', v),
-    setAmount: (v: string) => set('amount', v),
+    // The automatic last part of a split follows the amount.
+    setAmount: (v: string) => {
+      setFields((f) => ({ ...f, amount: v, split: splitWithTotal(f.split, v) }));
+      setError(null);
+      setInvalid([]);
+    },
+    setSplit: (v: SplitForm) => set('split', v),
     setType: (v: TransactionType) => set('type', v),
     setDate: (v: string) => set('date', v),
     setNotes: (v: string) => set('notes', v),

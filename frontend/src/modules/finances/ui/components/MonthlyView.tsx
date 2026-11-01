@@ -6,6 +6,7 @@ import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
 import { isPendingAutomatic } from '@modules/finances/domain/monthCharges';
+import { inAccount } from '@modules/finances/domain/accountSplit';
 import { useFinances } from '../../application/FinancesContext';
 import {
   useTransactionView,
@@ -127,7 +128,7 @@ function MovementsPanel({
       (tx) =>
         !hidden.has(tx.id) &&
         !isPendingAutomatic(tx, today) &&
-        (!accountId || tx.accountId === accountId)
+        (!accountId || inAccount(tx, accountId))
     );
   }, [f.transactions, accountId, bulk.hidden]);
   const range = useMemo(

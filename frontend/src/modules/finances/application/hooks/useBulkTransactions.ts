@@ -78,7 +78,8 @@ export function useBulkTransactions({
         ...(changes.type && { type: changes.type }),
         ...(changes.date && { date: changes.date }),
         ...(category && { category: category.name, categoryId: category.id }),
-        ...(account && { accountId: account.id, accountName: account.name }),
+        // Moved to one account: a split movement goes there whole.
+        ...(account && { accountId: account.id, accountName: account.name, splits: [] }),
         ...(changes.notes !== undefined && {
           notes: notesAfter(
             tx.notes,

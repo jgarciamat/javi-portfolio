@@ -1,0 +1,131 @@
+/* ─── «Dividir entre varias cuentas» ─────────────────────────────────────────
+   Big targets and plain words: it is used by older people too, often on a phone. */
+.acct-split-fieldset {
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+/* The legend is for screen readers: the switch says what it is. */
+.acct-split-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.acct-split-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-100);
+  cursor: pointer;
+}
+
+.acct-split-toggle input {
+  width: 1.35rem;
+  height: 1.35rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.acct-split-hint {
+  color: var(--slate-400);
+  font-size: 0.8rem;
+}
+
+.acct-split-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.acct-split-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.acct-split-row .tx-input {
+  min-height: 2.9rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.acct-split-remove {
+  min-width: 2.9rem;
+  min-height: 2.9rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acct-split-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.acct-split-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.acct-split-action {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.acct-split-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.acct-split-status {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.acct-split-status--pending {
+  color: var(--red-400);
+}
+
+.acct-split-status--ok {
+  color: var(--green-400);
+}
+
+/* On a phone the amount goes under the account, the remove button beside both. */
+@media (max-width: 480px) {
+  .acct-split-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .acct-split-row .acct-split-account {
+    grid-column: 1 / -1;
+  }
+
+  .acct-split-actions .acct-split-action {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
