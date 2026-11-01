@@ -209,11 +209,12 @@ test('«Recibos y cargos de este mes» lists the automatic charges apart', async
     await toggle.click();
     const card = page.locator('.month-charges');
     await expect(card).toBeVisible();
-    await expect(card.getByText('Cuota gimnasio')).toBeVisible();
-    await expect(card.getByText('Total del mes').locator('..')).toContainText('82,40');
+    const body = card.locator('.collapsible-body');
+    await expect(body.getByText('Cuota gimnasio')).toBeVisible();
+    await expect(body.getByText('Total del mes').locator('..')).toContainText('82,40');
     if (pending) {
-      await expect(card.getByText('Queda pendiente').locator('..')).toContainText('42,50');
-      await expect(card.getByText('Pendiente', { exact: true })).toBeVisible();
+      await expect(body.getByText('Queda pendiente').locator('..')).toContainText('42,50');
+      await expect(body.getByText('Pendiente', { exact: true })).toBeVisible();
       // Not among the movements of the month until its day.
       const list = page.locator('[data-tour="movements"]');
       await expect(list.getByText('Seguro del coche')).toHaveCount(0);
