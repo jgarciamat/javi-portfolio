@@ -6,6 +6,8 @@ import { Icon } from '@shared/components/Icon';
 import { useResource } from '@shared/hooks/useResource';
 import { errorMessage } from '@shared/utils/errors';
 import { parseQuickEntry, quickCategory } from '@modules/finances/domain/quickEntry';
+import { parseVoiceEntry, quickEntryText } from '@modules/finances/domain/voiceEntry';
+import { useSpeechDictation } from '@modules/finances/application/hooks/useSpeechDictation';
 import type { ScannedReceipt } from '@modules/finances/domain/receiptParser';
 import type {
   Account,
@@ -14,6 +16,7 @@ import type {
   Transaction,
 } from '@modules/finances/domain/types';
 import { ReceiptScanner } from './ReceiptScanner';
+import { VoiceButton, VoicePanel } from './QuickVoice';
 import '../css/QuickAdd.css';
 
 /** Keys that jump to the quick entry on a computer (not while typing somewhere else). */
@@ -50,8 +53,8 @@ interface QuickAddProps {
 }
 
 /** What is typed, the category it would get (or the one chosen) and the saving of it. */
-function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickAddProps) {
-  const { t } = useI18n();
+export function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickAddProps) {
+  const { t, locale } = useI18n();
   const { money } = useFormat();
   const { categoryRuleApi } = useApi();
   const rules = useResource(() => categoryRuleApi.getAll(), [categoryRuleApi], { initial: [] });
@@ -63,6 +66,8 @@ function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickA
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
   const [scannedDate, setScannedDate] = useState<string | null>(null);
+  /** A dictated phrase is waiting for the person to confirm it. */
+  const [dictated, setDictated] = useState(false);
 
   const entry = parseQuickEntry(text);
   const category = entry ? (chosen ?? quickCategory(entry, rules.data, transactions)) : chosen;
@@ -77,8 +82,8 @@ function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickA
         ).id
       : null;
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: FormEvent) => {
+    event?.preventDefault();
     setAdded(null);
     if (!entry) return setError(t('app.quickAdd.invalid'));
     const dto = {
@@ -98,6 +103,7 @@ function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickA
       setText('');
       setChosen(null);
       setScannedDate(null);
+      setDictated(false);
       input.current?.focus();
     } catch (e) {
       setError(errorMessage(e, t('app.quickAdd.error')));
@@ -116,10 +122,35 @@ function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickA
     input.current?.focus();
   };
 
+  /** What was said, read like the typed line; it is left in the field to correct it. */
+  const heard = (speech: string) => {
+    const spoken = parseVoiceEntry(speech, locale === 'en' ? 'en' : 'es');
+    setText(spoken ? quickEntryText(spoken) : speech);
+    setChosen(null);
+    setScannedDate(null);
+    setDictated(true);
+    setError(null);
+    setAdded(null);
+  };
+  const dictation = useSpeechDictation(locale === 'en' ? 'en-US' : 'es-ES', heard);
+
   return {
     input,
     text,
     scanned,
+    dictation,
+    dictated,
+    /** Listens (again): whatever was waiting is dropped. */
+    dictate: () => {
+      setDictated(false);
+      setAdded(null);
+      dictation.start();
+    },
+    /** Drops the dictated phrase and what it filled in. */
+    discard: () => {
+      setDictated(false);
+      setText('');
+    },
     setText: (value: string) => {
       setText(value);
       setError(null);
@@ -225,12 +256,14 @@ export function QuickAdd(props: QuickAddProps) {
           aria-invalid={!!quick.error}
           onChange={(e) => quick.setText(e.target.value)}
         />
+        <VoiceButton quick={quick} />
         <button type="submit" className="btn-primary" disabled={quick.busy}>
           {quick.busy ? t('app.transaction.form.saving') : t('app.quickAdd.add')}
         </button>
       </div>
       <ReceiptScanner onScanned={quick.scanned} />
       <QuickSelects quick={quick} categories={props.categories ?? []} idBase={id} />
+      <VoicePanel quick={quick} />
       <p id={`${id}-hint`} className="section-hint">
         {entry
           ? t('app.quickAdd.preview', {

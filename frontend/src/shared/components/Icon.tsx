@@ -30,6 +30,7 @@ import {
   Image,
   KeyRound,
   Landmark,
+  Mic,
   Eye,
   EyeOff,
   Lock,
@@ -67,6 +68,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   alert: AlertTriangle,
   bank: Landmark,
+  mic: Mic,
   bell: Bell,
   book: BookOpen,
   briefcase: Briefcase,

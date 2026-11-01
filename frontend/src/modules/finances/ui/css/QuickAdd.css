@@ -49,3 +49,77 @@
   width: 100%;
   min-height: 2.75rem;
 }
+
+/* ─── Dictation: a big microphone button and the card with what was understood ─── */
+.quick-add-row .quick-mic {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  margin: 0;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Pressed: filled, so it is not only a color change that shows it is listening. */
+.quick-add-row .quick-mic[aria-pressed='true'] {
+  background: var(--accent, #2563eb);
+  border-color: var(--accent, #2563eb);
+  color: #fff;
+}
+
+.quick-voice-listening {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.quick-voice-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: currentColor;
+  animation: quick-voice-pulse 1s ease-in-out infinite;
+}
+
+@keyframes quick-voice-pulse {
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-voice-dot {
+    animation: none;
+  }
+}
+
+.quick-voice-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid currentColor;
+  border-radius: 0.75rem;
+  font-size: 1.05rem;
+}
+
+.quick-voice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quick-voice-actions button {
+  min-height: 2.75rem;
+  margin: 0;
+  width: auto;
+}
