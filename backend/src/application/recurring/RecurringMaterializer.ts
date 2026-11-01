@@ -1,3 +1,4 @@
+import { sameSplits } from '@domain/model/AccountSplit';
 import { Transaction } from '@domain/model/Transaction';
 import { RecurringRule } from '@domain/model/RecurringRule';
 import {
@@ -45,18 +46,21 @@ export class RecurringMaterializer {
   ) {}
 
   /**
-   * The rule's account is no longer usable (archived before archiving was blocked, or old data):
-   * its movements still to come, dated after today, go to the default account too. The past ones
-   * and those already charged stay. Idempotent; unarchiving does not bring them back.
+   * The rule's account (or the account of one of its parts) is no longer usable (archived before
+   * archiving was blocked, or old data): its movements still to come, dated after today, go to
+   * the default account too. The past ones, those already charged and those the person moved
+   * stay. Idempotent; unarchiving does not bring them back.
    */
   private relocateComing(rule: RecurringRule, today: string, monthStartDay: number): void {
     if (!rule.accountId) return;
-    const target = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
-    if (target === rule.accountId) return;
+    const target = this.accounts.forGeneratedSplits(rule.userId, rule.accountId, rule.splits);
+    if (target.accountId === rule.accountId && sameSplits(target.splits, rule.splits)) return;
     for (const tx of this.transactions.listByRule(rule.userId, rule.id)) {
-      const { date, accountId } = tx.toPrimitives();
-      if (date <= today || accountId !== rule.accountId) continue;
-      this.transactions.save(tx.update({ accountId: target }, monthStartDay));
+      const { date, accountId, splits } = tx.toPrimitives();
+      if (date <= today || accountId !== rule.accountId || !sameSplits(splits, rule.splits)) {
+        continue;
+      }
+      this.transactions.save(tx.update(target, monthStartDay));
     }
   }
 
@@ -99,7 +103,12 @@ export class RecurringMaterializer {
    */
   materializeRule(rule: RecurringRule, from: Period, to: Period, monthStartDay: number): number {
     const skipped = new Set(this.rules.skippedPeriods(rule.id).map(periodOrdinal));
-    const accountId = this.accounts.forGeneratedMovement(rule.userId, rule.accountId).id;
+    // Generated with the rule's parts too (each in a usable account).
+    const { accountId, splits } = this.accounts.forGeneratedSplits(
+      rule.userId,
+      rule.accountId,
+      rule.splits
+    );
     const debt = this.debts?.planner(rule) ?? null;
     let count = 0;
     for (const period of rule.periodsWithin(from, to)) {
@@ -113,6 +122,8 @@ export class RecurringMaterializer {
         {
           userId: rule.userId,
           accountId,
+          // A debt's payment is never split (its amount changes with what is left).
+          splits: debt ? [] : splits,
           categoryId: rule.categoryId,
           description: rule.description,
           amountCents,

@@ -9,6 +9,7 @@ import {
   periodOrdinal,
 } from '@domain/shared/period';
 import { TransactionType, parseTransactionType } from './TransactionType';
+import { AccountSplit, cleanSplits, sameSplits } from './AccountSplit';
 
 export const RECURRING_FREQUENCIES = ['monthly', 'bimonthly', 'quarterly', 'yearly'] as const;
 export type RecurringFrequency = (typeof RECURRING_FREQUENCIES)[number];
@@ -27,7 +28,10 @@ export interface RecurringRuleProps {
   amountCents: Cents;
   type: TransactionType;
   categoryId: string;
+  /** null: the default account. When split, the first part's account. */
   accountId: string | null;
+  /** Empty: the whole amount in `accountId`. Otherwise 2+ parts adding up to the amount. */
+  splits: AccountSplit[];
   start: Period;
   end: Period | null;
   frequency: RecurringFrequency;
@@ -43,6 +47,11 @@ export interface RecurringRuleInput {
   type: string;
   categoryId: string;
   accountId?: string | null;
+  /**
+   * An array replaces the parts, null (or []) leaves one account. Not given on an update, they
+   * stay unless `accountId` names another account (then the whole amount goes there).
+   */
+  splits?: AccountSplit[] | null;
   start: Period;
   end?: Period | null;
   frequency?: string;
@@ -71,7 +80,14 @@ function validate(props: RecurringRuleProps): RecurringRuleProps {
   if (!RECURRING_FREQUENCIES.includes(props.frequency)) {
     throw new ValidationError(`Frecuencia inválida. Debe ser ${RECURRING_FREQUENCIES.join(', ')}`);
   }
-  return { ...props, description, type: parseTransactionType(props.type) };
+  const splits = cleanSplits(props.splits, props.amountCents);
+  return {
+    ...props,
+    description,
+    type: parseTransactionType(props.type),
+    splits,
+    accountId: splits[0]?.accountId ?? props.accountId,
+  };
 }
 
 export class RecurringRule {
@@ -87,6 +103,7 @@ export class RecurringRule {
         type: input.type as TransactionType,
         categoryId: input.categoryId,
         accountId: input.accountId ?? null,
+        splits: input.splits ?? [],
         start: input.start,
         end: input.end ?? null,
         frequency: (input.frequency ?? 'monthly') as RecurringFrequency,
@@ -98,7 +115,7 @@ export class RecurringRule {
   }
 
   static reconstitute(props: RecurringRuleProps): RecurringRule {
-    return new RecurringRule({ ...props });
+    return new RecurringRule({ ...props, splits: props.splits.map((s) => ({ ...s })) });
   }
 
   /** Returns a validated copy with the changes applied (the stored rule is never half-valid). */
@@ -114,6 +131,10 @@ export class RecurringRule {
     if (changes.frequency !== undefined) next.frequency = changes.frequency as RecurringFrequency;
     if (changes.active !== undefined) next.active = changes.active;
     if (changes.day !== undefined) next.day = changes.day;
+    if (changes.splits !== undefined) next.splits = changes.splits ?? [];
+    else if (changes.accountId !== undefined && changes.accountId !== this.props.accountId) {
+      next.splits = [];
+    }
     return new RecurringRule(validate(next));
   }
 
@@ -141,8 +162,23 @@ export class RecurringRule {
     return result;
   }
 
-  /** Whether a change affects the content of the movements already generated. */
-  static contentChanged(before: RecurringRule, after: RecurringRule): boolean {
+  /** Whether the accounts the movements are noted in changed (the account or its parts). */
+  static accountsChanged(before: RecurringRule, after: RecurringRule): boolean {
+    return (
+      before.props.accountId !== after.props.accountId ||
+      !sameSplits(before.props.splits, after.props.splits)
+    );
+  }
+
+  /**
+   * Whether a change affects the content of the movements already generated. With
+   * `ignoreAccounts`, a change of account (or of its parts) alone does not count.
+   */
+  static contentChanged(
+    before: RecurringRule,
+    after: RecurringRule,
+    { ignoreAccounts = false } = {}
+  ): boolean {
     const a = before.props;
     const b = after.props;
     return (
@@ -150,7 +186,7 @@ export class RecurringRule {
       a.amountCents !== b.amountCents ||
       a.type !== b.type ||
       a.categoryId !== b.categoryId ||
-      a.accountId !== b.accountId ||
+      (!ignoreAccounts && RecurringRule.accountsChanged(before, after)) ||
       a.day !== b.day
     );
   }
@@ -176,6 +212,15 @@ export class RecurringRule {
   get accountId(): string | null {
     return this.props.accountId;
   }
+  get splits(): AccountSplit[] {
+    return this.props.splits.map((s) => ({ ...s }));
+  }
+  /** Whether the rule names this account, alone or as one of its parts. */
+  usesAccount(accountId: string): boolean {
+    return (
+      this.props.accountId === accountId || this.props.splits.some((s) => s.accountId === accountId)
+    );
+  }
   get start(): Period {
     return this.props.start;
   }
@@ -193,6 +238,6 @@ export class RecurringRule {
   }
 
   toPrimitives(): RecurringRuleProps {
-    return { ...this.props };
+    return { ...this.props, splits: this.props.splits.map((s) => ({ ...s })) };
   }
 }

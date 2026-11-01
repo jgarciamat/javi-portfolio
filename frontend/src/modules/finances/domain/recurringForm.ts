@@ -6,6 +6,7 @@ import type {
   TransactionType,
 } from './types';
 import { parseDecimal, isPositiveAmount } from '@shared/utils/numbers';
+import { noSplit, splitFromParts, splitProblem, splitTarget, type SplitForm } from './accountSplit';
 
 export const FREQUENCIES: RecurringFrequency[] = ['monthly', 'bimonthly', 'quarterly', 'yearly'];
 
@@ -16,6 +17,8 @@ export interface RuleFormState {
   category: string;
   /** Account the movements are noted in; '' is «the default account». */
   accountId: string;
+  /** «Dividir entre varias cuentas» (off: everything in `accountId`). */
+  split: SplitForm;
   frequency: RecurringFrequency;
   /** YYYY-MM-DD (only year and month are used). */
   startDate: string;
@@ -33,6 +36,7 @@ export function emptyRuleForm(today = new Date(), defaultAccountId = ''): RuleFo
     type: 'EXPENSE',
     category: '',
     accountId: defaultAccountId,
+    split: noSplit(),
     frequency: 'monthly',
     startDate: firstDay(today.getFullYear(), today.getMonth() + 1),
     hasEnd: false,
@@ -48,6 +52,7 @@ export function ruleToForm(rule: RecurringRule): RuleFormState {
     type: rule.type,
     category: rule.category,
     accountId: rule.accountId ?? '',
+    split: splitFromParts(rule.splits),
     frequency: rule.frequency,
     startDate: firstDay(rule.startYear, rule.startMonth),
     hasEnd,
@@ -65,6 +70,8 @@ function ruleFormError(form: RuleFormState, amount: number): string | null {
   if (!form.description.trim()) return 'app.recurring.error.description';
   if (!isPositiveAmount(amount)) return 'app.recurring.error.amount';
   if (!form.category) return 'app.recurring.error.category';
+  const split = splitProblem(form.split, form.amount);
+  if (split) return split;
   if (!form.startDate) return 'app.recurring.error.start';
   return null;
 }
@@ -87,7 +94,7 @@ export function validateRuleForm(
       amount,
       type: form.type,
       category: form.category,
-      accountId: form.accountId || null,
+      ...splitTarget(form.split, form.accountId || null),
       frequency: form.frequency,
       startYear,
       startMonth,

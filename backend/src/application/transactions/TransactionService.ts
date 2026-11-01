@@ -1,4 +1,5 @@
 import { BusinessRuleError, DomainError, NotFoundError } from '@domain/errors';
+import { AccountSplit } from '@domain/model/AccountSplit';
 import { Transaction } from '@domain/model/Transaction';
 import { TransactionType, balanceEffect } from '@domain/model/TransactionType';
 import {
@@ -68,6 +69,12 @@ export interface NewTransactionInput extends CategoryRef {
   amountCents: Cents;
   type: TransactionType | string;
   accountId?: string | null;
+  /**
+   * Split between several accounts (2+ parts adding up to the amount; the first part's account
+   * is the movement's). On an update: an array replaces the parts, null leaves one account, not
+   * given keeps them (unless `accountId` names another account: the whole movement moves).
+   */
+  splits?: AccountSplit[] | null;
   date?: string;
   notes?: string | null;
 }
@@ -171,11 +178,16 @@ export class TransactionService {
     const startDay = this.startDay(userId);
     return this.uow.run(() => {
       const category = this.categoryResolver.resolve(userId, input);
-      const account = this.accountResolver.resolveForMovement(userId, input.accountId);
+      const splits = input.splits?.length
+        ? this.accountResolver.resolveSplits(userId, input.splits)
+        : [];
+      const accountId =
+        splits[0]?.accountId ?? this.accountResolver.resolveForMovement(userId, input.accountId).id;
       const tx = Transaction.create(
         {
           userId,
-          accountId: account.id,
+          accountId,
+          splits,
           categoryId: category.id,
           description: input.description,
           amountCents: input.amountCents,
@@ -192,6 +204,17 @@ export class TransactionService {
     });
   }
 
+  /** Not given: unchanged; null or []: one account; parts: checked against the user's accounts. */
+  private splitsChange(
+    userId: string,
+    splits: AccountSplit[] | null | undefined,
+    current: Transaction
+  ): AccountSplit[] | null | undefined {
+    if (splits === undefined) return undefined;
+    if (!splits || splits.length === 0) return null;
+    return this.accountResolver.resolveSplits(userId, splits, current.parts);
+  }
+
   private require(userId: string, id: string): Transaction {
     const tx = this.transactions.findById(userId, id);
     if (!tx) throw new NotFoundError('Movimiento no encontrado', 'TRANSACTION_NOT_FOUND');
@@ -206,8 +229,10 @@ export class TransactionService {
         input.categoryId || (input.category && input.category.trim())
           ? this.categoryResolver.resolve(userId, input).id
           : undefined;
+      const splits = this.splitsChange(userId, input.splits, current);
+      // With new parts, the movement's account is the first part's: the one named is not used.
       const accountId =
-        input.accountId !== undefined && input.accountId !== null
+        !splits?.length && input.accountId !== undefined && input.accountId !== null
           ? this.accountResolver.resolveForMovement(userId, input.accountId).id
           : undefined;
       let next = current.update(
@@ -219,6 +244,7 @@ export class TransactionService {
           notes: input.notes,
           categoryId,
           accountId,
+          splits,
         },
         startDay
       );
@@ -286,6 +312,8 @@ export class TransactionService {
         this.update(userId, id, {
           categoryId,
           accountId,
+          // Moved to one account: a split movement goes there whole.
+          splits: accountId ? null : undefined,
           type: changes.type,
           date: changes.date,
           notes,

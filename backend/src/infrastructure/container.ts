@@ -466,7 +466,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       accountResolver,
       entitlements,
       clock,
-      repos.rules
+      repos.rules,
+      uow
     ),
     recurring: new RecurringService(
       repos.rules,

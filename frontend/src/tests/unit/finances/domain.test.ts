@@ -117,6 +117,7 @@ describe('recurring rule form', () => {
         type: 'EXPENSE',
         category: 'Vivienda',
         accountId: null,
+        splits: null,
         frequency: 'monthly',
         startYear: 2026,
         startMonth: 3,

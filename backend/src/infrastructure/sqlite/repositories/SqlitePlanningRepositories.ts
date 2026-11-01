@@ -1,3 +1,4 @@
+import { AccountSplit } from '@domain/model/AccountSplit';
 import { CategoryBudget } from '@domain/model/CategoryBudget';
 import { CustomAlert, CustomAlertMetric, CustomAlertOperator } from '@domain/model/CustomAlert';
 import { Goal } from '@domain/model/Goal';
@@ -35,7 +36,7 @@ interface RuleRow {
   created_at: string;
 }
 
-const toRule = (r: RuleRow): RecurringRule =>
+const toRule = (r: RuleRow, splits: Map<string, AccountSplit[]>): RecurringRule =>
   RecurringRule.reconstitute({
     id: r.id,
     userId: r.user_id,
@@ -44,6 +45,7 @@ const toRule = (r: RuleRow): RecurringRule =>
     type: r.type as TransactionType,
     categoryId: r.category_id,
     accountId: r.account_id,
+    splits: splits.get(r.id) ?? [],
     start: { year: r.start_year, month: r.start_month },
     end:
       r.end_year !== null && r.end_month !== null ? { year: r.end_year, month: r.end_month } : null,
@@ -56,19 +58,43 @@ const toRule = (r: RuleRow): RecurringRule =>
 export class SqliteRecurringRuleRepository implements RecurringRuleRepository {
   constructor(private readonly db: Db) {}
 
+  /** The parts of the user's split rules (or of one rule), by rule id, in order. */
+  private splits(userId: string, ruleId?: string): Map<string, AccountSplit[]> {
+    const rows = this.db
+      .prepare(
+        `SELECT s.rule_id, s.account_id, s.amount_cents FROM recurring_rule_splits s
+           JOIN recurring_rules r ON r.id = s.rule_id
+          WHERE r.user_id = ? ${ruleId ? 'AND r.id = ?' : ''}
+          ORDER BY s.rule_id, s.position`
+      )
+      .all(...(ruleId ? [userId, ruleId] : [userId])) as {
+      rule_id: string;
+      account_id: string;
+      amount_cents: number;
+    }[];
+    const found = new Map<string, AccountSplit[]>();
+    for (const r of rows) {
+      const list = found.get(r.rule_id) ?? [];
+      list.push({ accountId: r.account_id, amountCents: r.amount_cents });
+      found.set(r.rule_id, list);
+    }
+    return found;
+  }
+
   listByUser(userId: string): RecurringRule[] {
+    const splits = this.splits(userId);
     return (
       this.db
         .prepare('SELECT * FROM recurring_rules WHERE user_id = ? ORDER BY created_at')
         .all(userId) as RuleRow[]
-    ).map(toRule);
+    ).map((r) => toRule(r, splits));
   }
 
   findById(userId: string, id: string): RecurringRule | null {
     const row = this.db
       .prepare('SELECT * FROM recurring_rules WHERE user_id = ? AND id = ?')
       .get(userId, id) as RuleRow | undefined;
-    return row ? toRule(row) : null;
+    return row ? toRule(row, this.splits(userId, id)) : null;
   }
 
   save(rule: RecurringRule): void {
@@ -104,6 +130,12 @@ export class SqliteRecurringRuleRepository implements RecurringRuleRepository {
         day: p.day,
         createdAt: p.createdAt,
       });
+    this.db.prepare('DELETE FROM recurring_rule_splits WHERE rule_id = ?').run(p.id);
+    const insert = this.db.prepare(
+      `INSERT INTO recurring_rule_splits (rule_id, account_id, amount_cents, position)
+       VALUES (?, ?, ?, ?)`
+    );
+    p.splits.forEach((s, i) => insert.run(p.id, s.accountId, s.amountCents, i));
   }
 
   delete(userId: string, id: string): void {

@@ -12,6 +12,7 @@ export const transactionSearch = {
       categoryIcon: '🎉',
       accountId: '00000000-0000-4000-8000-000000000003',
       accountName: 'Principal',
+      splits: [],
       date: '2026-03-10',
       year: 2026,
       month: 3,

@@ -155,6 +155,20 @@ const transactionType = z
   .transform((v) => v.toUpperCase())
   .pipe(z.enum(['INCOME', 'EXPENSE', 'SAVING']));
 
+/**
+ * The parts of an amount split between several accounts (2+ different accounts adding up to the
+ * amount: the domain checks it, with its own codes). null or [] leaves one account.
+ */
+const accountSplits = z
+  .array(
+    z
+      .object({ accountId: id, amount: money })
+      .strict()
+      .transform((s) => ({ accountId: s.accountId, amountCents: s.amount }))
+  )
+  .max(50)
+  .nullish();
+
 export const transactionBody = z.object({
   description: z.string().min(1).max(200),
   amount: money,
@@ -162,6 +176,7 @@ export const transactionBody = z.object({
   category: categoryName.optional(),
   categoryId: optionalId,
   accountId: optionalId,
+  splits: accountSplits,
   date: date.optional(),
   notes: z.string().max(1000).nullish(),
 });
@@ -291,6 +306,7 @@ export const recurringBody = z.object({
   category: categoryName.optional(),
   categoryId: optionalId,
   accountId: optionalId,
+  splits: accountSplits,
   startYear: year,
   startMonth: month,
   endYear: year.nullish(),

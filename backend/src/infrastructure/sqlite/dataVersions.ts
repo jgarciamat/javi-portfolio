@@ -154,6 +154,12 @@ export function statsTracking(db: Db): Record<string, WriteTracking> {
         'earliestPeriod',
         'count',
         'countSample',
+        // Inner helpers: only the methods above call them, on the repository itself.
+        'splitsOf',
+        'splitsOfUser',
+        'entities',
+        'views',
+        'writeSplits',
       ],
       writes: {
         save: entityOwner,
@@ -165,7 +171,7 @@ export function statsTracking(db: Db): Record<string, WriteTracking> {
       },
     },
     rules: {
-      untracked: ['listByUser', 'findById', 'skippedPeriods'],
+      untracked: ['listByUser', 'findById', 'skippedPeriods', 'splits'],
       writes: { save: entityOwner, delete: userArg, addSkip: ruleOwner, clearSkipsFrom: ruleOwner },
     },
     categories: {

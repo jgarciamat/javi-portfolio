@@ -1,6 +1,8 @@
+import { AccountSplit } from '@domain/model/AccountSplit';
 import { Transaction } from '@domain/model/Transaction';
 import { TransactionType } from '@domain/model/TransactionType';
 import {
+  AccountSplitView,
   PeriodTotals,
   TransactionRepository,
   TransactionSearchFilters,
@@ -63,7 +65,48 @@ const SORTS: Record<TransactionSort, string> = {
   amount_asc: 't.amount_cents ASC, t.date DESC',
 };
 
-function toEntity(r: TransactionRow): Transaction {
+interface SplitRow {
+  transaction_id: string;
+  account_id: string;
+  account_name: string;
+  amount_cents: number;
+}
+
+/** The parts of split movements, by movement id (movements in one account have none). */
+type SplitsById = Map<string, AccountSplitView[]>;
+
+const SPLIT_SELECT = `
+  SELECT s.transaction_id, s.account_id, a.name AS account_name, s.amount_cents
+    FROM transaction_splits s JOIN accounts a ON a.id = s.account_id`;
+
+function groupSplits(rows: SplitRow[], into: SplitsById = new Map()): SplitsById {
+  for (const r of rows) {
+    const list = into.get(r.transaction_id) ?? [];
+    list.push({
+      accountId: r.account_id,
+      accountName: r.account_name,
+      amountCents: r.amount_cents,
+    });
+    into.set(r.transaction_id, list);
+  }
+  return into;
+}
+
+const bare = (splits: AccountSplitView[] = []): AccountSplit[] =>
+  splits.map((s) => ({ accountId: s.accountId, amountCents: s.amountCents }));
+
+/**
+ * Each account's part of the movement `t`, as a balance sees it: its row in transaction_splits
+ * when split, the whole amount otherwise. Used to filter and add up by account.
+ */
+const ACCOUNT_PART = `COALESCE(
+  (SELECT s.amount_cents FROM transaction_splits s
+    WHERE s.transaction_id = t.id AND s.account_id = @accountId),
+  CASE WHEN t.account_id = @accountId
+        AND NOT EXISTS (SELECT 1 FROM transaction_splits s WHERE s.transaction_id = t.id)
+       THEN t.amount_cents END)`;
+
+function toEntity(r: TransactionRow, splits: SplitsById): Transaction {
   return Transaction.reconstitute({
     id: r.id,
     userId: r.user_id,
@@ -78,10 +121,11 @@ function toEntity(r: TransactionRow): Transaction {
     recurringRuleId: r.recurring_rule_id,
     importHash: r.import_hash,
     createdAt: r.created_at,
+    splits: bare(splits.get(r.id)),
   });
 }
 
-function toView(r: ViewRow): TransactionView {
+function toView(r: ViewRow, splits: SplitsById): TransactionView {
   return {
     id: r.id,
     description: r.description,
@@ -93,6 +137,7 @@ function toView(r: ViewRow): TransactionView {
     categoryIcon: r.category_icon,
     accountId: r.account_id,
     accountName: r.account_name,
+    splits: splits.get(r.id) ?? [],
     date: r.date,
     year: r.year,
     month: r.month,
@@ -131,18 +176,66 @@ const INSERT_COLUMNS = `(id, user_id, account_id, category_id, year, month, date
 export class SqliteTransactionRepository implements TransactionRepository {
   constructor(private readonly db: Db) {}
 
+  /** The parts of the given movements (in the order they were given). */
+  private splitsOf(ids: string[]): SplitsById {
+    const found: SplitsById = new Map();
+    inChunks(ids, 500, (chunk) => {
+      const rows = this.db
+        .prepare(
+          `${SPLIT_SELECT} WHERE s.transaction_id IN (${placeholders(chunk.length)})
+           ORDER BY s.transaction_id, s.position`
+        )
+        .all(...chunk) as SplitRow[];
+      groupSplits(rows, found);
+    });
+    return found;
+  }
+
+  /** Every part of the user's movements in one query (there may be tens of thousands). */
+  private splitsOfUser(userId: string): SplitsById {
+    return groupSplits(
+      this.db
+        .prepare(
+          `${SPLIT_SELECT} JOIN transactions t ON t.id = s.transaction_id
+            WHERE t.user_id = ? ORDER BY s.transaction_id, s.position`
+        )
+        .all(userId) as SplitRow[]
+    );
+  }
+
+  private entities(rows: TransactionRow[]): Transaction[] {
+    const splits = this.splitsOf(rows.map((r) => r.id));
+    return rows.map((r) => toEntity(r, splits));
+  }
+
+  private views(rows: ViewRow[]): TransactionView[] {
+    const splits = this.splitsOf(rows.map((r) => r.id));
+    return rows.map((r) => toView(r, splits));
+  }
+
+  /** Writes the parts of a movement again (none for a movement in a single account). */
+  private writeSplits(tx: Transaction): void {
+    const { id, splits } = tx.toPrimitives();
+    this.db.prepare('DELETE FROM transaction_splits WHERE transaction_id = ?').run(id);
+    const insert = this.db.prepare(
+      `INSERT INTO transaction_splits (transaction_id, account_id, amount_cents, position)
+       VALUES (?, ?, ?, ?)`
+    );
+    splits.forEach((s, i) => insert.run(id, s.accountId, s.amountCents, i));
+  }
+
   findById(userId: string, id: string): Transaction | null {
     const row = this.db
       .prepare('SELECT * FROM transactions WHERE user_id = ? AND id = ?')
       .get(userId, id) as TransactionRow | undefined;
-    return row ? toEntity(row) : null;
+    return row ? this.entities([row])[0] : null;
   }
 
   findView(userId: string, id: string): TransactionView | null {
     const row = this.db
       .prepare(`${VIEW_SELECT} WHERE t.user_id = ? AND t.id = ?`)
       .get(userId, id) as ViewRow | undefined;
-    return row ? toView(row) : null;
+    return row ? this.views([row])[0] : null;
   }
 
   save(tx: Transaction): void {
@@ -157,13 +250,15 @@ export class SqliteTransactionRepository implements TransactionRepository {
            recurring_rule_id = excluded.recurring_rule_id`
       )
       .run(toRow(tx));
+    this.writeSplits(tx);
   }
 
   insertIfAbsent(tx: Transaction): boolean {
-    return (
+    const inserted =
       this.db.prepare(`INSERT OR IGNORE INTO transactions ${INSERT_COLUMNS}`).run(toRow(tx))
-        .changes > 0
-    );
+        .changes > 0;
+    if (inserted) this.writeSplits(tx);
+    return inserted;
   }
 
   delete(userId: string, id: string): boolean {
@@ -180,7 +275,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
          ORDER BY t.date DESC, t.created_at DESC`
       )
       .all(userId, period.year, period.month) as ViewRow[];
-    return rows.map(toView);
+    return this.views(rows);
   }
 
   search(userId: string, f: TransactionSearchFilters): TransactionSearchResult {
@@ -204,8 +299,10 @@ export class SqliteTransactionRepository implements TransactionRepository {
       });
       where.push(`t.category_id IN (${keys.join(', ')})`);
     }
+    // By account: the movements with a part in it, added up by that part only.
+    const amount = f.accountId ? ACCOUNT_PART : 't.amount_cents';
     if (f.accountId) {
-      where.push('t.account_id = @accountId');
+      where.push(`${ACCOUNT_PART} IS NOT NULL`);
       params.accountId = f.accountId;
     }
     if (f.from) {
@@ -233,14 +330,14 @@ export class SqliteTransactionRepository implements TransactionRepository {
     const agg = this.db
       .prepare(
         `SELECT COUNT(*) AS total,
-                COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount_cents END), 0) AS income,
-                COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount_cents END), 0) AS expense,
-                COALESCE(SUM(CASE WHEN t.type = 'SAVING' THEN t.amount_cents END), 0) AS saving
+                COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN ${amount} END), 0) AS income,
+                COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN ${amount} END), 0) AS expense,
+                COALESCE(SUM(CASE WHEN t.type = 'SAVING' THEN ${amount} END), 0) AS saving
            FROM transactions t WHERE ${whereSql}`
       )
       .get(params) as { total: number; income: number; expense: number; saving: number };
     return {
-      items: rows.map(toView),
+      items: this.views(rows),
       total: agg.total,
       totals: { incomeCents: agg.income, expenseCents: agg.expense, savingCents: agg.saving },
     };
@@ -383,7 +480,7 @@ export class SqliteTransactionRepository implements TransactionRepository {
     const rows = this.db
       .prepare('SELECT * FROM transactions WHERE user_id = ? AND recurring_rule_id = ?')
       .all(userId, ruleId) as TransactionRow[];
-    return rows.map(toEntity);
+    return this.entities(rows);
   }
 
   deleteByRuleAfter(userId: string, ruleId: string, date: string): number {
@@ -410,7 +507,8 @@ export class SqliteTransactionRepository implements TransactionRepository {
     const rows = this.db
       .prepare('SELECT * FROM transactions WHERE user_id = ?')
       .all(userId) as TransactionRow[];
-    return rows.map(toEntity);
+    const splits = this.splitsOfUser(userId);
+    return rows.map((r) => toEntity(r, splits));
   }
 
   listSubscriptionCandidates(
@@ -498,7 +596,8 @@ export class SqliteTransactionRepository implements TransactionRepository {
     const rows = this.db
       .prepare(`${VIEW_SELECT} WHERE t.user_id = ? ORDER BY t.date, t.created_at`)
       .all(userId) as ViewRow[];
-    return rows.map(toView);
+    const splits = this.splitsOfUser(userId);
+    return rows.map((r) => toView(r, splits));
   }
 
   earliestPeriod(userId: string): Period | null {

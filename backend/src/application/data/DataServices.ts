@@ -397,6 +397,7 @@ export class ExportService {
         type: t.type,
         category: t.categoryName,
         account: t.accountName,
+        splits: t.splits.map((s) => ({ account: s.accountName, amount: money(s.amountCents) })),
         notes: t.notes,
         recurringRuleId: t.recurringRuleId,
       })),

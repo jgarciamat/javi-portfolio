@@ -4,6 +4,7 @@ import { Cents, assertPositiveCents } from '@domain/shared/money';
 import { Period, periodOfDate, toDateOnly } from '@domain/shared/period';
 import { normalizeText } from '@domain/shared/text';
 import { TransactionType, parseTransactionType } from './TransactionType';
+import { AccountSplit, cleanSplits } from './AccountSplit';
 
 export const DESCRIPTION_MAX = 200;
 export const NOTES_MAX = 1000;
@@ -11,7 +12,10 @@ export const NOTES_MAX = 1000;
 export interface TransactionProps {
   id: string;
   userId: string;
+  /** The account of the movement; when it is split, the first part's (see `splits`). */
   accountId: string;
+  /** Empty: the whole amount is in `accountId`. Otherwise 2+ parts adding up to the amount. */
+  splits: AccountSplit[];
   categoryId: string;
   description: string;
   amountCents: Cents;
@@ -37,14 +41,37 @@ export interface NewTransaction {
   notes?: string | null;
   recurringRuleId?: string | null;
   importHash?: string | null;
+  /** Split between several accounts (the first part's account becomes `accountId`). */
+  splits?: AccountSplit[] | null;
 }
 
+/**
+ * `splits`: an array replaces the parts, null (or []) leaves the movement in one account. Not
+ * given, the parts stay as they are unless `accountId` names another account: then the whole
+ * movement moves there.
+ */
 export type TransactionChanges = Partial<
   Pick<
     NewTransaction,
-    'accountId' | 'categoryId' | 'description' | 'amountCents' | 'type' | 'date' | 'notes'
+    | 'accountId'
+    | 'categoryId'
+    | 'description'
+    | 'amountCents'
+    | 'type'
+    | 'date'
+    | 'notes'
+    | 'splits'
   >
 >;
+
+/** The parts checked against the amount; a split movement is noted under its first account. */
+function withSplits(
+  props: TransactionProps,
+  splits: AccountSplit[] | null | undefined
+): TransactionProps {
+  const clean = cleanSplits(splits, props.amountCents);
+  return { ...props, splits: clean, accountId: clean[0]?.accountId ?? props.accountId };
+}
 
 function cleanDescription(value: string): string {
   const trimmed = value.trim();
@@ -71,7 +98,7 @@ export class Transaction {
   static create(input: NewTransaction, monthStartDay: number, now = new Date()): Transaction {
     assertPositiveCents(input.amountCents);
     const date = toDateOnly(input.date);
-    return new Transaction({
+    const props: TransactionProps = {
       id: randomUUID(),
       userId: input.userId,
       accountId: input.accountId,
@@ -85,15 +112,17 @@ export class Transaction {
       recurringRuleId: input.recurringRuleId ?? null,
       importHash: input.importHash ?? null,
       createdAt: now.toISOString(),
-    });
+      splits: [],
+    };
+    return new Transaction(withSplits(props, input.splits));
   }
 
   static reconstitute(props: TransactionProps): Transaction {
-    return new Transaction({ ...props });
+    return new Transaction({ ...props, splits: props.splits.map((s) => ({ ...s })) });
   }
 
   update(changes: TransactionChanges, monthStartDay: number): Transaction {
-    const next: TransactionProps = { ...this.props };
+    let next: TransactionProps = { ...this.props };
     if (changes.accountId !== undefined) next.accountId = changes.accountId;
     if (changes.categoryId !== undefined) next.categoryId = changes.categoryId;
     if (changes.description !== undefined) next.description = cleanDescription(changes.description);
@@ -105,6 +134,12 @@ export class Transaction {
     if (changes.date !== undefined) next.date = toDateOnly(changes.date);
     if (changes.notes !== undefined) next.notes = cleanNotes(changes.notes);
     next.period = periodOfDate(next.date, monthStartDay);
+    let splits: AccountSplit[] | null | undefined = changes.splits;
+    if (splits === undefined) {
+      const moved = changes.accountId !== undefined && changes.accountId !== this.props.accountId;
+      splits = moved ? null : this.props.splits;
+    }
+    next = withSplits(next, splits);
     return new Transaction(next);
   }
 
@@ -143,8 +178,21 @@ export class Transaction {
   get recurringRuleId(): string | null {
     return this.props.recurringRuleId;
   }
+  get accountId(): string {
+    return this.props.accountId;
+  }
+  /** What each account holds of the movement: one part with the whole amount when not split. */
+  get parts(): AccountSplit[] {
+    return this.props.splits.length > 0
+      ? this.props.splits.map((s) => ({ ...s }))
+      : [{ accountId: this.props.accountId, amountCents: this.props.amountCents }];
+  }
 
   toPrimitives(): TransactionProps {
-    return { ...this.props, period: { ...this.props.period } };
+    return {
+      ...this.props,
+      period: { ...this.props.period },
+      splits: this.props.splits.map((s) => ({ ...s })),
+    };
   }
 }

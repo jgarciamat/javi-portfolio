@@ -58,6 +58,8 @@ import { cryptoSimTransferred } from './fixtures/cryptoSimTransferred';
 import { accounts } from './fixtures/accounts';
 import { assets } from './fixtures/assets';
 import { recurringRules } from './fixtures/recurringRules';
+import { splitRecurringRules } from './fixtures/splitRecurringRules';
+import { splitTransaction } from './fixtures/splitTransaction';
 import { annualSummary } from './fixtures/annualSummary';
 import { authResult } from './fixtures/authResult';
 import { autonomoData } from './fixtures/autonomoData';
@@ -105,6 +107,13 @@ describe('API answers fit the types of the app', () => {
     contract<ImportResult>()(importResult);
     contract<SampleDataStatus>()(sampleData);
     expect(monthOverview.transactions.length).toBeGreaterThan(0);
+  });
+
+  it('movements and automatic operations split between accounts', () => {
+    contract<Transaction>()(splitTransaction);
+    contract<RecurringRule[]>()(splitRecurringRules);
+    expect(splitTransaction.splits).toHaveLength(2);
+    expect(splitRecurringRules[0].splits).toHaveLength(2);
   });
 
   it('plans and referrals', () => {

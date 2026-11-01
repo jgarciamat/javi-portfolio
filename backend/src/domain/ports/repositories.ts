@@ -193,12 +193,21 @@ export interface TransactionView {
   categoryIcon: string;
   accountId: string;
   accountName: string;
+  /** Empty: the whole amount is in `accountId`. Otherwise each account's part, in order. */
+  splits: AccountSplitView[];
   date: string;
   year: number;
   month: number;
   notes: string | null;
   recurringRuleId: string | null;
   createdAt: string;
+}
+
+/** One account's part of a split movement, with the account's name. */
+export interface AccountSplitView {
+  accountId: string;
+  accountName: string;
+  amountCents: Cents;
 }
 
 export type TransactionSort = 'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc';

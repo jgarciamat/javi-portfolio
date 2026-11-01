@@ -38,6 +38,8 @@ import {
   type CreateAssetInput,
 } from '@modules/finances/domain/assetForm';
 import type { DebtPaymentInput } from '@modules/finances/domain/types';
+import { splitParts, type SplitForm } from '@modules/finances/domain/accountSplit';
+import { emptyRuleForm, validateRuleForm } from '@modules/finances/domain/recurringForm';
 import saved from './fixtures/requests.json';
 
 const FILE = resolve(__dirname, 'fixtures/requests.json');
@@ -185,6 +187,35 @@ add('recurringCreate', () =>
     frequency: 'monthly',
   })
 );
+// 800 € split between two accounts (500 + 300), as the movement and operation forms send it.
+const split800: SplitForm = {
+  on: true,
+  rows: [
+    { accountId: '{account}', amount: '500' },
+    { accountId: '{account2}', amount: '300' },
+  ],
+  autoLast: false,
+};
+add('transactionCreateSplit', () =>
+  transactionApi.create({
+    description: 'Cuenta común',
+    amount: 800,
+    type: 'EXPENSE',
+    category: 'Ocio',
+    date: '2026-03-10',
+    notes: null,
+    accountId: '{account}',
+    splits: splitParts(split800),
+  })
+);
+const splitRule = validateRuleForm({
+  ...emptyRuleForm(new Date(2026, 0, 15)),
+  description: 'Cuenta común',
+  amount: '800',
+  category: 'Ocio',
+  split: split800,
+}) as { dto: Parameters<typeof recurringApi.create>[0] };
+add('recurringCreateSplit', () => recurringApi.create(splitRule.dto));
 // A mortgage paid every month from an account, as the form of «Inversiones, bienes y deudas»
 // builds it, and then a new monthly payment from the same form of the debt.
 const mortgage = assetFormResult({

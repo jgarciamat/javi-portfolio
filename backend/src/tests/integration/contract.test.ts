@@ -150,6 +150,16 @@ describe('API contract', () => {
     const list = (await get('/categories')).body as { id: string; name: string }[];
     return list.find((c) => c.name === name)!.id;
   }
+  /** The default account and «Cuenta nómina» (accountCreate), to split between. */
+  async function splitAccounts(): Promise<Record<string, string>> {
+    await send('accountCreate');
+    const list = (await get('/accounts')).body.accounts as { id: string; isDefault: boolean }[];
+    return {
+      ...(await vars()),
+      account: list.find((a) => a.isDefault)!.id,
+      account2: list.find((a) => !a.isDefault)!.id,
+    };
+  }
   const vars = async () => ({
     'category:Ocio': await categoryId('Ocio'),
     'category:Salario': await categoryId('Salario'),
@@ -180,6 +190,13 @@ describe('API contract', () => {
       contract('categories', (await get('/categories')).body);
       contract('budgets', (await get('/budgets')).body);
       contract('settings', (await get('/settings')).body);
+    });
+
+    it('movements and automatic operations split between accounts', async () => {
+      const two = await splitAccounts();
+      contract('splitTransaction', (await send('transactionCreateSplit', two)).body);
+      await send('recurringCreateSplit', two);
+      contract('splitRecurringRules', (await get('/recurring-rules')).body);
     });
 
     it('accounts, goals and imports', async () => {
@@ -453,6 +470,12 @@ describe('API contract', () => {
       ]) {
         await send(name, { ...v, ...ids });
       }
+    });
+
+    it('movements and automatic operations split between accounts', async () => {
+      const two = await splitAccounts();
+      await send('transactionCreateSplit', two);
+      await send('recurringCreateSplit', two);
     });
 
     it('self-employed, plans and payments', async () => {
