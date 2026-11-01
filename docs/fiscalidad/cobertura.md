@@ -75,7 +75,7 @@ En pocas palabras: además del caso «nómina o pensión + alquiler + mínimos +
 | Casillas | Estado | Dónde | Regla y límites |
 |---|---|---|---|
 | 10, 11, 70, 77, 92 (identificación) | LEÍDO | `rentaDraft.ts` | Edad a 31-12, discapacidad (0/33/65), comunidad, edades de hijos y ascendientes desde el borrador |
-| 68/69 | CALCULADO | `rentaJoint.ts` | Compara la declaración individual con la conjunta y recomienda una |
+| 68/69 | CALCULADO | `rentaJoint.ts` | Compara la declaración individual con la conjunta y dice cuál sale mejor con los datos (no recomienda): el cónyuge no obligado a declarar al que le saldría a pagar cuenta 0 € (art. 96) |
 | 0003, 0013-0016 | LEÍDO | `rentaForm.ts` | Bruto, Seguridad Social (6,5 % si se deja vacía), sindicatos, colegios (hasta 500 €), defensa jurídica (hasta 300 €) |
 | 0017-0022 | CALCULADO | `rentaCalc.ts workIncome` | 2.000 € de otros gastos, +2.000 € de movilidad, +3.500/7.750 € por discapacidad en activo; en conjunta, regla del Manual (un incremento por discapacidad, el del mayor grado) |
 | 0023, 0025 | CALCULADO | `rentaWork.ts` | Art. 20 LIRPF con el límite de 6.500 € de otras rentas |
