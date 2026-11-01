@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { Icon } from '@shared/components/Icon';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction } from '@modules/finances/domain/types';
@@ -26,10 +27,24 @@ export function MonthCharges({ onEdit }: { onEdit: (tx: Transaction) => void }) 
   const title = t(f.isCurrentPeriod ? 'app.charges.title' : 'app.charges.titleOther');
 
   return (
-    <section className="card month-charges" aria-label={title}>
-      <h2 className="section-title">
-        <Icon name="repeat" /> {title}
-      </h2>
+    <CollapsiblePanel
+      className="month-charges"
+      title={
+        <>
+          <Icon name="repeat" /> {title}
+          <span className="month-charges-summary">
+            {t('app.charges.total')} {money(charges.total)} · {t('app.charges.pending')}{' '}
+            {money(charges.pendingTotal)}
+            {charges.pendingCount > 0 &&
+              ` · ${
+                charges.pendingCount === 1
+                  ? t('app.charges.pendingOne')
+                  : t('app.charges.pendingMany', { count: charges.pendingCount })
+              }`}
+          </span>
+        </>
+      }
+    >
       <p className="section-hint">{t('app.charges.hint')}</p>
       <dl className="month-charges-facts">
         <div>
@@ -79,6 +94,6 @@ export function MonthCharges({ onEdit }: { onEdit: (tx: Transaction) => void }) 
         ))}
       </ul>
       {charges.pendingCount > 0 && <p className="section-hint">{t('app.charges.pendingNote')}</p>}
-    </section>
+    </CollapsiblePanel>
   );
 }

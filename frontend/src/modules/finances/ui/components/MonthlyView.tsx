@@ -176,6 +176,7 @@ function MovementsPanel({
           </>
         }
         className="collapsible-panel--flush"
+        defaultOpen
         tourId="movements"
       >
         {view.mode === 'day' && (

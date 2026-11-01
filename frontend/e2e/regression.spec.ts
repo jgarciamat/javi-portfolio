@@ -62,6 +62,8 @@ for (const width of [390, 1280]) {
     await trackShifts(page);
     await page.reload();
     await expect(page.locator('.summary-card').first()).toBeVisible();
+    // Folded by default: open it to see the end of the month.
+    await page.locator('[data-tour="forecast"] .collapsible-header').click();
     await expect(page.locator('[data-tour="forecast"] .eom')).toBeVisible();
     await page.waitForTimeout(500);
     expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
@@ -202,13 +204,17 @@ test('«Recibos y cargos de este mes» lists the automatic charges apart', async
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.reload();
-    const card = page.getByRole('region', { name: 'Recibos y cargos de este mes' });
+    const toggle = page.getByRole('button', { name: /^Recibos y cargos de este mes/ });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    const card = page.locator('.month-charges');
     await expect(card).toBeVisible();
-    await expect(card.getByText('Cuota gimnasio')).toBeVisible();
-    await expect(card.getByText('Total del mes').locator('..')).toContainText('82,40');
+    const body = card.locator('.collapsible-body');
+    await expect(body.getByText('Cuota gimnasio')).toBeVisible();
+    await expect(body.getByText('Total del mes').locator('..')).toContainText('82,40');
     if (pending) {
-      await expect(card.getByText('Queda pendiente').locator('..')).toContainText('42,50');
-      await expect(card.getByText('Pendiente', { exact: true })).toBeVisible();
+      await expect(body.getByText('Queda pendiente').locator('..')).toContainText('42,50');
+      await expect(body.getByText('Pendiente', { exact: true })).toBeVisible();
       // Not among the movements of the month until its day.
       const list = page.locator('[data-tour="movements"]');
       await expect(list.getByText('Seguro del coche')).toHaveCount(0);

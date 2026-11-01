@@ -614,6 +614,13 @@ describe('AI advisor', () => {
   });
 });
 
+/** The folded panel by its title (opening it when asked): the card that holds it. */
+async function chargesPanel(titleKey = 'app.charges.title', open = true) {
+  const toggle = await screen.findByRole('button', { name: new RegExp(tr(titleKey)) });
+  if (open) fireEvent.click(toggle);
+  return { toggle, card: within(toggle.closest('.card') as HTMLElement) };
+}
+
 describe('«Recibos y cargos de este mes»', () => {
   const gym = (id: string, date: string) =>
     f.transaction({
@@ -632,7 +639,12 @@ describe('«Recibos y cargos de este mes»', () => {
         transactions: [dinner, payroll, gym('g1', '2026-03-05'), gym('g2', '2026-03-28')],
       })
     );
-    const card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    const { toggle, card } = await chargesPanel('app.charges.title', false);
+    // Folded to begin with, with the short summary in the header.
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent(/60,00\s€ .*30,00\s€ · 1 cargo/);
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
     const rows = card.getAllByRole('listitem');
     // Only the expenses (not the payroll), by date: the charged one, then the one to come.
     expect(rows).toHaveLength(2);
@@ -658,14 +670,14 @@ describe('«Recibos y cargos de este mes»', () => {
         transactions: [dinner, gym('g2', '2026-03-28'), gym('g3', '2026-03-29')],
       })
     );
-    const card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    const { card } = await chargesPanel();
     expect(card.getByText(tr('app.charges.pending')).nextSibling).toHaveTextContent(
       /^60,00\s€ · 2 cargos$/
     );
     unmount();
     setup();
     await screen.findAllByText('Cena');
-    expect(screen.queryByRole('region', { name: tr('app.charges.title') })).toBeNull();
+    expect(screen.queryByRole('button', { name: new RegExp(tr('app.charges.title')) })).toBeNull();
   });
 
   it('names the account each charge is noted in once there is more than one', async () => {
@@ -676,7 +688,7 @@ describe('«Recibos y cargos de este mes»', () => {
     });
     const unnamed = f.transaction({ ...gym('g2', '2026-03-28'), accountName: undefined });
     const { unmount } = setup(f.overview({ transactions: [dinner, crypto, unnamed] }));
-    let card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    let { card } = await chargesPanel();
     await waitFor(() => expect(card.getAllByRole('listitem')[0]).toHaveTextContent('· Cripto'));
     expect(card.getAllByRole('listitem')[1]).not.toHaveTextContent('Principal');
     unmount();
@@ -690,16 +702,16 @@ describe('«Recibos y cargos de este mes»', () => {
       total: 1000,
     });
     renderWithProviders(<Dashboard />, { api });
-    card = within(await screen.findByRole('region', { name: tr('app.charges.title') }));
+    ({ card } = await chargesPanel());
     await waitFor(() => expect(api.accountApi.getAll).toHaveBeenCalled());
     expect(card.getByRole('listitem')).not.toHaveTextContent('Cripto');
   });
 
   it('says «del mes» in another month, where everything was already charged', async () => {
     setup(f.overview({ transactions: [dinner, gym('g1', '2026-02-05')] }));
-    await screen.findByRole('region', { name: tr('app.charges.title') });
+    await chargesPanel('app.charges.title', false);
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.nav.prev')) }));
-    const card = within(await screen.findByRole('region', { name: tr('app.charges.titleOther') }));
+    const { card } = await chargesPanel('app.charges.titleOther');
     expect(card.getByText(tr('app.charges.pending')).nextSibling).toHaveTextContent(/^0,00\s€$/);
     expect(card.queryByText(tr('app.charges.pendingNote'))).toBeNull();
   });
