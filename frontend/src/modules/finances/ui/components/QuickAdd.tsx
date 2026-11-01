@@ -5,14 +5,18 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useResource } from '@shared/hooks/useResource';
 import { errorMessage } from '@shared/utils/errors';
-import {
-  parseQuickEntry,
-  quickCategory,
-  recentCategories,
-} from '@modules/finances/domain/quickEntry';
+import { parseQuickEntry, quickCategory } from '@modules/finances/domain/quickEntry';
+import { parseVoiceEntry, quickEntryText } from '@modules/finances/domain/voiceEntry';
+import { useSpeechDictation } from '@modules/finances/application/hooks/useSpeechDictation';
 import type { ScannedReceipt } from '@modules/finances/domain/receiptParser';
-import type { CreateTransactionDTO, Transaction } from '@modules/finances/domain/types';
+import type {
+  Account,
+  Category,
+  CreateTransactionDTO,
+  Transaction,
+} from '@modules/finances/domain/types';
 import { ReceiptScanner } from './ReceiptScanner';
+import { VoiceButton, VoicePanel } from './QuickVoice';
 import '../css/QuickAdd.css';
 
 /** Keys that jump to the quick entry on a computer (not while typing somewhere else). */
@@ -40,35 +44,54 @@ function useShortcut(input: RefObject<HTMLInputElement | null>) {
 
 interface QuickAddProps {
   transactions: Transaction[];
-  /** The month is loading: the row of recent categories keeps its place until they arrive. */
-  loading?: boolean;
+  /** The person's categories, to choose one in the list. */
+  categories?: Category[];
+  /** Their accounts: the selector is shown only with more than one active account. */
+  accounts?: Account[];
   defaultDate: string;
   onAdd: (dto: CreateTransactionDTO) => Promise<unknown>;
 }
 
 /** What is typed, the category it would get (or the one chosen) and the saving of it. */
-function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
-  const { t } = useI18n();
+export function useQuickAdd({ transactions, defaultDate, onAdd, accounts = [] }: QuickAddProps) {
+  const { t, locale } = useI18n();
   const { money } = useFormat();
   const { categoryRuleApi } = useApi();
   const rules = useResource(() => categoryRuleApi.getAll(), [categoryRuleApi], { initial: [] });
   const input = useRef<HTMLInputElement>(null);
   const [text, setText] = useState('');
   const [chosen, setChosen] = useState<string | null>(null);
+  const [chosenAccount, setChosenAccount] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
   const [scannedDate, setScannedDate] = useState<string | null>(null);
+  /** A dictated phrase is waiting for the person to confirm it. */
+  const [dictated, setDictated] = useState(false);
 
   const entry = parseQuickEntry(text);
   const category = entry ? (chosen ?? quickCategory(entry, rules.data, transactions)) : chosen;
-  const recent = recentCategories(transactions, entry?.type ?? 'EXPENSE');
+  // Same rule as the full form: the active accounts, the default one first chosen.
+  const selectable = accounts.filter((a) => !a.archived);
+  const accountId =
+    selectable.length > 1
+      ? (
+          selectable.find((a) => a.id === chosenAccount) ??
+          selectable.find((a) => a.isDefault) ??
+          selectable[0]
+        ).id
+      : null;
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: FormEvent) => {
+    event?.preventDefault();
     setAdded(null);
     if (!entry) return setError(t('app.quickAdd.invalid'));
-    const dto = { ...entry, category: category as string, date: scannedDate ?? defaultDate };
+    const dto = {
+      ...entry,
+      category: category as string,
+      date: scannedDate ?? defaultDate,
+      ...(accountId ? { accountId } : {}),
+    };
     setBusy(true);
     setError(null);
     try {
@@ -80,6 +103,7 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
       setText('');
       setChosen(null);
       setScannedDate(null);
+      setDictated(false);
       input.current?.focus();
     } catch (e) {
       setError(errorMessage(e, t('app.quickAdd.error')));
@@ -98,17 +122,44 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
     input.current?.focus();
   };
 
+  /** What was said, read like the typed line; it is left in the field to correct it. */
+  const heard = (speech: string) => {
+    const spoken = parseVoiceEntry(speech, locale === 'en' ? 'en' : 'es');
+    setText(spoken ? quickEntryText(spoken) : speech);
+    setChosen(null);
+    setScannedDate(null);
+    setDictated(true);
+    setError(null);
+    setAdded(null);
+  };
+  const dictation = useSpeechDictation(locale === 'en' ? 'en-US' : 'es-ES', heard);
+
   return {
     input,
     text,
     scanned,
+    dictation,
+    dictated,
+    /** Listens (again): whatever was waiting is dropped. */
+    dictate: () => {
+      setDictated(false);
+      setAdded(null);
+      dictation.start();
+    },
+    /** Drops the dictated phrase and what it filled in. */
+    discard: () => {
+      setDictated(false);
+      setText('');
+    },
     setText: (value: string) => {
       setText(value);
       setError(null);
     },
     entry,
     category,
-    chips: category && !recent.includes(category) ? [category, ...recent] : recent,
+    selectable,
+    accountId,
+    chooseAccount: setChosenAccount,
     choose: setChosen,
     busy,
     error,
@@ -117,42 +168,67 @@ function useQuickAdd({ transactions, defaultDate, onAdd }: QuickAddProps) {
   };
 }
 
-/** The categories last used, to pick another one with a tap; the one that will be used is pressed. */
-function CategoryChips({
-  chips,
-  category,
-  loading,
-  onChoose,
+/** The category that will be used (the suggested one, editable) and, with several accounts, the account. */
+function QuickSelects({
+  quick,
+  categories,
+  idBase,
 }: {
-  chips: string[];
-  category: string | null;
-  loading?: boolean;
-  onChoose: (name: string) => void;
+  quick: ReturnType<typeof useQuickAdd>;
+  categories: Category[];
+  idBase: string;
 }) {
-  const { t } = useI18n();
-  if (chips.length === 0) {
-    return loading ? <div className="quick-add-chips" aria-hidden="true" /> : null;
-  }
+  const { t, tCategory } = useI18n();
+  const { category } = quick;
+  // A suggested category the person no longer has still shows, so it is never silently changed.
+  const known = categories.some((c) => c.name === category);
   return (
-    <div className="quick-add-chips" role="group" aria-label={t('app.quickAdd.categories')}>
-      {chips.map((name) => (
-        <button
-          key={name}
-          type="button"
-          className="quick-add-chip"
-          aria-pressed={name === category}
-          onClick={() => onChoose(name)}
+    <div className="quick-add-selects">
+      <div className="quick-add-field">
+        <label className="tx-field-label" htmlFor={`${idBase}-category`}>
+          {t('app.quickAdd.categories')}
+        </label>
+        <select
+          id={`${idBase}-category`}
+          className="tx-input"
+          value={category ?? ''}
+          onChange={(e) => quick.choose(e.target.value || null)}
         >
-          {name}
-        </button>
-      ))}
+          <option value="">{t('app.transaction.form.category.placeholder')}</option>
+          {category && !known && <option value={category}>{tCategory(category)}</option>}
+          {categories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.icon} {tCategory(c.name)}
+            </option>
+          ))}
+        </select>
+      </div>
+      {quick.accountId && (
+        <div className="quick-add-field">
+          <label className="tx-field-label" htmlFor={`${idBase}-account`}>
+            {t('app.quickAdd.account')}
+          </label>
+          <select
+            id={`${idBase}-account`}
+            className="tx-input"
+            value={quick.accountId}
+            onChange={(e) => quick.chooseAccount(e.target.value)}
+          >
+            {quick.selectable.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.icon} {a.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }
 
 /**
  * «Alta rápida»: «café 1,50» and Enter. The category comes from the person's rules, the last
- * movement with the same concept or the last one used, and can be changed with the recent chips.
+ * movement with the same concept or the last one used, and can be changed in the list.
  */
 export function QuickAdd(props: QuickAddProps) {
   const { t } = useI18n();
@@ -180,17 +256,14 @@ export function QuickAdd(props: QuickAddProps) {
           aria-invalid={!!quick.error}
           onChange={(e) => quick.setText(e.target.value)}
         />
+        <VoiceButton quick={quick} />
         <button type="submit" className="btn-primary" disabled={quick.busy}>
           {quick.busy ? t('app.transaction.form.saving') : t('app.quickAdd.add')}
         </button>
       </div>
       <ReceiptScanner onScanned={quick.scanned} />
-      <CategoryChips
-        chips={quick.chips}
-        category={category}
-        loading={props.loading}
-        onChoose={quick.choose}
-      />
+      <QuickSelects quick={quick} categories={props.categories ?? []} idBase={id} />
+      <VoicePanel quick={quick} />
       <p id={`${id}-hint`} className="section-hint">
         {entry
           ? t('app.quickAdd.preview', {

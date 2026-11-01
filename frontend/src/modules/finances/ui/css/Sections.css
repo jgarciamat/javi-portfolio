@@ -573,7 +573,8 @@
   align-items: center;
   justify-content: center;
   z-index: 60;
-  padding: 1rem;
+  padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem
+    calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
 .modal-panel {
@@ -583,6 +584,10 @@
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
+  max-height: var(--dialog-max-h);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
 }

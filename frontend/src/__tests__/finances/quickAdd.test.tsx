@@ -3,7 +3,7 @@ import { QuickAdd } from '@modules/finances/ui/components/QuickAdd';
 import { MonthlyView } from '@modules/finances/ui/components/MonthlyView';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
-import type { CategoryRule } from '@modules/finances/domain/types';
+import type { Account, Category, CategoryRule } from '@modules/finances/domain/types';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
 const worker = { recognize: jest.fn(), terminate: jest.fn() };
@@ -14,13 +14,29 @@ const history = [
   f.transaction({ description: 'Super', category: 'Alimentación', date: '2026-03-05' }),
 ];
 
-const setup = (onAdd = jest.fn().mockResolvedValue(undefined), rules: CategoryRule[] = []) => {
+const categories: Category[] = [
+  f.category({ name: 'Desayunos', icon: '☕' }),
+  f.category({ name: 'Alimentación', icon: '🛒' }),
+  f.category({ name: 'Transporte', icon: '🚌' }),
+];
+
+const setup = (
+  onAdd = jest.fn().mockResolvedValue(undefined),
+  rules: CategoryRule[] = [],
+  accounts: Account[] = []
+) => {
   const api = createFakeApi();
   api.categoryRuleApi.getAll.mockResolvedValue(rules);
   renderWithProviders(
     <>
       <button type="button">otro</button>
-      <QuickAdd transactions={history} defaultDate="2026-03-15" onAdd={onAdd} />
+      <QuickAdd
+        transactions={history}
+        categories={categories}
+        accounts={accounts}
+        defaultDate="2026-03-15"
+        onAdd={onAdd}
+      />
     </>,
     { api }
   );
@@ -29,15 +45,17 @@ const setup = (onAdd = jest.fn().mockResolvedValue(undefined), rules: CategoryRu
 };
 
 const type = (field: HTMLElement, value: string) => fireEvent.change(field, { target: { value } });
-const chip = (name: string) => screen.getByRole('button', { name });
+const categorySelect = () =>
+  screen.getByLabelText(tr('app.quickAdd.categories')) as HTMLSelectElement;
+const accountSelect = () => screen.getByLabelText(tr('app.quickAdd.account')) as HTMLSelectElement;
 
 describe('QuickAdd', () => {
   it('adds «café 1,50» with the category of the last coffee, and is ready for the next one', async () => {
     const { onAdd, field } = setup();
     expect(screen.getByText(tr('app.quickAdd.hint'))).toBeVisible();
     type(field, 'café 1,50');
-    expect(chip('Desayunos')).toHaveAttribute('aria-pressed', 'true');
-    expect(chip('Alimentación')).toHaveAttribute('aria-pressed', 'false');
+    expect(categorySelect()).toHaveValue('Desayunos');
+    expect(screen.queryByLabelText(tr('app.quickAdd.account'))).toBeNull();
     fireEvent.submit(field);
     await waitFor(() =>
       expect(onAdd).toHaveBeenCalledWith({
@@ -53,26 +71,69 @@ describe('QuickAdd', () => {
     expect(field).toHaveFocus();
   });
 
-  it('uses a rule of the person, and a chip changes the category', async () => {
+  it('uses a rule of the person, and the list changes the category', async () => {
     const { onAdd, field } = setup(jest.fn().mockResolvedValue(undefined), [
       { id: 'r1', pattern: 'taxi', categoryId: 'c1', categoryName: 'Transporte' },
     ]);
     await act(async () => undefined);
     type(field, 'taxi 12');
-    await waitFor(() => expect(chip('Transporte')).toHaveAttribute('aria-pressed', 'true'));
-    fireEvent.click(chip('Alimentación'));
-    expect(chip('Alimentación')).toHaveAttribute('aria-pressed', 'true');
+    await waitFor(() => expect(categorySelect()).toHaveValue('Transporte'));
+    fireEvent.change(categorySelect(), { target: { value: 'Alimentación' } });
+    expect(categorySelect()).toHaveValue('Alimentación');
     fireEvent.submit(field);
     await waitFor(() =>
       expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ category: 'Alimentación' }))
     );
   });
 
-  it('has no chips before the first movement', () => {
+  it('has the list of categories even before the first movement, and keeps a suggestion that is not in it', () => {
     renderWithProviders(<QuickAdd transactions={[]} defaultDate="2026-03-15" onAdd={jest.fn()} />, {
       api: createFakeApi(),
     });
-    expect(screen.queryByRole('group')).toBeNull();
+    expect(categorySelect()).toHaveValue('');
+    type(screen.getByLabelText(literal(tr('app.quickAdd.label'))), 'pan 1');
+    expect(categorySelect()).toHaveValue('Otros');
+    fireEvent.change(categorySelect(), { target: { value: '' } });
+    expect(categorySelect()).toHaveValue('Otros');
+  });
+
+  describe('with several accounts', () => {
+    const main = f.account({ name: 'Principal', icon: '🏦', isDefault: true });
+    const cash = f.account({ name: 'Efectivo', icon: '💶' });
+    const old = f.account({ name: 'Vieja', archived: true });
+
+    it('preselects the default account, and the one chosen goes with the movement', async () => {
+      const { onAdd, field } = setup(jest.fn().mockResolvedValue(undefined), [], [cash, main, old]);
+      expect(accountSelect()).toHaveValue(main.id);
+      expect(screen.queryByRole('option', { name: /Vieja/ })).toBeNull();
+      type(field, 'café 1,50');
+      fireEvent.change(accountSelect(), { target: { value: cash.id } });
+      fireEvent.submit(field);
+      await waitFor(() =>
+        expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ accountId: cash.id }))
+      );
+    });
+
+    it('falls back to the first account when none is the default', async () => {
+      const { onAdd, field } = setup(
+        jest.fn().mockResolvedValue(undefined),
+        [],
+        [f.account({ isDefault: false }), cash]
+      );
+      expect(accountSelect().value).not.toBe('');
+      type(field, 'café 1,50');
+      fireEvent.submit(field);
+      await waitFor(() => expect(onAdd).toHaveBeenCalled());
+    });
+
+    it('does not ask for an account when only one can be used', async () => {
+      const { onAdd, field } = setup(jest.fn().mockResolvedValue(undefined), [], [main, old]);
+      expect(screen.queryByLabelText(tr('app.quickAdd.account'))).toBeNull();
+      type(field, 'café 1,50');
+      fireEvent.submit(field);
+      await waitFor(() => expect(onAdd).toHaveBeenCalled());
+      expect(onAdd.mock.calls[0][0]).not.toHaveProperty('accountId');
+    });
   });
 
   it('shows what it will add, an income with a plus', () => {

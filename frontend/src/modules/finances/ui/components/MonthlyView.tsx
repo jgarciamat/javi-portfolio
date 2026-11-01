@@ -352,7 +352,8 @@ export function MonthlyView({
         {/* Near the top: on a phone it is the quickest way to note a movement down. */}
         <QuickAdd
           transactions={f.transactions}
-          loading={f.loading}
+          categories={f.categories}
+          accounts={f.accounts}
           defaultDate={defaultDate}
           onAdd={f.addTransaction}
         />

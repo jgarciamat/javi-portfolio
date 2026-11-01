@@ -7,16 +7,23 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem
+    calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
 .edit-tx-modal {
   background: var(--slate-800);
   border: 1px solid var(--slate-700);
   border-radius: 14px;
-  padding: 1.5rem;
+  padding: 0;
   width: 100%;
   max-width: 520px;
+  /* Alto máximo = viewport dinámico menos zona segura; el cuerpo hace scroll y el pie queda fijo. */
+  max-height: 100dvh;
+  max-height: var(--dialog-max-h);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
   animation: editModalIn 0.18s ease;
 }
@@ -37,7 +44,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 1rem 1.5rem 0.75rem;
+  background: var(--slate-800);
+}
+
+.edit-tx-modal .tx-form {
+  margin-bottom: 0;
+  padding: 0.25rem 1.5rem 0;
 }
 
 .edit-tx-modal-title {
@@ -54,6 +70,8 @@
   color: var(--slate-500);
   font-size: 1.2rem;
   line-height: 1;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0.25rem;
   transition: color 0.15s;
 }
@@ -66,6 +84,13 @@
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
+  /* Pie siempre visible: Guardar nunca queda fuera de la pantalla. */
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 0.75rem 0 1rem;
+  background: var(--slate-800);
+  border-top: 1px solid var(--slate-700);
 }
 
 .edit-tx-modal-actions > button {
@@ -75,7 +100,14 @@
 
 @media (max-width: 600px) {
   .edit-tx-modal {
-    padding: 1.1rem;
     border-radius: 10px;
+  }
+
+  .edit-tx-modal-header {
+    padding: 0.75rem 1.1rem 0.5rem;
+  }
+
+  .edit-tx-modal .tx-form {
+    padding: 0.25rem 1.1rem 0;
   }
 }

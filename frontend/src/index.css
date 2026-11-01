@@ -3,6 +3,11 @@
    values are the original ones; the light theme turns the grey scale around so every text,
    surface and border keeps its role. The theme is `data-theme` on <html> (see core/theme). */
 :root {
+  /* Alto útil de un diálogo: viewport dinámico (teclado incluido, lo fija useDialog) menos zona segura. */
+  --dialog-max-h: calc(
+    var(--vv-height, 100dvh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) -
+      2rem
+  );
   color-scheme: dark;
   --slate-950: #020617;
   --slate-900: #0f172a;

@@ -44,6 +44,48 @@ describe('Modal', () => {
   });
 });
 
+describe('Modal locks the page and follows the visible viewport', () => {
+  const open = (label: string) => (
+    <Modal label={label} onClose={jest.fn()}>
+      <button>x</button>
+    </Modal>
+  );
+
+  afterEach(() => {
+    Object.defineProperty(window, 'visualViewport', { value: undefined, configurable: true });
+  });
+
+  it('keeps the page from scrolling until the last dialog closes', () => {
+    document.body.style.overflow = 'auto';
+    const first = renderWithI18n(open('uno'));
+    const second = renderWithI18n(open('dos'));
+    expect(document.body.style.overflow).toBe('hidden');
+    first.unmount();
+    expect(document.body.style.overflow).toBe('hidden');
+    second.unmount();
+    expect(document.body.style.overflow).toBe('auto');
+    document.body.style.overflow = '';
+  });
+
+  it('sets --vv-height from the visual viewport (the keyboard shrinks it) and clears it', () => {
+    const listeners: Record<string, () => void> = {};
+    const viewport = {
+      height: 500,
+      addEventListener: (name: string, fn: () => void) => (listeners[name] = fn),
+      removeEventListener: jest.fn(),
+    };
+    Object.defineProperty(window, 'visualViewport', { value: viewport, configurable: true });
+    const { unmount } = renderWithI18n(open('uno'));
+    expect(document.documentElement.style.getPropertyValue('--vv-height')).toBe('500px');
+    viewport.height = 300;
+    act(() => listeners.resize());
+    expect(document.documentElement.style.getPropertyValue('--vv-height')).toBe('300px');
+    unmount();
+    expect(document.documentElement.style.getPropertyValue('--vv-height')).toBe('');
+    expect(viewport.removeEventListener).toHaveBeenCalledWith('resize', listeners.resize);
+  });
+});
+
 describe('Modal focus and keyboard', () => {
   function Opener({ autoFocus = false }: { autoFocus?: boolean }) {
     const [open, setOpen] = useState(false);

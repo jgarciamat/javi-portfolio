@@ -282,7 +282,8 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem
+    calc(1rem + env(safe-area-inset-bottom, 0px));
   animation: fadeIn 0.15s ease;
 }
 
@@ -303,6 +304,8 @@
   width: 100%;
   max-width: 520px;
   max-height: 90vh;
+  max-height: var(--dialog-max-h);
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
