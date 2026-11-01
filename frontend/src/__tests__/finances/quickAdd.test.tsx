@@ -1,4 +1,5 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QuickAdd } from '@modules/finances/ui/components/QuickAdd';
 import { MonthlyView } from '@modules/finances/ui/components/MonthlyView';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -83,6 +84,35 @@ describe('QuickAdd', () => {
     fireEvent.submit(field);
     await waitFor(() =>
       expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ category: 'Alimentación' }))
+    );
+  });
+
+  it('follows the concept typed letter by letter until the person picks a category', async () => {
+    const { onAdd, field } = setup(jest.fn().mockResolvedValue(undefined), [
+      { id: 'r1', pattern: 'taxi', categoryId: 'c1', categoryName: 'Transporte' },
+    ]);
+    await act(async () => undefined);
+    const user = userEvent.setup();
+    await user.type(field, '12 ca');
+    // Nothing to go by yet: the last category used.
+    expect(categorySelect()).toHaveValue('Alimentación');
+    await user.type(field, 'fé');
+    expect(categorySelect()).toHaveValue('Desayunos');
+    await user.clear(field);
+    await user.type(field, '12 tax');
+    expect(categorySelect()).toHaveValue('Alimentación');
+    await user.type(field, 'i');
+    expect(categorySelect()).toHaveValue('Transporte');
+    // Picked by hand: typing on does not change it…
+    await user.selectOptions(categorySelect(), 'Alimentación');
+    await user.type(field, ' café');
+    expect(categorySelect()).toHaveValue('Alimentación');
+    // …until the list goes back to its empty choice, and the suggestion follows again.
+    await user.selectOptions(categorySelect(), '');
+    expect(categorySelect()).toHaveValue('Transporte');
+    await user.type(field, '{Enter}');
+    await waitFor(() =>
+      expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ category: 'Transporte' }))
     );
   });
 

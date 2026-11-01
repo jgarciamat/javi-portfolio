@@ -363,11 +363,17 @@ function deductionScreens(ctx: Ctx): WizardScreen[] {
 function reviewScreen(ctx: Ctx): WizardScreen {
   const { p, t, answers, answer, money } = ctx;
   const left = queueOf(p.found.candidates, p.review, p.dismissed);
+  // The answers named as the review's own buttons say them: the hint cannot drift from them.
+  const buttons = {
+    yes: t('tools.renta.draft.yes'),
+    no: t('tools.renta.draft.no'),
+    later: t('tools.renta.review.later'),
+  };
   return {
     id: 'review',
     title: t(w('q.review')),
-    hint: t(w('hint.review')),
-    help: t(w('help.review')),
+    hint: t(w('hint.review'), buttons),
+    help: t(w('help.review'), buttons),
     ready: answers.review === 'done' || left.length === 0,
     missing: t(w('missing.review')),
     body: (

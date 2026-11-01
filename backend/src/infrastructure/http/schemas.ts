@@ -313,6 +313,8 @@ export const recurringBody = z.object({
   endMonth: month.nullish(),
   frequency: frequency.default('monthly'),
   active: z.boolean().optional(),
+  /** Day of the month of each movement; null or left out: the first day of the period. */
+  day: z.coerce.number().int().min(1).max(31).nullish(),
 });
 export const recurringPatchBody = recurringBody
   .partial()

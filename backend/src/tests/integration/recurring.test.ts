@@ -52,6 +52,49 @@ describe('Recurring rules API', () => {
     ]);
   });
 
+  it('notes each movement on the day sent, the last day in shorter months', async () => {
+    const rule = (await createRule({ day: 31 }).expect(201)).body;
+    expect(rule.day).toBe(31);
+    expect((await generated()).map((t: { date: string }) => t.date)).toEqual([
+      '2026-01-31',
+      '2026-02-28',
+      '2026-03-31',
+      '2026-04-30',
+    ]);
+    const listed = (await request(ctx.app).get('/api/recurring-rules').set(user.auth)).body;
+    expect(listed[0].day).toBe(31);
+  });
+
+  it('changes the day from this month on and goes back to the first with null', async () => {
+    const rule = (await createRule({ day: 10 }).expect(201)).body;
+    const res = await request(ctx.app)
+      .patch(`/api/recurring-rules/${rule.id}`)
+      .set(user.auth)
+      .send({ day: 20 })
+      .expect(200);
+    expect(res.body.day).toBe(20);
+    expect((await monthTx(2026, 2))[0].date).toBe('2026-02-10');
+    expect((await monthTx(2026, 3))[0].date).toBe('2026-03-20');
+    // Another change without the day keeps it.
+    await request(ctx.app)
+      .patch(`/api/recurring-rules/${rule.id}`)
+      .set(user.auth)
+      .send({ amount: 900 })
+      .expect(200);
+    expect((await monthTx(2026, 4))[0]).toMatchObject({ date: '2026-04-20', amount: 900 });
+    const cleared = await request(ctx.app)
+      .patch(`/api/recurring-rules/${rule.id}`)
+      .set(user.auth)
+      .send({ day: null })
+      .expect(200);
+    expect(cleared.body.day).toBeNull();
+    expect((await monthTx(2026, 4))[0].date).toBe('2026-04-01');
+  });
+
+  it.each([0, 32, 1.5, 'x'])('rejects the day %p', async (day) => {
+    await createRule({ day }).expect(400);
+  });
+
   it('listing rules has no side effects', async () => {
     await createRule().expect(201);
     const before = (await generated()).length;

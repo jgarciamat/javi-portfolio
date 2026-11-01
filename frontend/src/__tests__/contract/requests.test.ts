@@ -187,6 +187,19 @@ add('recurringCreate', () =>
     frequency: 'monthly',
   })
 );
+// Paid on a fixed day of the month: the API keeps it and notes each movement that day.
+add('recurringCreateDay', () =>
+  recurringApi.create({
+    description: 'Seguro del coche',
+    amount: 42.5,
+    type: 'EXPENSE',
+    category: 'Ocio',
+    startYear: 2026,
+    startMonth: 1,
+    frequency: 'monthly',
+    day: 28,
+  })
+);
 // 800 € split between two accounts (500 + 300), as the movement and operation forms send it.
 const split800: SplitForm = {
   on: true,

@@ -212,7 +212,9 @@ describe('the Renta step by step: the other paths', () => {
     expect(screen.getByText(tr('tools.renta.stateDeductions'))).toBeInTheDocument();
     finish(7);
     // 300 € given: 80 % of 250 and 40 % of 50 (Ley 49/2002, art. 19), said in the review.
-    expect(screen.getByText(/ahorras unos/)).toHaveTextContent('220,00');
+    expect(screen.getByText(/la posible diferencia en tu resultado es de unos/)).toHaveTextContent(
+      '220,00'
+    );
   });
 
   it('brings the activity from the self-employed screen', () => {
@@ -250,6 +252,34 @@ describe('the Renta step by step: the other paths', () => {
     local();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.investCard.linkButton') }));
     expect(heading(tr('tools.renta.investCard.title'))).toBeInTheDocument();
+  });
+
+  it('names in the hint and the help the answers the review buttons say', async () => {
+    saved({ ccaaId: 'madrid', gross: '20000', age: '30', answers: { income: 'work' } });
+    at(7);
+    local();
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+    fireEvent.click(await screen.findByRole('button', { name: tr('tools.renta.review.start') }));
+    const buttons = screen
+      .getAllByRole('button')
+      .filter((b) => b.closest('.renta-review-nav'))
+      .map((b) => b.textContent as string)
+      .filter((label) => label !== tr('tools.renta.guide.back'));
+    expect(buttons).toHaveLength(3);
+    const hint = document.querySelector('.wiz-hint')?.textContent as string;
+    buttons.forEach((label) => expect(hint).toContain(`«${label}»`));
+    fireEvent.click(screen.getByRole('button', { name: tr('wizard.whatIs') }));
+    expect(document.querySelector('.wiz-help')).toHaveTextContent(`«${buttons[2]}»`);
+    // In English too: the labels come from the buttons' keys, never written in the text.
+    for (const locale of ['es', 'en']) {
+      const texts = JSON.parse(
+        readFileSync(join(__dirname, `../../locales/${locale}.json`), 'utf8')
+      );
+      ['{yes}', '{no}', '{later}'].forEach((p) =>
+        expect(texts['wizard.renta.hint.review']).toContain(p)
+      );
+      expect(texts['wizard.renta.help.review']).toContain('{later}');
+    }
   });
 
   it('says what is missing in the review and walks it', async () => {
@@ -363,7 +393,7 @@ describe('the boxes to copy, in the app with Premium', () => {
       })
     );
     premium();
-    const line = await screen.findByText(/marcado ahorras unos/);
+    const line = await screen.findByText(/marcado, la posible diferencia/);
     expect(line.textContent?.replace(/\s/g, ' ')).toBe(
       tr('wizard.renta.finaleSaved', { amount: '120,00 €' }).replace(/\s/g, ' ')
     );

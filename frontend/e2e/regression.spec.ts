@@ -170,9 +170,10 @@ test('«Recibos y cargos de este mes» lists the automatic charges apart', async
   const now = new Date();
   const [year, month] = [now.getFullYear(), now.getMonth() + 1];
   const last = new Date(year, month, 0).getDate();
-  for (const [description, amount] of [
-    ['Cuota gimnasio', 39.9],
-    ['Seguro del coche', 42.5],
+  // The bank charges the insurance at the end of the month: its day, so it is still to come.
+  for (const [description, amount, day] of [
+    ['Cuota gimnasio', 39.9, null],
+    ['Seguro del coche', 42.5, last],
   ] as const) {
     const rule = await request.post(`${API_URL}/recurring-rules`, {
       headers,
@@ -183,22 +184,13 @@ test('«Recibos y cargos de este mes» lists the automatic charges apart', async
         category: 'Otros',
         startYear: year,
         startMonth: month,
+        day,
       },
     });
     expect(rule.ok()).toBe(true);
+    expect((await rule.json()).day).toBe(day);
   }
-  const overview = await (
-    await request.get(`${API_URL}/months/${year}/${month}`, { headers })
-  ).json();
-  const insurance = overview.transactions.find(
-    (tx: { description: string }) => tx.description === 'Seguro del coche'
-  );
-  // The bank charges it at the end of the month: noted with that date, it is still to come.
   const pending = now.getDate() < last;
-  if (pending) {
-    const date = `${year}-${String(month).padStart(2, '0')}-${String(last).padStart(2, '0')}`;
-    await request.patch(`${API_URL}/transactions/${insurance.id}`, { headers, data: { date } });
-  }
 
   await signIn(page);
   for (const width of [390, 1280]) {
