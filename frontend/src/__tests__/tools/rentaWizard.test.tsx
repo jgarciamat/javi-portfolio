@@ -212,7 +212,9 @@ describe('the Renta step by step: the other paths', () => {
     expect(screen.getByText(tr('tools.renta.stateDeductions'))).toBeInTheDocument();
     finish(7);
     // 300 € given: 80 % of 250 and 40 % of 50 (Ley 49/2002, art. 19), said in the review.
-    expect(screen.getByText(/ahorras unos/)).toHaveTextContent('220,00');
+    expect(screen.getByText(/la posible diferencia en tu resultado es de unos/)).toHaveTextContent(
+      '220,00'
+    );
   });
 
   it('brings the activity from the self-employed screen', () => {
@@ -391,7 +393,7 @@ describe('the boxes to copy, in the app with Premium', () => {
       })
     );
     premium();
-    const line = await screen.findByText(/marcado ahorras unos/);
+    const line = await screen.findByText(/marcado, la posible diferencia/);
     expect(line.textContent?.replace(/\s/g, ' ')).toBe(
       tr('wizard.renta.finaleSaved', { amount: '120,00 €' }).replace(/\s/g, ' ')
     );
