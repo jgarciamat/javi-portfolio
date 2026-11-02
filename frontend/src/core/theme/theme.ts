@@ -1,6 +1,6 @@
 import { storage } from '@shared/utils/storage';
 
-/** The look of the app: follow the device, or always light or dark. Kept on this device. */
+/** The look of the app: always dark by default, or light, or follow the device. Kept on this device. */
 export type ThemeChoice = 'system' | 'light' | 'dark';
 
 const KEY = 'mm_theme';
@@ -11,7 +11,7 @@ const BAR_COLOR = { light: '#ffffff', dark: '#0f172a' } as const;
 
 export function loadTheme(): ThemeChoice {
   const stored = storage.get(KEY);
-  return THEME_CHOICES.includes(stored as ThemeChoice) ? (stored as ThemeChoice) : 'system';
+  return THEME_CHOICES.includes(stored as ThemeChoice) ? (stored as ThemeChoice) : 'dark';
 }
 
 export function resolveTheme(choice: ThemeChoice, prefersLight: boolean): 'light' | 'dark' {
@@ -28,7 +28,7 @@ export function applyTheme(choice: ThemeChoice): void {
 }
 
 export function saveTheme(choice: ThemeChoice): void {
-  storage.set(KEY, choice === 'system' ? null : choice);
+  storage.set(KEY, choice);
   applyTheme(choice);
 }
 

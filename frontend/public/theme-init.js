@@ -4,7 +4,8 @@
   try {
     var choice = localStorage.getItem('mm_theme');
     var light = window.matchMedia('(prefers-color-scheme: light)').matches;
-    var theme = choice === 'light' || choice === 'dark' ? choice : light ? 'light' : 'dark';
+    // Dark unless the person chose light or "follow the device" (then the device decides).
+    var theme = choice === 'light' || (choice === 'system' && light) ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', theme);
     // People with a session never see the text search engines read (see scripts/prerender.mjs),
     // and their dashboard downloads with the main chunk instead of after it.

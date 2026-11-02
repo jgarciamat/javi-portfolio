@@ -39,12 +39,14 @@ beforeEach(() => {
 });
 
 describe('theme', () => {
-  it('defaults to the system and ignores nonsense in storage', () => {
-    expect(loadTheme()).toBe('system');
+  it('defaults to dark and ignores nonsense in storage', () => {
+    expect(loadTheme()).toBe('dark');
     localStorage.setItem('mm_theme', 'purple');
-    expect(loadTheme()).toBe('system');
+    expect(loadTheme()).toBe('dark');
     localStorage.setItem('mm_theme', 'light');
     expect(loadTheme()).toBe('light');
+    localStorage.setItem('mm_theme', 'system');
+    expect(loadTheme()).toBe('system');
     expect(THEME_CHOICES).toEqual(['system', 'light', 'dark']);
   });
 
@@ -74,18 +76,19 @@ describe('theme', () => {
     expect(theme()).toBe('light');
   });
 
-  it('remembers the choice, except "system", which is the default', () => {
+  it('remembers every choice, "system" included', () => {
     mockMedia(false);
     saveTheme('light');
     expect(localStorage.getItem('mm_theme')).toBe('light');
     expect(theme()).toBe('light');
     saveTheme('system');
-    expect(localStorage.getItem('mm_theme')).toBeNull();
+    expect(localStorage.getItem('mm_theme')).toBe('system');
     expect(theme()).toBe('dark');
   });
 
   it('follows the device only while the choice is "system"', () => {
     const media = mockMedia(false);
+    saveTheme('system');
     const stop = startTheme();
     expect(theme()).toBe('dark');
     media.set(true);
