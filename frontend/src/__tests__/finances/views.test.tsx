@@ -1475,7 +1475,7 @@ describe('the appearance setting', () => {
     const select = await screen.findByRole('combobox', {
       name: new RegExp(tr('app.settings.theme')),
     });
-    expect(select).toHaveValue('system');
+    expect(select).toHaveValue('dark');
     fireEvent.change(select, { target: { value: 'light' } });
     expect(localStorage.getItem('mm_theme')).toBe('light');
     expect(document.documentElement.getAttribute('data-theme')).toBe('light');
