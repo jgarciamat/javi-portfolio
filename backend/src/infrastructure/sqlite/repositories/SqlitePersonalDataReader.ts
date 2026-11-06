@@ -84,6 +84,10 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         autonomoPdfs: this.uses('autonomo_pdfs', userId),
       },
       imports: this.uses('import_uses', userId),
+      capturesByMonth: this.all(
+        'SELECT month, uses FROM capture_month_uses WHERE user_id = ? ORDER BY month',
+        userId
+      ),
       referrals: this.referrals(userId),
       creator: this.creator(userId),
       household: this.household(userId),

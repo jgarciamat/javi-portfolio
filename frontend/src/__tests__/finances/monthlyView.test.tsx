@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
@@ -152,6 +153,37 @@ describe('month view', () => {
     await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 3));
     fireEvent.click(screen.getByRole('button', { name: `${tr('app.nav.next')} ›` }));
     await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 4));
+  });
+
+  it('goes to the current month and «Para revisar» when a notice of the phone opened the app', async () => {
+    const Go = () => {
+      const navigate = useNavigate();
+      const { search } = useLocation();
+      return (
+        <button data-search={search} onClick={() => navigate('/?revisar=1')}>
+          go
+        </button>
+      );
+    };
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [dinner] }));
+    api.categoryApi.getAll.mockResolvedValue(categories);
+    renderWithProviders(
+      <>
+        <Dashboard />
+        <Go />
+      </>,
+      { api }
+    );
+    await screen.findByText('Cena');
+    fireEvent.click(screen.getByRole('button', { name: `‹ ${tr('app.nav.prev')}` }));
+    await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 2));
+    fireEvent.click(screen.getByRole('button', { name: 'go' }));
+    await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 3));
+    // Once there, the address forgets it (a reload does not jump again).
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'go' })).toHaveAttribute('data-search', '')
+    );
   });
 
   it('exports the month as CSV', async () => {

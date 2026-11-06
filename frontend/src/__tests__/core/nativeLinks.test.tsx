@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { Capacitor } from '@capacitor/core';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { NativeLinks, parseAddLink } from '@core/native/NativeLinks';
+import { NativeLinks, isReviewLink, parseAddLink } from '@core/native/NativeLinks';
 
 jest.mock('@capacitor/app', () => ({
   App: { getLaunchUrl: jest.fn(), addListener: jest.fn() },
@@ -42,7 +42,23 @@ describe('parseAddLink', () => {
   });
 });
 
+describe('isReviewLink', () => {
+  it('understands the link of the notice of detected payments only', () => {
+    expect(isReviewLink('moneymanager://review')).toBe(true);
+    expect(isReviewLink('moneymanager://review/')).toBe(true);
+    expect(isReviewLink('moneymanager://reviews')).toBe(false);
+    expect(isReviewLink(undefined)).toBe(false);
+  });
+});
+
 describe('NativeLinks', () => {
+  it('opens «Para revisar» when the app was launched by the notice of detected payments', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    app.getLaunchUrl.mockResolvedValue({ url: 'moneymanager://review' });
+    mount();
+    await waitFor(() => expect(screen.getByTestId('where')).toHaveTextContent('/?revisar=1'));
+  });
+
   it('does nothing in a browser', () => {
     jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
     mount();

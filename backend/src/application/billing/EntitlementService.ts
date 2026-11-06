@@ -32,6 +32,7 @@ const RESOURCE_LABELS: Record<LimitedResource, string> = {
   autonomoPdfs: 'PDF de borradores de autónomo',
   assets: 'inversiones y deudas',
   imports: 'importaciones de extractos',
+  captures: 'pagos detectados este mes',
 };
 
 /** Answers "what can this user do right now?" and enforces it. */

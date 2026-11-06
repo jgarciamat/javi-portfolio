@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 and newer: what the Google backup and a transfer to a new phone leave out. The
+  payments read from notifications stay on this phone ("todo en tu móvil"), as does the WebView's
+  storage (the session and the payments waiting in «Para revisar»): a new phone signs in again.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="mm_capture.xml" />
+        <exclude domain="root" path="app_webview/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="mm_capture.xml" />
+        <exclude domain="root" path="app_webview/" />
+    </device-transfer>
+</data-extraction-rules>

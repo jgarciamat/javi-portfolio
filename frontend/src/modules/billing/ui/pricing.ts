@@ -27,6 +27,7 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         assets: 3,
         // Free and unlimited on every plan.
         imports: null,
+        captures: 15,
       },
       features: {
         insights: false,
@@ -34,7 +35,7 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         forecast: false,
         household: false,
         inbox: false,
-        capture: false,
+        capture: true,
         investCourse: false,
         cryptoPro: false,
       },
@@ -52,6 +53,7 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         autonomoPdfs: null,
         assets: null,
         imports: null,
+        captures: null,
       },
       features: {
         insights: true,
@@ -94,6 +96,7 @@ export const RESOURCE_KEYS: Record<LimitedResource, string> = {
   autonomoPdfs: 'billing.resource.autonomoPdfs',
   assets: 'billing.resource.assets',
   imports: 'billing.resource.imports',
+  captures: 'billing.resource.captures',
 };
 
 export const FEATURE_KEYS: Record<PremiumFeature, string> = {
@@ -143,6 +146,7 @@ const COMPARED_RESOURCES: LimitedResource[] = [
   'customAlerts',
   'assets',
   'imports',
+  'captures',
   'rentaCalculations',
   'autonomoDrafts',
   'autonomoPdfs',
@@ -150,6 +154,7 @@ const COMPARED_RESOURCES: LimitedResource[] = [
 const FREE_RESOURCE_NOTES: Partial<Record<LimitedResource, string>> = {
   rentaCalculations: 'pricing.perCampaign',
   autonomoDrafts: 'pricing.perQuarter',
+  captures: 'pricing.perMonthCount',
 };
 
 /** Rows with a fixed text for each plan (features that are not limits of the API). */
@@ -163,7 +168,6 @@ const STATIC_ROWS: { key: string; free: string; premium: string }[] = [
   { key: 'annualReport', free: '', premium: '' },
   { key: 'forecast', free: 'pricing.row.forecast.free', premium: 'pricing.row.forecast.premium' },
   { key: 'inbox', free: '', premium: '' },
-  { key: 'capture', free: '', premium: 'pricing.row.capture.premium' },
   { key: 'household', free: '', premium: '' },
   { key: 'renta', free: 'pricing.row.renta.free', premium: 'pricing.row.renta.premium' },
   { key: 'course', free: 'pricing.row.course.free', premium: 'pricing.row.course.premium' },

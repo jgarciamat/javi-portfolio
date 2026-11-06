@@ -12,7 +12,9 @@ export type LimitedResource =
   | 'autonomoDrafts'
   | 'autonomoPdfs'
   | 'assets'
-  | 'imports';
+  | 'imports'
+  /** Payments detected in the bank notifications added this month (it starts again each month). */
+  | 'captures';
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature =
@@ -21,6 +23,10 @@ export type PremiumFeature =
   | 'forecast'
   | 'household'
   | 'inbox'
+  /**
+   * Detecting payments in the bank notifications. Every plan has it now (the free plan adds
+   * `captures` a month); kept so the apps already installed show it to everybody.
+   */
   | 'capture'
   | 'investCourse'
   /** Comforts of the crypto console (statistics, price alerts, season report); no ranking edge. */
@@ -64,6 +70,9 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       // size of each file and how many are sent per hour). Kept as a resource so the apps
       // already installed read it as unlimited.
       imports: Infinity,
+      // Payments detected in the bank notifications: 15 added a month (the rest wait in
+      // «Para revisar», nothing is lost).
+      captures: 15,
     },
     features: {
       insights: false,
@@ -71,7 +80,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       forecast: false,
       household: false,
       inbox: false,
-      capture: false,
+      capture: true,
       investCourse: false,
       cryptoPro: false,
     },
@@ -89,6 +98,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       autonomoPdfs: Infinity,
       assets: Infinity,
       imports: Infinity,
+      captures: Infinity,
     },
     features: {
       insights: true,
@@ -126,6 +136,9 @@ export function serializableLimits(limits: PlanLimits): {
 export function rentaCampaignOf(now: Date): number {
   return now.getUTCMonth() >= 3 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
 }
+
+/** The calendar month (YYYY-MM) of a date by the day in mainland Spain: what `captures` counts. */
+export const captureMonthOf = (now: Date): string => spanishDays(now)[0].slice(0, 7);
 
 /** The calendar quarter of a day (YYYY-MM-DD). */
 const quarterOfDay = (day: string): { year: number; quarter: 1 | 2 | 3 | 4 } => ({

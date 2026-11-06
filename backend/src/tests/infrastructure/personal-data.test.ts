@@ -53,6 +53,7 @@ function seed(db: Db): void {
     INSERT INTO autonomo_quarter_drafts (user_id, year, quarter, uses, territory, territory_extra)
       VALUES ('ana', 2026, 1, 1, 'ceuta', 1);
     INSERT INTO import_uses (user_id, uses) VALUES ('ana', 2);
+    INSERT INTO capture_month_uses (user_id, month, uses) VALUES ('ana', '2026-03', 4), ('ana', '2026-02', 15);
     INSERT INTO referral_codes (user_id, code, rewards_granted) VALUES ('ana', 'ANA1', 1);
     INSERT INTO referrals (referred_id, referrer_id, created_at, rewarded_at)
       VALUES ('carl', 'ana', '${NOW}', '${NOW}'), ('ana', 'bea', '${NOW}', NULL);
@@ -152,6 +153,10 @@ describe('SqlitePersonalDataReader', () => {
         autonomoPdfs: 0,
       },
       imports: 2,
+      capturesByMonth: [
+        { month: '2026-02', uses: 15 },
+        { month: '2026-03', uses: 4 },
+      ],
       referrals: {
         code: 'ANA1',
         rewardsGranted: 1,
@@ -194,6 +199,7 @@ describe('SqlitePersonalDataReader', () => {
       subscription: null,
       renta: { passEndsAt: null, calculations: 0, calculationsByCampaign: [] },
       imports: 0,
+      capturesByMonth: [],
       referrals: {
         code: null,
         rewardsGranted: 0,

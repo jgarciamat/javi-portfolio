@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and older: what the Google backup leaves out (see data_extraction_rules.xml). -->
+<full-backup-content>
+    <!-- The notifications of the bank apps waiting to be read by the app -->
+    <exclude domain="sharedpref" path="mm_capture.xml" />
+    <!-- The WebView's storage: the session and the payments waiting in «Para revisar» -->
+    <exclude domain="root" path="app_webview/" />
+</full-backup-content>

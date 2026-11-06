@@ -309,6 +309,7 @@ describe('PlanBanner', () => {
           autonomoPdfs: 0,
           assets: 0,
           imports: 2,
+          captures: 0,
           movements: 37,
         },
       })

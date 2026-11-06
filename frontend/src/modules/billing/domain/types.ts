@@ -17,7 +17,9 @@ export type LimitedResource =
   | 'autonomoDrafts'
   | 'autonomoPdfs'
   | 'assets'
-  | 'imports';
+  | 'imports'
+  /** Payments detected in the bank notifications added this month (15 on the free plan). */
+  | 'captures';
 export type PremiumFeature =
   | 'insights'
   | 'aiAdvisor'

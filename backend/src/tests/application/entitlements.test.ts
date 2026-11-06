@@ -71,9 +71,15 @@ describe('EntitlementService', () => {
     expect(thrown(() => service.assertFeature('u1', 'forecast'))).toEqual(
       expect.objectContaining({ code: 'PREMIUM_REQUIRED', details: { feature: 'forecast' } })
     );
-    for (const feature of ['inbox', 'capture', 'investCourse'] as const) {
+    for (const feature of ['inbox', 'investCourse'] as const) {
       expect(() => service.assertFeature('u1', feature)).toThrow(PaymentRequiredError);
     }
+    // Detecting payments in the bank notifications is on every plan: 15 added a month.
+    expect(() => service.assertFeature('u1', 'capture')).not.toThrow();
+    expect(() => service.assertCanCreate('u1', 'captures', 14)).not.toThrow();
+    expect(() => service.assertCanCreate('u1', 'captures', 15)).toThrow(
+      'Has llegado al máximo del plan gratuito para pagos detectados este mes: 15'
+    );
     expect(() => service.assertCanCreate('u1', 'assets', 2)).not.toThrow();
     expect(() => service.assertCanCreate('u1', 'assets', 3)).toThrow(
       'Has llegado al máximo del plan gratuito para inversiones y deudas: 3'

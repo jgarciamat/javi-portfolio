@@ -418,6 +418,13 @@ export interface AutonomoPdfRepository {
   increment(userId: string): number;
 }
 
+/** How many payments detected in the bank notifications a user added in each month (YYYY-MM). */
+export interface CaptureUsageRepository {
+  count(userId: string, month: string): number;
+  /** `uses` more in that month; returns how many there are now. */
+  add(userId: string, month: string, uses: number): number;
+}
+
 /** How many tax return calculations a user has made in each Renta campaign. */
 export interface RentaUsageRepository {
   count(userId: string, campaign: number): number;

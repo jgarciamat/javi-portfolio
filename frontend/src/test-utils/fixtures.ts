@@ -458,6 +458,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         autonomoPdfs: 1,
         assets: 3,
         imports: null,
+        captures: 15,
       },
       features: {
         insights: false,
@@ -465,7 +466,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         forecast: false,
         household: false,
         inbox: false,
-        capture: false,
+        capture: true,
         investCourse: false,
         cryptoPro: false,
       },
@@ -483,6 +484,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         autonomoPdfs: null,
         assets: null,
         imports: null,
+        captures: null,
       },
       features: {
         insights: true,
@@ -536,6 +538,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     autonomoPdfs: 0,
     assets: 0,
     imports: 0,
+    captures: 0,
     movements: 5,
   },
   autonomoQuarters: [],
