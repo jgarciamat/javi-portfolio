@@ -369,7 +369,9 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       code: code?.code ?? null,
       rewardsGranted: code?.rewards_granted ?? 0,
       invited: this.all(
-        'SELECT created_at AS createdAt, rewarded_at AS rewardedAt FROM referrals WHERE referrer_id = ? ORDER BY created_at',
+        `SELECT created_at AS createdAt, rewarded_at AS rewardedAt,
+                inviter_settled_at AS monthSettledAt, inviter_month AS gaveMonth
+         FROM referrals WHERE referrer_id = ? ORDER BY created_at`,
         userId
       ),
       referredBy:

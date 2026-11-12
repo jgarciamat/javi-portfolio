@@ -90,4 +90,40 @@ export class SqliteReferralRepository implements ReferralRepository {
       .prepare('UPDATE referral_codes SET rewards_granted = ? WHERE user_id = ?')
       .run(count, userId);
   }
+
+  referredBy(referrerId: string): string[] {
+    const rows = this.db
+      .prepare('SELECT referred_id FROM referrals WHERE referrer_id = ?')
+      .all(referrerId) as { referred_id: string }[];
+    return rows.map((r) => r.referred_id);
+  }
+
+  unsettledForInviter(referrerId: string): string[] {
+    const rows = this.db
+      .prepare(
+        `SELECT referred_id FROM referrals
+         WHERE referrer_id = ? AND rewarded_at IS NOT NULL AND inviter_settled_at IS NULL
+         ORDER BY rewarded_at, referred_id`
+      )
+      .all(referrerId) as { referred_id: string }[];
+    return rows.map((r) => r.referred_id);
+  }
+
+  settleForInviter(referredId: string, at: string, month: boolean): void {
+    this.db
+      .prepare(
+        'UPDATE referrals SET inviter_settled_at = ?, inviter_month = ? WHERE referred_id = ?'
+      )
+      .run(at, month ? 1 : 0, referredId);
+  }
+
+  inviterMonthsSince(referrerId: string, since: string): number {
+    const row = this.db
+      .prepare(
+        `SELECT COALESCE(SUM(inviter_month), 0) AS n FROM referrals
+         WHERE referrer_id = ? AND inviter_settled_at >= ?`
+      )
+      .get(referrerId, since) as { n: number };
+    return row.n;
+  }
 }

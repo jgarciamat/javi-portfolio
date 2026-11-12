@@ -444,7 +444,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         budgets: firstStepCount(userId, 'budgets'),
         goals: firstStepCount(userId, 'goals'),
         automations: firstStepCount(userId, 'automations'),
-      })
+      }),
+      {
+        accountOf: (userId) => {
+          const user = repos.users.findById(userId)?.toPrimitives();
+          return user ? { email: user.email, createdAt: user.createdAt } : null;
+        },
+        activeDays: (userId, from, to) => repos.transactions.activeDays(userId, from, to),
+      }
     ),
     activation: new ActivationTracker(funnel, firstStepCount),
     creators,

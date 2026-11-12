@@ -128,6 +128,12 @@ describe('POST /api/funnel', () => {
     await send(ctx, { event: 'goal_date_view', detail: 'real' }).expect(204);
     await send(ctx, { event: 'goal_sim_change', detail: 'slider' }).expect(204);
     await send(ctx, { event: 'goal_dp_apply' }).expect(204);
+    await send(ctx, { event: 'calc_result', detail: 'salary' }).expect(204);
+    await send(ctx, { event: 'calc_cta_click', detail: 'reta' }).expect(204);
+    await send(ctx, { event: 'review_request', detail: 'goal_reached' }).expect(204);
+    await send(ctx, { event: 'calc_result', detail: 'renta' }).expect(400); // not open
+    await send(ctx, { event: 'calc_result', detail: '1200' }).expect(400); // never an amount
+    await send(ctx, { event: 'review_request', detail: 'later' }).expect(400);
     await send(ctx, { event: 'dp_view', detail: 'other' }).expect(400);
     await send(ctx, { event: 'dp_import_cta', detail: 'complete' }).expect(400);
     await send(ctx, { event: 'goal_dp_apply', detail: 'dp' }).expect(400);
@@ -135,12 +141,15 @@ describe('POST /api/funnel', () => {
     await send(ctx, { event: 'dp_view', detail: 'x'.repeat(21) }).expect(400);
     await send(ctx, { event: 'dp_found', detail: '1-2' }).expect(400);
     expect(rows(ctx).map((r) => `${r.event}:${r.detail}`)).toEqual([
+      'calc_cta_click:reta',
+      'calc_result:salary',
       'dp_import_cta:none',
       'dp_view:complete',
       'goal_date_view:real',
       'goal_dp_apply:',
       'goal_sim_change:slider',
       'paywall_view:dp',
+      'review_request:goal_reached',
     ]);
   });
 
@@ -425,6 +434,8 @@ describe('Funnel report', () => {
     await send(ctx, { event: 'visit', ref: 'www.google.es' });
     await send(ctx, { event: 'guide_view', guide: 'modelo-303', ref: 'www.google.es' });
     await send(ctx, { event: 'guide_cta_click', guide: 'modelo-303', ref: 'www.google.es' });
+    for (let i = 0; i < 4; i++) await send(ctx, { event: 'calc_result', detail: 'salary' });
+    await send(ctx, { event: 'calc_cta_click', detail: 'salary' });
     await send(ctx, { event: 'signup_view', utm_source: 'tiktok' });
     await request(ctx.app)
       .post('/api/auth/register')
@@ -451,6 +462,8 @@ describe('Funnel report', () => {
     expect(line('google')).toMatch(/^google\s+1\s+1\s+0\s+0\s+0\.0 %$/);
     expect(line('tiktok · renta2026')).toMatch(/4\s+1\s+25\.0 %$/);
     expect(line('modelo-303')).toMatch(/1\s+1\s+100\.0 %$/);
+    expect(line('salary')).toMatch(/^salary\s+4\s+1\s+25\.0 %$/);
+    expect(line('Clics en «Crear cuenta» (calculadoras)')).toMatch(/1$/);
     expect(line('2026-03-15')).toMatch(/^2026-03-15\s+5\s+1/);
     expect(line('2026-03-16')).toMatch(/^2026-03-16\s+1\s+0/);
     expect(line('  3 movimientos')).toMatch(/1$/);
@@ -467,6 +480,7 @@ describe('Funnel report', () => {
     const text = formatFunnel(ctx.container.repos.funnel, 7, new Date('2026-03-15T12:00:00Z'));
     expect(text).not.toContain('Campaña');
     expect(text).not.toContain('Guía');
+    expect(text).not.toContain('Clic/resultado');
     expect(text).toContain('(direct)');
   });
 });

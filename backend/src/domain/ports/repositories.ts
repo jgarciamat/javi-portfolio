@@ -307,6 +307,11 @@ export interface TransactionRepository {
   earliestPeriod(userId: string): Period | null;
   /** How many movements the user has in total. */
   count(userId: string): number;
+  /**
+   * Different days (UTC) in [from, to) on which the user wrote down, imported or confirmed a
+   * movement: neither the examples nor the ones a recurring rule adds by itself count.
+   */
+  activeDays(userId: string, from: string, to: string): number;
   /** The invented movements of «Pruébalo con datos de ejemplo» (import hash `sample:…`). */
   countSample(userId: string): number;
   /** Removes those invented movements; returns how many. */
@@ -611,9 +616,17 @@ export interface ReferralRepository {
   counts(referrerId: string): { qualified: number; pending: number };
   /** Invited users still waiting to complete the first steps. */
   pendingReferred(referrerId: string): string[];
-  /** Months of Premium already granted to the inviter for their invitations. */
+  /** Months of Premium already granted to the inviter for their invitations, in total. */
   rewardsGranted(userId: string): number;
   setRewardsGranted(userId: string, count: number): void;
+  /** Every user the inviter brought, rewarded or not. */
+  referredBy(referrerId: string): string[];
+  /** Friends who count but whose month for the inviter is still to be given (oldest first). */
+  unsettledForInviter(referrerId: string): string[];
+  /** The inviter's side of a friend is settled: with `month`, it gave the inviter a month. */
+  settleForInviter(referredId: string, at: string, month: boolean): void;
+  /** Months the inviter got from friends settled on or after `since` (an ISO date or time). */
+  inviterMonthsSince(referrerId: string, since: string): number;
 }
 
 // ─── Creator affiliate program (docs/afiliacion) ─────────────────────────────

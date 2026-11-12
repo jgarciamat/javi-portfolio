@@ -5,6 +5,8 @@ const STEPS: { event: string; label: string; chain?: boolean }[] = [
   { event: 'visit', label: 'Visitas (cargas de la web)', chain: true },
   { event: 'guide_view', label: 'Vistas de guía' },
   { event: 'guide_cta_click', label: 'Clics en «Crear cuenta» (guías)' },
+  { event: 'calc_result', label: 'Resultados en calculadoras abiertas' },
+  { event: 'calc_cta_click', label: 'Clics en «Crear cuenta» (calculadoras)' },
   { event: 'signup_view', label: 'Vistas de la página de registro', chain: true },
   { event: 'signup', label: 'Registros', chain: true },
   { event: 'trial_start', label: 'Pruebas de 14 días iniciadas' },
@@ -137,6 +139,16 @@ export function formatFunnel(
       return [guide, views, clicks, percent(clicks, views)];
     });
     out.push('', ...table(['Guía', 'Vistas', 'Clics', 'Clic/vista'], guides, 40));
+  }
+
+  const calcRows = rows.filter((r) => r.event.startsWith('calc_') && r.detail);
+  if (calcRows.length) {
+    const calcs = [...new Set(calcRows.map((r) => r.detail))].sort().map((calc) => {
+      const results = sum(calcRows, 'calc_result', (r) => r.detail === calc);
+      const clicks = sum(calcRows, 'calc_cta_click', (r) => r.detail === calc);
+      return [calc, results, clicks, percent(clicks, results)];
+    });
+    out.push('', ...table(['Calculadora', 'Resultados', 'Clics', 'Clic/resultado'], calcs, 40));
   }
 
   const dayEvents = [

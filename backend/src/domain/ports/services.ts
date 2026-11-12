@@ -289,7 +289,15 @@ export const CLIENT_FUNNEL_EVENTS = [
   'goal_date_view',
   'goal_sim_change',
   'goal_dp_apply',
+  // Calculators open without an account: a result worked out, «Crear cuenta» under it.
+  'calc_result',
+  'calc_cta_click',
+  // The Google Play review sheet requested after an achievement (Google decides if it shows).
+  'review_request',
 ] as const;
+
+/** Calculators open without an account (detail of `calc_result` and `calc_cta_click`). */
+export const OPEN_CALCULATORS = ['salary', 'reta'] as const;
 
 /**
  * The only `detail` each browser event may carry (docs/analitica.md): never an amount, a
@@ -301,6 +309,9 @@ export const CLIENT_FUNNEL_DETAILS: Partial<Record<ClientFunnelEvent, readonly s
   dp_import_cta: ['none', 'partial'],
   goal_date_view: ['real', 'asked', 'done'],
   goal_sim_change: ['chip', 'slider', 'input'],
+  calc_result: OPEN_CALCULATORS,
+  calc_cta_click: OPEN_CALCULATORS,
+  review_request: ['autonomo_draft', 'goal_reached', 'dp_recovered'],
 };
 
 /** Funnel events only the server records, when the thing really happens. */

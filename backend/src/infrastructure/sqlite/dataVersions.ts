@@ -153,6 +153,7 @@ export function statsTracking(db: Db): Record<string, WriteTracking> {
         'exportAll',
         'earliestPeriod',
         'count',
+        'activeDays',
         'countSample',
         // Inner helpers: only the methods above call them, on the repository itself.
         'splitsOf',

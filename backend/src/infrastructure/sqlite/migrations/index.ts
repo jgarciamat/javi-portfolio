@@ -46,6 +46,7 @@ import { cryptoRecordedPositions } from './045-crypto-recorded-positions';
 import { debtPayments } from './046-debt-payments';
 import { accountSplits } from './047-account-splits';
 import { captureMonthUses } from './048-capture-month-uses';
+import { referralMonthPerFriend } from './049-referral-month-per-friend';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -98,4 +99,5 @@ export const migrations: Migration[] = [
   debtPayments,
   accountSplits,
   captureMonthUses,
+  referralMonthPerFriend,
 ];

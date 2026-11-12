@@ -616,6 +616,17 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return row.n;
   }
 
+  activeDays(userId: string, from: string, to: string): number {
+    const row = this.db
+      .prepare(
+        `SELECT COUNT(DISTINCT substr(created_at, 1, 10)) AS n FROM transactions
+         WHERE user_id = ? AND created_at >= ? AND created_at < ?
+           AND recurring_rule_id IS NULL AND COALESCE(import_hash, '') NOT LIKE ?`
+      )
+      .get(userId, from, to, `${SAMPLE_HASH_PREFIX}%`) as { n: number };
+    return row.n;
+  }
+
   countSample(userId: string): number {
     const row = this.db
       .prepare(`SELECT COUNT(*) AS n FROM transactions WHERE user_id = ? AND ${SAMPLE_ROWS}`)
