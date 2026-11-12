@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { track } from '@core/analytics';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { askForReview } from '@core/review/review';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useOnlineStatus } from '@shared/hooks/useOnlineStatus';
@@ -292,6 +293,11 @@ function Reviewed({
   const { money } = useFormat();
   const [open, setOpen] = useState(false);
   const { cancelMonthly, recoveredAnnual } = data.reviewed;
+  // A cancellation checked (money no longer charged): a good moment for the review sheet.
+  const recovered = recoveredAnnual > 0;
+  useEffect(() => {
+    if (recovered) void askForReview('dp_recovered');
+  }, [recovered]);
   if (list.length === 0) return null;
   return (
     <section className="card" aria-label={t('app.leaks.reviewed', { count: list.length })}>

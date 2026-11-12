@@ -15,8 +15,19 @@ afterEach(restoreTime);
 const TITLE = () => tr('app.inviteeGoal.title');
 const DONE = () => tr('app.inviteeGoal.done');
 
-const invited = (counts: Parameters<typeof f.inviteeSteps>[0] = {}, rewarded = false) =>
-  f.referral({ invited: { rewarded, steps: f.inviteeSteps(counts) } });
+const invited = (
+  counts: Parameters<typeof f.inviteeSteps>[0] = {},
+  rewarded = false,
+  { days = 0, eligible = true } = {}
+) =>
+  f.referral({
+    invited: {
+      rewarded,
+      steps: f.inviteeSteps(counts),
+      activeDays: { count: days, goal: 3 },
+      eligible,
+    },
+  });
 
 function dashboard(referral = invited({ movements: 1, goals: 1 })) {
   const api = createFakeApi();
@@ -30,11 +41,13 @@ describe('The invited user’s free month', () => {
     dashboard();
     const card = await screen.findByRole('region', { name: TITLE() });
     expect(within(card).getByText(tr('app.inviteeGoal.hint', { days: 30 }))).toBeVisible();
-    const progress = tr('app.inviteeGoal.progress', { done: 1, total: 4 });
+    const progress = tr('app.inviteeGoal.progress', { done: 1, total: 5 });
     expect(within(card).getByText(progress)).toBeVisible();
     const bar = within(card).getByRole('progressbar', { name: TITLE() });
     expect(bar).toHaveAttribute('aria-valuenow', '2');
-    expect(bar).toHaveAttribute('aria-valuemax', '6');
+    expect(bar).toHaveAttribute('aria-valuemax', '9');
+    // The days of use: nothing to press, they come with using the app.
+    expect(within(card).getByText(tr('app.inviteeGoal.days', { count: 0, goal: 3 }))).toBeVisible();
     expect(bar).toHaveAttribute('aria-valuetext', progress);
     expect(
       within(card).getByText(tr('app.inviteeGoal.movements', { count: 1, goal: 3 }))
@@ -121,6 +134,23 @@ describe('The invited user’s free month', () => {
     await screen.findByRole('region', { name: tr('app.gettingStarted.title') });
     expect(screen.queryByRole('status', { name: DONE() })).toBeNull();
     expect(screen.queryByRole('region', { name: TITLE() })).toBeNull();
+  });
+
+  it('counts the days of use as one more step', async () => {
+    dashboard(invited({ movements: 3, budgets: 1, goals: 1, automations: 1 }, false, { days: 3 }));
+    const card = await screen.findByRole('region', { name: TITLE() });
+    expect(
+      within(card).getByText(tr('app.inviteeGoal.progress', { done: 5, total: 5 }))
+    ).toBeVisible();
+    expect(within(card).getAllByText(new RegExp(tr('app.inviteeGoal.stepDone')))).toHaveLength(5);
+    expect(within(card).queryByRole('button', { name: /^Ir a|^Nueva/ })).toBeNull();
+  });
+
+  it('says plainly that a throwaway address earns no month', async () => {
+    dashboard(invited({}, false, { eligible: false }));
+    const card = await screen.findByRole('region', { name: TITLE() });
+    expect(within(card).getByText(tr('app.inviteeGoal.notEligible'))).toBeVisible();
+    expect(within(card).queryByText(tr('app.inviteeGoal.hint', { days: 30 }))).toBeNull();
   });
 
   it('shows nothing to a user who was not invited', async () => {

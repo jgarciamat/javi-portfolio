@@ -105,12 +105,12 @@ describe('Invite a friend in the console: the card', () => {
     setup({ referral: f.referral() });
     const section = await card();
     expect(section).toHaveTextContent(
-      'recibe 30 días de Premium y tú sumas meses de Premium (hasta 5)'
+      'recibe 30 días de Premium y tú ganas un mes (hasta 6 al año)'
     );
     expect(section).toHaveTextContent('Operar en la consola no cuenta para la invitación.');
     expect(within(section).getByLabelText('Tu enlace de invitación')).toHaveTextContent(LINK);
     expect(section).toHaveTextContent(
-      'Tus invitaciones: 2 completadas · 1 en camino · 1 de 5 meses conseguidos.'
+      'Tus invitaciones: 2 completadas · 1 en camino · 2 de 6 meses este año.'
     );
     expect(track).toHaveBeenCalledWith('cons_invite_view');
     // Already invited someone: the card stays, the notice does not come.
@@ -189,7 +189,9 @@ describe('Invite a friend in the console: the notice', () => {
       name: 'Has cerrado una operación con resultado positivo',
     });
     expect(notice).toHaveTextContent('competid en el ranking con el mismo dinero virtual');
-    expect(notice).toHaveTextContent('recibe 30 días de Premium y tú sumas meses (hasta 5)');
+    expect(notice).toHaveTextContent(
+      'recibe 30 días de Premium y tú ganas un mes (hasta 6 al año)'
+    );
     expect(saved()).toEqual({ at: NOW, done: ['win'], open: 'win' });
     fireEvent.click(within(notice).getByRole('button', { name: 'Ahora no' }));
     expect(nudge()).toBeNull();

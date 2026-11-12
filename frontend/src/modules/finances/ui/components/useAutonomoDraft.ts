@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
-import { recordPositiveMoment } from '@core/review/review';
+import { askForReview } from '@core/review/review';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useAction } from '@shared/hooks/useAction';
 import { storage } from '@shared/utils/storage';
@@ -163,8 +163,9 @@ export function useAutonomoDraft() {
       const next: Snapshot = { draft: result, inputs };
       storage.setJSON(SNAPSHOT_KEY, next);
       setSnapshot(next);
-      recordPositiveMoment();
       await plan?.refresh();
+      // The draft is on screen: a good moment for the Google Play review sheet.
+      void askForReview('autonomo_draft');
     });
 
   return {

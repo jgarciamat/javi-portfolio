@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { recordOpen } from '@core/review/review';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { Icon } from '@shared/components/Icon';
@@ -370,6 +371,8 @@ export function Dashboard() {
   const tour = useWelcomeTour(dash.tab, dash.setTab);
   const shared = useImportRequest(dash.openImport);
   useBudgetAlertNotifications();
+  // The days the app is opened: the review sheet waits until it is a few days old.
+  useEffect(() => recordOpen(new Date()), []);
 
   // The browser tab names the open section: "Presupuestos · Finanverso".
   const appName = t('app.header.title');

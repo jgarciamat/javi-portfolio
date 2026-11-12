@@ -17,6 +17,7 @@ import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 import { captureDownloads } from '@test-utils/dom';
 import { ApiError } from '@core/api/http';
+import { askForReview } from '@core/review/review';
 
 jest.mock('@modules/finances/ui/components/AutonomoWizard', () =>
   jest.requireActual('@test-utils/expertScreens').autonomoWithForm()
@@ -47,6 +48,11 @@ jest.mock('@modules/finances/application/autonomoPdf', () => ({
   buildAutonomoPdf: jest.fn(async () => new Blob(['pdf'], { type: 'application/pdf' })),
 }));
 jest.mock('@shared/utils/shareImage', () => ({ shareImage: jest.fn(async () => 'saved') }));
+// The review sheet has its own suite (rate.test.tsx): here, only when it is asked for.
+jest.mock('@core/review/review', () => ({
+  ...jest.requireActual('@core/review/review'),
+  askForReview: jest.fn(async () => false),
+}));
 
 describe('AccountsView', () => {
   const main = f.account({ id: 'a1', name: 'Principal', isDefault: true, balance: 900 });
@@ -325,17 +331,14 @@ describe('GoalsView', () => {
     expect(screen.getAllByText(/Comparte la categoría/)).toHaveLength(2);
   });
 
-  it('notes a reached goal as a good moment to ask for a review, and only then', async () => {
-    localStorage.removeItem('mm_review');
+  it('asks for the review sheet with a reached goal on screen, and only then', async () => {
     setup([f.goal({ id: 'g1' })]);
     await screen.findByRole('progressbar', { name: 'Viaje' });
-    expect(localStorage.getItem('mm_review')).toBeNull();
+    expect(askForReview).not.toHaveBeenCalled();
     cleanup();
     setup();
     await screen.findByRole('progressbar', { name: 'Viaje' });
-    await waitFor(() =>
-      expect(JSON.parse(localStorage.getItem('mm_review') as string).positive).toBe(true)
-    );
+    await waitFor(() => expect(askForReview).toHaveBeenCalledWith('goal_reached'));
   });
 
   it('creates, archives and deletes goals', async () => {
@@ -737,7 +740,7 @@ describe('the self-employed draft', () => {
     const api = open();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
     expect(await screen.findByText(/Borrador de \d{4}, \d\.º trimestre/)).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem('mm_review') as string).positive).toBe(true);
+    await waitFor(() => expect(askForReview).toHaveBeenCalledWith('autonomo_draft'));
     expect(screen.getAllByText('Modelo 303').length).toBeGreaterThan(0);
     expect(screen.getByText('Modelo 130')).toBeInTheDocument();
     expect(screen.getByText('Base imponible al 21 %')).toBeInTheDocument();

@@ -29,6 +29,11 @@ export const TRACK_EVENTS = [
   'goal_date_view',
   'goal_sim_change',
   'goal_dp_apply',
+  // Calculators open without an account: a result worked out, «Crear cuenta» under it.
+  'calc_result',
+  'calc_cta_click',
+  // The Google Play review sheet requested after an achievement (Google decides if it shows).
+  'review_request',
 ] as const;
 
 export type TrackEvent = (typeof TRACK_EVENTS)[number];

@@ -30,7 +30,6 @@ import { EmptyMonthPanel } from './EmptyMonthPanel';
 import type { ImportSource } from './ImportSources';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
-import { RatePrompt } from './RatePrompt';
 import { MonthRecap } from './MonthRecap';
 import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
@@ -287,9 +286,6 @@ function CurrentPeriodPanels({
         <GettingStarted checklist={checklist} onOpenTab={onOpenTab} onAddMovement={onAddMovement} />
       ) : (
         <MonthRecap />
-      )}
-      {!checklist.visible && (
-        <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
       )}
       <LeaksTeaser onOpen={() => onOpenTab('leaks')} />
       <Forecast empty={empty} onOpenTab={onOpenTab} />
