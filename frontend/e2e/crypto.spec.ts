@@ -722,7 +722,7 @@ test('invites a friend from the ranking: the card, its link copied and a notice 
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await invitable(page);
   const card = page.getByRole('region', { name: 'Invita a un amigo y competid' });
-  await expect(card).toContainText('recibe 30 días de Premium y tú sumas meses de Premium');
+  await expect(card).toContainText('recibe 30 días de Premium y tú ganas un mes (hasta 6 al año)');
   await expect(card).toContainText('Operar en la consola no cuenta para la invitación.');
   // Only the random code of the invitation: nothing about the person.
   const link = card.getByLabel('Tu enlace de invitación');
