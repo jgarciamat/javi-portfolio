@@ -6,10 +6,17 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { parseDecimal } from '@shared/utils/numbers';
-import { TOOL_PAGES, faqOf, guidesOfTool, toolPage, type ToolPage } from '../domain/toolPages';
+import {
+  TOOL_PAGES,
+  faqOf,
+  guidesOfTool,
+  isOpenTool,
+  toolPage,
+  type ToolPage,
+} from '../domain/toolPages';
 import { VIDEOS_PATH } from '@modules/guides/domain/videos';
 import { HACIENDA_PATH } from '@modules/guides/domain/hacienda';
-import { SignupWall, TeaserOutline, useGate } from '@modules/guides/ui/SignupWall';
+import { SignupWall, useGate } from '@modules/guides/ui/SignupWall';
 import './css/Tools.css';
 import '@modules/guides/ui/css/Guides.css';
 
@@ -71,7 +78,7 @@ export function CalculatorLayout({
   path: string;
   titleKey: string;
   descriptionKey: string;
-  /** Shown to everyone, above the tool or the sign-up wall (the tool itself is for accounts). */
+  /** Shown to everyone, above the tool or the sign-up wall (open calculators: `open` in toolPages). */
   lead?: ReactNode;
   children: ReactNode;
 }) {
@@ -94,19 +101,15 @@ export function CalculatorLayout({
         <h1 className="pricing-title">{t(titleKey)}</h1>
         <p className="pricing-subtitle">{t(descriptionKey)}</p>
         {lead}
-        {gate === 'open' ? (
+        {/* Open calculators show the tool to everybody: their breakdown asks for the account. */}
+        {gate === 'open' || isOpenTool(path) ? (
           <>
             {children}
             {faq.length > 0 && <Faq keyOf={faqKey} numbers={faq} />}
           </>
         ) : (
-          <>
-            <TeaserOutline
-              title={t('wall.outline.tool')}
-              items={faq.map((n) => t(faqKey(n, 'q')))}
-            />
-            <SignupWall kicker={t('wall.kicker.tool')} />
-          </>
+          // The calculators with questions are open: the closed ones only have the invitation.
+          <SignupWall kicker={t('wall.kicker.tool')} />
         )}
         <section className="guide-related">
           <h2>{t('landing.learn.guides')}</h2>

@@ -55,6 +55,9 @@ describe('track', () => {
       'goal_date_view',
       'goal_sim_change',
       'goal_dp_apply',
+      'calc_result',
+      'calc_cta_click',
+      'review_request',
     ]);
   });
 

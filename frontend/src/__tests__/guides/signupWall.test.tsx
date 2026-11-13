@@ -18,9 +18,17 @@ import {
   welcomeVideo,
 } from '@modules/guides/domain/signupWall';
 import { GuidePage } from '@modules/guides/ui/GuidePages';
-import { renderWithProviders, tr } from '@test-utils/render';
+import { TeaserOutline } from '@modules/guides/ui/SignupWall';
+import { renderWithI18n, renderWithProviders, tr } from '@test-utils/render';
 
 beforeEach(() => localStorage.clear());
+
+describe('the outline of what is locked', () => {
+  it('is left out when there is nothing to list', () => {
+    const { container } = renderWithI18n(<TeaserOutline title="Locked" items={[]} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+});
 
 describe('the teaser of the guides', () => {
   it('cuts the first section and lists the headings of the rest, sources included', () => {

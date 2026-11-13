@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import {
   LGSS_URL,
@@ -16,7 +15,9 @@ import {
   type RetaPerson,
   type RetaQuote,
 } from '../domain/retaCalc';
+import { RETA_EXAMPLE } from '../domain/calcExamples';
 import { CalculatorLayout, NumberField, SelectField, number, useMoney } from './CalculatorLayout';
+import { OpenDetail, useOpenForm } from './OpenCalculator';
 import { Breakdown, CheckField, Sources, usePercent } from './calculatorParts';
 
 type Mode = 'monthly' | 'yearly';
@@ -32,11 +33,11 @@ interface RetaForm {
 
 const START: RetaForm = {
   mode: 'monthly',
-  monthly: '2000',
+  monthly: String(RETA_EXAMPLE.monthlyNet),
   income: '36000',
   expenses: '12000',
-  person: 'individual',
-  flatRate: false,
+  person: RETA_EXAMPLE.person,
+  flatRate: RETA_EXAMPLE.flatRate,
 };
 
 type Set = <K extends keyof RetaForm>(key: K) => (value: RetaForm[K]) => void;
@@ -201,11 +202,14 @@ function RetaTable({ current }: { current: string }) {
   );
 }
 
-/** Monthly self-employed contribution of 2026 from the net income. */
+/**
+ * Monthly self-employed contribution of 2026 from the net income. Open without an account: how
+ * it is worked out and the table of brackets ask for one.
+ */
 export function RetaCalculatorPage() {
   const { t } = useI18n();
-  const [form, setForm] = useState<RetaForm>(START);
-  const set: Set = (key) => (value) => setForm((f) => ({ ...f, [key]: value }));
+  const { form, update, gate, keep } = useOpenForm<RetaForm>('reta', START);
+  const set: Set = (key) => (value) => update((f) => ({ ...f, [key]: value }));
   const monthlyNet =
     form.mode === 'monthly'
       ? number(form.monthly)
@@ -220,9 +224,17 @@ export function RetaCalculatorPage() {
       <RetaFields form={form} set={set} />
       <p className="plan-note">{t('tools.reta.expensesHint')}</p>
       <RetaCards quote={quote} />
-      <RetaBreakdown quote={quote} monthlyNet={monthlyNet} />
-      <RetaTable current={quote.bracket.id} />
       <p className="plan-note">{t('tools.reta.disclaimer')}</p>
+      <OpenDetail
+        calc="reta"
+        gate={gate}
+        onKeep={keep}
+        outline={[t('tools.reta.howTitle'), t('tools.reta.tableTitle')]}
+      >
+        <h2>{t('tools.reta.howTitle')}</h2>
+        <RetaBreakdown quote={quote} monthlyNet={monthlyNet} />
+        <RetaTable current={quote.bracket.id} />
+      </OpenDetail>
       <Sources
         prefix="tools.reta"
         links={[RETA_ORDER_URL, LGSS_URL, RETA_LAW_URL]}

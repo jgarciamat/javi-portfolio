@@ -13,7 +13,8 @@ export { isGatedPath } from '../../../shared/utils/appLinks';
  * The guides open to everybody, whole, with or without an account (experiment D3 of
  * docs/marketing/plan-crecimiento.md §1.1): the nine on procedures with search intent, four on
  * saving and the one on correcting a filed 130 or 303. They show the same to visitors and to search
- * engines; the account is only invited, softly, at the end. Calculators, drafts and everything that uses the user's data stay behind an account.
+ * engines; the account is only invited, softly, at the end. Calculators (except the open ones,
+ * `open` in toolPages), drafts and everything that uses the user's data stay behind an account.
  */
 export const OPEN_GUIDES: readonly string[] = [
   'como-hacer-la-renta-2025-paso-a-paso',

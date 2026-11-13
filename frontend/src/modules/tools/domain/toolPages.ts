@@ -8,6 +8,12 @@ export interface ToolPage {
   guides?: readonly string[];
   /** Number of visible questions: `tools.<key>.faq<n>.q / .a`, also published as FAQPage. */
   faq?: number;
+  /**
+   * Open without an account (docs/plan-captacion-retencion.md, B2 and B3): the form, the main
+   * result and the questions for everybody; the breakdown asks for an account. The rest of the
+   * calculators stay behind it (decision of 18-10-2026).
+   */
+  open?: boolean;
 }
 
 /** The public calculators: route and the key of their texts. */
@@ -24,6 +30,7 @@ export const TOOL_PAGES: readonly ToolPage[] = [
     key: 'salary',
     guides: ['renta-a-pagar-o-a-devolver', 'como-leer-borrador-renta', 'metodo-50-30-20'],
     faq: 4,
+    open: true,
   },
   {
     path: '/calculadora-cuota-autonomos',
@@ -35,11 +42,15 @@ export const TOOL_PAGES: readonly ToolPage[] = [
       'fechas-modelos-trimestrales-autonomos-2026',
     ],
     faq: 4,
+    open: true,
   },
 ];
 
 export const toolPage = (path: string): ToolPage | undefined =>
   TOOL_PAGES.find((p) => p.path === path);
+
+/** The calculator answers without an account (the breakdown still asks for one). */
+export const isOpenTool = (path: string): boolean => toolPage(path)?.open === true;
 
 /** The guides of a calculator: those that link to it, then the ones it names itself. */
 export function guidesOfTool(path: string, guides: Guide[] = GUIDES): Guide[] {

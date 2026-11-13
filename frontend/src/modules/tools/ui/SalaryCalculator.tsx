@@ -18,7 +18,9 @@ import {
   type NetSalary,
   type SalaryInput,
 } from '../domain/salaryCalc';
+import { SALARY_EXAMPLE } from '../domain/calcExamples';
 import { CalculatorLayout, NumberField, SelectField, number, useMoney } from './CalculatorLayout';
+import { OpenDetail, useOpenForm } from './OpenCalculator';
 import { Breakdown, CheckField, Sources, rowsOf, usePercent } from './calculatorParts';
 import { resultTone } from './renta/shared';
 
@@ -36,15 +38,15 @@ interface SalaryForm {
 }
 
 const START: SalaryForm = {
-  gross: '30000',
-  payments: '14',
-  age: '35',
-  situation: '3',
-  children: '0',
-  under3: '0',
-  shared: false,
-  disability: '0',
-  contract: 'indefinite',
+  gross: String(SALARY_EXAMPLE.gross),
+  payments: String(SALARY_EXAMPLE.payments),
+  age: String(SALARY_EXAMPLE.age),
+  situation: String(SALARY_EXAMPLE.situation),
+  children: String(SALARY_EXAMPLE.children),
+  under3: String(SALARY_EXAMPLE.under3),
+  shared: SALARY_EXAMPLE.sharedChildren,
+  disability: String(SALARY_EXAMPLE.disability),
+  contract: SALARY_EXAMPLE.contract,
   ccaa: '',
 };
 
@@ -289,11 +291,14 @@ function RentaBox({ result, ccaaId }: { result: NetSalary; ccaaId: string }) {
   );
 }
 
-/** Gross yearly salary → net per payment and per year, with Social Security and income tax. */
+/**
+ * Gross yearly salary → net per payment and per year, with Social Security and income tax. Open
+ * without an account: the breakdown and the tax return estimate ask for one.
+ */
 export function SalaryCalculatorPage() {
   const { t } = useI18n();
-  const [form, setForm] = useState<SalaryForm>(START);
-  const set: Set = (key) => (value) => setForm((f) => ({ ...f, [key]: value }));
+  const { form, update, gate, keep } = useOpenForm<SalaryForm>('salary', START);
+  const set: Set = (key) => (value) => update((f) => ({ ...f, [key]: value }));
   const result = netSalary(inputOf(form));
   return (
     <CalculatorLayout
@@ -303,9 +308,20 @@ export function SalaryCalculatorPage() {
     >
       <SalaryFields form={form} set={set} />
       <SalaryCards result={result} />
-      <SalaryBreakdown result={result} />
-      <RentaBox result={result} ccaaId={form.ccaa} />
       <p className="plan-note">{t('tools.salary.disclaimer')}</p>
+      <OpenDetail
+        calc="salary"
+        gate={gate}
+        onKeep={keep}
+        outline={[
+          t('tools.salary.ssTitle'),
+          t('tools.salary.irpfTitle'),
+          t('tools.salary.rentaTitle'),
+        ]}
+      >
+        <SalaryBreakdown result={result} />
+        <RentaBox result={result} ccaaId={form.ccaa} />
+      </OpenDetail>
       <Sources
         prefix="tools.salary"
         links={[PAYROLL_ORDER_URL, WITHHOLDING_ALGORITHM_URL, SMI_DEDUCTION_URL]}
