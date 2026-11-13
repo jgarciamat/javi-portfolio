@@ -1,7 +1,8 @@
 # Propuesta de textos legales: tanda 1 de captación y retención (noviembre de 2026)
 
-Fecha: 13 de noviembre de 2026. Estado: **propuesta para que la apruebe el dueño. No se ha
-editado ningún texto legal** (`app.privacy.*`, `terms.*`). Acompaña a los commits de la tanda 1 de
+Fecha: 13 de noviembre de 2026. Estado: **aprobada por el dueño el 13/11/2026 y aplicada** en
+`app.privacy.*` y `terms.*` (puntos 1.1 a 1.3 y 2), con los ajustes de la sección 5. Los puntos 3
+y 4 no cambian textos. Acompaña a los commits de la tanda 1 de
 `docs/plan-captacion-retencion.md` (invitaciones con un mes por amigo, calculadoras abiertas y
 reseña de Google Play tras un logro).
 
@@ -144,3 +145,27 @@ autónomos). No se ha cambiado.
 
 Sin texto legal nuevo. La app no ofrece nada a cambio de una reseña ni filtra a quién se le pide
 (directrices de Google Play), y «Danos tu opinión» en Ajustes es igual para todos.
+
+## 5. Ajustes al aplicarla (13/11/2026)
+
+- 1.1: la ventana de uso son los **primeros 30 días** desde el registro y cuenta el día en que se
+  apunta cada movimiento (no la fecha del movimiento). La «+etiqueta» se quita en todos los
+  correos y los puntos solo en Gmail. Con un correo temporal la invitación no da Premium a nadie
+  (ni al invitado ni a quien invita), no solo «no da meses».
+- 1.3: las cifras de la calculadora se borran al volver a ella con la sesión iniciada, no al
+  iniciar sesión; el texto lo dice así. Para que «al cerrar sesión borramos todo esto»
+  (`s8.p3`) siga siendo cierto, cerrar sesión borra ahora también las claves `mm_` de
+  `sessionStorage` (salvo `mm_chunk_reload`). `s8.p1` dice «en algún caso, sessionStorage»: la
+  calculadora no es el único (la guía de la consola crypto lo usa si no hay localStorage).
+- 2: la sección va como «11. Programa de invitaciones» y «Legislación aplicable» pasa a ser la
+  12. Se añade lo que hace el código y la propuesta no decía: no cuentan los datos de ejemplo ni
+  los movimientos de una automatización, ni un email que quien invita ya invitó; quien invita con
+  correo temporal no gana meses hasta cambiarlo; máximo de 100 invitados por usuario. Los meses
+  en espera se conceden «a partir del» mes o año siguiente (se liquidan al abrir «Invita a un
+  amigo» o cuando otro amigo cuenta, no el día 1).
+- `terms.s2.body`: los pagos detectados pasan al plan Gratuito (15 al mes) y Premium quita el
+  límite.
+- Aceptación: `TERMS_VERSION` sube a 2026-11-13. El código no permite subir la versión sin pedir
+  la aceptación a quien aceptó una anterior (diálogo `terms.update`, solo a quien pagó), y
+  `terms.s8` promete pedirla cuando cambian las condiciones; además, la versión guardada al pagar
+  debe corresponder al texto que se leyó. `terms.update.body` describe este cambio.

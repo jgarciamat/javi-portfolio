@@ -10,7 +10,8 @@
  * Removed, among others: session (`mm_token`, `mm_refresh_token`, `mm_user`), drafts
  * (`mm_renta_snapshot_v2`, `mm_renta_progress`, `mm_autonomo_*`, `mm_hacienda_*`), captured payments
  * (`mm_captured*`, `mm_capture_enabled`), invite codes (`mm_ref`, `mm_join`), the
- * app lock, reminders and UI state.
+ * app lock, reminders and UI state; and from this tab, the open calculators' figures
+ * (`mm_calc_draft:*`).
  */
 export const KEPT_KEYS = [
   'mm_theme',
@@ -25,14 +26,20 @@ export const REMEMBER_EMAIL_KEY = 'mm_remember_email';
 
 const PREFIX = 'mm_';
 
+/** This tab's storage too: the figures of an open calculator kept for after signing up. */
+const STORES = ['localStorage', 'sessionStorage'] as const;
+
 export function clearLocalUserData(options: { keepRememberedEmail: boolean }): void {
   const kept = new Set(KEPT_KEYS);
   if (options.keepRememberedEmail) kept.add(REMEMBER_EMAIL_KEY);
-  try {
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(PREFIX) && !kept.has(key))
-      .forEach((key) => localStorage.removeItem(key));
-  } catch {
-    /* storage unavailable: nothing was stored either */
+  for (const name of STORES) {
+    try {
+      const store = window[name];
+      Object.keys(store)
+        .filter((key) => key.startsWith(PREFIX) && !kept.has(key))
+        .forEach((key) => store.removeItem(key));
+    } catch {
+      /* storage unavailable: nothing was stored either */
+    }
   }
 }

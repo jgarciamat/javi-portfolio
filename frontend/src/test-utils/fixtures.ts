@@ -546,7 +546,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
   autonomoQuarters: [],
   ai: { used: 0, quota: 10 },
   catalog: catalog(),
-  terms: { version: '2026-10-18', acceptedVersion: null, acceptedAt: null, mustAccept: false },
+  terms: { version: '2026-11-13', acceptedVersion: null, acceptedAt: null, mustAccept: false },
   ...over,
 });
 

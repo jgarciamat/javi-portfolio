@@ -118,7 +118,7 @@ export const billingOverview = {
       },
     },
   },
-  terms: { version: '2026-10-18', acceptedVersion: null, acceptedAt: null, mustAccept: false },
+  terms: { version: '2026-11-13', acceptedVersion: null, acceptedAt: null, mustAccept: false },
   household: {
     role: 'none',
     owner: null,
