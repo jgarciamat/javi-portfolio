@@ -9,26 +9,22 @@ import './css/Billing.css';
 
 type Translate = ReturnType<typeof useI18n>['t'];
 
-const plural = (t: Translate, unit: 'friend' | 'month', count: number) =>
-  count === 1 ? t(`billing.invite.${unit}One`) : t(`billing.invite.${unit}Many`, { count });
-
-/** How far the user is from the next month, counted from the month just earned. */
-function tierPercent(data: ReferralSummary): number {
-  if (data.nextAt === null) return 100;
-  const from = data.tiers[data.rewardsEarned - 1] ?? 0;
-  return Math.round(((data.qualified - from) / (data.nextAt - from)) * 100);
-}
+/** This year's months, as a share of the yearly maximum. */
+const yearPercent = (data: ReferralSummary): number =>
+  Math.min(100, Math.round((data.rewardsEarned / data.maxRewards) * 100));
 
 function progressText(data: ReferralSummary, t: Translate): string {
   if (data.maxed) return t('billing.invite.progressMaxed', { max: data.maxRewards });
-  return data.missing === 1
-    ? t('billing.invite.progressOne')
-    : t('billing.invite.progressMany', { missing: data.missing });
+  if (data.waiting > 0) {
+    return t('billing.invite.progressWaiting', { count: data.waiting, perMonth: data.perMonth });
+  }
+  return t('billing.invite.progressNext');
 }
 
 /**
- * "Invite a friend": a link that gives both a free month of Premium. Inside "Your plan" it is a
- * card; with `onClose` it is the content of a dialog (no card of its own, a close button on top).
+ * "Invite a friend": a link that gives the friend a free month of Premium and the user one more
+ * per friend (up to the yearly maximum). Inside "Your plan" it is a card; with `onClose` it is the
+ * content of a dialog (no card of its own, a close button on top).
  */
 export function InviteCard({ onClose }: { onClose?: () => void }) {
   const { billingApi } = useApi();
@@ -48,7 +44,7 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
     await navigator.clipboard.writeText(link);
     setCopied(true);
   };
-  const percent = data ? tierPercent(data) : 0;
+  const percent = data ? yearPercent(data) : 0;
   const stats = data
     ? [
         { key: 'statQualified', icon: 'checkCircle', value: `${data.qualified}` },
@@ -66,7 +62,6 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
         pending: data.pending,
         earned: data.rewardsEarned,
         max: data.maxRewards,
-        missing: data.missing,
       })
     : '';
 
@@ -94,7 +89,7 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
           <ol className="invite-steps" aria-label={t('billing.invite.stepsLabel')}>
             <li>{t('billing.invite.step1')}</li>
             <li>{t('billing.invite.step2')}</li>
-            <li>{t('billing.invite.step3', { days: data.rewardDays })}</li>
+            <li>{t('billing.invite.step3', { days: data.rewardDays, max: data.maxRewards })}</li>
           </ol>
           <div className="invite-linkbox">
             <code className="invite-link" aria-label={t('billing.invite.linkLabel')}>
@@ -146,23 +141,13 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
           </div>
           <details className="invite-months">
             <summary>{t('billing.invite.monthsTitle')}</summary>
-            <p>{t('billing.invite.monthsRule')}</p>
-            <table className="invite-tiers">
-              <thead>
-                <tr>
-                  <th scope="col">{t('billing.invite.monthsColFriends')}</th>
-                  <th scope="col">{t('billing.invite.monthsColMonths')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.tiers.map((friends, i) => (
-                  <tr key={friends} className={i < data.rewardsEarned ? 'is-earned' : undefined}>
-                    <td>{plural(t, 'friend', friends)}</td>
-                    <td>{plural(t, 'month', i + 1)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <p>
+              {t('billing.invite.monthsRule', {
+                days: data.rewardDays,
+                perMonth: data.perMonth,
+                max: data.maxRewards,
+              })}
+            </p>
           </details>
         </>
       )}

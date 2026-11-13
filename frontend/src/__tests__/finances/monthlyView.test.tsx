@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
@@ -50,34 +51,6 @@ beforeEach(() => {
   freezeTime('2026-03-15T12:00:00');
 });
 afterEach(restoreTime);
-
-describe('the review prompt of the month view', () => {
-  it('appears after real use and its invitation opens the plan section', async () => {
-    localStorage.setItem(
-      'mm_review',
-      JSON.stringify({
-        days: ['2026-03-01', '2026-03-05', '2026-03-09', '2026-03-12'],
-        askedAt: null,
-        done: false,
-      })
-    );
-    const api = createFakeApi();
-    const many = Array.from({ length: 8 }, (_, i) =>
-      f.transaction({ id: `t${i}`, description: `Compra ${i}` })
-    );
-    api.monthApi.get.mockResolvedValue(f.overview({ transactions: many }));
-    api.categoryApi.getAll.mockResolvedValue(categories);
-    api.accountApi.getAll.mockResolvedValue({ accounts, total: 1000 });
-    api.settingsApi.get.mockResolvedValue(f.settings({ showGettingStarted: false }));
-    renderWithProviders(<Dashboard />, { api, plan: true });
-    // The month view loads several panels first: on a busy machine it takes more than a second.
-    fireEvent.click(
-      await screen.findByRole('button', { name: tr('app.rate.yes') }, { timeout: 5000 })
-    );
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.invite') }));
-    expect(await screen.findByRole('region', { name: tr('app.tabs.plan') })).toBeInTheDocument();
-  });
-});
 
 describe('month view', () => {
   it('shows the figures, alerts and movements of the month', async () => {
@@ -152,6 +125,37 @@ describe('month view', () => {
     await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 3));
     fireEvent.click(screen.getByRole('button', { name: `${tr('app.nav.next')} ›` }));
     await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 4));
+  });
+
+  it('goes to the current month and «Para revisar» when a notice of the phone opened the app', async () => {
+    const Go = () => {
+      const navigate = useNavigate();
+      const { search } = useLocation();
+      return (
+        <button data-search={search} onClick={() => navigate('/?revisar=1')}>
+          go
+        </button>
+      );
+    };
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [dinner] }));
+    api.categoryApi.getAll.mockResolvedValue(categories);
+    renderWithProviders(
+      <>
+        <Dashboard />
+        <Go />
+      </>,
+      { api }
+    );
+    await screen.findByText('Cena');
+    fireEvent.click(screen.getByRole('button', { name: `‹ ${tr('app.nav.prev')}` }));
+    await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 2));
+    fireEvent.click(screen.getByRole('button', { name: 'go' }));
+    await waitFor(() => expect(api.monthApi.get).toHaveBeenLastCalledWith(2026, 3));
+    // Once there, the address forgets it (a reload does not jump again).
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'go' })).toHaveAttribute('data-search', '')
+    );
   });
 
   it('exports the month as CSV', async () => {

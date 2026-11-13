@@ -244,8 +244,9 @@ describe('billing edge cases', () => {
     );
     expect(row(tr('pricing.row.course'))).toHaveTextContent(tr('pricing.row.course.free'));
     expect(row(tr('pricing.row.videos'))).toHaveTextContent(tr('pricing.row.videos.premium'));
-    expect(row(tr('pricing.row.capture'))).toHaveTextContent(
-      `—${tr('pricing.row.capture.premium')}`
+    // Payments detected in the bank notifications: 15 a month free, no limit with Premium.
+    expect(row(tr('pricing.row.captures'))).toHaveTextContent(
+      `${tr('pricing.perMonthCount', { count: 15 })}${tr('pricing.unlimited')}`
     );
     expect(row(tr('pricing.row.aiAnalyses'))).toHaveTextContent(
       tr('pricing.aiQuota', { count: 1 }) + tr('pricing.aiQuota', { count: 10 })

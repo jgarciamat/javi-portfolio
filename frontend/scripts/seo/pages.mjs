@@ -40,6 +40,11 @@ const { GUIDES, GUIDE_NOTICE, inlineParts, longDate } = await load(
 );
 const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts');
 const { TOOL_PAGES, faqOf, guidesOfTool } = await load('src/modules/tools/domain/toolPages.ts');
+const { SALARY_EXAMPLE, RETA_EXAMPLE } = await load('src/modules/tools/domain/calcExamples.ts');
+const { netSalary } = await load('src/modules/tools/domain/salaryCalc.ts');
+const { retaQuote } = await load('src/modules/tools/domain/retaCalc.ts');
+const payroll = await load('src/modules/tools/data/payroll2026.ts');
+const reta = await load('src/modules/tools/data/reta2026.ts');
 const wall = await load('src/modules/guides/domain/signupWall.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
 const { yearlySavingPct, comparisonRows, DEFAULT_CATALOG } = await load(
@@ -133,15 +138,15 @@ function pagesIn(lang) {
   // The invitation to create an account, as the app shows it to people without one (SignupWall):
   // `wall` in place of a guide or a calculator, with the welcome video; `cta` under the lists.
   const numbers = wall.wallNumbers();
-  const signupWall = (path, { kicker, variant = 'wall' } = {}) => {
+  const signupWall = (path, { kicker, variant = 'wall', title, lead } = {}) => {
     const soft = variant === 'soft';
     const back = wall.isGatedPath(path);
     const video = variant === 'wall' ? wall.welcomeVideo(videos.VIDEOS) : undefined;
     const thumbnail = video && videos.videoThumbnail(video);
     return `<section aria-labelledby="signup-wall-title">${
       kicker ? `<p>${esc(kicker)}</p>` : ''
-    }<h2 id="signup-wall-title">${esc(t(soft ? 'wall.soft.title' : 'wall.title'))}</h2><p>${esc(
-      t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
+    }<h2 id="signup-wall-title">${esc(title ?? t(soft ? 'wall.soft.title' : 'wall.title'))}</h2><p>${esc(
+      lead ?? t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
     )}</p><p>${(back ? gate : link)(
       back ? wall.registerHref(path) : '/login?mode=register',
       t('wall.register')
@@ -626,29 +631,161 @@ function pagesIn(lang) {
     });
   }
 
-  // Calculators: without an account, what each one does and the questions it answers (by title
-  // only), then the invitation; the form, the results and the answers are for people with one.
+  // Open calculators (`open` in toolPages): the form with the figures of the example, its result,
+  // the notice, the questions with their answers (also as FAQPage) and the official sources, as
+  // the app shows them to everybody; the breakdown only by title, then the invitation.
+  const euros = (n) =>
+    new Intl.NumberFormat(lang === 'en' ? 'en-IE' : 'es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: 'always',
+    }).format(n);
+  const pct = (n) =>
+    `${n.toLocaleString(lang === 'en' ? 'en-GB' : 'es-ES', { maximumFractionDigits: 2 })} %`;
+  const dateIn = (iso) =>
+    new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${iso}T00:00:00Z`));
+  const salary = netSalary(SALARY_EXAMPLE);
+  const quote = retaQuote(RETA_EXAMPLE);
+  const OPEN = {
+    salary: {
+      fields: [
+        ['salary-gross', t('tools.salary.gross'), euros(SALARY_EXAMPLE.gross)],
+        ['salary-payments', t('tools.salary.payments'), t('tools.salary.payments14')],
+        ['salary-age', t('tools.salary.age'), String(SALARY_EXAMPLE.age)],
+        ['salary-contract', t('tools.salary.contract'), t('tools.salary.contract.indefinite')],
+        ['salary-situation', t('tools.salary.situation'), t('tools.salary.situation.3')],
+        ['salary-children', t('tools.salary.children'), String(SALARY_EXAMPLE.children)],
+        ['salary-disability', t('tools.salary.disability'), t('tools.renta.disability.0')],
+      ],
+      results: [
+        [
+          t('tools.salary.monthly'),
+          `${euros(salary.regularPayment)} (${t('tools.salary.monthlyHint14', {
+            extra: euros(salary.extraPayment),
+          })})`,
+        ],
+        [t('tools.salary.yearly'), euros(salary.yearlyNet)],
+        [t('tools.salary.irpf'), pct(salary.withholding.rate)],
+        [t('tools.salary.ss'), euros(salary.socialSecurity.total)],
+      ],
+      detail: [
+        t('tools.salary.ssTitle'),
+        t('tools.salary.irpfTitle'),
+        t('tools.salary.rentaTitle'),
+      ],
+      sources: {
+        date: payroll.PAYROLL_SOURCE_DATE,
+        links: [
+          payroll.PAYROLL_ORDER_URL,
+          payroll.WITHHOLDING_ALGORITHM_URL,
+          payroll.SMI_DEDUCTION_URL,
+        ],
+      },
+    },
+    reta: {
+      fields: [
+        ['reta-mode', t('tools.reta.mode'), t('tools.reta.mode.monthly')],
+        ['reta-monthly', t('tools.reta.monthlyNet'), euros(RETA_EXAMPLE.monthlyNet)],
+        ['reta-person', t('tools.reta.person'), t('tools.reta.person.individual')],
+      ],
+      results: [
+        [t('tools.reta.fee'), euros(quote.feeMin)],
+        [
+          t('tools.reta.bracket'),
+          t(`tools.reta.bracket.${quote.bracket.id[0]}`, { n: quote.bracket.id.slice(1) }),
+        ],
+        [
+          t('tools.reta.bases'),
+          `${euros(quote.bracket.baseMin)} – ${euros(quote.bracket.baseMax)}`,
+        ],
+      ],
+      detail: [t('tools.reta.howTitle'), t('tools.reta.tableTitle')],
+      sources: {
+        date: reta.RETA_SOURCE_DATE,
+        links: [reta.RETA_ORDER_URL, reta.LGSS_URL, reta.RETA_LAW_URL],
+      },
+    },
+  };
+  const openBody = (tool) => {
+    const calc = OPEN[tool.key];
+    const faq = faqOf(tool).map((n) => ({
+      q: t(`tools.${tool.key}.faq${n}.q`),
+      a: t(`tools.${tool.key}.faq${n}.a`),
+    }));
+    const pairs = (rows) =>
+      `<dl>${rows.map(([label, value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join('')}</dl>`;
+    return {
+      html: `<form aria-label="${esc(t(`tools.${tool.key}.title`))}">${calc.fields
+        .map(
+          ([id, label, value]) =>
+            `<p><label for="${id}">${esc(label)}</label> <input id="${id}" value="${esc(value)}" readonly /></p>`
+        )
+        .join('')}</form><section><h2>${esc(t('tools.example.title'))}</h2><h3>${esc(
+        t('tools.example.data')
+      )}</h3>${pairs(calc.fields.map(([, label, value]) => [label, value]))}<h3>${esc(
+        t('tools.example.result')
+      )}</h3>${pairs(calc.results)}</section><p>${esc(
+        t(`tools.${tool.key}.disclaimer`)
+      )}</p>${outline(t('tools.open.outline'), calc.detail)}${signupWall(tool.path, {
+        variant: 'soft',
+        title: t(`tools.${tool.key}.cta.title`),
+        lead: t(`tools.${tool.key}.cta.lead`),
+      })}<section><h2>${esc(t('tools.faq.title'))}</h2>${faq
+        .map(({ q, a }) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`)
+        .join(
+          ''
+        )}</section><section><h2>${esc(t('tools.sources.title'))}</h2><ul>${calc.sources.links
+        .map((to, i) => `<li>${external(to, t(`tools.${tool.key}.source${i + 1}`))}</li>`)
+        .join('')}</ul><p>${esc(
+        t('tools.sources.checked', { date: dateIn(calc.sources.date) })
+      )}</p></section>`,
+      // The questions and answers are on the page: also as FAQPage.
+      faqLd: {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map(({ q, a }) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
+      },
+    };
+  };
+
+  // The other calculators: without an account, what each one does and the questions it answers
+  // (by title only), then the invitation; the form, the results and the answers are for people
+  // with one.
   for (const tool of TOOL_PAGES) {
     const url = urlOf(tool.path, lang);
     const title = t(`tools.${tool.key}.title`);
     const description = t(`tools.${tool.key}.description`);
     const questions = faqOf(tool).map((n) => t(`tools.${tool.key}.faq${n}.q`));
+    const open = tool.open ? openBody(tool) : null;
     add({
       path: tool.path,
       title,
       description,
-      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${outline(
-        t('wall.outline.tool'),
-        questions
-      )}${signupWall(tool.path, { kicker: t('wall.kicker.tool') })}<section><h2>${esc(
-        t('landing.learn.guides')
-      )}</h2><ul>${guidesOfTool(tool.path)
+      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${
+        open
+          ? open.html
+          : `${outline(t('wall.outline.tool'), questions)}${signupWall(tool.path, {
+              kicker: t('wall.kicker.tool'),
+            })}`
+      }<section><h2>${esc(t('landing.learn.guides'))}</h2><ul>${guidesOfTool(tool.path)
         .map((g) => `<li>${link(`/guias/${g.slug}`, g.title)}</li>`)
         .join('')}</ul><p>${link(VIDEOS_PATH, `🎬 ${t('videos.title')}`)} · ${link(
         HACIENDA_PATH,
         `🏛️ ${t('hacienda.title')}`
       )}</p></section>${nav}</main>`,
-      // No FAQPage: the answers are not in what the page shows.
+      // FAQPage only where the answers are on the page (the open calculators).
+      ...(open ? { bodyLd: [open.faqLd] } : {}),
       nodes: [
         {
           '@type': 'WebApplication',

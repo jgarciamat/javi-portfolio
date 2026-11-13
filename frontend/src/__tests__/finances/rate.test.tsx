@@ -1,16 +1,15 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { Capacitor } from '@capacitor/core';
+import { track } from '@core/analytics';
 import {
   MIN_ACCOUNT_DAYS,
-  MIN_DAYS,
-  MIN_MOVEMENTS,
   RETRY_DAYS,
-  finishReview,
+  REVIEW_DELAY_MS,
+  askForReview,
+  canAskForReview,
   recordOpen,
-  recordPositiveMoment,
   requestStoreReview,
-  shouldAskForReview,
-  snoozeReview,
+  resetReviewSessionForTests,
   storeListingUrl,
 } from '@core/review/review';
 import { RatePrompt } from '@modules/finances/ui/components/RatePrompt';
@@ -19,159 +18,177 @@ import { tr } from '@test-utils/render';
 
 const inAppReview = { requestReview: jest.fn() };
 jest.mock('@capacitor-community/in-app-review', () => ({ InAppReview: inAppReview }));
+jest.mock('@core/analytics', () => ({ track: jest.fn() }));
 
+const DAY = 24 * 60 * 60 * 1000;
 const day = (n: number) => new Date(Date.UTC(2026, 2, n, 12));
+const stored = () => JSON.parse(localStorage.getItem('mm_review') as string);
+const native = () => jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
 
-/** Seeds the state as if the app had been opened on `days` different days. */
-const openOn = (days: number) => {
-  for (let i = 1; i <= days; i++) recordOpen(day(i));
+/** The app was first opened on day 1, in an earlier run: this run is not the first session. */
+const openedBefore = () => {
+  recordOpen(day(1));
+  resetReviewSessionForTests();
 };
 
 beforeEach(() => {
   localStorage.clear();
   localStorage.setItem('mm_locale', 'es');
   jest.clearAllMocks();
+  resetReviewSessionForTests();
   inAppReview.requestReview.mockResolvedValue(undefined);
 });
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => {
+  jest.restoreAllMocks();
+  jest.useRealTimers();
+});
 
-describe('review timing', () => {
-  it('asks only after enough days and movements', () => {
-    openOn(MIN_DAYS - 1);
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(10))).toBe(false);
-    recordOpen(day(9));
-    expect(shouldAskForReview(MIN_MOVEMENTS - 1, day(10))).toBe(false);
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(10))).toBe(true);
-  });
-
-  it('counts a day once and keeps the last thirty', () => {
+describe('days the app is opened', () => {
+  it('counts a day once and keeps the last thirty, with the first one apart', () => {
     recordOpen(day(1));
     recordOpen(day(1));
     for (let i = 2; i <= 31; i++) recordOpen(day(i));
-    expect(JSON.parse(localStorage.getItem('mm_review') as string).days).toHaveLength(30);
+    expect(stored().days).toHaveLength(30);
+    expect(stored().firstSeen).toBe(day(1).toISOString().slice(0, 10));
   });
 
-  it('waits after a "later" and never asks again once finished', () => {
-    openOn(MIN_DAYS);
-    snoozeReview(day(10));
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(11))).toBe(false);
-    const later = new Date(day(10).getTime() + (RETRY_DAYS + 1) * 24 * 60 * 60 * 1000);
-    expect(shouldAskForReview(MIN_MOVEMENTS, later)).toBe(true);
-    finishReview();
-    expect(shouldAskForReview(MIN_MOVEMENTS, later)).toBe(false);
-  });
-});
-
-describe('positive moments', () => {
-  it('ask after a happy moment even with few movements, once the account is 3 days old', () => {
-    recordOpen(day(1));
-    recordPositiveMoment();
-    recordPositiveMoment();
-    expect(shouldAskForReview(0, day(1 + MIN_ACCOUNT_DAYS - 1))).toBe(false);
-    expect(shouldAskForReview(0, day(1 + MIN_ACCOUNT_DAYS))).toBe(true);
-  });
-
-  it('keep the first day even when only the last thirty are stored, and never ask unopened', () => {
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(20))).toBe(false);
-    for (let i = 1; i <= 31; i++) recordOpen(day(i));
-    expect(JSON.parse(localStorage.getItem('mm_review') as string).firstSeen).toBe(
-      day(1).toISOString().slice(0, 10)
-    );
-  });
-
-  it('use the first open day of states saved before it was kept, and do not ask without usage', () => {
+  it('uses the first open day of states saved before it was kept', () => {
     localStorage.setItem(
       'mm_review',
       JSON.stringify({ days: ['2026-03-01'], askedAt: null, done: false })
     );
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(20))).toBe(false);
     recordOpen(day(2));
-    expect(JSON.parse(localStorage.getItem('mm_review') as string).firstSeen).toBe('2026-03-01');
+    expect(stored().firstSeen).toBe('2026-03-01');
   });
 
-  it('never ask more than once every 90 days', () => {
+  it('counts whoever answered the old question as asked that day, once', () => {
+    localStorage.setItem(
+      'mm_review',
+      JSON.stringify({ days: ['2026-03-01'], firstSeen: '2026-03-01', askedAt: null, done: true })
+    );
     recordOpen(day(1));
-    recordPositiveMoment();
-    snoozeReview(day(10));
-    expect(RETRY_DAYS).toBe(90);
-    expect(shouldAskForReview(0, new Date(day(10).getTime() + 89 * 24 * 3600 * 1000))).toBe(false);
+    expect(stored()).toEqual({
+      days: ['2026-03-01'],
+      firstSeen: '2026-03-01',
+      askedAt: day(1).toISOString(),
+    });
+    localStorage.setItem(
+      'mm_review',
+      JSON.stringify({ days: ['2026-03-01'], askedAt: '2026-02-01T00:00:00.000Z', done: true })
+    );
+    recordOpen(day(3));
+    expect(stored()).toEqual({
+      days: ['2026-03-01', '2026-03-03'],
+      firstSeen: '2026-03-01',
+      askedAt: '2026-02-01T00:00:00.000Z',
+    });
+  });
+});
+
+describe('when the review sheet may be requested', () => {
+  it('only in the Android app', () => {
+    openedBefore();
+    expect(canAskForReview(day(10))).toBe(false);
+    native();
+    expect(canAskForReview(day(10))).toBe(true);
   });
 
+  it('never in the first session, nor before the app is 3 days old, nor unopened', () => {
+    native();
+    expect(canAskForReview(day(10))).toBe(false); // never opened
+    recordOpen(day(1));
+    expect(canAskForReview(day(10))).toBe(false); // the first run of the app
+    resetReviewSessionForTests();
+    expect(canAskForReview(day(1 + MIN_ACCOUNT_DAYS - 1))).toBe(false);
+    expect(canAskForReview(day(1 + MIN_ACCOUNT_DAYS))).toBe(true);
+  });
+
+  it('at most once every 90 days', async () => {
+    native();
+    openedBefore();
+    jest.useFakeTimers();
+    const asked = askForReview('goal_reached', day(10));
+    expect(RETRY_DAYS).toBe(90);
+    expect(canAskForReview(new Date(day(10).getTime() + 89 * DAY))).toBe(false);
+    expect(canAskForReview(new Date(day(10).getTime() + 91 * DAY))).toBe(true);
+    await act(async () => {
+      jest.advanceTimersByTime(REVIEW_DELAY_MS);
+    });
+    await asked;
+  });
+});
+
+describe('askForReview', () => {
+  it('requests Google’s sheet a moment after the achievement, with no question first', async () => {
+    native();
+    openedBefore();
+    jest.useFakeTimers();
+    const asked = askForReview('autonomo_draft', day(10));
+    expect(track).toHaveBeenCalledWith('review_request', { detail: 'autonomo_draft' });
+    expect(stored().askedAt).toBe(day(10).toISOString());
+    expect(inAppReview.requestReview).not.toHaveBeenCalled(); // the result is seen first
+    await act(async () => {
+      jest.advanceTimersByTime(REVIEW_DELAY_MS);
+    });
+    expect(await asked).toBe(true);
+    expect(inAppReview.requestReview).toHaveBeenCalledTimes(1);
+    // A second achievement the same day asks nothing more.
+    expect(await askForReview('goal_reached', day(10))).toBe(false);
+    expect(inAppReview.requestReview).toHaveBeenCalledTimes(1);
+    expect(track).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing on the web, and uses today when no date is given', async () => {
+    openedBefore();
+    expect(await askForReview('dp_recovered')).toBe(false);
+    expect(track).not.toHaveBeenCalled();
+    expect(stored().askedAt).toBeNull();
+  });
+
+  it('survives the plugin failing', async () => {
+    native();
+    openedBefore();
+    inAppReview.requestReview.mockRejectedValueOnce(new Error('no play'));
+    jest.useFakeTimers();
+    const asked = askForReview('goal_reached', day(10));
+    await act(async () => {
+      jest.advanceTimersByTime(REVIEW_DELAY_MS);
+    });
+    expect(await asked).toBe(false);
+  });
+});
+
+describe('store links', () => {
   it('link to the Play listing: the store app on Android, the web page elsewhere', () => {
     expect(storeListingUrl()).toBe(
       'https://play.google.com/store/apps/details?id=com.jgarciamat.moneymanager'
     );
-    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    native();
     expect(storeListingUrl()).toBe('market://details?id=com.jgarciamat.moneymanager');
   });
-});
 
-describe('requestStoreReview', () => {
   it('opens the Google Play sheet in the Android app and nowhere else', async () => {
     expect(await requestStoreReview()).toBe(false);
-    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    native();
     expect(await requestStoreReview()).toBe(true);
-    inAppReview.requestReview.mockRejectedValueOnce(new Error('no play'));
-    expect(await requestStoreReview()).toBe(false);
   });
 });
 
 describe('RatePrompt', () => {
-  const mount = (movements = MIN_MOVEMENTS, onInvite = jest.fn()) => {
-    openOn(MIN_DAYS);
+  it('offers the same two ways to everybody, without asking anything first', () => {
     render(
       <I18nProvider>
-        <RatePrompt movements={movements} onInvite={onInvite} />
+        <RatePrompt />
       </I18nProvider>
     );
-    return onInvite;
-  };
-
-  it('stays hidden for people who have not used the app enough', () => {
-    mount(MIN_MOVEMENTS - 1);
-    expect(screen.queryByText(tr('app.rate.title'))).toBeNull();
-  });
-
-  it('thanks the people who like it on the web and offers to invite a friend', async () => {
-    const onInvite = mount();
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.yes') }));
-    expect(await screen.findByText(tr('app.rate.thanks'))).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: tr('app.rate.title') })).toBeInTheDocument();
+    expect(screen.queryByRole('button')).toBeNull();
     expect(screen.getByRole('link', { name: tr('app.rate.store') }).getAttribute('href')).toContain(
       'play.google.com/store/apps/details?id=com.jgarciamat.moneymanager'
     );
-    fireEvent.click(screen.getByRole('button', { name: tr('app.rate.invite') }));
-    expect(onInvite).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: tr('app.common.close') }));
-    expect(screen.queryByRole('region')).toBeNull();
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(11))).toBe(false);
-  });
-
-  it('opens the store sheet inside the Android app and goes away', async () => {
-    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
-    mount();
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.yes') }));
-    await waitFor(() => expect(inAppReview.requestReview).toHaveBeenCalled());
-    await waitFor(() => expect(screen.queryByRole('region')).toBeNull());
-  });
-
-  it('asks what to improve, with a way to write, and does not insist', async () => {
-    mount();
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.no') }));
-    const write = await screen.findByRole('link', { name: tr('app.rate.write') });
-    expect(write.getAttribute('href')).toContain('mailto:support@finanverso.app');
-    fireEvent.click(write);
-    expect(screen.queryByRole('region')).toBeNull();
-    expect(shouldAskForReview(MIN_MOVEMENTS, day(11))).toBe(false);
-  });
-
-  it('can be closed from the feedback step and postponed with "later"', async () => {
-    mount();
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.no') }));
-    fireEvent.click(screen.getByRole('button', { name: tr('app.common.close') }));
-    expect(screen.queryByRole('region')).toBeNull();
-    localStorage.clear();
-    mount();
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.later') }));
-    expect(screen.queryByRole('region')).toBeNull();
+    expect(screen.getByRole('link', { name: tr('app.rate.write') }).getAttribute('href')).toContain(
+      'mailto:support@finanverso.app'
+    );
+    expect(inAppReview.requestReview).not.toHaveBeenCalled();
   });
 });

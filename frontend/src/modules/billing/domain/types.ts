@@ -17,7 +17,9 @@ export type LimitedResource =
   | 'autonomoDrafts'
   | 'autonomoPdfs'
   | 'assets'
-  | 'imports';
+  | 'imports'
+  /** Payments detected in the bank notifications added this month (15 on the free plan). */
+  | 'captures';
 export type PremiumFeature =
   | 'insights'
   | 'aiAdvisor'
@@ -126,16 +128,20 @@ export interface ReferralSummary {
   pending: number;
   /** Free Premium days per reward, for each side. */
   rewardDays: number;
-  /** Free months earned so far. */
+  /** Free months earned this calendar year (one per friend). */
   rewardsEarned: number;
-  /** Friends still needed for the next free month (0 once every month has been earned). */
+  /** Friends who count but whose month waits for next month (or next year), over the limits. */
+  waiting: number;
+  /** Friends still needed for the next free month: 1, or 0 once this year's are earned. */
   missing: number;
-  /** Friends needed in total for the next month; null once every month has been earned. */
+  /** Friends needed in total for the next month; null once this year's months are earned. */
   nextAt: number | null;
-  /** Every month the invitations can give has been earned. */
+  /** This year's months have all been earned. */
   maxed: boolean;
+  /** Months that can be earned per calendar year, and per calendar month. */
   maxRewards: number;
-  /** Friends needed in total for each month: 1 → 1 month, 5 → 2 months… */
+  perMonth: number;
+  /** For app versions before one month per friend: 1 friend → 1 month, 2 → 2… */
   tiers: number[];
   /** Set when the user was invited: their own free month and its first steps. */
   invited: InviteeStatus | null;
@@ -155,6 +161,10 @@ export interface FirstStepProgress {
 export interface InviteeStatus {
   rewarded: boolean;
   steps: FirstStepProgress[];
+  /** Different days with movements in the first month (up to the goal). */
+  activeDays: { count: number; goal: number };
+  /** False with a throwaway e-mail address: the invitation gives no month until it changes. */
+  eligible: boolean;
 }
 
 /** Why the paywall was opened. */

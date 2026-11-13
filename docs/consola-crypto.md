@@ -662,12 +662,12 @@ Un empujón al programa «Invita a un amigo» del menú, **sin sistema nuevo**: 
 (`inviteLink`, `https://finanverso.app/?ref=CÓDIGO`, solo el código aleatorio, nada de la persona),
 los mismos contadores y la misma recompensa, leídos de `GET /referral` (`ReferralService`).
 
-- **Recompensa real** (la del programa, sin inventar nada): si el amigo se registra con el enlace y
+- **Recompensa real** (la del programa, sin inventar nada): si el amigo se registra con el enlace,
   completa los primeros pasos de la app (3 movimientos, un presupuesto, una meta y una
-  automatización), recibe 30 días de Premium (`rewardDays`), y quien invita suma meses según los
-  amigos que lo consiguen: 1 mes con el primero, 2 con 5, 3 con 20, 4 con 40 y 5 con 50
-  (`tiers`, máximo `maxRewards`). **Operar en la consola no cuenta** para la invitación, y la
-  tarjeta lo dice.
+  automatización) y apunta movimientos en 3 días distintos de su primer mes, recibe 30 días de
+  Premium (`rewardDays`), y quien invita gana un mes por cada amigo que lo consigue, hasta 3 al
+  mes y 6 al año (`perMonth`, `maxRewards`; desde el 13-11-2026, antes por tramos). **Operar en la
+  consola no cuenta** para la invitación, y la tarjeta lo dice.
 - **Tarjeta «Invita a un amigo y competid»** (`ui/InvitePanel.tsx`), debajo del ranking del mes:
   la recompensa con las cifras del servidor, el enlace, «Copiar enlace», «Compartir» (Web Share;
   donde el navegador no comparte, copia) y «Tus invitaciones: completadas · en camino · meses

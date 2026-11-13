@@ -36,7 +36,10 @@ describe('storage', () => {
 });
 
 describe('clearLocalUserData', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
   afterEach(() => jest.restoreAllMocks());
 
   it('removes every mm_ key except the device preferences', () => {
@@ -45,6 +48,14 @@ describe('clearLocalUserData', () => {
     }
     clearLocalUserData({ keepRememberedEmail: false });
     expect(Object.keys(localStorage).sort()).toEqual([...KEPT_KEYS, 'foreign'].sort());
+  });
+
+  it("also forgets this tab's open calculator figures", () => {
+    for (const key of ['mm_calc_draft:salary', 'mm_chunk_reload', 'foreign']) {
+      sessionStorage.setItem(key, '1');
+    }
+    clearLocalUserData({ keepRememberedEmail: true });
+    expect(Object.keys(sessionStorage).sort()).toEqual(['foreign', 'mm_chunk_reload']);
   });
 
   it('never throws when storage is unavailable', () => {

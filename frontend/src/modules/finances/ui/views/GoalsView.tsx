@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { track } from '@core/analytics';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
-import { recordPositiveMoment } from '@core/review/review';
+import { askForReview } from '@core/review/review';
 import { useFormat, useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
@@ -292,9 +292,9 @@ export function GoalsView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
     counted.current = true;
     track('goal_date_view', { detail });
   }, [detail]);
-  // Reaching a goal is a good moment to ask for a review.
+  // A reached goal on screen is a good moment for the Google Play review sheet.
   useEffect(() => {
-    if (reached) recordPositiveMoment();
+    if (reached) void askForReview('goal_reached');
   }, [reached]);
 
   /** Every goal, archived ones included, with how far along it is. */

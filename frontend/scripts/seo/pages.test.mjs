@@ -1,6 +1,8 @@
 // What search engines get of the public pages (`npm run test:seo`, also run by the build):
 // people without an account, and search engines with them, get the whole of the open guides
-// (OPEN_GUIDES), only the teaser of the other guides and of the calculators, and the structured data only describes what the page shows.
+// (OPEN_GUIDES) and of the open calculators (`open` in toolPages) except their breakdown, only
+// the teaser of the other guides and calculators, and the structured data only describes what
+// the page shows.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { MESSAGES, NOT_FOUND, PAGES, esc, load, pathIn } from './pages.mjs';
@@ -116,10 +118,10 @@ test('a Hacienda guide shows its first step and the titles of the others; never 
   }
 });
 
-test('a calculator shows what it does and its questions, not the answers nor the form', () => {
+test('a calculator behind the account shows what it does and its questions, not the answers nor the form', () => {
   for (const lang of langs) {
     const t = (key) => MESSAGES[lang][key] ?? MESSAGES.es[key];
-    for (const tool of TOOL_PAGES) {
+    for (const tool of TOOL_PAGES.filter((x) => !x.open)) {
       const { body, bodyLd } = pageOf(tool.path, lang);
       assert.ok(body.includes(esc(t(`tools.${tool.key}.description`))), tool.path);
       assert.ok(body.includes(esc(t('wall.kicker.tool'))), tool.path);
@@ -129,6 +131,37 @@ test('a calculator shows what it does and its questions, not the answers nor the
       }
       assert.ok(!/<(form|input|select)\b/.test(body), tool.path);
       assert.deepEqual(bodyLd ?? [], [], tool.path);
+    }
+  }
+});
+
+test('an open calculator shows its form, a worked example, the answers and the sources', () => {
+  const open = TOOL_PAGES.filter((x) => x.open);
+  assert.deepEqual(
+    open.map((x) => x.key),
+    ['salary', 'reta']
+  );
+  const results = { salary: /1\.628,50\s€/, reta: /380,88\s€/ };
+  for (const lang of langs) {
+    const t = (key) => MESSAGES[lang][key] ?? MESSAGES.es[key];
+    for (const tool of open) {
+      const { body, bodyLd } = pageOf(tool.path, lang);
+      assert.match(body, /<form\b/, tool.path);
+      assert.ok(body.includes(esc(t('tools.example.title'))), tool.path);
+      if (lang === 'es') assert.match(body, results[tool.key], tool.path);
+      assert.ok(body.includes(esc(t(`tools.${tool.key}.disclaimer`))), tool.path);
+      for (const n of faqOf(tool)) {
+        assert.ok(body.includes(esc(t(`tools.${tool.key}.faq${n}.a`))), tool.path);
+      }
+      assert.ok(body.includes('boe.es'), `${tool.path} cites its sources`);
+      // The breakdown only by title, then the soft invitation with the way back.
+      assert.ok(body.includes(esc(t('tools.open.outline'))), tool.path);
+      assert.ok(body.includes(esc(t(`tools.${tool.key}.cta.title`))), tool.path);
+      assert.ok(body.includes(esc(wall.registerHref(tool.path))), tool.path);
+      assert.ok(!body.includes(esc(t('wall.kicker.tool'))), tool.path);
+      const [faq] = bodyLd;
+      assert.equal(faq['@type'], 'FAQPage');
+      assert.equal(faq.mainEntity.length, faqOf(tool).length);
     }
   }
 });
@@ -148,11 +181,21 @@ test('the wall brings people back to the page they were on, in their language', 
 test('structured data only describes what the gated pages show', () => {
   const gated = PAGES.filter((p) => wall.isGatedPath(p.path));
   assert.equal(gated.length, GUIDES.length + 2 * (HACIENDA_GUIDES.length + TOOL_PAGES.length));
+  const openTools = TOOL_PAGES.filter((x) => x.open).map((x) => x.path);
   for (const page of gated) {
     const all = deepTypes([page.nodes, page.bodyLd ?? []]);
-    for (const banned of ['HowTo', 'HowToStep', 'FAQPage', 'Question', 'VideoObject']) {
-      assert.ok(!all.includes(banned), `${page.lang} ${page.path}: no ${banned}`);
+    // The open calculators show their answers: their FAQPage describes what is on the page.
+    const faqShown = openTools.includes(page.path);
+    const banned = [
+      'HowTo',
+      'HowToStep',
+      'VideoObject',
+      ...(faqShown ? [] : ['FAQPage', 'Question']),
+    ];
+    for (const type of banned) {
+      assert.ok(!all.includes(type), `${page.lang} ${page.path}: no ${type}`);
     }
+    if (faqShown) assert.ok(all.includes('FAQPage'), page.path);
     assert.ok(types(page).includes('BreadcrumbList'), page.path);
     assert.ok(
       types(page).includes(

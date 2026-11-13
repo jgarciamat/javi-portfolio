@@ -1503,10 +1503,113 @@ button.entity-item {
 
 /* ─── Payments detected in notifications ─────────────────────────────────── */
 
-.capture-actions {
+/* «Para revisar»: big targets (48px) and a card that follows the finger sideways. */
+.review-count {
+  margin-left: 0.5rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.review-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  list-style: none;
+}
+
+.review-card {
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: pan-y;
+  transition: background-color 0.15s;
+}
+
+.review-card:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.review-card--add {
+  background: color-mix(in srgb, var(--green-400) 25%, transparent);
+}
+
+.review-card--discard {
+  background: color-mix(in srgb, var(--red-400) 25%, transparent);
+}
+
+.review-card-body {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  background: var(--slate-800);
+}
+
+.review-card-head {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1.05rem;
+}
+
+.review-card-body small,
+.review-card-category {
+  margin: 0;
+  color: var(--slate-300);
+}
+
+.review-card-actions,
+.review-chips {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.review-btn {
+  min-height: 48px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.review-picker {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.review-more {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.review-more select {
+  min-height: 48px;
+}
+
+.review-toast {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.review-toast:empty {
+  display: none;
+}
+
+.capture-disclosure ul {
+  padding-left: 1.2rem;
+}
+
+.capture-disclosure li {
+  margin: 0.35rem 0;
 }
 
 .capture-access {
@@ -2069,4 +2172,15 @@ button.entity-item {
     font-weight: 600;
     color: var(--slate-200);
   }
+}
+
+.capture-alerts {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.capture-alerts legend {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
 }

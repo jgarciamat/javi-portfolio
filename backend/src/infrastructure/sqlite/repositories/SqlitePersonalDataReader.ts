@@ -84,6 +84,10 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         autonomoPdfs: this.uses('autonomo_pdfs', userId),
       },
       imports: this.uses('import_uses', userId),
+      capturesByMonth: this.all(
+        'SELECT month, uses FROM capture_month_uses WHERE user_id = ? ORDER BY month',
+        userId
+      ),
       referrals: this.referrals(userId),
       creator: this.creator(userId),
       household: this.household(userId),
@@ -365,7 +369,9 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       code: code?.code ?? null,
       rewardsGranted: code?.rewards_granted ?? 0,
       invited: this.all(
-        'SELECT created_at AS createdAt, rewarded_at AS rewardedAt FROM referrals WHERE referrer_id = ? ORDER BY created_at',
+        `SELECT created_at AS createdAt, rewarded_at AS rewardedAt,
+                inviter_settled_at AS monthSettledAt, inviter_month AS gaveMonth
+         FROM referrals WHERE referrer_id = ? ORDER BY created_at`,
         userId
       ),
       referredBy:

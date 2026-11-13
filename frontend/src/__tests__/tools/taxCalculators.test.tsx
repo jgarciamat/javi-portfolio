@@ -1,7 +1,15 @@
 import { act, fireEvent, screen, within } from '@testing-library/react';
+import { track } from '@core/analytics';
+import { tokenStore } from '@core/api/http';
 import * as renta from '@modules/tools/data/renta';
 import { GUIDES } from '@modules/guides/domain/guides';
-import { TOOL_PAGES, faqOf, guidesOfTool, toolPage } from '@modules/tools/domain/toolPages';
+import {
+  TOOL_PAGES,
+  faqOf,
+  guidesOfTool,
+  isOpenTool,
+  toolPage,
+} from '@modules/tools/domain/toolPages';
 import { SalaryCalculatorPage } from '@modules/tools/ui/SalaryCalculator';
 import { RetaCalculatorPage } from '@modules/tools/ui/RetaCalculator';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -14,6 +22,11 @@ const row = (label: string | RegExp) =>
   screen.getByRole('rowheader', { name: label }).closest('tr') as HTMLElement;
 /** Amounts as the page writes them: 1.628,50 € (with a narrow space or not). */
 const euros = (text: string) => new RegExp(`^${text.replace(/\./g, '\\.')}\\s?€$`);
+
+jest.mock('@core/analytics', () => ({
+  ...jest.requireActual('@core/analytics'),
+  track: jest.fn(),
+}));
 
 afterEach(() => jest.restoreAllMocks());
 
@@ -43,6 +56,14 @@ describe('toolPages helpers', () => {
     expect(faqOf(toolPage('/calculadora-iva'))).toEqual([]);
     expect(faqOf(undefined)).toEqual([]);
     expect(TOOL_PAGES.map((p) => p.key)).toEqual(expect.arrayContaining(['salary', 'reta']));
+  });
+
+  it('opens only the net salary and the self-employed contribution calculators', () => {
+    expect(TOOL_PAGES.filter((p) => isOpenTool(p.path)).map((p) => p.key)).toEqual([
+      'salary',
+      'reta',
+    ]);
+    expect(isOpenTool('/no-such-tool')).toBe(false);
   });
 });
 
@@ -226,29 +247,40 @@ describe('self-employed contribution calculator', () => {
 });
 
 describe('tax calculators for visitors without an account', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    jest.mocked(track).mockClear();
+  });
 
-  it.each([
+  const OPEN = [
     [SalaryCalculatorPage, 'salary', 'tools.salary.gross', '/calculadora-sueldo-neto'],
-    [RetaCalculatorPage, 'reta', 'tools.reta.mode', '/calculadora-cuota-autonomos'],
-  ] as const)(
-    '%p lists its questions but not the answers nor the form',
+    [RetaCalculatorPage, 'reta', 'tools.reta.monthlyNet', '/calculadora-cuota-autonomos'],
+  ] as const;
+
+  it.each(OPEN)(
+    '%p shows the form, the result and the answers; the breakdown asks for an account',
     (Page, key, field, path) => {
       renderWithProviders(<Page />, { authenticated: false, route: path });
       expect(
         screen.getByRole('heading', { level: 1, name: tr(`tools.${key}.title`) })
       ).toBeVisible();
-      const outline = screen
-        .getByRole('heading', { name: tr('wall.outline.tool') })
-        .closest('section') as HTMLElement;
+      expect(screen.getByLabelText(tr(field))).toBeInTheDocument();
+      expect(screen.getByText(tr(`tools.${key}.disclaimer`))).toBeInTheDocument();
       for (const n of [1, 2, 3, 4]) {
-        expect(within(outline).getByText(tr(`tools.${key}.faq${n}.q`))).toBeInTheDocument();
-        expect(screen.queryByText(tr(`tools.${key}.faq${n}.a`))).toBeNull();
+        expect(screen.getByText(tr(`tools.${key}.faq${n}.a`))).toBeInTheDocument();
       }
-      expect(screen.queryByLabelText(tr(field))).toBeNull();
-      expect(screen.queryByText(tr(`tools.${key}.disclaimer`))).toBeNull();
-      // No FAQPage: the answers are not on the page.
-      expect(document.querySelector('script[type="application/ld+json"]')).toBeNull();
+      const ld = document.querySelector('script[type="application/ld+json"]') as HTMLElement;
+      expect(JSON.parse(ld.innerHTML)['@type']).toBe('FAQPage');
+      // The breakdown: only its titles, then the invitation with the calculator's own words.
+      expect(screen.queryByRole('table')).toBeNull();
+      const outline = screen
+        .getByRole('heading', { name: tr('tools.open.outline') })
+        .closest('section') as HTMLElement;
+      expect(within(outline).getAllByRole('listitem').length).toBeGreaterThan(1);
+      expect(screen.getByRole('heading', { name: tr(`tools.${key}.cta.title`) })).toBeVisible();
+      expect(screen.getByText(tr(`tools.${key}.cta.lead`))).toBeVisible();
+      expect(screen.queryByText(tr('wall.kicker.tool'))).toBeNull();
       expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
         'href',
         `/login?mode=register&next=${encodeURIComponent(path)}`
@@ -259,4 +291,76 @@ describe('tax calculators for visitors without an account', () => {
       );
     }
   );
+
+  it('shows the net pay of the example without an account', () => {
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    expect(within(card('tools.salary.monthly')).getByText(euros('1.628,50'))).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.salary.renta.choose'))).toBeNull();
+    expect(screen.queryByRole('rowheader', { name: /Contingencias comunes/ })).toBeNull();
+  });
+
+  it('counts the first result worked out and the click to sign up, never the figures', () => {
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    expect(track).not.toHaveBeenCalled();
+    change('tools.salary.gross', '42000');
+    change('tools.salary.age', '50');
+    expect(track).toHaveBeenCalledTimes(1);
+    expect(track).toHaveBeenCalledWith('calc_result', { detail: 'salary' });
+    fireEvent.click(screen.getByRole('link', { name: tr('wall.register') }));
+    expect(track).toHaveBeenLastCalledWith('calc_cta_click', { detail: 'salary' });
+    expect(JSON.stringify(jest.mocked(track).mock.calls)).not.toContain('42000');
+    // The figures wait in this tab for when the person comes back with an account.
+    expect(JSON.parse(sessionStorage.getItem('mm_calc_draft:salary') as string)).toMatchObject({
+      gross: '42000',
+      age: '50',
+    });
+  });
+
+  it('keeps the figures on «I have an account» too, and picks them up after signing in', () => {
+    const view = renderWithProviders(<RetaCalculatorPage />, { authenticated: false });
+    change('tools.reta.monthlyNet', '3100');
+    fireEvent.click(screen.getByRole('link', { name: tr('wall.login') }));
+    expect(track).not.toHaveBeenCalledWith('calc_cta_click', expect.anything());
+    view.unmount();
+    jest.mocked(track).mockClear();
+
+    renderWithProviders(<RetaCalculatorPage />, { authenticated: true });
+    expect(screen.getByLabelText(tr('tools.reta.monthlyNet'))).toHaveValue('3100');
+    expect(screen.getAllByRole('table')).toHaveLength(2);
+    expect(screen.getByRole('heading', { name: tr('tools.reta.howTitle') })).toBeVisible();
+    expect(sessionStorage.getItem('mm_calc_draft:reta')).toBeNull();
+    // With an account nothing is counted.
+    change('tools.reta.monthlyNet', '3200');
+    expect(track).not.toHaveBeenCalledWith('calc_result', expect.anything());
+  });
+
+  it('shows neither the breakdown nor its titles while a stored session is being restored', () => {
+    tokenStore.setSession('expired.token.x', 'refresh-token');
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    expect(screen.getByLabelText(tr('tools.salary.gross'))).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(tr('wall.checking'));
+    expect(screen.queryByRole('heading', { name: tr('tools.open.outline') })).toBeNull();
+    tokenStore.clear();
+  });
+
+  it('starts from the example when this tab cannot keep anything', () => {
+    const blocked = () => {
+      throw new Error('blocked');
+    };
+    const original = window.sessionStorage;
+    Object.defineProperty(window, 'sessionStorage', {
+      value: { getItem: blocked, setItem: blocked, removeItem: blocked },
+      configurable: true,
+    });
+    try {
+      const view = renderWithProviders(<RetaCalculatorPage />, { authenticated: false });
+      change('tools.reta.monthlyNet', '3100');
+      fireEvent.click(screen.getByRole('link', { name: tr('wall.register') }));
+      view.unmount();
+      renderWithProviders(<RetaCalculatorPage />, { authenticated: true });
+      expect(screen.getByLabelText(tr('tools.reta.monthlyNet'))).toHaveValue('2000');
+    } finally {
+      Object.defineProperty(window, 'sessionStorage', { value: original, configurable: true });
+    }
+  });
 });

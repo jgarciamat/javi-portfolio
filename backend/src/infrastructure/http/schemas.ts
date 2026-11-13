@@ -245,7 +245,7 @@ export const importBody = z.object({
   dryRun: z.boolean().default(false),
   /** The user's opt-in to send unplaced descriptions to the AI provider. */
   useAi: z.boolean().default(false),
-  /** A bank statement (unlimited on every plan) or payments read from bank notifications (Premium). */
+  /** A bank statement (unlimited on every plan) or payments read from bank notifications (15 a month free). */
   source: z.enum(['statement', 'capture']).default('statement'),
   rows: z
     .array(
@@ -1107,14 +1107,18 @@ export const referralSummaryResponse = z
     pending: count,
     rewardDays: count,
     rewardsEarned: count,
+    waiting: count,
     missing: count,
     nextAt: count.nullable(),
     maxed: z.boolean(),
     maxRewards: count,
+    perMonth: count,
     tiers: z.array(count).max(20),
     invited: z
       .object({
         rewarded: z.boolean(),
+        activeDays: z.object({ count, goal: count }).strict(),
+        eligible: z.boolean(),
         steps: z
           .array(
             z

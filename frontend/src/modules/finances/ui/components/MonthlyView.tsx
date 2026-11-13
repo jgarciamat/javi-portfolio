@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { REVIEW_PARAM } from '@core/native/NativeLinks';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
@@ -22,14 +23,13 @@ import { InviteeGoal } from '@modules/billing/ui/InviteeGoal';
 import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
-import { CapturedPayments } from './CapturedPayments';
+import { ReviewTray } from './ReviewTray';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { EmptyMonthPanel } from './EmptyMonthPanel';
 import type { ImportSource } from './ImportSources';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
-import { RatePrompt } from './RatePrompt';
 import { MonthRecap } from './MonthRecap';
 import { LeaksTeaser } from './LeaksTeaser';
 import { MonthActions } from './MonthActions';
@@ -100,6 +100,28 @@ const QUICK_ADD: Record<string, TransactionType> = {
   income: 'INCOME',
   saving: 'SAVING',
 };
+
+/**
+ * `?revisar=1`: a tap on the phone's notice of detected payments opens «Para revisar» (in the
+ * current month, where it is). Once there, the address forgets it.
+ */
+function useReviewRequest(f: ReturnType<typeof useFinances>) {
+  const [params, setParams] = useSearchParams();
+  const open = params.get(REVIEW_PARAM) === '1';
+  const done = useCallback(() => {
+    setParams(
+      (p) => {
+        p.delete(REVIEW_PARAM);
+        return p;
+      },
+      { replace: true }
+    );
+  }, [setParams]);
+  useEffect(() => {
+    if (open && !f.isCurrentPeriod) f.goToCurrent();
+  }, [open, f]);
+  return { open, done };
+}
 
 // ─── Movements panel ──────────────────────────────────────────────────────────
 
@@ -265,9 +287,6 @@ function CurrentPeriodPanels({
       ) : (
         <MonthRecap />
       )}
-      {!checklist.visible && (
-        <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
-      )}
       <LeaksTeaser onOpen={() => onOpenTab('leaks')} />
       <Forecast empty={empty} onOpenTab={onOpenTab} />
     </>
@@ -314,6 +333,7 @@ export function MonthlyView({
   const checklist = useGettingStarted();
   const [params, setParams] = useSearchParams();
   const quickAdd = quickAddOf(params.get('add'));
+  const review = useReviewRequest(f);
   const defaultDate = defaultDateOf(f);
   const activeAccounts = f.accounts.filter((a) => !a.archived);
   const [accountFilter, setAccountFilter] = useState<string | null>(null);
@@ -338,7 +358,7 @@ export function MonthlyView({
       <div className="month-content">
         {f.loading && <MonthLoading />}
 
-        {f.isCurrentPeriod && <CapturedPayments />}
+        {f.isCurrentPeriod && <ReviewTray focus={review.open} onFocused={review.done} />}
         {empty ? (
           <EmptyMonthPanel onImport={onImport} onAddExpense={addExpense}>
             {sample}

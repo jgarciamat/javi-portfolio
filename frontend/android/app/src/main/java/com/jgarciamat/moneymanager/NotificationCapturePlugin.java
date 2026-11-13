@@ -60,9 +60,35 @@ public class NotificationCapturePlugin extends Plugin {
         SharedPreferences.Editor editor = prefs().edit();
         editor.putBoolean(NotificationCaptureService.KEY_ENABLED, enabled);
         editor.putStringSet(NotificationCaptureService.KEY_PACKAGES, packages);
+        // The notices: older versions of the app do not send them and keep the daily one.
+        String alert = call.getString("alert");
+        if (alert != null) editor.putString(CaptureAlerts.KEY_ALERT, alert);
+        JSObject texts = call.getObject("texts");
+        if (texts != null) editor.putString(CaptureAlerts.KEY_TEXTS, texts.toString());
         // Turning it off also forgets what was waiting.
-        if (!enabled) editor.remove(NotificationCaptureService.KEY_PENDING);
+        if (!enabled) {
+            editor.remove(NotificationCaptureService.KEY_PENDING);
+            editor.remove(CaptureAlerts.KEY_DETECTED);
+            editor.remove(CaptureAlerts.KEY_WAITING);
+        }
         editor.apply();
+        if (!enabled || !"daily".equals(prefs().getString(CaptureAlerts.KEY_ALERT, "daily"))) {
+            CaptureAlerts.clear(getContext());
+        }
+        call.resolve();
+    }
+
+    /** How many payments wait in «Para revisar»: tonight's reminder is planned while some wait. */
+    @PluginMethod
+    public void review(PluginCall call) {
+        int waiting = Math.max(0, call.getInt("waiting", 0));
+        SharedPreferences prefs = prefs();
+        prefs.edit().putInt(CaptureAlerts.KEY_WAITING, waiting).apply();
+        boolean daily = "daily".equals(prefs.getString(CaptureAlerts.KEY_ALERT, "daily"));
+        if (CaptureAlerts.waiting(prefs) == 0) CaptureAlerts.clear(getContext());
+        else if (daily && prefs.getBoolean(NotificationCaptureService.KEY_ENABLED, false)) {
+            CaptureAlerts.scheduleReminder(getContext());
+        }
         call.resolve();
     }
 
@@ -73,13 +99,15 @@ public class NotificationCapturePlugin extends Plugin {
         synchronized (NotificationCaptureService.LOCK) {
             SharedPreferences prefs = prefs();
             String raw = prefs.getString(NotificationCaptureService.KEY_PENDING, "[]");
-            prefs.edit().remove(NotificationCaptureService.KEY_PENDING).apply();
+            // The app counts them from now on (it says how many wait with review()).
+            prefs.edit().remove(NotificationCaptureService.KEY_PENDING).remove(CaptureAlerts.KEY_DETECTED).apply();
             try {
                 result.put("notifications", new JSArray(raw));
             } catch (JSONException e) {
                 result.put("notifications", new JSArray());
             }
         }
+        CaptureAlerts.dismiss(getContext());
         call.resolve(result);
     }
 }

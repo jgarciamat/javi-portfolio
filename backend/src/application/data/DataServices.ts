@@ -5,6 +5,7 @@ import { Transaction } from '@domain/model/Transaction';
 import { TransactionType, parseTransactionType } from '@domain/model/TransactionType';
 import {
   AccountRepository,
+  CaptureUsageRepository,
   CategoryBudgetRepository,
   CategoryRepository,
   CustomAlertRepository,
@@ -20,6 +21,7 @@ import {
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { guessCategoryName } from '@domain/services/categorizer';
+import { captureMonthOf } from '@domain/services/plans';
 import { MATCH_DAYS, RuleMovement, coveringMovements } from '@domain/services/recurring-match';
 import { Cents, fromCents } from '@domain/shared/money';
 import { toDateOnly } from '@domain/shared/period';
@@ -92,7 +94,8 @@ export class ImportService {
     private readonly categoryRules: CategoryRuleService,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
-    private readonly usage: ImportUsageRepository
+    private readonly usage: ImportUsageRepository,
+    private readonly captures: CaptureUsageRepository
   ) {}
 
   /**
@@ -109,14 +112,30 @@ export class ImportService {
     return result;
   }
 
-  /** Payments read from the notifications of the bank apps (Premium): not a statement import. */
+  /** Payments detected in the bank notifications added this month (what the free plan limits). */
+  capturesThisMonth(userId: string): number {
+    return this.captures.count(userId, captureMonthOf(this.clock.now()));
+  }
+
+  /**
+   * Payments read from the notifications of the bank apps, confirmed in «Para revisar»: not a
+   * statement import. The free plan adds 15 a month: a batch that would go over it is refused
+   * whole (402), so they stay waiting in the phone; previews (the suggested categories) are
+   * free. A row's category is the one the person chose there, so it beats their rules.
+   */
   async importCaptured(
     userId: string,
     rows: ImportRow[],
     options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
   ): Promise<ImportResult> {
-    this.entitlements.assertFeature(userId, 'capture');
-    return this.importRows(userId, rows, options);
+    const month = captureMonthOf(this.clock.now());
+    if (!options.dryRun) {
+      const used = this.captures.count(userId, month);
+      this.entitlements.assertCanCreate(userId, 'captures', used + Math.max(rows.length, 1) - 1);
+    }
+    const result = await this.importRows(userId, rows, { ...options, chosenCategories: true });
+    if (!result.dryRun && result.imported > 0) this.captures.add(userId, month, result.imported);
+    return result;
   }
 
   /**
@@ -130,7 +149,13 @@ export class ImportService {
   async importRows(
     userId: string,
     rows: ImportRow[],
-    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
+    options: {
+      accountId?: string | null;
+      dryRun?: boolean;
+      useAi?: boolean;
+      /** The rows' categories were chosen by the person (not read from a file): they beat rules. */
+      chosenCategories?: boolean;
+    }
   ): Promise<ImportResult> {
     if (rows.length > MAX_IMPORT_ROWS) {
       throw new ValidationError(`Máximo ${MAX_IMPORT_ROWS} filas por importación`, 'TOO_MANY_ROWS');
@@ -184,7 +209,7 @@ export class ImportService {
         const { category, source } = this.pickCategory(
           userId,
           row,
-          ruleFor,
+          options.chosenCategories && row.category ? () => null : ruleFor,
           history,
           aiGuesses,
           byName,

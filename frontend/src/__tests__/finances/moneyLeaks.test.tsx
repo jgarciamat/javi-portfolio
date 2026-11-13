@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { track } from '@core/analytics';
+import { askForReview } from '@core/review/review';
 import { loadLocale } from '@core/i18n/I18nContext';
 import { MoneyLeaksView, UNDO_MS } from '@modules/finances/ui/views/MoneyLeaksView';
 import type { LeakFinding, MoneyLeaks } from '@modules/finances/domain/types';
@@ -8,6 +9,7 @@ import * as f from '@test-utils/fixtures';
 import { formatMoney } from '@shared/utils/format';
 import { renderWithProviders, tr } from '@test-utils/render';
 
+jest.mock('@core/review/review', () => ({ askForReview: jest.fn(async () => false) }));
 jest.mock('@core/analytics', () => ({
   ...jest.requireActual('@core/analytics'),
   track: jest.fn(),
@@ -237,6 +239,8 @@ describe('Tu dinero perdido', () => {
       expect(
         screen.getByText(tr('app.leaks.recoveredTotal', { amount: '478 €' }))
       ).toBeInTheDocument();
+      // A cancellation checked is an achievement: the review sheet is requested.
+      expect(askForReview).toHaveBeenCalledWith('dp_recovered');
 
       fireEvent.click(screen.getByRole('button', { name: /Revisados \(7\)/ }));
       expect(

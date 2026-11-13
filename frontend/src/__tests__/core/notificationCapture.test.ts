@@ -5,6 +5,7 @@ const plugin = {
   drain: jest.fn().mockResolvedValue({
     notifications: [{ packageName: 'p', title: 't', text: 'x', postedAt: 1 }],
   }),
+  review: jest.fn().mockResolvedValue(undefined),
 };
 const capacitor = { isNativePlatform: jest.fn(), getPlatform: jest.fn() };
 
@@ -19,6 +20,7 @@ import {
   configureCapture,
   drainCaptured,
   openCaptureSettings,
+  reportWaiting,
 } from '@core/capture/notificationCapture';
 
 describe('notification capture bridge', () => {
@@ -39,6 +41,23 @@ describe('notification capture bridge', () => {
     expect(plugin.openSettings).toHaveBeenCalled();
     await configureCapture(true, ['a', 'b']);
     expect(plugin.configure).toHaveBeenCalledWith({ enabled: true, packages: ['a', 'b'] });
+    const texts = {
+      channel: 'c',
+      eachTitle: 'e',
+      manyTitle: 'm',
+      eachBody: 'b',
+      dailyTitle: 'd',
+      dailyBody: 'db',
+    };
+    await configureCapture(false, [], { alert: 'each', texts });
+    expect(plugin.configure).toHaveBeenLastCalledWith({
+      enabled: false,
+      packages: [],
+      alert: 'each',
+      texts,
+    });
+    await reportWaiting(3);
+    expect(plugin.review).toHaveBeenCalledWith({ waiting: 3 });
     expect(await drainCaptured()).toEqual([
       { packageName: 'p', title: 't', text: 'x', postedAt: 1 },
     ]);

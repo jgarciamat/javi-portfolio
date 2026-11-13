@@ -66,11 +66,13 @@ describe('Plans and limits', () => {
             assets: 3,
             // Free and unlimited on every plan; the apps already installed read null as such.
             imports: null,
+            // Payments detected in the bank notifications, 15 a month.
+            captures: 15,
           },
-          features: { forecast: false, inbox: false, capture: false, investCourse: false },
+          features: { forecast: false, inbox: false, capture: true, investCourse: false },
         },
         premium: {
-          resources: { accounts: null, imports: null },
+          resources: { accounts: null, imports: null, captures: null },
           features: { inbox: true, investCourse: true },
           aiMonthlyQuota: 10,
         },
@@ -249,23 +251,102 @@ describe('Plans and limits', () => {
     expect((await billing()).usage.imports).toBe(3);
   });
 
-  it('takes payments read from bank notifications with Premium only, not as a statement', async () => {
-    const send = () =>
+  it('takes payments read from bank notifications, not as a statement: 15 a month on the free plan', async () => {
+    let sent = 0;
+    const send = (n: number, extra: Record<string, unknown> = {}) =>
       request(ctx.app)
         .post('/api/transactions/import')
         .set(user.auth)
         .send({
-          rows: [{ date: '2026-03-01', description: 'Bizum', amount: -5 }],
+          rows: Array.from({ length: n }, () => ({
+            date: '2026-03-01',
+            description: `Bizum ${++sent}`,
+            amount: -1,
+          })),
           source: 'capture',
+          ...extra,
         });
-    await send().expect(201);
-    expect((await billing()).usage.imports).toBe(0);
+    await send(1).expect(201);
+    expect((await billing()).usage).toMatchObject({ imports: 0, captures: 1 });
+    expect((await billing()).limits.features.capture).toBe(true);
     expireTrial(ctx, user);
-    const refused = await send().expect(402);
+    expect((await billing()).limits.resources.captures).toBe(15);
+    expect((await billing()).limits.features.capture).toBe(true);
+    // The trial's one counts too: 14 left this month.
+    await send(10).expect(201);
+    // A batch that goes over the limit is refused whole (they stay waiting in the phone).
+    const refused = await send(5).expect(402);
     expect(refused.body).toMatchObject({
-      code: 'PREMIUM_REQUIRED',
-      details: { feature: 'capture' },
+      code: 'PLAN_LIMIT',
+      details: { resource: 'captures', limit: 15 },
     });
+    expect((await billing()).usage.captures).toBe(11);
+    // Previews (the suggested categories) are free and not counted.
+    await send(20, { dryRun: true }).expect(200);
+    await send(4).expect(201);
+    expect((await billing()).usage.captures).toBe(15);
+    await send(1).expect(402);
+    // A new month starts again (by the day in mainland Spain).
+    ctx.clock.set('2026-03-31T22:30:00Z');
+    expect((await billing()).usage.captures).toBe(0);
+    await send(1).expect(201);
+    expect((await billing()).usage.captures).toBe(1);
+  });
+
+  it('counts only the payments that were added, and none with Premium is too many', async () => {
+    const send = (rows: { date: string; description: string; amount: number }[]) =>
+      request(ctx.app)
+        .post('/api/transactions/import')
+        .set(user.auth)
+        .send({ rows, source: 'capture' });
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      date: '2026-03-02',
+      description: `Café ${i}`,
+      amount: -1.5,
+    }));
+    expect((await send(rows).expect(201)).body.imported).toBe(20);
+    // The same ones again are duplicates: nothing more is counted.
+    expect((await send(rows).expect(201)).body.duplicates).toBe(20);
+    expect((await billing()).usage.captures).toBe(20);
+    expect((await billing()).limits.resources.captures).toBeNull();
+  });
+
+  it('keeps the category chosen in «Para revisar» over a rule, and uses the rule otherwise', async () => {
+    const categories = (await request(ctx.app).get('/api/categories').set(user.auth)).body as {
+      id: string;
+      name: string;
+    }[];
+    const id = (name: string) => categories.find((c) => c.name === name)!.id;
+    await request(ctx.app)
+      .post('/api/category-rules')
+      .set(user.auth)
+      .send({ pattern: 'mercadona', categoryId: id('Alimentación') })
+      .expect(201);
+    const send = (rows: Record<string, unknown>[], extra: Record<string, unknown> = {}) =>
+      request(ctx.app)
+        .post('/api/transactions/import')
+        .set(user.auth)
+        .send({ rows, source: 'capture', ...extra });
+    const suggested = await send([{ date: '2026-03-03', description: 'MERCADONA', amount: -20 }], {
+      dryRun: true,
+    }).expect(200);
+    expect(suggested.body.rows[0]).toMatchObject({
+      categoryName: 'Alimentación',
+      categorySource: 'rule',
+    });
+    const chosen = await send([
+      { date: '2026-03-03', description: 'MERCADONA', amount: -20, category: 'Ocio' },
+    ]).expect(201);
+    expect(chosen.body.rows[0]).toMatchObject({ categoryName: 'Ocio', categorySource: 'file' });
+    // A bank statement still follows the rule over the file's own category.
+    const statement = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({
+        rows: [{ date: '2026-03-04', description: 'MERCADONA', amount: -9, category: 'Ocio' }],
+      })
+      .expect(201);
+    expect(statement.body.rows[0]).toMatchObject({ categoryName: 'Alimentación' });
   });
 
   it('keeps the analysis view for Premium', async () => {

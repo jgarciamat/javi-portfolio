@@ -1,4 +1,4 @@
-import { act, fireEvent, renderHook, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, renderHook, screen, waitFor } from '@testing-library/react';
 import { Capacitor } from '@capacitor/core';
 import { billingApi, offersApi } from '@core/api/billingApi';
 import { ApiError, apiRequest } from '@core/api/http';
@@ -309,6 +309,7 @@ describe('PlanBanner', () => {
           autonomoPdfs: 0,
           assets: 0,
           imports: 2,
+          captures: 0,
           movements: 37,
         },
       })
@@ -467,15 +468,13 @@ describe('Invite a friend', () => {
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
     withPlan(<PlanView />);
     expect(await screen.findByText('https://finanverso.app/?ref=ABCD2345')).toBeInTheDocument();
-    expect(screen.getByText(tr('billing.invite.progressMany', { missing: 3 }))).toBeVisible();
-    // 2 friends: 1 of the 4 between the first month (1) and the second (5).
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
-    expect(screen.getByText('1/5')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toHaveAccessibleName(
-      /completado los primeros pasos: 2/
-    );
+    expect(screen.getByText(tr('billing.invite.progressNext'))).toBeVisible();
+    // 2 of the 6 months of the year.
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '33');
+    expect(screen.getByText('2/6')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName(/Amigos que cuentan: 2/);
     expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(6);
-    expect(screen.getByText(tr('billing.invite.step3', { days: 30 }))).toBeVisible();
+    expect(screen.getByText(tr('billing.invite.step3', { days: 30, max: 6 }))).toBeVisible();
     expect(screen.getByText(tr('billing.invite.monthsTitle'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('app.common.close') })).toBeNull();
     expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
@@ -504,41 +503,44 @@ describe('Invite a friend', () => {
     }
   });
 
-  it('says "1 friend" when only one is missing', async () => {
-    const api = createFakeApi();
-    api.billingApi.referral.mockResolvedValue(f.referral({ missing: 1, qualified: 4 }));
-    withPlan(<PlanView />, f.billing(), api);
-    expect(await screen.findByText(tr('billing.invite.progressOne'))).toBeVisible();
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
-  });
-
-  it('shows the table of months, with those already earned marked', async () => {
-    withPlan(<PlanView />);
-    fireEvent.click(await screen.findByText(tr('billing.invite.monthsTitle')));
-    const table = screen.getByRole('table');
-    const rows = within(table).getAllByRole('row');
-    expect(rows).toHaveLength(6);
-    expect(within(rows[0]).getByText(tr('billing.invite.monthsColFriends'))).toBeVisible();
-    expect(within(rows[1]).getByText(tr('billing.invite.friendOne'))).toBeVisible();
-    expect(within(rows[1]).getByText(tr('billing.invite.monthOne'))).toBeVisible();
-    expect(rows[1]).toHaveClass('is-earned');
-    expect(within(rows[2]).getByText(tr('billing.invite.friendMany', { count: 5 }))).toBeVisible();
-    expect(within(rows[2]).getByText(tr('billing.invite.monthMany', { count: 2 }))).toBeVisible();
-    expect(rows[2]).not.toHaveClass('is-earned');
-    expect(within(rows[5]).getByText(tr('billing.invite.friendMany', { count: 50 }))).toBeVisible();
-    expect(within(rows[5]).getByText(tr('billing.invite.monthMany', { count: 5 }))).toBeVisible();
-  });
-
-  it('says when every month has been earned', async () => {
+  it('says how many months wait for next month', async () => {
     const api = createFakeApi();
     api.billingApi.referral.mockResolvedValue(
-      f.referral({ qualified: 50, rewardsEarned: 5, missing: 0, nextAt: null, maxed: true })
+      f.referral({ qualified: 5, rewardsEarned: 3, waiting: 2 })
     );
     withPlan(<PlanView />, f.billing(), api);
-    expect(await screen.findByText(tr('billing.invite.progressMaxed', { max: 5 }))).toBeVisible();
+    expect(
+      await screen.findByText(tr('billing.invite.progressWaiting', { count: 2, perMonth: 3 }))
+    ).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
+  });
+
+  it('explains the rule: a month per friend, with the limits', async () => {
+    withPlan(<PlanView />);
+    fireEvent.click(await screen.findByText(tr('billing.invite.monthsTitle')));
+    expect(
+      screen.getByText(tr('billing.invite.monthsRule', { days: 30, perMonth: 3, max: 6 }))
+    ).toBeVisible();
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+
+  it('says when this year’s months have been earned', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockResolvedValue(
+      f.referral({
+        qualified: 8,
+        rewardsEarned: 6,
+        waiting: 2,
+        missing: 0,
+        nextAt: null,
+        maxed: true,
+      })
+    );
+    withPlan(<PlanView />, f.billing(), api);
+    expect(await screen.findByText(tr('billing.invite.progressMaxed', { max: 6 }))).toBeVisible();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
-    expect(screen.getByRole('progressbar')).toHaveAccessibleName(/Has conseguido el máximo/);
-    expect(screen.getByText('5/5')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName(/todos los de este año/);
+    expect(screen.getByText('6/6')).toBeInTheDocument();
   });
 
   it('starts the bar from zero before the first friend', async () => {
@@ -547,7 +549,7 @@ describe('Invite a friend', () => {
       f.referral({ qualified: 0, pending: 0, rewardsEarned: 0, missing: 1, nextAt: 1 })
     );
     withPlan(<PlanView />, f.billing(), api);
-    expect(await screen.findByText(tr('billing.invite.progressOne'))).toBeVisible();
+    expect(await screen.findByText(tr('billing.invite.progressNext'))).toBeVisible();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
   });
 

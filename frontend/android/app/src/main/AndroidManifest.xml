@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- The Google backup leaves out the payments read from notifications and the app's own
+         storage (the WebView keeps the session and what waits in «Para revisar»). -->
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        tools:targetApi="31"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -30,6 +36,13 @@
                 <data android:scheme="moneymanager" android:host="add" />
             </intent-filter>
 
+            <!-- moneymanager://review: the notice of detected payments opens «Para revisar» -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="moneymanager" android:host="review" />
+            </intent-filter>
+
         </activity>
 
         <receiver
@@ -54,6 +67,11 @@
             </intent-filter>
         </service>
 
+        <!-- 21:00: the daily reminder of the payments waiting in «Para revisar» -->
+        <receiver
+            android:name=".CaptureReminderReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -69,6 +87,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Android 13+: the notices of detected payments and the reminders (asked in the app) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Android 11+: lets the app see the system speech recognition service (dictation) -->
     <queries>

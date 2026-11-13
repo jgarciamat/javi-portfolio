@@ -15,11 +15,13 @@ const hiddenKey = (userId: string) => `mm_invitee_goal_hidden:${userId}`;
 /** The "your month is here" message is shown only once. */
 const doneKey = (userId: string) => `mm_invitee_goal_done:${userId}`;
 
-const units = (steps: FirstStepProgress[]) => steps.reduce((sum, s) => sum + s.count, 0);
+const units = (steps: FirstStepProgress[], days: { count: number }) =>
+  steps.reduce((sum, s) => sum + s.count, days.count);
 
 /**
  * For a user who signed up with an invitation: the first steps that still stand between them and
- * their free month of Premium (counted by the server, as the reward is), each with a way to do it.
+ * their free month of Premium (counted by the server, as the reward is), each with a way to do it,
+ * and the different days of use in their first month.
  */
 export function InviteeGoal({
   onOpenStep,
@@ -63,12 +65,12 @@ export function InviteeGoal({
     );
   }
 
-  const { steps } = invited;
-  const marker = `${todayDateOnly()}|${units(steps)}`;
+  const { steps, activeDays: days } = invited;
+  const marker = `${todayDateOnly()}|${units(steps, days)}`;
   if (dismissible && hidden === marker) return null;
-  const completed = steps.filter((s) => s.done).length;
-  const goal = steps.reduce((sum, s) => sum + s.goal, 0);
-  const progress = t('app.inviteeGoal.progress', { done: completed, total: steps.length });
+  const completed = [...steps, { done: days.count >= days.goal }].filter((s) => s.done).length;
+  const goal = steps.reduce((sum, s) => sum + s.goal, days.goal);
+  const progress = t('app.inviteeGoal.progress', { done: completed, total: steps.length + 1 });
   const dismiss = () => {
     storage.set(hiddenKey(userId), marker);
     setHidden(marker);
@@ -86,7 +88,11 @@ export function InviteeGoal({
           </button>
         )}
       </div>
-      <p className="section-hint">{t('app.inviteeGoal.hint', { days: data.rewardDays })}</p>
+      <p className="section-hint">
+        {invited.eligible
+          ? t('app.inviteeGoal.hint', { days: data.rewardDays })
+          : t('app.inviteeGoal.notEligible')}
+      </p>
       <p className="section-hint">{progress}</p>
       <div
         className="getting-started-bar"
@@ -95,9 +101,9 @@ export function InviteeGoal({
         aria-valuetext={progress}
         aria-valuemin={0}
         aria-valuemax={goal}
-        aria-valuenow={units(steps)}
+        aria-valuenow={units(steps, days)}
       >
-        <span style={{ width: `${(units(steps) / goal) * 100}%` }} />
+        <span style={{ width: `${(units(steps, days) / goal) * 100}%` }} />
       </div>
       <ul className="getting-started-list">
         {steps.map((step) => (
@@ -114,7 +120,23 @@ export function InviteeGoal({
             )}
           </li>
         ))}
+        <DaysStep days={days} />
       </ul>
     </section>
+  );
+}
+
+/** The different days of use: nothing to press, they come with using the app. */
+function DaysStep({ days }: { days: { count: number; goal: number } }) {
+  const { t } = useI18n();
+  const done = days.count >= days.goal;
+  return (
+    <li className={done ? 'is-done' : undefined}>
+      <span aria-hidden="true">{done ? '✅' : '⬜'}</span>
+      <span className="getting-started-text">
+        {t('app.inviteeGoal.days', days)}
+        {done && <span className="sr-only"> · {t('app.inviteeGoal.stepDone')}</span>}
+      </span>
+    </li>
   );
 }

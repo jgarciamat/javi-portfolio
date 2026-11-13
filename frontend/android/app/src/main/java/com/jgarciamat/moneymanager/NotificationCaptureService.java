@@ -15,6 +15,7 @@ import org.json.JSONObject;
  * Keeps the notifications of the bank and payment apps the person chose, so the app can suggest
  * the payments they contain. It only runs when the person gave access in the system settings and
  * turned the feature on; anything from other apps is ignored, and nothing leaves the phone from here.
+ * What looks like a payment may also bring a notice of the app ({@link CaptureAlerts}).
  */
 public class NotificationCaptureService extends NotificationListenerService {
 
@@ -56,6 +57,12 @@ public class NotificationCaptureService extends NotificationListenerService {
             }
         } catch (JSONException ignored) {
             // A notification that cannot be stored is simply skipped.
+            return;
+        }
+        String full = (title == null ? "" : title.toString()) + ". " + text;
+        if (!CaptureAlerts.looksLikePayment(full)) return;
+        synchronized (LOCK) {
+            CaptureAlerts.onDetected(this, prefs);
         }
     }
 }

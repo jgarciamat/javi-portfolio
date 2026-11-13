@@ -33,6 +33,9 @@ Contadores **diarios y agregados** en la tabla `funnel_daily` (migración 034): 
 | `goal_date_view` | navegador | se ve la fecha de las metas, una vez por apertura (detalle = `real`, `asked` o `done`) | sí |
 | `goal_sim_change` | navegador | primer cambio en «¿Y si apartas más?» de cada apertura (detalle = `chip`, `slider` o `input`) | sí |
 | `goal_dp_apply` | navegador | «Usar lo que vas a dar de baja» | sí |
+| `calc_result` | navegador | primer cambio del formulario en una calculadora abierta sin cuenta, una vez por apertura (detalle = `salary` o `reta`; nunca las cifras) | sí |
+| `calc_cta_click` | navegador | «Crear cuenta» bajo el resultado de una calculadora abierta (detalle = `salary` o `reta`) | sí |
+| `review_request` | navegador | se pide a Google Play la hoja de reseña tras un logro (detalle = `autonomo_draft`, `goal_reached` o `dp_recovered`); Google decide si la muestra y no dice si se valoró | sí |
 
 - **Origen**: el servidor lo normaliza a partir de `utm_source` o, si no hay, del dominio que
   enlaza (`google`, `tiktok`, `youtube`, `x`…); sin nada, `(direct)`; en la app, `(app)`.

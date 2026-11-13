@@ -27,6 +27,7 @@ import { CategoryRulesCard } from '../components/CategoryRulesCard';
 import { CaptureCard } from '../components/CaptureCard';
 import { InboxCard } from '../components/InboxCard';
 import { HouseholdCard } from '../components/HouseholdCard';
+import { RatePrompt } from '../components/RatePrompt';
 import {
   downloadFile,
   useExportCSV,
@@ -458,6 +459,7 @@ export function SettingsView({ onOpenProfile, onStartTour, onStartFullTour }: Se
         onStartFullTour={onStartFullTour}
       />
       <InstallGuideCard />
+      <RatePrompt />
       <AppLockCard />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />

@@ -121,7 +121,9 @@ un abogado.**
     tratamiento del autónomo (art. 28): valorar una cláusula de encargo en las condiciones.
 13. **Condiciones del programa de invitaciones.** Las condiciones de contratación no lo
     mencionan; si se quieren reglas vinculantes (30 días, meses por tramos, límites, abusos),
-    habría que añadirlas a `terms.*` y pedir de nuevo la aceptación. No se han tocado.
+    habría que añadirlas a `terms.*` y pedir de nuevo la aceptación. **Resuelta el 13/11/2026**:
+    sección «11. Programa de invitaciones» en `terms.*` y `TERMS_VERSION` 2026-11-13 (ver
+    `propuesta-textos-tanda1-noviembre.md`).
 14. **Aviso de cambios (s10).** La política promete avisar en la app cuando cambie, pero solo hay
     aviso para las condiciones (`terms.update`). Decidir si se avisa de esta versión.
 

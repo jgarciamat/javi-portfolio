@@ -100,6 +100,7 @@ import { RentaService } from '@application/renta/RentaService';
 import { LearnService } from '@application/learn/LearnService';
 import { PREMIUM_CHAPTERS } from './learn';
 import { SqliteImportUsageRepository } from './sqlite/repositories/SqliteImportUsageRepository';
+import { SqliteCaptureUsageRepository } from './sqlite/repositories/SqliteCaptureUsageRepository';
 import { SqliteAutonomoUsageRepository } from './sqlite/repositories/SqliteAutonomoUsageRepository';
 import { SqliteAutonomoPdfRepository } from './sqlite/repositories/SqliteAutonomoPdfRepository';
 import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
@@ -194,6 +195,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     autonomoDrafts: new SqliteAutonomoUsageRepository(db),
     autonomoPdfs: new SqliteAutonomoPdfRepository(db),
     imports: new SqliteImportUsageRepository(db),
+    captures: new SqliteCaptureUsageRepository(db),
     accounts: tracked('accounts', new SqliteAccountRepository(db)),
     transfers: tracked('transfers', new SqliteTransferRepository(db)),
     transactions: tracked('transactions', new SqliteTransactionRepository(db)),
@@ -341,7 +343,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     categoryRules,
     uow,
     clock,
-    repos.imports
+    repos.imports,
+    repos.captures
   );
   const tax = new TaxService(
     repos.business,
@@ -441,7 +444,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         budgets: firstStepCount(userId, 'budgets'),
         goals: firstStepCount(userId, 'goals'),
         automations: firstStepCount(userId, 'automations'),
-      })
+      }),
+      {
+        accountOf: (userId) => {
+          const user = repos.users.findById(userId)?.toPrimitives();
+          return user ? { email: user.email, createdAt: user.createdAt } : null;
+        },
+        activeDays: (userId, from, to) => repos.transactions.activeDays(userId, from, to),
+      }
     ),
     activation: new ActivationTracker(funnel, firstStepCount),
     creators,
@@ -573,6 +583,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         autonomoPdfs: repos.autonomoPdfs.count(userId),
         assets: repos.assets.listByUser(userId).length,
         imports: repos.imports.count(userId),
+        captures: importer.capturesThisMonth(userId),
         movements: repos.transactions.count(userId),
       }),
       (userId) => tax.draftQuarters(userId),

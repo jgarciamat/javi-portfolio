@@ -62,12 +62,20 @@ export function TeaserOutline({ title, items }: { title: string; items: string[]
 export function SignupWall({
   kicker,
   variant = 'wall',
+  title,
+  lead,
   onRegister,
+  onLogin,
 }: {
   kicker?: string;
   variant?: 'wall' | 'cta' | 'soft';
+  /** The page's own heading and text in place of the variant's (open calculators). */
+  title?: string;
+  lead?: string;
   /** Called when «Crear cuenta» is clicked (to count it anonymously). */
   onRegister?: () => void;
+  /** Called when «Ya tengo cuenta» is clicked. */
+  onLogin?: () => void;
 }) {
   const { t } = useI18n();
   const { pathname } = useLocation();
@@ -93,10 +101,10 @@ export function SignupWall({
       )}
       {kicker && <p className="signup-wall-kicker">{kicker}</p>}
       <h2 id="signup-wall-title" className="signup-wall-title">
-        {t(soft ? 'wall.soft.title' : 'wall.title')}
+        {title ?? t(soft ? 'wall.soft.title' : 'wall.title')}
       </h2>
       <p className="signup-wall-lead">
-        {t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')}
+        {lead ?? t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')}
       </p>
       <div className="signup-wall-actions">
         <Link
@@ -109,6 +117,7 @@ export function SignupWall({
         <Link
           className="btn-secondary signup-wall-login"
           to={back ? loginHref(pathname) : '/login'}
+          onClick={onLogin}
         >
           {t('wall.login')}
         </Link>

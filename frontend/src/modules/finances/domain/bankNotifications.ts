@@ -10,6 +10,15 @@ export const CAPTURE_PACKAGES = [
   'com.paypal.android.p2pmobile',
 ];
 
+/**
+ * Wallets that also notify a card payment the bank notifies: paying with Google Pay and a BBVA
+ * card brings one notification from each app. The bank's one wins (it names the shop).
+ */
+const WALLET_PACKAGES = new Set(['com.google.android.apps.walletnfcrel']);
+
+/** Two notifications of the same amount from different apps closer than this are one payment. */
+export const SAME_PAYMENT_MS = 10 * 60 * 1000;
+
 export interface DetectedPayment {
   /** Stable id of the notification, to avoid adding it twice. */
   id: string;
@@ -19,6 +28,9 @@ export interface DetectedPayment {
   type: 'EXPENSE' | 'INCOME';
   /** YYYY-MM-DD. */
   date: string;
+  /** When the notification arrived (ms) and the app that posted it (older saved ones lack them). */
+  postedAt?: number;
+  app?: string;
 }
 
 const AMOUNT =
@@ -30,6 +42,9 @@ const WITH_CURRENCY = new RegExp(
 
 const NOT_A_PAYMENT =
   /\b(saldo|codigo|clave|verificacion|contrasena|pin|otp|oferta|promocion|limite)\b/;
+/** Payments that did not happen (refused, cancelled) or not yet (a hold on the card). */
+const NOT_DONE =
+  /\b(denegad[ao]s?|rechazad[ao]s?|anulad[ao]s?|cancelad[ao]s?|no autorizad[ao]s?|no se ha podido|no se pudo|pre-?autorizacion(es)?|pre-?autorizad[ao]s?|retencion(es)?|retenid[ao]s?|declined|rejected|cancell?ed|pre-?authori[sz]ation|on hold)\b/;
 const INCOME_WORDS =
   /\b(has recibido|recibido|ingreso|abono|abonado|nomina|devolucion|reembolso|received|deposit)\b/;
 const EXPENSE_WORDS =
@@ -98,11 +113,12 @@ function describe(
 export function parseBankNotification(
   title: string,
   text: string,
-  postedAt: number
+  postedAt: number,
+  app?: string
 ): DetectedPayment | null {
   const full = `${title}. ${text}`;
   const plain = strip(full);
-  if (NOT_A_PAYMENT.test(plain)) return null;
+  if (NOT_A_PAYMENT.test(plain) || NOT_DONE.test(plain)) return null;
   const found = WITH_CURRENCY.exec(full);
   if (!found) return null;
   const amount = toNumber(found[1] ?? found[2]);
@@ -119,5 +135,23 @@ export function parseBankNotification(
     amount,
     type,
     date: `${when.getFullYear()}-${pad(when.getMonth() + 1)}-${pad(when.getDate())}`,
+    postedAt,
+    ...(app && { app }),
   };
 }
+
+/**
+ * The same payment told by two apps (Google Wallet and the bank): same amount and type, from
+ * different apps, less than 10 minutes apart. Two equal payments in the same app are two payments.
+ */
+export function samePayment(a: DetectedPayment, b: DetectedPayment): boolean {
+  if (!a.app || !b.app || a.app === b.app || a.postedAt === undefined) return false;
+  if (b.postedAt === undefined || a.type !== b.type || a.amount !== b.amount) return false;
+  return Math.abs(a.postedAt - b.postedAt) < SAME_PAYMENT_MS;
+}
+
+/** Of two notifications of the same payment, the one to keep: the bank's (it names the shop). */
+export const betterOf = (kept: DetectedPayment, other: DetectedPayment): DetectedPayment =>
+  WALLET_PACKAGES.has(kept.app as string) && !WALLET_PACKAGES.has(other.app as string)
+    ? other
+    : kept;
